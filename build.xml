@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="GETobjects" default="makejars" basedir=".">
+
+  <!-- give user a chance to override any of the following settings
+         NOTE: any properties defined in one of these files will prevent
+               the defaults provided below from being set - this means
+               they will be effectively overriden!
+  -->
+  <property file=".ant.properties"/>
+  <property file="${user.home}/.ant.properties"/>
+
+  <!-- DEFAULTS -->
+  <property name="src"       location="." />
+  <property name="libs"      location="ThirdParty" />
+  <property name="bin"       location="ant-obj" />
+  <property name="bin.core"  value="${bin}/core" />
+  <property name="bin.jetty" value="${bin}/jetty" />
+  <property name="jardir"    value="${bin}/lib" />
+
+  <!-- include the version file NOW -->
+  <property file="version.properties" />
+
+  <!-- NOTE: This is the default version name for each release build.
+             If you need to override it, i.e. if you want to refer to a
+             specific trunk snapshot including a particular subversion revision
+             or timestamp, you can do this before this statement.
+  -->
+  <property name="version.name"
+            value="${version.major}.${version.minor}.${version.subminor}" />
+
+  <!-- products -->
+  <property name="jarfile.getobjects"
+            value="${jardir}/getobjects-${version.name}.jar"
+  />
+  <property name="jarfile.jetty"
+            value="${jardir}/jettyrunner-${version.name}.jar"
+  />
+  <property name="jarfile.getobjects.eof"
+            value="${jardir}/getobjects-eof-${version.name}.jar"
+  />
+  <property name="jarfile.getobjects.fat"
+            value="${jardir}/getobjects-fat-${version.name}.jar"
+  />
+
+  <!-- global compile options -->
+  <property name="compile.debug"     value="off" />
+  <property name="compile.listfiles" value="false" />
+  <property name="compile.source"    value="1.4" />
+  <property name="compile.target"    value="1.2" />
+
+  <!--
+  <property name="build.compiler"
+      value="org.eclipse.jdt.core.JDTCompilerAdaptor" />
+  -->
+
+  <!-- All the parts of the project...
+       We want to package everything excluding the unit tests,
+       thus we need to define the parts of the project with
+       several exclude rules
+  -->
+
+  <!-- EOF -->
+  <patternset id="foundation">
+    <include name="org/getobjects/foundation/**/*.java" />
+    <exclude name="org/getobjects/foundation/tests/" />
+  </patternset>
+  <patternset id="eoaccess">
+    <include name="org/getobjects/eoaccess/**/*.java" />
+    <exclude name="org/getobjects/eoaccess/tests/" />
+  </patternset>
+  <patternset id="eocontrol">
+    <include name="org/getobjects/eocontrol/**/*.java" />
+    <exclude name="org/getobjects/eocontrol/tests/" />
+  </patternset>
+  <patternset id="eogenerator">
+    <include name="org/getobjects/eogenerator/**/*.java" />
+    <exclude name="org/getobjects/eogenerator/tests/" />
+  </patternset>
+
+  <!-- Core -->
+  <patternset id="appserver">
+    <include name="org/getobjects/appserver/**/*.java" />
+    <exclude name="org/getobjects/appserver/tests/" />
+  </patternset>
+  <patternset id="jaas">
+    <include name="org/getobjects/jaas/**/*.java" />
+  </patternset>
+  <patternset id="jmi">
+    <include name="org/getobjects/jmi/**/*.java" />
+  </patternset>
+  <patternset id="jsapp">
+    <include name="org/getobjects/jsapp/**/*.java" />
+  </patternset>
+  <patternset id="ognl">
+    <include name="org/getobjects/ognl/**/*.java" />
+  </patternset>
+  <patternset id="ofs">
+    <include name="org/getobjects/ofs/**/*.java" />
+  </patternset>
+  <patternset id="rules">
+    <include name="org/getobjects/rules/**/*.java" />
+    <exclude name="org/getobjects/rules/tests/" />
+  </patternset>
+
+  <!-- Extensions -->
+  <patternset id="weextensions">
+    <include name="org/getobjects/weextensions/**/*.java" />
+    <exclude name="org/getobjects/weextensions/tests/" />
+  </patternset>
+  <patternset id="weprototype">
+    <include name="org/getobjects/weprototype/**.java" />
+    <exclude name="org/getobjects/weprototype/tests/" />
+  </patternset>
+  <patternset id="woextensions">
+    <include name="org/getobjects/woextensions/**/*.java" />
+    <exclude name="org/getobjects/woextensions/tests/" />
+  </patternset>
+
+  <!-- Adaptors -->
+  <patternset id="jetty">
+    <include name="org/getobjects/jetty/**/*.java" />
+    <exclude name="org/getobjects/jetty/tests/" />
+  </patternset>
+  <patternset id="servlets">
+    <include name="org/getobjects/servlets/**/*.java" />
+    <exclude name="org/getobjects/servlets/tests/"  />
+  </patternset>
+
+  <!-- Samples -->
+  <patternset id="samples">
+    <include name="org/getobjects/samples/**/*.java" />
+  </patternset>
+
+  <!-- Resources -->
+  <patternset id="getobjects.resources">
+    <include name="**/*.properties" />
+    <include name="**/*.txt" />
+    <include name="**/*.plist" />
+
+    <!-- templates -->
+    <include name="**/*.html" />
+    <include name="**/*.wod"  />
+    <include name="**/*.wox"  />
+
+    <!-- scripts -->
+    <include name="**/*.js" />
+
+    <!-- exclude samples -->
+
+    <!-- don't copy from products or the www directory -->
+    <exclude name="${bin}/**" />
+    <exclude name="www/**" />
+    <exclude name="bin/**" />
+
+    <!-- do not include sample apps -->
+    <exclude name="org/getobjects/samples/**" />
+
+    <!-- eclipse product directory -->
+    <!-- special files we don't want to put in the package -->
+    <exclude name="log4j.properties" />
+    <exclude name="version.properties" />
+
+    <!-- JMI and OFS -->
+    <include name="org/getobjects/jmi/www/*.gif" />
+    <include name="org/getobjects/jmi/www/*.css" />
+    <include name="org/getobjects/jmi/www/*.js" />
+    <include name="org/getobjects/jmi/*.html" />
+    <include name="org/getobjects/jmi/product.plist" />
+
+    <!-- JSApp -->
+    <!--
+    <include name="org/getobjects/jsapp/www/product.plist" />
+  -->
+  </patternset>
+
+  <patternset id="samples.resources">
+    <include name="org/getobjects/samples/**/jopelink.txt" />
+    <include name="org/getobjects/samples/**/*.plist" />
+    <include name="org/getobjects/samples/**/*.html" />
+    <include name="org/getobjects/samples/**/*.wod" />
+    <include name="org/getobjects/samples/**/*.wox" />
+    <include name="org/getobjects/samples/**/*.properties" />
+  </patternset>
+
+  <!-- stripping included jars -->
+  <patternset id="strip.manifest">
+    <exclude name="META-INF/**/*" />
+  </patternset>
+
+  <!-- Setup classpath necessary for building -->
+  <path id="build.classpath">
+    <pathelement path="${classpath}" />
+    <!-- third party libs ... required for building und running -->
+    <fileset dir="${libs}">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <!-- clean bin and lib ... this should probably be split? -->
+  <target name="clean.all">
+    <delete dir="${bin.core}" />
+    <mkdir  dir="${bin.core}" />
+    <delete dir="${jardir}"   />
+    <mkdir  dir="${jardir}"   />
+  </target>
+
+  <target name="clean.jetty">
+    <delete dir="${bin.jetty}" />
+    <mkdir  dir="${bin.jetty}" />
+  </target>
+
+
+  <!-- no need to clean up before! -->
+  <target name="compile.eof">
+    <javac srcdir="${src}"
+           destdir="${bin.core}"
+           debug="${compile.debug}"
+           listfiles="${compile.listfiles}"
+    >
+      <classpath  refid="build.classpath" />
+
+      <patternset refid="foundation"  />
+      <patternset refid="eoaccess"    />
+      <patternset refid="eocontrol"   />
+      <patternset refid="eogenerator" />
+    </javac>
+  </target>
+
+  <target name="compile.core" depends="compile.eof">
+    <!-- compile it -->
+    <javac srcdir="${src}"
+           destdir="${bin.core}"
+           debug="${compile.debug}"
+           listfiles="${compile.listfiles}"
+    >
+      <classpath  refid="build.classpath" />
+
+      <patternset refid="appserver"    />
+      <patternset refid="jaas"         />
+      <patternset refid="jmi"          />
+      <patternset refid="jsapp"        />
+      <patternset refid="ofs"          />
+      <patternset refid="ognl"         />
+      <patternset refid="rules"        />
+      <patternset refid="weextensions" />
+      <patternset refid="weprototype"  />
+      <patternset refid="woextensions" />
+    </javac>
+
+    <!-- copy resources -->
+    <copy todir="${bin.core}">
+      <fileset dir="${src}">
+        <patternset refid="getobjects.resources" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile.jetty" depends="compile.core">
+    <javac srcdir="${src}"
+           destdir="${bin.jetty}"
+           debug="${compile.debug}"
+           listfiles="${compile.listfiles}"
+    >
+      <classpath refid="build.classpath" />
+      <patternset refid="jetty" />
+    </javac>
+  </target>
+
+  <target name="compile.servlets" depends="compile.core">
+    <javac srcdir="${src}"
+           destdir="${bin.core}"
+           debug="${compile.debug}"
+           listfiles="${compile.listfiles}"
+    >
+      <classpath refid="build.classpath" />
+      <patternset refid="servlets" />
+    </javac>
+  </target>
+
+  <target name="compile.samples" depends="compile.core">
+    <javac srcdir="${src}"
+           destdir="${bin.core}"
+           debug="${compile.debug}"
+           listfiles="${compile.listfiles}"
+    >
+      <classpath refid="build.classpath" />
+      <patternset refid="samples" />
+    </javac>
+
+    <!-- copy resources -->
+    <copy todir="${bin.core}">
+      <fileset dir="${src}">
+        <patternset refid="samples.resources" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="makejars" depends="makejar.getobjects, makejar.jetty" />
+
+  <!-- we clean stuff in advance in order to guarantee that no artifacts
+       (if any) are being packaged in this release
+  -->
+  <target name="makejar.getobjects" depends="clean.all, compile.servlets">
+    <jar destfile="${jarfile.getobjects}"
+         basedir="${bin.core}"
+         index="true"
+         compress="true"
+    >
+      <!-- copy readmes -->
+      <fileset file="${src}/COPYING" />
+      <fileset file="${src}/COPYRIGHT" />
+      <fileset file="${src}/NOTES.txt" />
+      <manifest>
+        <section name="org/getobjects">
+          <attribute name="Specification-Title"    value="GETobjects" />
+          <attribute name="Specification-Version"  value="${version.major}.${version.minor}" />
+          <attribute name="Specification-Vendor"   value="GETobjects.org" />
+          <attribute name="Implementation-Title"   value="org.getobjects" />
+          <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.subminor}" />
+          <attribute name="Implementation-Vendor"  value="GETobjects.org" />
+        </section>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="makejar.jetty" depends="clean.jetty, compile.jetty">
+    <jar destfile="${jarfile.jetty}"
+         basedir="${bin.jetty}"
+         index="true"
+         compress="true"
+    >
+      <manifest>
+        <section name="org/getobjects/jetty">
+          <attribute name="Specification-Title"    value="WOJettyRunner" />
+          <attribute name="Specification-Version"  value="${version.major}.${version.minor}" />
+          <attribute name="Specification-Vendor"   value="GETobjects.org" />
+          <attribute name="Implementation-Title"   value="org.getobjects.jetty.WOJettyRunner" />
+          <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.subminor}" />
+          <attribute name="Implementation-Vendor"  value="GETobjects.org" />
+        </section>
+      </manifest>
+    </jar>
+  </target>
+
+
+  <!-- This target - which is not enabled by default (!) - creates a
+       getobjects-eof-x.x.x.jar which contains only the EOF (database
+       abstraction) part of GETobjects. It doesn't include any required third
+       party libraries!
+  -->
+  <target name="makejar.getobjects.eof" depends="clean.all, compile.eof">
+    <jar destfile="${jarfile.getobjects.eof}"
+         basedir="${bin.core}"
+         index="true"
+         compress="true"
+    >
+      <!-- copy readmes -->
+      <fileset file="${src}/COPYING" />
+      <fileset file="${src}/COPYRIGHT" />
+      <fileset file="${src}/NOTES.txt" />
+      <manifest>
+        <section name="org/getobjects">
+          <attribute name="Specification-Title"    value="GETobjects-EOF" />
+          <attribute name="Specification-Version"  value="${version.major}.${version.minor}" />
+          <attribute name="Specification-Vendor"   value="GETobjects.org" />
+          <attribute name="Implementation-Title"   value="org.getobjects" />
+          <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.subminor}" />
+          <attribute name="Implementation-Vendor"  value="GETobjects.org" />
+        </section>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- This target - which is not enabled by default (!) - creates a
+       getobjects-fat-x.x.x.jar which contains all dependencies by default.
+       As such, it's rather huge and only suited for situations when
+       you need to get something up and running quickly.
+       In your own projects you might want to custom tailor this jar
+       further by i.e. stripping other unnecessary classes or adding
+       a concrete logging framework like apache-log4j.
+  -->
+  <target name="makejar.getobjects.fat" depends="clean.all, compile.servlets, clean.jetty, compile.jetty">
+    <!-- first, create a jar comprised of jetty-runner and third party
+         libs... don't compress it, yet
+    -->
+    <jar destfile="${jarfile.getobjects.fat}"
+         basedir="${bin.jetty}"
+         index="false"
+         compress="false"
+         update="false"
+    >
+      <!-- logging -->
+      <zipfileset src="${libs}/commons-logging-1.1.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/javax.servlet.jar">
+        <patternset refid="strip.manifest" />
+        <!-- strip JSP garbage -->
+        <exclude name="javax/servlet/jsp/**/*.*" />
+      </zipfileset>
+      <!-- Scripting -->
+      <zipfileset src="${libs}/ognl-2.6.9.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/js-1.6r7.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <!-- WOFileUpload -->
+      <zipfileset src="${libs}/commons-fileupload-1.2.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/commons-codec-1.3.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/commons-io-1.3.2.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <!-- Extras (PDF generation and charts) -->
+      <zipfileset src="${libs}/iText-2.0.7.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/jfreechart-1.0.9.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/jcommon-1.0.12.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <!-- Jetty -->
+      <zipfileset src="${libs}/jetty-6.1.7.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/jetty-util-6.1.7.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <!-- Database adaptors
+           It's rather debatable whether this really belongs here,
+           but I'll include it for completeness's sake
+      -->
+      <zipfileset src="${libs}/derby-10.2.2.0.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/mysql-connector-java-3.1.13-bin.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/postgresql-8.2-506.jdbc3.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+
+      <!-- copy license readmes -->
+      <fileset file="${libs}/Apache-LICENSE.txt" />
+      <fileset file="${libs}/derby-LICENSE.txt" />
+      <fileset file="${libs}/iText-MPL-1.1.txt" />
+      <fileset file="${libs}/jcommon-license.txt" />
+      <fileset file="${libs}/jfreechart-license.txt" />
+      <fileset file="${libs}/js-mozlicense.txt" />
+      <fileset file="${libs}/ognl-license.txt" />
+    </jar>
+    <!-- now, update this jar with contents of ${bin.core} and finally
+         compress it!
+    -->
+    <jar destfile="${jarfile.getobjects.fat}"
+         basedir="${bin.core}"
+         index="true"
+         update="true"
+         compress="true"
+    >
+      <!-- copy readmes -->
+      <fileset file="${src}/COPYING" />
+      <fileset file="${src}/COPYRIGHT" />
+      <fileset file="${src}/NOTES.txt" />
+      <manifest>
+        <section name="org/getobjects">
+          <attribute name="Specification-Title"    value="GETobjects" />
+          <attribute name="Specification-Version"  value="${version.major}.${version.minor}" />
+          <attribute name="Specification-Vendor"   value="GETobjects.org" />
+          <attribute name="Implementation-Title"   value="org.getobjects" />
+          <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.subminor}" />
+          <attribute name="Implementation-Vendor"  value="GETobjects.org" />
+        </section>
+      </manifest>
+    </jar>
+  </target>
+
+</project>
