@@ -7,7 +7,7 @@
 
   classes = {
   
-    org.opengroupware.jope.jsapp.JSComponentWrapper = {
+    org.getobjects.jsapp.JSComponentWrapper = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
       

@@ -1,5 +1,5 @@
-JOPE JavaScript Applications
-============================
+Go JavaScript Applications
+==========================
 
 OK, so this kinda works now. This package lets you write JOPE applications in
 JavaScript, w/o the need to compile any Java code. To do so, it uses the Rhino
@@ -37,7 +37,7 @@ Running an App
 
 To run the JS application you should use the 'run' class from the jsapp package:
 
-  java org.opengroupware.jope.jsapp.run AppName/
+  java org.getobjects.jsapp.run AppName/
 
 Also check the run.sh, it contains a template of a shell script to run the app.
 Be sure to include all necessary JARs in the classpath, eg js.jar, the Rhino
@@ -96,7 +96,7 @@ in KVC eval this will show up as:
 
 Remember that you need to import packages. Its reasonably easy:
 
-  importPackage(org.opengroupware.jope.foundation);
+  importPackage(org.getobjects.foundation);
 
 * 3) OGNL Interop (aka no OGNL on JavaScript components)
 

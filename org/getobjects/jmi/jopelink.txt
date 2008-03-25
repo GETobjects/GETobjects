@@ -1,2 +1,2 @@
-org.opengroupware.jope.ext.dtree
-org.opengroupware.jope.weprototype
+org.getobjects.ext.dtree
+org.getobjects.weprototype

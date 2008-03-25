@@ -32,7 +32,7 @@ import org.junit.Test;
 
 public class TWOString extends WOElementTest {
   
-  static String elemName = "org.opengroupware.jope.appserver.elements.WOString";
+  static String elemName = "org.getobjects.appserver.elements.WOString";
 
   static String hello     = "hello world";
   static String helloHTML = "hello <b>world</b>";

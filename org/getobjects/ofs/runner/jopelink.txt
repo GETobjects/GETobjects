@@ -1,3 +1,3 @@
-org.opengroupware.jope.appserver.core
-org.opengroupware.jope.ofs
-org.opengroupware.jope.jmi
+org.getobjects.appserver.core
+org.getobjects.ofs
+org.getobjects.jmi

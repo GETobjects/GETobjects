@@ -192,7 +192,7 @@ public class WOComponentDefinition extends NSObject
   /* loading */
   
   protected static final String builderPkgName =
-    "org.opengroupware.jope.appserver.templates";
+    "org.getobjects.appserver.templates";
   
   /**
    * Load the template using a TemplateBuilder. This is called by

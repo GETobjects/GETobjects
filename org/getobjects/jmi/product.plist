@@ -6,11 +6,11 @@
   };
   
   classes = {
-    org.opengroupware.jope.jmi.JMIManageAddProduct = {
+    org.getobjects.jmi.JMIManageAddProduct = {
       protectedBy   = "View Management Screens";
       defaultAccess = "allow";
     };
-    org.opengroupware.jope.jmi.JMIManageAddProduct$FactoryLookup = {
+    org.getobjects.jmi.JMIManageAddProduct$FactoryLookup = {
       protectedBy   = "View Management Screens";
       defaultAccess = "allow";
     };
@@ -19,7 +19,7 @@
   categories = {
   
   	/* we attempt to manage everything ;-) */
-    org.opengroupware.jope.foundation.NSObject = {
+    org.getobjects.foundation.NSObject = {
       defaultRoles = {
         "WebDAV Access"           		    = "Authenticated";
         "Access Contents Information"     = "Authenticated";
@@ -55,7 +55,7 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSBaseObject = {
+    org.getobjects.ofs.OFSBaseObject = {
       slots = {
 				"-manage_options" = {
           protectedBy = "View Management Screens";
@@ -69,7 +69,7 @@
 				"-manage_addProduct" = {
           protectedBy = "View Management Screens";
 				  valueClass = /* this instantiates the factory, its no the JoObject */
-				  	"org.opengroupware.jope.jmi.JMIManageAddProductFactory";
+				  	"org.getobjects.jmi.JMIManageAddProductFactory";
 				};
 				
 				"-manage_addChildren" = {
@@ -87,7 +87,7 @@
     };
     
     /*
-    org.opengroupware.jope.ofs.OFSFile = {
+    org.getobjects.ofs.OFSFile = {
       methods = {
         "-manage_workspace" = {
           protectedBy = "View Management Screens";
@@ -102,7 +102,7 @@
     };
     */
     
-    org.opengroupware.jope.ofs.OFSPlainTextFile = {
+    org.getobjects.ofs.OFSPlainTextFile = {
       methods = {
         "-manage_workspace" = {
           protectedBy = "View Management Screens";
@@ -116,7 +116,7 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSFolder = {
+    org.getobjects.ofs.OFSFolder = {
       slots = {
 				"-manage_addChildren" = {
           protectedBy = "View Management Screens";
@@ -186,7 +186,7 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSImageFile = {
+    org.getobjects.ofs.OFSImageFile = {
       methods = {
         "-manage_workspace" = {
           protectedBy = "View Management Screens";
@@ -195,7 +195,7 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSSelect = {
+    org.getobjects.ofs.OFSSelect = {
       slots = {
 				"-manage_options" = {
           protectedBy = "View Management Screens";

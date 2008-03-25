@@ -30,9 +30,9 @@ import org.junit.Test;
 public class TWOGenericElement extends WOElementTest {
 
   static String elemName = 
-    "org.opengroupware.jope.appserver.elements.WOGenericElement";
+    "org.getobjects.appserver.elements.WOGenericElement";
   static String containerName = 
-    "org.opengroupware.jope.appserver.elements.WOGenericContainer";
+    "org.getobjects.appserver.elements.WOGenericContainer";
   
   static String hrRendering   = "<hr border=\"1\" />";
   static String fontRendering = "<font color=\"green\" />";

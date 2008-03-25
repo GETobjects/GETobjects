@@ -12,12 +12,12 @@
   <!-- Global servlet parameters for this area -->
   <context-param>
     <param-name>WOAppName</param-name>
-    <param-value>org.opengroupware.jope.samples.HelloWorld.HelloWorld</param-value>
+    <param-value>org.getobjects.samples.HelloWorld.HelloWorld</param-value>
   </context-param>
 
   <servlet>
     <servlet-name>HelloWorld</servlet-name>
-    <servlet-class>org.opengroupware.jope.servlets.WOServletAdaptor</servlet-class>
+    <servlet-class>org.getobjects.servlets.WOServletAdaptor</servlet-class>
   </servlet>
 
   <servlet-mapping>
