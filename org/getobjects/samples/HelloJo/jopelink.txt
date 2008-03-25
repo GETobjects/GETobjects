@@ -1,5 +1,5 @@
-org.opengroupware.jope.woextensions
-org.opengroupware.jope.weextensions
-org.opengroupware.jope.weprototype
+org.getobjects.woextensions
+org.getobjects.weextensions
+org.getobjects.weprototype
 
-org.opengroupware.jope.appserver.core
+org.getobjects.appserver.core

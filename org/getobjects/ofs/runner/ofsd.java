@@ -93,11 +93,11 @@ public class ofsd extends OFSApplication {
     if (false) {
       servlet_handler = new ServletHandler();
       servlet_handler.addServletWithMapping
-        ("org.opengroupware.jope.servlets.WOServletAdaptor",
+        ("org.getobjects.servlets.WOServletAdaptor",
          "/*" /* Path Spec */);
     }
     
-    root.addServlet("org.opengroupware.jope.servlets.WOServletAdaptor",
+    root.addServlet("org.getobjects.servlets.WOServletAdaptor",
                     "/*" /* Path Spec */);
     log.info("mapped application to URL: /");
     

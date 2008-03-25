@@ -1,5 +1,5 @@
-org.opengroupware.jope.woextensions
-org.opengroupware.jope.weextensions
-org.opengroupware.jope.weprototype
-org.opengroupware.jope.ext.tinymce
-org.opengroupware.jope.ext.dtree
+org.getobjects.woextensions
+org.getobjects.weextensions
+org.getobjects.weprototype
+org.getobjects.ext.tinymce
+org.getobjects.ext.dtree

@@ -12,12 +12,12 @@
   };
   
   classes = {
-    org.opengroupware.jope.samples.HelloJo.LanguageSelector = {
+    org.getobjects.samples.HelloJo.LanguageSelector = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
     };
     
-    org.opengroupware.jope.samples.HelloJo.PoJo = {
+    org.getobjects.samples.HelloJo.PoJo = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
 

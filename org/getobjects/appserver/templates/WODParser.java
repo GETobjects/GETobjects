@@ -50,7 +50,7 @@ public class WODParser extends NSPropertyListParser {
     //      whether the class is available (how?)
     ClassLoader loader = WODParser.class.getClassLoader();
     try {
-      Class clazz = loader.loadClass("org.opengroupware.jope.ognl.WOFramework");
+      Class clazz = loader.loadClass("org.getobjects.ognl.WOFramework");
       Method m = clazz.getMethod("setup", new Class[0]);
       
       m.invoke(clazz, new Object[0]);

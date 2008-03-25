@@ -1,13 +1,13 @@
 /*
  * Copyright (C) 2007-2008 Helge Hess
  *
- * This file is part of JOPE.
+ * This file is part of GETobjects (Go).
  *
- * JOPE is free software; you can redistribute it and/or modify it under the
+ * Go is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2, or (at your option) any later version.
  *
- * JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+ * Go is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
@@ -25,7 +25,7 @@ import org.getobjects.jetty.WOJettyRunner;
 /**
  * The runner class which starts Jetty for a JavaScript JOPE application. Call
  * it on a MyApp.woa directory, eg:<pre>
- *   java org.opengroupware.jope.jsapp.run MyApp.woa
+ *   java org.getobjects.jsapp.run MyApp.woa
  * </pre>
  */
 public class run extends WOJettyRunner {

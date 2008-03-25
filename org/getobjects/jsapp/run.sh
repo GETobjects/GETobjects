@@ -1,9 +1,9 @@
 #!/bin/sh
 
-JARDIR="$HOME/dev/eclipse/JOPE/ThirdParty"
-JOPEPATH="$HOME/dev/eclipse/JOPE/bin"
+JARDIR="$HOME/dev/eclipse-go/GETobjects/ThirdParty"
+GOPATH="$HOME/dev/eclipse-go/GETobjects/bin"
 
-RUNNER="org.opengroupware.jope.jsapp.run"
+RUNNER="org.getobjects.jsapp.run"
 WOPORT=5859
 
 # ThirdParty dependencies
@@ -18,7 +18,7 @@ CLASSPATH="`ls ${JARDIR}/ognl-2.6.*.jar`:${CLASSPATH}"
 CLASSPATH="`ls ${JARDIR}/js*.jar`:${CLASSPATH}"
 
 # JOPE
-CLASSPATH="${JOPEPATH}:${CLASSPATH}"
+CLASSPATH="${GOPATH}:${CLASSPATH}"
 
 echo "CLASSPATH: ${CLASSPATH}"
 

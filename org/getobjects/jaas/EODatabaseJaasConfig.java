@@ -1,14 +1,14 @@
 /*
   Copyright (C) 2008 Helge Hess
 
-  This file is part of OpenGroupware.org (OGo)
+  This file is part of GETobjects (Go)
 
-  OGo is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  OGo is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
   License for more details.
@@ -34,7 +34,7 @@ import org.getobjects.eoaccess.EODatabase;
  * method like:<pre>
  *   public IJoAuthenticator authenticatorInContext(IJoContext _ctx) {
  *     return new JoHTTPAuthenticator("Hello World",
- *       new EODatabaseJaasConfig(this, "org.opengroupware.jope.MyAuthModule"));
+ *       new EODatabaseJaasConfig(this, "org.getobjects.MyAuthModule"));
  *   }</pre>
  * The module will receive the EODatabase object in the 'database' options
  * key.

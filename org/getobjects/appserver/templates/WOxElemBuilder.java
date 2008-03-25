@@ -248,17 +248,17 @@ public abstract class WOxElemBuilder extends NSObject {
       org.getobjects.appserver.associations.WOValueAssociation.class);
     /*
     nsToAssocClass.put(XMLNamespaces.XMLNS_OD_EVALJS,
-      org.opengroupware.jope.appserver.WOScriptAssociation.class);
+      org.getobjects.appserver.WOScriptAssociation.class);
     nsToAssocClass.put("http://www.skyrix.com/od/so-lookup",
-      org.opengroupware.jope.appserver.SoLookupAssociation.class);
+      org.getobjects.appserver.SoLookupAssociation.class);
     nsToAssocClass.put("OGo:script",
-      org.opengroupware.jope.appserver.WOScriptAssociation.class);
+      org.getobjects.appserver.WOScriptAssociation.class);
     nsToAssocClass.put("OGo:url",
-      org.opengroupware.jope.appserver.WOResourceURLAssociation.class);
+      org.getobjects.appserver.WOResourceURLAssociation.class);
     nsToAssocClass.put("OGo:label",
-      org.opengroupware.jope.appserver.WOLabelAssociation.class);
+      org.getobjects.appserver.WOLabelAssociation.class);
     nsToAssocClass.put("OGo:path",
-      org.opengroupware.jope.appserver.SoLookupAssociation.class);
+      org.getobjects.appserver.SoLookupAssociation.class);
       */
   }
 }

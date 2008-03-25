@@ -3,13 +3,13 @@
   };
   
   renderers = {
-    org.opengroupware.jope.ofs.OFSResourceFileRenderer = {
+    org.getobjects.ofs.OFSResourceFileRenderer = {
     };
   };
 
   classes = {
   
-    org.opengroupware.jope.ofs.OFSBaseObject = {
+    org.getobjects.ofs.OFSBaseObject = {
       protectedBy   = "View";
       defaultAccess = "allow";
       
@@ -26,8 +26,8 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSFolder = {
-      superclass = "org.opengroupware.jope.ofs.OFSBaseObject";
+    org.getobjects.ofs.OFSFolder = {
+      superclass = "org.getobjects.ofs.OFSBaseObject";
     
       slots = {
       };
@@ -36,8 +36,8 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSComponentWrapper = {
-      superclass = "org.opengroupware.jope.ofs.OFSFolder";
+    org.getobjects.ofs.OFSComponentWrapper = {
+      superclass = "org.getobjects.ofs.OFSFolder";
     
       slots = {
       };
@@ -45,8 +45,8 @@
       methods = {
       };
     };
-    org.opengroupware.jope.ofs.OFSComponentFile = {
-      superclass = "org.opengroupware.jope.ofs.OFSBaseObject";
+    org.getobjects.ofs.OFSComponentFile = {
+      superclass = "org.getobjects.ofs.OFSBaseObject";
     
       slots = {
       };
@@ -55,8 +55,8 @@
       };
     };
     
-    org.opengroupware.jope.ofs.OFSApplication = {
-      superclass = "org.opengroupware.jope.appserver.core.WOApplication";
+    org.getobjects.ofs.OFSApplication = {
+      superclass = "org.getobjects.appserver.core.WOApplication";
     };
     
   };

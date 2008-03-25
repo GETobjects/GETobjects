@@ -1,10 +1,10 @@
 #!/bin/sh
 
-JARDIR="$HOME/dev/eclipse/JOPE/ThirdParty"
-JOPEPATH="$HOME/dev/eclipse/JOPE/bin"
-OGOPATH="$HOME/dev/eclipse/OGoCore/bin"
+JARDIR="$HOME/dev/eclipse-go/JOPE/ThirdParty"
+GOPATH="$HOME/dev/eclipse-go/JOPE/bin"
+OGOPATH="$HOME/dev/eclipse-go/OGoCore/bin"
 
-RUNNER="org.opengroupware.jope.jsapp.run"
+RUNNER="org.getobjects.jsapp.run"
 WOPORT=5859
 
 # ThirdParty dependencies
@@ -27,7 +27,7 @@ CLASSPATH="`ls ${JARDIR}/jcommon-1.0*.jar`:${CLASSPATH}"
 CLASSPATH="`ls ${JARDIR}/iText-2.0*.jar`:${CLASSPATH}"
 
 # JOPE
-CLASSPATH="${JOPEPATH}:${OGOPATH}:${CLASSPATH}"
+CLASSPATH="${GOPATH}:${OGOPATH}:${CLASSPATH}"
 
 #echo "CLASSPATH: ${CLASSPATH}"
 

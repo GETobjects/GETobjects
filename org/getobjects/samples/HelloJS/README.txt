@@ -1,7 +1,7 @@
 WORK IN PROGRESS, do not use
 
 Runner class:
-  org.opengroupware.jope.jsapp.run
+  org.getobjects.jsapp.run
 
 cd HelloJS
-java org.opengroupware.jope.jsapp.run
+java org.getobjects.jsapp.run
