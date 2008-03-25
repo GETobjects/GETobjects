@@ -1,0 +1,21 @@
+<#Frame>
+  <h3>Main Component</h3>
+
+
+  <#WOForm action="default">
+    a: <#WOTextField name="a" var:value="a" numberformat="#" />
+    (<#get ognl:value="a.getClass()" />)
+    <br />
+    b: <#WOTextField name="b" var:value="b" numberformat="#" />
+    (<#get ognl:value="b.getClass()" />)
+    <br />
+    <#WOSubmitButton name="add:action" value="add" />
+    <#WOSubmitButton name="addAndReturnNew:action" value="add-n-new" />
+    <#WOSubmitButton name="reset:action" value="reset" />
+  </#WOForm>
+  
+  <hr />
+  Self: <#get var:value="self" /><br />
+  Ctx:  <#get var:value="context" /><br />
+  Comp: <#get var:value="context.component" /><br />
+</#Frame>

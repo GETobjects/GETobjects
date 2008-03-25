@@ -1,0 +1,54 @@
+<table class="jotabtable" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td colspan="2">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tbody>
+            <tr>
+              <#WORepetition var:list="tabs" var:item="ctab" var:index="index">
+                <#td align="center" var:background="tabBGImage"
+                     height="22" valign="middle" width="100">
+
+                  <#WOConditional var:condition="ctab.action" value="-SELF">
+                    <#a var:href="viewURL" class="jotablink"
+                       ><#WOString var:value="ctab.label"/></#a>
+                  </#WOConditional>
+      
+                  <#WOConditional 
+                    var:condition="ctab.action" value="-SELF" const:negate="true">
+                    
+                    <#WOConditional var:condition="isTabSelected">
+                      <#a var:href="ctab.action" class="jotablink_sel jotablink"
+                        ><#WOString var:value="ctab.label"/></#a>
+                    </#WOConditional>
+                    
+                    <#WOConditional var:condition="isTabSelected" negate="1">
+                      <#a var:href="ctab.action" class="jotablink"
+                        ><#WOString var:value="ctab.label"/></#a>
+                    </#WOConditional>
+                  </#WOConditional>
+                </#td>
+              </#WORepetition>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    
+    <tr class="jotabcornerrow">
+      <td align="left" width="10"
+        ><#WOConditional var:condition="isFirstNotSelected"><img alt="" 
+        src="/-ControlPanel/Products/jmi/orange-corner-left-18x19.gif"
+        border="0"></#></td>
+      <td align="right"><img alt=""
+        src="/-ControlPanel/Products/jmi/orange-corner-right-18x19.gif"
+        border="0"></td>
+    </tr>
+    
+    <#WOConditional var:condition="hideContent" const:negate="true">
+      <tr class="jotabcontentrow">
+        <td colspan="2"><div class="jotabcontent"><#WOComponentContent/></div></td>
+      </tr>
+    </#WOConditional>
+  </tbody>
+</table>

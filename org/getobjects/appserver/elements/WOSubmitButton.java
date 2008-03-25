@@ -1,0 +1,199 @@
+/*
+  Copyright (C) 2006-2007 Helge Hess
+
+  This file is part of JOPE.
+
+  JOPE is free software; you can redistribute it and/or modify it under
+  the terms of the GNU Lesser General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with JOPE; see the file COPYING.  If not, write to the
+  Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
+
+package org.getobjects.appserver.elements;
+
+import java.util.Map;
+
+import org.getobjects.appserver.core.WOAssociation;
+import org.getobjects.appserver.core.WOContext;
+import org.getobjects.appserver.core.WOElement;
+import org.getobjects.appserver.core.WORequest;
+import org.getobjects.appserver.core.WOResponse;
+
+/**
+ * WOSubmitButton
+ * <p>
+ * Generates an HTML form submit button.
+ * <p>
+ * Sample:<pre>
+ * OK: WOSubmitButton {
+ *   name  = "OK";
+ *   value = "OK";
+ * }
+ * </pre>
+ * 
+ * Renders:
+ *   <pre>&lt;input type="submit" name="OK" value="OK" /&gt;</pre>
+ * 
+ * Bindings (WOInput):<pre>
+ *   id       [in] - string
+ *   name     [in] - string
+ *   value    [io] - object
+ *   disabled [in] - boolean</pre>
+ * Bindings:<pre>
+ *   action   [in] - action
+ *   pageName [in] - string</pre>
+ */
+public class WOSubmitButton extends WOInput {
+  
+  protected WOAssociation action;
+  protected WOAssociation pageName;
+  
+  public WOSubmitButton(String _name, Map<String, WOAssociation> _assocs,
+                        WOElement _template)
+  {
+    super(_name, _assocs, _template);
+    
+    this.action   = grabAssociation(_assocs, "action");
+    this.pageName = grabAssociation(_assocs, "pageName");
+    
+    /* special, shortcut hack. Doesn't make sense to have String actions ... */
+    if (this.action != null && this.action.isValueConstant()) {
+      Object v = this.action.valueInComponent(null);
+      if (v instanceof String)
+        this.action = WOAssociation.associationWithKeyPath((String)v);
+    }
+  }
+  
+  
+  /* handle request */
+
+  @Override
+  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+    Object cursor = _ctx.cursor();
+    
+    // System.err.println("TAKE VALS: " + this + ": " + _ctx.elementID());
+    
+    if (this.disabled != null) {
+      if (this.disabled.booleanValueInComponent(cursor))
+        return;
+    }
+    
+    Object formValue = _rq.formValueForKey(this.elementNameInContext(_ctx));
+    
+    if (this.value != null && this.value.isValueSettableInComponent(cursor))
+      this.value.setValue(formValue, cursor);
+    
+    if (formValue != null) {
+      if (this.action != null || this.pageName != null)
+        _ctx.addActiveFormElement(this);
+    }
+  }
+  
+  @Override
+  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+    Object cursor = _ctx.cursor();
+    
+    if (this.disabled != null) {
+      if (this.disabled.booleanValueInComponent(cursor))
+        return null;
+    }
+
+    String oldId = null;
+    String lid = _ctx.elementID();
+    Object v = this.eid != null ? this.eid.valueInComponent(cursor) : null;
+    if (v instanceof Boolean) /* in this mode we just expose the ID in HTML */
+      ;
+    else if (v != null) {
+      oldId = lid;
+      lid = v.toString();
+    }
+
+    // System.err.println("MY: " + lid);
+    // System.err.println("RQ: " + _ctx.senderID());
+    
+    Object result;
+    
+    if (lid == null || !lid.equals(_ctx.senderID())) {
+      // TODO: print a log?
+      result = null;
+    }
+    else if (this.action != null)
+      result = this.action.valueInComponent(cursor);
+    else if (this.pageName != null) {
+      String pname;
+      
+      pname = this.pageName.stringValueInComponent(cursor);
+      if (pname == null) {
+        // TODO: print a log
+        result = null;
+      }
+      else
+        result = _ctx.application().pageWithName(pname, _ctx);
+    }
+    else
+      result = null;
+    
+    if (oldId != null)
+      _ctx._setElementID(oldId);
+    
+    return result;
+  }
+  
+  
+  /* generate response */
+  
+  @Override
+  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+    if (_ctx.isRenderingDisabled())
+      return;
+    
+    Object cursor = _ctx.cursor();
+
+    _r.appendBeginTag("input");
+    _r.appendAttribute("type",  "submit");
+    
+    String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
+    if (lid != null) _r.appendAttribute("id", lid);
+
+    _r.appendAttribute("name",  this.elementNameInContext(_ctx));
+    
+    if (this.value != null) {
+      _r.appendAttribute("value",
+          this.value.stringValueInComponent(cursor));
+    }
+    
+    if (this.disabled != null) {
+      if (this.disabled.booleanValueInComponent(cursor)) {
+        _r.appendAttribute("disabled",
+            _ctx.generateEmptyAttributes() ? null : "disabled");
+      }
+    }
+    
+    if (this.coreAttributes != null)
+      this.coreAttributes.appendToResponse(_r, _ctx);
+    this.appendExtraAttributesToResponse(_r, _ctx);
+    // TODO: otherTagString
+    
+    _r.appendBeginTagClose(_ctx.closeAllElements());
+  }
+  
+  /* description */
+  
+  @Override
+  public void appendAttributesToDescription(StringBuilder _d) {
+    super.appendAttributesToDescription(_d);
+    
+    this.appendAssocToDescription(_d, "action",   this.action);
+    this.appendAssocToDescription(_d, "pageName", this.pageName);
+  }  
+}

@@ -1,0 +1,27 @@
+<#Frame>
+  <h2><#Title/></h2>
+
+  Form-Values: <WEBOBJECT NAME="FormValues"></WEBOBJECT><br />
+    
+  <#Form>
+      <h3>Inside my form...</h3>
+      
+      Upload a file:
+      <#WOFileUpload name="upload"
+        var:data="data" var:filePath="fileName" var:contentType="contentType" />
+      
+      <#WOSubmitButton name="ok" value="ok" />
+      
+      <br />
+      Uploaded File:
+      <#WOString var:value="fileName" />
+      <br />
+      Uploaded Size:
+      <#WOString var:value="dataLength" />
+      <br />
+      Uploaded Type:
+      <#WOString var:value="contentType" />
+      <br />
+  </#Form>
+  
+</#Frame>

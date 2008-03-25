@@ -1,0 +1,41 @@
+<#Frame>
+  <h2><#WOString var:value="name"/></h2>
+
+  <table border="1">
+    <tr><td>Embedded Simple String:</td>
+      <td><#WOString ognl:value="name" /></td>
+    </tr>
+    <tr><td>Embedded Keypath String:</td>
+      <td><#WOString ognl:value="context.application.sessionStore" /></td>
+    </tr>
+    <tr><td>Join Strings:</td>
+      <td>
+        <#WOString ognl:value="'Component ' + name + ' is hosted on ' 
+            + context.application.sessionStore" /><br />
+      </td>
+    </tr>
+
+    <tr><td>Decl Simple String:</td>
+      <td><#Simple/></td>
+    </tr>
+    <tr><td>Decl Keypath String:</td>
+      <td><#Keypath/></td>
+    </tr>
+    <tr><td>Decl Join String:</td>
+      <td><#JoinStrings/></td>
+    </tr>
+  </table>
+  
+  <hr />
+  
+  A repetition:
+  <table border="0" cellspacing="0" cellpadding="4">
+    <tr>
+      <#Repeat>
+        <#DynTD>
+          <#RepeatValue/>
+        </#DynTD>
+      </#Repeat>
+    </tr>
+  </table>
+</#Frame>

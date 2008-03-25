@@ -1,0 +1,39 @@
+// bind template to controller
+
+Title: WOString {
+  value = name;
+}
+
+/* icon */
+
+Icon: WOImage {
+  filename = "lori_64x64.gif";
+  border   = 0;
+}
+
+/* headers */
+
+Headers: WOString {
+  value = context.request.headers;
+}
+
+HeaderRep: WORepetition {
+  list = context.request.headers.keySet;
+  item = headerKey;
+}
+HeaderKey: WOString {
+  value = headerKey;
+}
+HeaderValue: WOString {
+  value = headerValue;
+}
+
+FormValues: WOString {
+  value = context.request.formValues;
+}
+
+/* embedded components */
+
+Embed: HelloEmbed {
+  a = 10;
+}

@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <title>Hello Database!</title>
+    <style>
+      body, td {
+        background-color: white;
+        font-family:      Verdana, Helvetica, sans-serif; 
+        font-size:        9pt;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <#WOHyperlink actionClass="Main" action="default">[Main]</#>
+    <hr />
+
+    <h3>All Entities of the connected database</h3>
+    
+    <table border="0">
+      <!-- 
+        The EODatabase object in the HelloDB object (our application), knows
+        about its 'database model' (an object of the EOModel). You can either
+        provide a handcoded model for a database as an XML file, or you can
+        let EOAdaptor autocreate a model for you. It will do so by quering the
+        information schema of the database.
+        
+        Tables in the database are represented by EOEntity objects which are
+        collected in the EOModel.
+        With the following repetition we iterate over those entities and
+        display some information about them.
+        -->
+      <#WORepetition var:list="application.db.model.entities" var:item="item">
+        <tr>
+          <td valign="top" align="left">
+            <!-- 
+              An entity has a name and an external name (the name of the table).
+              -->
+            <#WOHyperlink actionClass="ShowEntity" action="default"
+              var:?entity="item.name"
+              ><#WOString var:value="item.name"/></#>
+            
+            <#WOConditional var:condition="item.isReadOnly">
+              <small>(read only)</small>
+            </#WOConditional>
+          </td>
+        </tr>
+      </#WORepetition>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+(
+  { name = "Duck";  firstname = "Donald";   mobile = "12345"; },
+  { name = "Duck";  firstname = "Dagobert"; mobile = "11111"; },
+  { name = "Mouse"; firstname = "Mickey";   mobile = "45454"; },
+  { name = "Mouse"; firstname = "Minney";   mobile = "23232"; },
+  { name = "Goswell";  firstname = "Donald";   mobile = "12345"; },
+  { name = "Dyer";  firstname = "Dagobert"; mobile = "11111"; },
+  { name = "Dickson"; firstname = "Mickey";   mobile = "45454"; },
+  { name = "Wright"; firstname = "Minney";   mobile = "23232"; },
+  { name = "Berg";  firstname = "Donald";   mobile = "12345"; },
+  { name = "Fowler";  firstname = "Dagobert"; mobile = "11111"; },
+  { name = "Deacon"; firstname = "Mickey";   mobile = "45454"; },
+  { name = "Callaghan"; firstname = "Minney";   mobile = "23232"; },
+  { name = "Bakerman";  firstname = "Donald";   mobile = "12345"; },
+  { name = "Hamerlinck";  firstname = "Dagobert"; mobile = "11111"; },
+  { name = "Chavez"; firstname = "Mickey";   mobile = "45454"; },
+  { name = "Schuart"; firstname = "Minney";   mobile = "23232"; },
+)

@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <title>Hello Database!</title>
+    <style>
+      body, td {
+        background-color: white;
+        font-family:      Verdana, Helvetica, sans-serif; 
+        font-size:        9pt;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <#WOHyperlink actionClass="AllEntities" action="default">[All Entities]</#>
+    <hr />
+
+    <!--
+      Just for demonstration purposes, we perform the select
+      inline and then iterate over the results.
+      The result of the fetch is a List of EOActiveRecord objects.
+      
+      The ognl: prefix selects the OGNL WOAssociation object, which allows us
+      to run arbitrary Java expressions. 'persons' is retrieved using KVC from
+      the Main class (the persons() method inside this class is called).
+      
+      The WORepetition puts the current list object into the 'item' variable
+      (via KVC, which creates an 'extra' variable in the Main object). Inside
+      the repetition we can then refer to the object using that variable, eg
+        item.name
+      -->
+    <#WORepetition var:item="item"
+      ognl:list="persons.fetchObjectsForSQL
+        ('SELECT company_id,name,firstname FROM person LIMIT 10')">
+      
+      <div style="border: 1px solid green; margin: 16px; width: 300px;">
+        <table width="100%">
+          <!--
+            What follows uses database schema reflection. If we already know
+            what columns we want to display, we could just access them like
+            this:
+              <#WOString var:value="item.lastname" />
+          
+            Here we repeat over the columns of the table the object belongs to.
+            The table is represented by an EOEntity object at runtime. Since
+            we did not write an own EOModel, the EOAdaptor will fetch the
+            database schema from the database' information schema for us.
+            
+            'item' is our current EOActiveRecord representing a table row. It
+            knows about the 'entity' it belongs to.
+            
+            This repetition iterates over the columns (attributes) of the entity
+            and prints them out.
+            -->
+          <#WORepetition var:list="item.entity.attributes" var:item="attr">
+          
+            <!-- 
+              A small hack :-) Here we only print column values which evaluate
+              to 'true'. Which is everything except 'null', 0 (int),
+              false (bool), 'false' (String), 'NO' (String).
+              See NSJavaRuntime for details.
+              -->
+            <#WOConditional ognl:condition="item.valueForKey(attr.name)">
+              <tr>
+                <td width="50%"><#WOString var:value="attr.name" /></td>
+                <td><#WOString ognl:value="item.valueForKey(attr.name)"/></td>
+              </tr>
+            </#WOConditional>
+            
+          </#WORepetition>
+        </table>
+      </div>
+    </#WORepetition>
+  </body>
+</html>

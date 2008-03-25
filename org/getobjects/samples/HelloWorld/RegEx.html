@@ -1,0 +1,57 @@
+<#Frame>
+  <script src="<#WOResourceURL filename="prototype.js" />"> </script>
+  <h2><#WOString var:value="name"/></h2>
+
+  <#if var:value="error">
+    <div style="border: 1px solid red;">
+      <#get var:value="error" />
+    </div>
+  </#if>
+
+  <#WEFormToRemote
+      id="form" fragment="matchresult" @action="evalRegEx"
+      method="POST"
+      >
+    <#WOTextField idname="value" var:value="value" size="40" />
+    (Value)<br />
+    <#WOTextField idname="regex" var:value="regex" size="40" />
+    (Regex)<br />
+    <#WOSubmitButton idname="ok" value="match" />
+  </#>
+  
+  <hr />
+  <#WOFragment name="matchresult" elementName="div">
+    Value: <#get var:value="value" /><br />
+    RegEx: <#get var:value="regex" /><br />
+  
+    <#if var:condition="didMatch" value="OK">
+      <b>DID MATCH</b>
+    </#if>
+    <#if var:condition="didMatch" value="FAIL">
+      <b>did NOT match</b>
+    </#if>
+  </#>
+  
+  <hr />
+  <h4>CheatSheet</h4>
+  <pre>
+<a href="#" onclick="$('regex').value='\\d{2,4}'"
+>\d{2,4}</a> - digits, at least 2, max 4
+
+<a href="#" onclick="$('regex').value='a?'"
+>a?</a>     - match 0 or 1 times     (aka a{0, 1} ?)
+<a href="#" onclick="$('regex').value='a*'"
+>a*</a>     - match 0 or more times  (aka a{0,} ?)
+<a href="#" onclick="$('regex').value='a+'"
+>a+</a>     - match 1 or more times  (aka a{1,} ?)
+<a href="#" onclick="$('regex').value='a{1,3}'"
+>a{n,m}</a> - match at least n, but no more than m times
+<a href="#" onclick="$('regex').value='a{2,}?'"
+>a{n,}</a>  - match at least n or more times
+<a href="#" onclick="$('regex').value='a{2}'"
+>a{n}</a>   - match exactly n times
+
+OR (|):
+$year = /\d{4}|\d{2}/;		(1999 and 99, but not 199)
+  </pre>
+</#Frame>

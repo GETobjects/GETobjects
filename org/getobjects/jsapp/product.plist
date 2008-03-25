@@ -1,0 +1,30 @@
+{
+  factories = {
+  };
+  
+  renderers = {
+  };
+
+  classes = {
+  
+    org.opengroupware.jope.jsapp.JSComponentWrapper = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+      
+      defaultRoles = {
+        "View"                    = "Anonymous";
+        "WebDAV Access"           = "Authenticated";
+        "Change Images and Files" = "Owner";
+      };
+      
+      slots = {
+      };
+      
+      methods = {
+      };
+    };
+  };
+  
+  categories = {
+  };
+}

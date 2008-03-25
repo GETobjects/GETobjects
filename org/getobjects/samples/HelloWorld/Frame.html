@@ -1,0 +1,15 @@
+<#WOHtml>
+  <head>
+    <title>Framed Page: <#get var:value="context.page.name"/></title>
+  </head>
+  
+  <body>
+    <#WOComponentContent/>
+    
+    <#if var:condition="context.page.name" value="Main" negate="1">
+      <hr />
+      <#a directActionName="default" actionClass="Main" ?wosid="0"
+       >[main]</#a>
+    </#if>
+  </body>
+</#WOHtml>

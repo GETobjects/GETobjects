@@ -1,0 +1,89 @@
+<#JMIManageFrame>
+  <#WOChangeQuerySession
+      ?dg_batchsize="true" ?dg_sort="true" ?dg_batchindex="true">
+  <#JMIBatchPager var:displayGroup="displayGroup" href="-manage_workspace">
+    <form id="objectItems" name="objectItems"
+          action="." method="post">
+      <input id="objectItemsMethod" type="hidden" name=":method" value="" />
+    
+    <table class="foldertv" cellspacing="0" border="0" cellpadding="3">
+      <tr class="th0 th">
+        <!--
+        <th class="th0 th" width="18"
+          ><#WELinkToRemote href="-manage_workspace" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              var:?dg_sort="nextSort.NSFileMimeType"
+              ?batchindex="1"
+            ><#img var:src="sortIcon.NSFileMimeType" border="0" align="top" />
+            Type</#WOHyperlink
+        ></th>
+        -->
+        <th class="th0 th"> </th>
+        <th class="th0 th"
+          ><#WELinkToRemote href="-manage_workspace" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              var:?dg_sort="nextSort.nameInContainer"
+              ?batchindex="1"
+            ><#img var:src="sortIcon.nameInContainer" border="0" align="top" />
+            File</#WOHyperlink
+        ></th>
+        <th class="th0 th" width="5%"><nobr
+          ><#WELinkToRemote href="-manage_workspace" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              ?batchindex="1"
+              var:?dg_sort="nextSort.NSFileSize"
+            ><#img var:src="sortIcon.NSFileSize" border="0" align="top" />
+            Size</#WOHyperlink
+        ></nobr></th>
+        <th class="th0 th" width="5%"><nobr
+          ><#WELinkToRemote href="-manage_workspace" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              ?batchindex="1"
+              var:?dg_sort="nextSort.NSFileModificationDate"
+            ><#img var:src="sortIcon.NSFileModificationDate" border="0" align="top" />
+            Modified</#WOHyperlink
+        ></nobr></th>
+        <th class="th0 th">
+          <input type="checkbox" name="toggleAll"
+                 onchange="jmiToggleSelection(this)"
+                 />
+        </th>
+      </tr>
+      
+      <#WORepetition var:list="displayGroup.displayedObjects" var:item="item"
+                     var:index="index">
+      
+        <#tr ognl:class="(index % 2) == 0 ? 'even td' : 'odd td'">
+          <td width="18" nowrap="1" valign="top"
+            ><#WOHyperlink
+              ognl:href="item.NSFileName + '/-manage_workspace'"
+              ><#WOImage var:src="itemIconURL" border="0"
+                         disableOnMissingLink="1"
+          /></#></td>
+          <td class="td0 td">
+            <#WOHyperlink
+              ognl:href="item.NSFileName + '/-manage_workspace'"
+              ><#WOString var:value="item.NSFileName"
+              /><#WOConditional var:condition="item.isFolderish">/</#></#>
+          </td>
+          <td class="td1 td" style="padding-left: 20px;">
+            <#WOString var:value="item.NSFileSize" />
+          </td>
+          <td class="td2 td" style="padding-left: 20px;"><nobr>
+            <#WOString var:value="item.NSFileModificationDate"
+                       dateformat="DATETIME.SHORT"/>
+          </nobr></td>
+          <td class="td3 td" align="right" width="2%">
+            <#input type="checkbox" name="ids:list"
+                    var:value="item.NSFileName" />
+          </td>
+        </#tr>
+      
+      </#WORepetiton>
+    </table>
+    
+    </form>
+  </#JMIBatchPager>
+  
+  </#WOChangeQuerySession>
+</#JMIManageFrame>

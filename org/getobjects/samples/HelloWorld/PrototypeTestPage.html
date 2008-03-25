@@ -1,0 +1,106 @@
+<html>
+  <head>
+    <title>Prototype Testpage</title>
+    
+    <script src="<#WOResourceURL filename="prototype.js" />"> </script>
+    <script src="<#WOResourceURL filename="effects.js" />"> </script>
+    <script src="<#WOResourceURL filename="dragdrop.js" />"> </script>
+    <script src="<#WOResourceURL filename="controls.js" />"> </script>
+  </head>
+  
+  <body>
+    <h2>Prototype Testpage</h2>
+    
+    <hr />
+    
+    <h3>What time is it?</h3>
+    
+    <div id="time_div">
+      I don't have the time, but
+      <#WELinkToRemote action="sayWhen" update="time_div">click me</#>
+      and I will look it up.
+    </div>
+    
+    <!-- insertion -->
+    <p>
+      <#WELinkToRemote action="sayWhen" update="time_div" position="after"
+        >add time after</#>,
+      <#WELinkToRemote action="sayWhen" update="time_div" position="before"
+        >add time before</#>,
+      <#WELinkToRemote action="sayWhen" update="time_div" position="top"
+        >add time top</#>,
+      <#WELinkToRemote action="sayWhen" update="time_div" position="bottom"
+        >add time bottom</#>
+    </p>
+    
+    <!-- confirm -->
+    <p>
+      <#WELinkToRemote action="sayWhen" update="time_div" position="after"
+        confirm="should add time?">add after confirm</#>,
+        
+      <#WELinkToRemote action="sayWhen" update="time_div" position="after"
+        confirm="should add time?" condition="confirm('really ;-) ??')"
+        >add after confirm, then condition(confirm)</#>
+    </p>
+    
+    <hr />
+    <h3>Forms</h3>
+    
+    <!-- forms -->
+
+    <div>
+      <h4>WEFormToRemote</h4>
+      <#WEFormToRemote update="my_list" position="top" action="addItem">
+        New item text:
+        <#WOTextField name="newitem" var:value="title" />
+        <input type="submit" value="Add item with Ajax" />
+      </#WEFormToRemote>
+      <ul id="my_list">
+        <li>Original item... please add more!</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>SubmitToRemote</h4>
+      <form action="#">
+        New item text:
+        <#WOTextField name="newitem" var:value="title" />
+        
+        <#WESubmitToRemote name="submit" value="Add item with Ajax"
+                           update="my_list2" action="addItem" position="top"/>
+      </form>
+      <ul id="my_list2">
+        <li>Original item... please add more!</li>
+      </ul>
+    </div>
+    
+    <!-- observe -->
+    <div>
+      <label for="searchtext">Live Search:</label>
+      <#WOTextField id="searchtext" name="searchtext" var:value="searchText" />
+      <#WEObserveField name="searchtext" frequency="0.5"
+                       update="search_hits" action="liveSearch" />
+      <p>Search Results:</p>
+      <div id="search_hits"></div>
+    </div>
+    
+    <hr />
+    
+    <!-- fragments -->
+    <div>
+      <h3>Fragments</h3>
+      
+      <#WOFragment name="timefrag" elementName="p">
+        The time is <#WOString var:value="now" />.
+      </#WOFragment>
+      
+      <#WELinkToRemote fragment="timefrag">Update Frag!</#>
+    </div>
+
+
+    <!-- link back to mainpage -->
+    <hr />
+    <#WOHyperlink directActionName="default" actionClass="Main"
+      >[main]</#WOHyperlink>
+  </body>
+</html>

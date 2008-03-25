@@ -1,0 +1,14 @@
+<#Frame>
+  <h2><#Title/></h2>
+
+  Form-Values: <WEBOBJECT NAME="FormValues"></WEBOBJECT><br />
+    
+  <#Form>
+    <h3>Inside my form...</h3>
+      
+    Firstname: <#WOTextField name="firstname" var:value="firstname" /><br />
+    Lastname:  <#WOTextField name="lastname"  var:value="lastname" /><br />
+    <#WOSubmitButton name="ok" value="ok" />
+  </#Form>
+
+</#Frame>

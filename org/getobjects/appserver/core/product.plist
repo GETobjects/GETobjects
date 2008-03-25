@@ -1,0 +1,113 @@
+{
+  factories = {
+  };
+  
+  renderers = {
+  };
+
+  classes = {
+    java.util.AbstractCollection = {
+      /* per default we allow access to collections. The objects inside the
+         collection need to be properly protected though ... */
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+  	
+    org.opengroupware.jope.appserver.core.WOApplication = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+      
+      slots = {
+				"-ControlPanel" = {
+          protectedBy = "<public>";
+				  valueClass  =
+				    "org.opengroupware.jope.appserver.publisher.JoControlPanel";
+				};
+      };
+      
+      methods = {
+      };
+    };
+    
+    org.opengroupware.jope.appserver.products.JoProduct = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    org.opengroupware.jope.appserver.publisher.JoResource = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    
+    org.opengroupware.jope.appserver.core.WOComponent = {
+      /* per default we expose all WOComponent objects to the web, including
+         all names */
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    org.opengroupware.jope.appserver.publisher.JoPageInvocation = {
+      /* per default we expose all WOComponent objects to the web, including
+         all names */
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    org.opengroupware.jope.appserver.publisher.JoDirectActionInvocation = {
+      /* per default we expose all DirectAction objects to the web, including
+         all names */
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    
+    org.opengroupware.jope.appserver.core.WODirectActionRequestHandler = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    org.opengroupware.jope.appserver.core.WOResourceRequestHandler = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    org.opengroupware.jope.appserver.core.WOComponentRequestHandler = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    
+    /* the control panel */
+    
+    org.opengroupware.jope.appserver.publisher.JoControlPanel = {
+      /*
+        Note: resources are retrieved using the control panel, so it is in
+              fact public. Protect sensitive slots individually.
+      */
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+      
+      slots = {
+				"Products" = {
+          protectedBy = "<public>";
+				  valueClass  =
+				    "org.opengroupware.jope.appserver.products.JoControlPanelProducts";
+				};
+      };
+      
+      methods = {
+      };
+    };
+    
+    org.opengroupware.jope.appserver.products.JoControlPanelProducts = {
+      /*
+        Note: resources are retrieved using the control panel, so it is in
+              fact public. Protect sensitive slots individually.
+      */
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+      
+      slots = {
+      };
+      
+      methods = {
+      };
+    };
+  };
+  
+  categories = {
+  };
+}

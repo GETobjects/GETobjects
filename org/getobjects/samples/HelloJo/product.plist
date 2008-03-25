@@ -1,0 +1,32 @@
+{
+  publicResources = (
+  );
+  
+  factories = {
+  };
+  
+  renderers = {
+  };
+  
+  categories = {
+  };
+  
+  classes = {
+    org.opengroupware.jope.samples.HelloJo.LanguageSelector = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+    };
+    
+    org.opengroupware.jope.samples.HelloJo.PoJo = {
+      protectedBy   = "<public>";
+      defaultAccess = "allow";
+
+      methods = {
+      	"view" = {
+      	  protectedBy = "<public>";
+      	  pageName    = "PoJoViewer";
+      	};
+      };
+    };
+  };
+}

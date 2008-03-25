@@ -1,0 +1,32 @@
+<#div var:id="id" class="WEBatchPager" var:style="style">
+  <table border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr class="WEBatchPagerRow">
+      <td valign="top" align="left"><div class="WEBatchPagerTitle"
+        ><#WOString var:value="topLeftLabelValue"
+      /></div></td>
+      
+      <td valign="top" align="right"
+        ><div class="WEBatchPagerButtons"
+             style="white-space: nowrap;"
+          ><#WEBatchLink var:displayGroup="displayGroup" page="first"
+                         var:icons="icons"
+                         var:queryDictionary="queryDictionary"
+          /><#WEBatchLink var:displayGroup="displayGroup" page="prev"
+                          var:icons="icons"
+                          var:queryDictionary="queryDictionary"
+          /><span class="WEBatchPagerButtonLabel"
+          ><#WOString var:value="batchLabelValue"
+          /></span
+          ><#WEBatchLink var:displayGroup="displayGroup" page="next"
+                         var:icons="icons"
+                         var:queryDictionary="queryDictionary"
+          /><#WEBatchLink var:displayGroup="displayGroup" page="last" 
+                          var:icons="icons"
+                          var:queryDictionary="queryDictionary"
+        /></div
+      ></td>
+    </tr>
+    
+    <tr class="td"><td colspan="2"><#WOComponentContent/></td></tr>
+  </table>
+</#div>

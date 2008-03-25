@@ -1,0 +1,14 @@
+<div style="padding-left: 4px; padding-top: 4px;">
+  <div style="background-color: #D0D0D0;">
+    <#JMITabs jo:tabs="-manage_options">
+    
+      <!-- a warning message -->
+      <#WOConditional var:condition="hasMessage">
+        <div class="system-msg"><#WOString var:value="message"/></div>
+      </#WOConditional>
+      
+      <#WOComponentContent />
+  
+    </#JMITabs>
+  </div>
+</div>

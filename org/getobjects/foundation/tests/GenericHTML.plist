@@ -1,0 +1,22 @@
+{
+  isRegularWebBrowser        = true;
+
+  browserCanResize           = true;
+  browserCanSwitchResolution = true;
+  
+  /* usually computer displays are horiz ... */
+  screenOrientation = horizontal;
+  
+  httpEncodings = ( gzip, deflate, x-gzip );
+  imageFormats  = ( png, jpeg, gif, x-xbitmap );
+  
+  doesRegularHTML       = true;
+  doesRegularJavaScript = false;
+  prefersHTML           = true;
+  supportsWML           = false;
+  
+  /* Note: it can only detect inner dimensions */
+  canDetectResolutionUsingJavaScript = false;
+  
+  networkType = "isdn";
+}

@@ -1,0 +1,66 @@
+{
+  factories = {
+  };
+  
+  renderers = {
+    org.opengroupware.jope.ofs.OFSResourceFileRenderer = {
+    };
+  };
+
+  classes = {
+  
+    org.opengroupware.jope.ofs.OFSBaseObject = {
+      protectedBy   = "View";
+      defaultAccess = "allow";
+      
+      defaultRoles = {
+        "View"                    = "Anonymous";
+        "WebDAV Access"           = "Authenticated";
+        "Change Images and Files" = "Owner";
+      };
+      
+      slots = {
+      };
+      
+      methods = {
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSFolder = {
+      superclass = "org.opengroupware.jope.ofs.OFSBaseObject";
+    
+      slots = {
+      };
+      
+      methods = {
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSComponentWrapper = {
+      superclass = "org.opengroupware.jope.ofs.OFSFolder";
+    
+      slots = {
+      };
+      
+      methods = {
+      };
+    };
+    org.opengroupware.jope.ofs.OFSComponentFile = {
+      superclass = "org.opengroupware.jope.ofs.OFSBaseObject";
+    
+      slots = {
+      };
+      
+      methods = {
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSApplication = {
+      superclass = "org.opengroupware.jope.appserver.core.WOApplication";
+    };
+    
+  };
+  
+  categories = {
+  };
+}

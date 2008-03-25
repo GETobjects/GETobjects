@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <meta name="author" content="OpenGroupware.org"/>
+    <meta name="robots" content="stop"/>
+    
+    <link href="mailto:helge.hess@opengroupware.org" rev="made"/>
+    
+    <link href="/-ControlPanel/Products/jmi/JMI.css"
+          rel="stylesheet" type="text/css" />
+    
+    <script type="text/javascript"
+            src="/-ControlPanel/Products/jmi/prototype.js"></script>
+    
+    <#JMIExposeClientObjectToJS/>
+    
+    <script type="text/javascript"
+            src="/-ControlPanel/Products/jmi/JMi.js"></script>
+  </head>
+
+  <body bgcolor="white" link="#000099" alink="#000099" vlink="#000099"
+        marginwidth="0" marginheight="0"
+        style="padding-top: 8px;"
+  >
+    <table border="0" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td class="jmiTitleRow">
+          <b>Add <#WOString var:value="addType"/> to</b>
+          
+          <a href="/-manage_workspace">[ROOT]</a>
+    
+          <#WORepetition var:list="navigationPath"
+                         var:item="item" var:index="index">
+            / <#a var:href="itemURL"
+             ><#WOString var:value="item.nameInContainer"/></#a>
+          </#WORepetition>
+          
+          <!-- (<#WOString var:value="clientJoClass.className"/>) -->
+        </td>
+      </tr>
+      
+      <tr>
+        <td valign="top" class="jmiContentSection">
+          <#WOComponentContent />
+        </td>
+        
+        <td class="jmiActionColumn">
+          TODO:<br />
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          Add context relative help text.
+          &nbsp;
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

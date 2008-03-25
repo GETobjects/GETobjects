@@ -1,0 +1,39 @@
+<#WOHtml>
+  <head>
+    <title>Hello Chart</title>
+    <style>
+      body, td {
+        background-color: white;
+        font-family:      Verdana, Helvetica, sans-serif; 
+        font-size:        9pt;
+      }
+    </style>
+  </head>
+  
+  <body>
+
+    <h3>Pie Chart</h3>
+    <#WOImage action="chart" ?chs="320x192" ?cht="p3"
+        ?title="Revenue" ?legend="true" ?tooltips="true"
+        valign="top" />
+    <#WOImage action="chart" ?chs="320x192" ?cht="p"
+        ?title="Revenue" ?legend="true" ?tooltips="true"
+        valign="top" />
+        
+    <h3>Bar Chart</h3>
+    <#WOImage action="chart" ?chs="240x192" ?cht="bvg"
+        ?title="Revenue" ?legend="true" ?tooltips="true"
+        ?ylabel="Dollars" ?xlabel="Months"
+        style="margin: 4px; float:left;"/>
+    <#WOImage action="chart" ?chs="240x192" ?cht="bvg3"
+        ?title="Revenue" ?legend="true" ?tooltips="true"
+        style="margin: 4px; float:left;"/>
+    <#WOImage action="chart" ?chs="192x192" ?cht="bhg"
+        ?title="Revenue" ?legend="true" ?tooltips="true"
+        style="margin: 4px; float:left;"/>
+    <#WOImage action="chart" ?chs="192x192" ?cht="bhg3"
+        ?title="Revenue" ?legend="true" ?tooltips="true"
+        style="margin: 4px; float:left;"/>
+  
+  </body>
+</#WOHtml>

@@ -1,0 +1,15 @@
+// bind template to controller
+
+Title: WOString {
+  value = name;
+}
+
+FormValues: WOString {
+  value = context.request.formValues;
+}
+
+Form: WOForm {
+  actionClass      = "FormPage";
+  directActionName = "post";
+  //method           = "GET"; // POST does not work yet?
+}
