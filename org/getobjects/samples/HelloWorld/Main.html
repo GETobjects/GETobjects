@@ -1,0 +1,72 @@
+<#Frame>
+  <style>
+    div.smallinfo {
+      border: 1px dotted black;
+      margin-bottom: 4px;
+    }
+    div.smallinfo th {
+      font-size:   9pt;
+      font-family: arial, sans-serif;
+      text-align:  left;
+      white-space: nowrap;
+    }
+    div.smallinfo td {
+      font-size:   8pt;
+      font-family: arial, sans-serif;
+    }
+    div.smallinfo td.smallinfokey {
+      white-space: nowrap;
+    }
+  </style>
+  
+    <#Icon/>
+
+    <h2><#Title/> - <#WOString var:value="labels.loctitle"/></h2>
+
+    <div class="smallinfo">
+      <table border="0">
+        <tr>
+          <th>Form Values</th>
+        </tr>
+        <tr>
+          <!-- Test Old Style WO Syntax -->
+          <td><WEBOBJECT NAME="FormValues"></WEBOBJECT></td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="smallinfo">
+      <table border="0">
+        <tr>
+          <th colspan="2">Headers</th>
+        </tr>
+        <#HeaderRep>
+          <tr>
+            <td class="smallinfokey"><#HeaderKey/>:</td>
+            <td><#HeaderValue/></td>
+          </tr>
+        </#HeaderRep>
+      </table>
+    </div>
+    
+    <hr />
+    
+    <#a action="default" actionClass="FormPage"         >[form page]</#a>,
+    <#a action="default" actionClass="PrototypeTestPage">[prototype page]</#a>,
+    <#a action="default" actionClass="UploadPage"       >[upload page]</#a>,
+    <#a action="default" actionClass="OnionSkinnedDropShadow"
+        >[drop shadow]</#a>,
+    <#a action="default" actionClass="TableView" >[tableview page]</#a>,
+    <#a action="default" actionClass="TinyMCE"   >[TinyMCE]</#a>,
+    <#a action="default" actionClass="TestOGNL"  >[OGNL page]</#a>
+    <#a action="default" actionClass="TestAction">[WO Style Actions Page]</#a>,
+    <#a action="default" actionClass="RegEx"     >[RegEx]</#a>
+      
+    <hr />
+    [Embed:<#Embed/>]
+    
+    <hr />
+    
+    Langs: <#WOString var:value="context.request.browserLanguages"/><br/>
+    Locale: <#WOString var:value="context.locale"/><br/>
+</#Frame>

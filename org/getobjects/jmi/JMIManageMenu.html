@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta name="author" content="OpenGroupware.org"/>
+    <meta name="robots" content="stop"/>
+    
+    <link href="mailto:helge.hess@opengroupware.org" rev="made"/>
+    
+    <link href="/-ControlPanel/Products/jmi/JMI.css"
+          rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript"
+            src="/-ControlPanel/Products/jmi/dtree.js">
+    </script>
+  </head>
+
+  <body class="jmiMenu" link="#6F1537" alink="#000099" vlink="#C97138"
+        marginwidth="0" marginheight="0"
+    
+    ><div class="jmiMiddleBanner"
+    ><img src="/-ControlPanel/Products/jmi/blue-middle-banner-148x24.gif"
+          border="0" 
+          /></div>
+    <#WEDTree id="tree"
+      var:root="clientObject"
+      var:list="itemIterator"
+      var:item="item"
+      var:path="itemPath"
+      var:label="item" const:formatterClass="JMITreeLabelFormat"
+      var:href="itemURL"
+      const:defaultTarget="manage_main"
+      const:useSelection="false"
+      var:icon="itemIconURL"
+      var:iconOpen="itemIconOpenURL"
+      />
+  </body>
+</html>

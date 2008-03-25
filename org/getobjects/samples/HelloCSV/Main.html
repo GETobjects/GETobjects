@@ -1,0 +1,101 @@
+<#WOHtml>
+  <head>
+    <title>Hello CSV</title>
+    <style>
+      body, td {
+        background-color: white;
+        font-family:      Verdana, Helvetica, sans-serif; 
+        font-size:        9pt;
+      }
+      .errorbox {
+        border:  1px solid red;
+        margin:  12px 4px 24px 4px;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  
+  <body>
+  
+    <#if var:condition="error">
+      <div class="errorbox"><#get var:value="error"/></div>
+    </#if>
+  
+    <#WOForm action="post" enctype="multipart/form-data">
+      Upload a CSV file:
+      <#WOFileUpload idname="upload"
+                     var:data="data" var:filePath="fileName"
+                     var:contentType="contentType" />
+      
+      <br />
+      <br />
+      <table border="0">
+        <tr>
+          <td>Delimiter</td>
+          <td><#WOTextField idname="delimiter" var:value="delimiter" size="2" /></td>
+        </tr>
+        <tr>
+          <td>Encapsulator</td>
+          <td><#WOTextField idname="encapsulator" var:value="encapsulator" size="2" /></td>
+        </tr>
+        <tr>
+          <td>Comment start</td>
+          <td><#WOTextField idname="commentStart" var:value="commentStart" size="2" /></td>
+        </tr>
+        <tr>
+          <td>Charset</td>
+          <td>
+            <#WOPopUpButton idname="charset" var:item="item" var:value="item"
+                plist:list="( 'UTF-8', 'ISO-Latin-1', 'Cp850', 'Cp437' )"
+                var:selection="charset" /> 
+          </td>
+        </tr>
+      </table>
+      <br />
+      <table border="0">
+        <tr>
+          <td>Ignore leading whitespace</td>
+          <td>
+            <#WOCheckBox idname="ignoreLeadingWS" var:checked="ignoreLeadingWS" />
+          </td>
+        </tr>
+        <tr>
+          <td>Interpret Unicode sequences</td>
+          <td>
+            <#WOCheckBox idname="interpretUnicode" var:checked="interpretUnicode" />
+          </td>
+        </tr>
+        <tr>
+          <td>Ignore empty lines</td>
+          <td>
+            <#WOCheckBox idname="ignoreEmptyLines" var:checked="ignoreEmptyLines" />
+          </td>
+        </tr>
+      </table>
+      <br />
+      
+      <br />
+      <#WOSubmitButton name="ok" value="upload" />
+      
+    </#WOForm>
+
+    <#if var:value="fileName">
+      <hr />
+      Uploaded File:
+      <#get var:value="fileName" />
+    </#if>
+    
+    
+    <#if var:value="existingSession.lines">
+      <hr />
+      Count: #<#get ognl:value="existingSession.lines.length" /> records.
+      <#WOTableRepetition border="1" cellpadding="2"
+          var:list="existingSession.lines" count="10" var:item="lines"
+          var:columns="lines" var:column="item"
+      >
+        <#get var:value="item" />
+      </#WOTableRepetition>
+    </#if>
+    
+  </body>
+</#WOHtml>

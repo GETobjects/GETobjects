@@ -1,0 +1,12 @@
+<#WOHtml>
+  <head>
+    <title><#get label:value="Page" />: <#get var:value="context.page.name"/></title>
+  </head>
+
+  <body>
+    <#WOComponentContent/>
+    <p>
+    <#get label:value="Current" /> <#get label:value="locale" />: <#get var:value="locale" />
+    (<#get var:value="nativeLocaleName" />)<br />
+  </body>
+</#WOHtml>

@@ -1,0 +1,46 @@
+<#JMIManageFrame>
+  <script>
+  function showEditor() {
+    var viewer = $('content_view');
+    var editor = $('content_editor');
+    
+    // editor.height = Element.getDimensions(viewer).height;
+    editor.content.value = viewer.innerHTML.unescapeHTML();
+    
+    viewer.style.display = 'none';
+    editor.style.display = 'block';
+    
+    editor.content.focus();
+    return false; /* stop events */
+  }
+  function hideEditor() {
+    $('content_editor').style.display = 'none';
+    $('content_view').style.display = 'block';
+    return false; /* stop events */
+  }
+  </script>
+
+  <#WOConditional ognl:condition="clientObject.mimeType.startsWith('text/')">
+    <div style="padding-right: 8px;">
+    
+      <pre id="content_view" onclick="showEditor()"
+        ><#WOString var:value="clientObject.contentAsString" /></pre>
+      
+      <#WOForm id="content_editor" style="display: none;"
+               href="-manage_saveContent"
+               >
+        <#WOText name="content" rows="30" />
+        <br />
+        <input name="save"   type="submit" value="Save" />
+        <input name="cancel" type="button" value="Cancel"
+               onclick="hideEditor()" />
+      </#WOForm>
+      
+    </div>
+  </#WOConditional>
+  
+  <#WOConditional ognl:condition="!clientObject.mimeType.startsWith('text/')">
+    Binary File: <#WOString var:value="clientObject.mimeType"/>
+  </#WOConditional>
+  
+</#JMIManageFrame>

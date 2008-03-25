@@ -1,0 +1,14 @@
+// bind template to controller
+
+Title: WOString {
+  value = name;
+}
+
+FormValues: WOString {
+  value = context.request.formValues;
+}
+
+Form: WOForm {
+  directActionName = "post";
+  enctype = "multipart/form-data";
+}

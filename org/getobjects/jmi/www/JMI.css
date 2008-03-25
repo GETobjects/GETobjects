@@ -1,0 +1,439 @@
+a:hover {  
+  font-family:     Verdana, Helvetica, sans-serif; 
+  text-decoration: underline;
+  color:           #333333; 
+}
+a:link {
+  font-family:     Verdana, Helvetica, sans-serif; 
+  text-decoration: none;
+  color:           black;
+}
+a:visited {
+  font-family:     Verdana, Helvetica, sans-serif; 
+  text-decoration: none;
+  color:           black;
+}
+
+a {
+  font-family: Verdana, Helvetica, sans-serif; 
+  text-decoration: none;
+  color: #000099;
+}
+
+a.strong-link {
+  font-family: Verdana, Helvetica, sans-serif;
+  text-decoration: underline;
+  color: #000099;
+}
+
+p {
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #333333;
+}
+
+th {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-weight: bold;
+  font-size: 10pt; 
+  color: #333333;
+}
+
+.form-help {
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #333333;
+}
+
+.std-text {
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #333333;
+}
+
+.tab-small {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-size: 8pt; 
+  color: #333333;
+}
+
+.location-bar {
+  background-color: #efefef;
+  border: none;
+}
+
+.strong-header {
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.list-header {
+  background-color: #c0c0c0;
+  border: none;
+}
+
+.list-item {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-size: 10pt; 
+}
+
+.list-nav {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-size: 10pt; 
+  font-weight: bold;
+}
+
+.row-normal {
+  background-color: #ffffff;
+  border: none;
+
+}
+
+.row-hilite {
+  background-color: #efefef;
+  border: none;
+}
+
+.section-bar {
+  background-color: #c0c0c0;
+  border: none;
+}
+
+.system-msg {
+  font-family:      Verdana, Helvetica, sans-serif; 
+  font-size:        10pt; 
+  background-color: #ffffff;
+  border:           1px solid #000000;
+  margin-bottom:    6px;
+  margin-top:       6px;
+  padding:          4px;
+  width:            100%;
+  color:            #660033;
+}
+
+.form-title {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-weight: bold;
+  font-size: 12pt; 
+  color: #333333;
+}
+
+.form-label {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-weight: bold;
+  font-size: 10pt; 
+  color: #333333;
+}
+
+.form-optional {
+  font-family: Verdana, Helvetica, sans-serif; 
+  font-weight: bold;
+  font-style:  italic;
+  font-size:   10pt; 
+  color:       #333333;
+}
+
+.form-element {
+  font-family: Verdana, Helvetica, aans-serif;
+  font-size:   10pt;
+  color:       #000000;
+}
+
+.form-text {
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size:   10pt;
+  color:       #333333;
+}
+
+.form-mono {
+  font-family:     monospace;
+  font-size:       12px;
+  text-decoration: none;
+}
+
+
+/* common table settings */
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
+
+
+/* dtree */
+
+/*--------------------------------------------------|
+| dTree 2.05 | www.destroydrop.com/javascript/tree/ |
+|---------------------------------------------------|
+| Copyright (c) 2002-2003 Geir Landrö               |
+|--------------------------------------------------*/
+
+.dtree {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #666;
+	white-space: nowrap;
+}
+.dtree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.dtree a {
+	color: #333;
+	text-decoration: none;
+}
+.dtree a.node, .dtree a.nodeSel {
+	white-space: nowrap;
+	padding: 1px 2px 1px 2px;
+}
+.dtree a.node:hover, .dtree a.nodeSel:hover {
+	color: #333;
+	text-decoration: underline;
+}
+.dtree a.nodeSel {
+	background-color: #c0d2ec;
+}
+.dtree .clip {
+	overflow: hidden;
+}
+
+
+/* folder tableview */
+
+div.listpageractions {
+  padding-top:    2px;
+  padding-bottom: 8px;
+  padding-left:   1em;
+  font-size:      9pt;
+  text-align:     left;
+}
+
+#listpager {
+  /* border:    1px solid #AAAAAA; */
+  width:     98%;
+  min-width: 22em; /* w/o that the div can become smaller than the table */
+}
+
+.foldertv {
+}
+div.WEBatchPagerTitle, div.WEBatchPagerButtons {
+  font-size: 10pt;
+}
+div.WEBatchPagerButtons {
+  padding: 1px 1px 1px 1px;
+}
+div.WEBatchPagerButtons img {
+  padding-left: 1px;
+}
+span.WEBatchPagerButtonLabel {
+  padding-left:  2px;
+  padding-right: 2px;
+}
+
+
+table.foldertv { width: 100%; }
+table.foldertv tr th { /* header */
+  background-color: #A2B8DF; /* a darker blue */
+  font-weight: bold;
+  white-space: nowrap;
+}
+table.foldertv tr th a { /* sort links */
+  text-decoration: none;
+  color:           #555555;
+}
+
+table.foldertv tr.even { } /* background-color: #E8E8E8; } */
+table.foldertv tr.odd  { background-color: #D8D8D8; }
+
+/* common settings for all rows, cells, headers */
+table.foldertv tr td, table.foldertv tr th {
+  font-size:   9pt;
+  text-align:  left;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+/* add a bit of space to the right of the sort buttons */
+tr.th img {
+  padding-right: 1px;
+  margin-left:   -3px; /* this moves the image links out of place */
+}
+
+
+/* SOPE style tab tableview */
+
+table tr.jotvtitlerow {
+	/* background-color: #fae8b8; */ /* darker yellow */
+	background-color: rgb(216, 225, 235); /* a light (menu) blue */
+}
+
+table tr.jotvtitlerow td {
+	/* background-color: #fae8b8; */ /* darker yellow */
+	background-color: rgb(216, 225, 235);
+	font-family:      Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size:        9pt;
+  /* font-weight:      bold; */
+}
+
+table.jotabtable {
+	width: 100%;
+}
+tr.jotabcornerrow {
+	background-color: #fcf8df; /* lighter background yellow */
+}
+tr.jotabcontentrow {
+	background-color: #fcf8df; /* lighter background yellow */
+}
+div.jotabcontent {
+  padding-left:   10px;
+  padding-right:  0px;
+  padding-top:    2px;
+  padding-bottom: 10px;
+}
+
+a.jotablink {
+	text-decoration: none;
+	color:     black;
+	font-size: 8pt;
+}
+a.jotablink_sel {
+  font-weight: bold;
+}
+
+tr.jomainbuttonrow {
+	background-color: #fae8b8;
+}
+tr.jomainbuttonrow table td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size:   9pt;
+}
+
+
+/* crappy menu */
+
+tr.jomainbuttonrow .jomenutitle {
+  /* display:      block; */
+  cursor:       pointer;
+  border-right: 1px solid #ffdaaa;
+  white-space:  nowrap;
+}
+.jomenutitle_on {
+  background-color: #ffdaaa;
+}
+
+body.jmiMenu {
+  /* background-color: #FFECD0; */ /* yellow */
+  background-color:    rgb(216, 225, 235); /* light blue */
+  background-image:    url(/-ControlPanel/Products/jmi/blue-menu-back-148x28.gif);
+  background-repeat:   repeat-y;
+  background-position: right;
+}
+
+div.jmiMiddleBanner {
+  background-color:  rgb(216, 225, 235);
+  text-align:        right;
+  background-image:  url(/-ControlPanel/Products/jmi/blue-middle-scanline-1x24.gif);
+  background-repeat: repeat-x;
+}
+div.jmiMiddleBanner img {
+  text-align: right;
+}
+
+div.jomenu {
+  display:  none;
+  z-index:  5;
+  position: absolute;
+  top:      27px;
+  right:    4px;
+  height:   auto;
+  padding:  0px;
+  margin:   0px;
+  cursor:   pointer;
+  
+  background-color: #fae8b8;
+  border:  1px solid #ffdaaa; /* dark orange */
+}
+div.jomenu a, div.jomenu a:hover {
+  display: block;
+  padding: 4px;
+  border-bottom: 1px solid #ffdaaa;
+}
+div.jomenu a:hover {
+  background-color: #ffdaaa; /* dark orange */
+}
+
+
+/* text areas */
+
+pre {
+  border:  1px solid #ffdaaa; /* dark orange */
+  padding: 10px;
+}
+
+form#content_editor {
+}
+
+form#content_editor input {
+	background-color: #ffdaaa; /* dark orange */
+	border: 1px solid #ffdaaa; /* dark orange */;
+	width: 10%;
+}
+
+form#content_editor textarea {
+	border:  1px solid #ffdaaa; /* dark orange */
+	width:   98%;
+	padding: 10px;
+}
+
+
+/* frame */
+
+td.jmiTitleRow {
+  border-bottom:  1px solid #0C368C; /* a dark blue */
+  vertical-align: bottom;
+  font-size:      10pt;;
+  font-family:    Arial,Helvetica,Verdana,Geneva,Tahoma,sans-serif;
+  color:          #0C368C; /* a dark blue */
+}
+
+td.jmiContentSection {
+  padding-top:    2px;
+  padding-right:  6px;
+  vertical-align: top;
+}
+
+td.jmiActionColumn {
+  font-family:    Arial,Helvetica,Verdana,Geneva,Tahoma,sans-serif;
+  border-left:    1px solid #0C368C; /* a dark blue */
+  width:          180px;
+  vertical-align: top;
+  font-size:      12px;
+  padding-left:   10px;
+}
+
+div.jmiActionSection {
+	padding-bottom: 8px;
+}
+div.jmiActionSection, div.jmiActionSection td, div.jmiActionSection a {
+  color:     #333;
+}
+
+div.jmiActionSection a:hover {
+	text-decoration: underline;
+}
+
+div.jmiActionSection h1 {
+  color:     #0C368C; /* a dark blue */
+	font-size: 12px;
+  margin:    0 0 0 0;
+}
+div.jmiActionSection > div {
+  margin-left:    8px;
+  padding-left:   4px;
+  padding-bottom: 4px;
+  border-left:    1px solid #0C368C;
+  border-bottom:  1px solid #0C368C;
+}
+

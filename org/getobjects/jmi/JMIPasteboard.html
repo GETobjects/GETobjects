@@ -1,0 +1,29 @@
+<div>
+  <#WOConditional var:condition="hasPasteboardContents">
+    <table border="0" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="1%" style="padding-right: 4px;">Action:</td>
+        <td><#WOString var:value="pasteboardContents.verb"/></td>
+      </tr>
+      <tr>
+        <td>Base:</td>
+        <td style="overflow: hidden;"
+          ><#a ognl:href="pasteboardContents.basePath + '/-manage_workspace'"
+             ><#WOString var:value="pasteboardContents.basePath"/></#a></td>
+      </tr>
+    </table>
+    
+    <div style="padding: 0 0 0 12;">
+      <#WORepetition var:list="pasteboardContents.ids" var:item="item">
+        <#a ognl:href=
+          "pasteboardContents.basePath + '/' + item + '/-manage_workspace'"
+          ><#WOString var:value="item"/></#a>
+        <br />
+      </#WORepetition>
+    </div>
+  </#WOConditional>
+  
+  <#WOConditional var:condition="hasPasteboardContents" const:negate="true">
+    <i>empty</i>
+  </#WOConditional>
+</div>

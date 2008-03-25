@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app
+  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+  "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<web-app>
+  <!--
+    Note: currently the context URL must match the WOApplication name (that
+          is HelloWorld in this example)
+    -->
+
+  <!-- Global servlet parameters for this area -->
+  <context-param>
+    <param-name>WOAppName</param-name>
+    <param-value>org.opengroupware.jope.samples.HelloWorld.HelloWorld</param-value>
+  </context-param>
+
+  <servlet>
+    <servlet-name>HelloWorld</servlet-name>
+    <servlet-class>org.opengroupware.jope.servlets.WOServletAdaptor</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>HelloWorld</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>

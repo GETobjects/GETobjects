@@ -1,0 +1,223 @@
+{
+  publicResources = (
+  );
+  
+  factories = {
+  };
+  
+  classes = {
+    org.opengroupware.jope.jmi.JMIManageAddProduct = {
+      protectedBy   = "View Management Screens";
+      defaultAccess = "allow";
+    };
+    org.opengroupware.jope.jmi.JMIManageAddProduct$FactoryLookup = {
+      protectedBy   = "View Management Screens";
+      defaultAccess = "allow";
+    };
+  };
+  
+  categories = {
+  
+  	/* we attempt to manage everything ;-) */
+    org.opengroupware.jope.foundation.NSObject = {
+      defaultRoles = {
+        "WebDAV Access"           		    = "Authenticated";
+        "Access Contents Information"     = "Authenticated";
+        "Change Images and Files" 		    = "Authenticated";
+        "Delete Objects"          		    = "Authenticated";
+        "View"                    	     	= "Anonymous";
+				"Add Documents, Images and Files" = "Authenticated";
+				"View Management Screens"         = "Authenticated"; // Manager
+      };
+    
+      slots = {
+      };
+      
+      methods = {
+        "-manage" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManage";
+        };
+        
+        "-manage_menu" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageMenu";
+        };
+        
+        "-manage_top_frame" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageTopFrame";
+        };
+        "-manage_top_leftframe" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageTopLeftEdge";
+        };
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSBaseObject = {
+      slots = {
+				"-manage_options" = {
+          protectedBy = "View Management Screens";
+	  			value = (
+	    			{ label = "Default";    action = "-manage_workspace";  },
+	    			{ label = "Properties"; action = "-manage_properties"; },
+	    			{ label = "View";       action = "-SELF"; }
+	  			);
+				};
+				
+				"-manage_addProduct" = {
+          protectedBy = "View Management Screens";
+				  valueClass = /* this instantiates the factory, its no the JoObject */
+				  	"org.opengroupware.jope.jmi.JMIManageAddProductFactory";
+				};
+				
+				"-manage_addChildren" = {
+          protectedBy = "View Management Screens";
+	  			value = ();
+				};
+      };
+      
+      methods = {
+        "-manage_properties" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageProperties";
+        };
+      };
+    };
+    
+    /*
+    org.opengroupware.jope.ofs.OFSFile = {
+      methods = {
+        "-manage_workspace" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageFile";
+        };
+        "-manage_saveContent" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageFile";
+          action      = "saveContent";
+        };
+      };
+    };
+    */
+    
+    org.opengroupware.jope.ofs.OFSPlainTextFile = {
+      methods = {
+        "-manage_workspace" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageTextFile";
+        };
+        "-manage_saveContent" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageTextFile";
+          action      = "saveContent";
+        };
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSFolder = {
+      slots = {
+				"-manage_addChildren" = {
+          protectedBy = "View Management Screens";
+	  			value = (
+	  			  /* for real product based factories we need this,
+	  			     for now we just hardcode the method names
+	  			     
+  				  { label  = "Folder";
+	  			    action = "-manage_addProduct/jmi/folderAdd"; },
+		  		  { label  = "Image";
+			  	    action = "-manage_addProduct/jmi/imageAdd"; },
+				    { label  = "Generic File";
+				      action = "-manage_addProduct/jmi/fileAdd"; }
+				    */
+
+				    { label  = "Folder";
+				      action = "-manage_addFolder";
+				    },
+				    { label  = "Image";
+				      action = "-manage_addImage";
+				    },
+				    { label  = "Generic File";
+				      action = "-manage_addFile";
+				    },
+				    { label  = "WOComponent";
+				      action = "-manage_addWOComponent";
+				    },
+				    { label  = "WOPart";
+				      action = "-manage_addWOPart";
+				    },
+				    { label  = "WOPage";
+				      action = "-manage_addWOPage";
+				    }
+				  );
+				};
+		  };
+      methods = {
+        "-manage_workspace" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageFolder";
+        };
+        
+        "-manage_addFolder" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageAddFolder";
+        };
+        "-manage_addImage" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageAddImage";
+        };
+        "-manage_addGenericFile" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageAddGenericFile";
+        };
+        "-manage_addWOComponent" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageAddWOComponent";
+        };
+        "-manage_addWOPart" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageAddWOComponent";
+        };
+        "-manage_addWOPage" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageAddWOComponent";
+        };
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSImageFile = {
+      methods = {
+        "-manage_workspace" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageImage";
+        };
+      };
+    };
+    
+    org.opengroupware.jope.ofs.OFSSelect = {
+      slots = {
+				"-manage_options" = {
+          protectedBy = "View Management Screens";
+	  			value = (
+	    			{ label = "Default";    action = "-manage_workspace";  },
+	    			{ label = "Select";     action = "-manage_select";     },
+	    			{ label = "Properties"; action = "-manage_properties"; },
+	    			{ label = "View";       action = "-SELF"; }
+	  			);
+				};
+		  };
+		  
+      methods = {
+        "-manage_workspace" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageFolder";
+        };
+        "-manage_select" = {
+          protectedBy = "View Management Screens";
+          pageName    = "JMIManageSelect";
+        };
+      };
+    };
+  };
+}

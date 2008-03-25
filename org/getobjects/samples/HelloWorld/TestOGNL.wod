@@ -1,0 +1,28 @@
+
+Simple: WOString {
+  value = ~name;
+}
+
+Keypath: WOString {
+  value = ~context.application.sessionStore;
+}
+
+JoinStrings: WOString {
+  value = ~'Component ' + name + ' is hosted on ' 
+    + context.application.sessionStore;
+}
+
+Repeat: WORepetition {
+  list  = ( "one", "two", "three", "four", "five" );
+  item  = item;
+  index = index;
+}
+
+RepeatValue: WOString {
+  value = index;
+}
+
+DynTD: WOGenericContainer {
+  elementName = "td";
+  bgcolor     = ~ index % 2 == 0 ? "red" : "lightgreen";
+}

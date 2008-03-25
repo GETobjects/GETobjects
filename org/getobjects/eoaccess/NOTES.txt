@@ -1,0 +1,141 @@
+EOAccess
+========
+
+Database access library. Some ideas and a lot of naming taken from EOF, some
+stuff from Ruby on Rails ActiveRecord. Overall developed to meet my own needs.
+
+The basic setup is that EOAccess has two levels of access:
+a) adaptor level (EOAdaptor, EOAdaptorChannel)
+b) database level (EODatabase, EODatabaseChannel, EODatabaseDataSource)
+
+In general its recommended to write an EOModel or an EOModel pattern, and then
+use the EODatabaseDataSource to fetch mapped objects.
+However, for simple SQL you can also do that in rather convinient ways at the
+adaptor level.
+
+Important: to inject raw SQL you don't have to go down to adaptor level! You
+have various ways to embed SQL in the model and thats the recommended way to
+do it. See below (Raw SQL Injection Notes).
+
+A small word on web interfaces: to display result sets in a WOComponent, you
+should use an EODataSource in combination with a WODisplayGroup or
+WEDisplayGroup. The display group coordinates batching and fetching for you!
+
+
+Adaptor Level
+=============
+
+The adaptor level is a relatively thin wrapper around JDBC which provides some
+convenience methods, a connection pool, model reflection etc.
+
+TBD: document
+
+
+Database Level
+==============
+
+TBD: document
+
+
+Raw SQL Injection Notes
+=======================
+TBD: cleanup & organize
+
+Debugging
+  log4j.logger.EOSQLRunLog = INFO
+  => shows all the generated SQL
+
+Classes:
+- EOFetchSpecification
+  - Hints:
+    - EOCustomQueryExpressionHintKey
+      - Beware: this key is overwritten on count() fetches in WODisplayGroup
+        - pattern: %(select)s COUNT(*) FROM %(tables)s %(where)s
+      - IMPORTANT:
+        - patterns use '%' (eg %(oid)s), NOT the $abc syntax of EOQualifiers
+      - the hint is being processed by EOSQLExpression
+        - you can also use EOSQLQualifier with EOSQLExpression (which uses the
+          $abc binding syntax)
+          
+      * Raw SQL Patterns
+      * ================
+      * 
+      * If the 'EOCustomQueryExpressionHintKey' is set, the value of this key is
+      * processed as a keyvalue-format pattern to produce the SQL. EOSQLExpression
+      * will still prepare and provide the parts of the SQL (eg qualifiers, sorts)
+      * but the assembly will be done using the SQL pattern.
+      * 
+      * Example:
+      *   SELECT COUNT(*) FROM %(tables)s WHERE %(where)s %(limit)s
+      *   
+      * Keys:
+      *   select       eg SELECT or SELECT DISTINCT
+      *   columns      eg BASE.lastname, BASE.firstname
+      *   tables       eg BASE.customer
+      *   basetable    eg customer
+      *   qualifier    eg lastname LIKE 'Duck%'
+      *   orderings    eg lastname ASC, firstname DESC
+      *   limit        eg OFFSET 0 LIMIT 1
+      *   lock         eg FOR UPDATE
+      *   joins
+      * Compound:
+      *   where        eg WHERE lastname LIKE 'Duck%'
+      *   andQualifier eg AND lastname LIKE 'Duck%'   (nothing w/o qualifier) 
+      *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier) 
+      *   orderby      eg ORDER BY mod_date DESC (nothing w/o orderings) 
+      - Note: wenn Joins fuer den Query gemacht werden, sollte die Basis-Tabelle
+              als BASE benannt werden, damit die anderen Features genutzt werden
+              koennen!
+    
+    - EOCustomQueryExpressionHintKeyBindPattern
+      - zB: %%(tables)s WHERE id = %(id)s
+        - zB: fs.fetchSpecificationWithQualifierBindings({ id = 1});
+           => EOCustomQueryExpressionHintKey = %(tables)s WHERE id = 1;
+        - formatting is done using NSKeyValueStringFormatter.format()
+        - TBD, SEC: do we need to be careful about SQL injection?
+
+    - EOCustomQueryExpressionHintKey is also set by EODatabaseDataSource
+      iteratorForSQL()
+      - or fetchObjectsForSQL()
+
+    - Usage in an EOModel:
+      <fetch name="count" rawrows="true">
+        <sql pattern="true/false">
+          %(select)s COUNT(*) FROM %(tables)s %(where)s
+        </sql>
+      </fetch>
+      Important: when using patterns, you need to escape EO SQL keys twice, eg:
+        %%(select)s COUNT(*) FROM %%(table)s WHERE oid=%(oid)i
+
+- EOSQLQualifier
+  - Bsp: "login = %@ OR SQL[balance IN $balance1, $balance2]"
+    - the SQL qualifier is getting split into parts, in this case:
+      "balance IN "
+      $balance1 (EOQualifierVariable name=balance1)
+      ", "
+      $balance2 (EOQualifierVariable name=balance2)
+  - is being processed in EOSQLExpression (sqlStringForRawQualifier(q))
+    - at this point all EOQualifierVariable's are resolved! (bindings to the
+      EOFetchSpecification)
+      - do not confuse SQL binding variables with EOFetchSpecification bindings
+
+- EOSQLValue
+  - to inject single values
+  - currently only supported by EOSQLExpression.addUpdateListAttribute
+  - e.g:
+    Map<String, Object> values = new HashMap<String, Object>(2);
+    values.put("status",  "created");
+    values.put("modDate", new EORawSQLValue("NOW()"));
+    
+    EOAdaptorOperation op = new EOAdaptorOperation(entity);
+    ...
+    op.setChangedValues(values);
+    
+    int affected = channel.performAdaptorOperationN(op);
+
+- EOAttribute Formats:
+  - man kann auch in readformat/writeformat SQL einschleusen, zB um alle
+    Werte nach lowercase beim Schreiben zu wandeln:
+      writeformat="LOWER(TRIM(%P))"
+    oder Case-Dinge:
+      readformat="CASE %P WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' END"

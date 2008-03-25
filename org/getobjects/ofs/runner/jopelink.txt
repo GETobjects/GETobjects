@@ -1,0 +1,3 @@
+org.opengroupware.jope.appserver.core
+org.opengroupware.jope.ofs
+org.opengroupware.jope.jmi

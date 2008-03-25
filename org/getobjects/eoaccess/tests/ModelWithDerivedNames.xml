@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model version="1.0">
+
+  <entity name="Contact" table="jopetest_contact" primarykey="pkey">
+    <attribute column="pkey" autoincrement="true"  notnull="true" />
+    <attribute name="firstname" column="firstname" notnull="true" />
+    <attribute name="lastname"  column="lastname"  notnull="true" />
+    
+    <!-- relationships -->
+    
+    <to-many name="toNotes" to="notes" join="pkey,contact_id" />
+    
+    <!-- named fetch specifications -->
+    
+    <fetch name="count" rawrows="true">
+      <sql>SELECT COUNT(*) FROM jopetest_contact</sql>
+    </fetch>
+
+    <fetch name="allDucks">
+      <qualifier>lastname like 'Duck*'</qualifier>
+      <ordering>lastname</ordering>
+    </fetch>
+    
+    <fetch name="allFirstnamesOfTheDucks">
+      <attributes>pkey,firstname</attributes>
+      <qualifier>lastname like 'Duck*'</qualifier>
+      <ordering>lastname</ordering>
+    </fetch>
+
+    <fetch name="allFirstnamesOfTheDucksSQL">
+      <!-- Note: the % must be quoted because its also used for pattern
+                 replacements (eg %(tables)s)
+        -->
+      <sql>
+        SELECT pkey, firstname FROM jopetest_contact 
+        WHERE lastname like 'Duck%%'
+      </sql>
+    </fetch>
+
+    <fetch name="allFirstnamesOfTheDucksSQLPat">
+      <sql>
+        SELECT pkey, firstname FROM %(tables)s WHERE %(qualifier)s
+      </sql>
+      <qualifier>lastname like 'Duck*'</qualifier>
+    </fetch>
+  </entity>
+  
+  <entity name="notes" table="jopetest_notes" primarykey="id">
+    <attribute column="id" autoincrement="true" notnull="true" />
+    <attribute column="notetext"   notnull="true" />
+    <attribute column="contact_id" notnull="false" />
+
+    <!-- relationships -->
+    
+    <to-one name="toContact" to="Contact" join="contact_id,pkey" />
+  </entity>
+
+</model>

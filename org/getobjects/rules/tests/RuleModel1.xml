@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<model version="1.0">
+  <!-- be careful when modifying this, the tests depend on the content -->
+
+  <rule priority="high">
+    <qualifier>task = 'edit'</qualifier>
+    <key>color</key>
+    <value>red</value>
+  </rule>
+  
+  <rule priority="55">
+    <qualifier>task = 'list'</qualifier>
+    <key>color</key>
+    <value>white</value>
+  </rule>
+  
+  <rule priority="high">
+    <qualifier>*true*</qualifier>
+    <key>color</key>
+    <var:value>backgroundColor</var:value>
+  </rule>
+  
+  <rule priority="low">
+    <qualifier>*true*</qualifier>
+    <action>color = backgroundColor</action>
+  </rule>
+  
+  <rule priority="high">
+    task = 'edit' AND object.toAddress.city LIKE "*Magdeburg*"
+    => placemark = 'cathedral'
+  </rule>
+  
+  <multirule priority="fallback">
+    <qualifier>
+      (task = 'inspect' OR task = 'list')
+      AND
+      propertyType = 'r'
+      AND
+      relationship.isToMany = true
+    </qualifier>
+    
+    <qualifier>task = 'error'</qualifier>
+    
+    <action>allowCollapsing = true</action>
+  </multirule>
+
+  <rule priority="fallback">
+    <action>allowCollapsing = false</action>
+  </rule>
+</model>

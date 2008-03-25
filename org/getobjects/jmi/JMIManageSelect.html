@@ -1,0 +1,43 @@
+<#JMIManageFrame>
+
+  <#WOCopyValue var:fs="clientObject.fetchSpecification">
+    <table border="0">
+      <#WOConditional var:condition="fs.entityName">
+        <tr>
+          <td>Entity:</td>
+          <td valign="top">
+            <#WOString var:value="fs.entityName"/>
+          </td>
+        </tr>
+      </#WOConditional>
+      <tr>
+        <td>Qualifier:</td>
+        <td valign="top">
+          <#WOString var:value="fs.qualifier.stringRepresentation"/>
+        </td>
+      </tr>
+      <tr>
+        <td>Sort:</td>
+        <td valign="top">
+          <#WORepetition var:list="fs.sortOrderings" var:item="so"
+             separator="<br />">
+            <#WOString var:value="so.stringRepresentation"/>
+          </#WORepetition>
+        </td>
+      </tr>
+      <tr>
+        <td>Limit:</td>
+        <td valign="top">
+          <#WOString var:value="fs.fetchLimit"/>
+        </td>
+      </tr>
+      <tr>
+        <td>Offset:</td>
+        <td valign="top">
+          <#WOString var:value="fs.fetchOffset"/>
+        </td>
+      </tr>
+    </table>
+  </#WOCopyValues>
+  
+</#JMIManageFrame>

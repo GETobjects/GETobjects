@@ -1,0 +1,175 @@
+<#Frame>
+<style>
+body {
+  background-color: white;
+  font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+  font-size:   11pt;
+  font-weight: normal;
+  color:       black;
+}
+</style>
+
+  <#WEBindDisplayGroup
+      var:displayGroup="dg"
+      var:queryDictionary="context.commonQD"
+      selectionKey="name"
+      numberOfObjectsPerBatch="3" />
+      
+  <!-- very simple & plain -->
+    
+  <#WETableView var:displayGroup="dg" var:item="item"
+    cellpadding="2" border="1">
+  
+    <#WETableData title="Name"      var:value="item.name"/>
+    <#WETableData title="Firstname" var:value="item.firstname"/>
+    <#WETableData title="Mobile"    var:value="item.mobile"/>
+  
+  </#WETableView>
+  
+  <br />
+  
+  <!-- multirow -->
+  
+  <#WEBatchPager var:displayGroup="dg"
+    var:queryDictionary="context.commonQD"
+    titleLabel="Batch through %(count)i item(s) ..."
+    buttonLabel="Batch %(currentBatchIndex)i of %(batchCount)s"
+    style="float: left; width: 30%;"
+  >
+    <#WETableView id="tv2" var:displayGroup="dg" var:item="item"
+      var:queryDictionary="context.commonQD"
+    >
+  
+      <!-- this will be the result: 'firstrow th' and 'firstrow td' -->
+      <#WETableRow>
+        <#WETableData sort="name" title="Name">
+          <#WOHyperlink
+            directActionName="default"
+            var:queryDictionary="context.commonQD"
+            var:?dg_sel="item.name"
+            var:string="item.name" 
+            />
+        </#>
+        <#WETableData sort="-firstname" title="Firstname"
+                      var:value="item.firstname"/>
+        <#WETableData title="Mobile"    var:value="item.mobile"/>
+      </#WETableRow>
+    
+      <#WETableRow>
+        <#WETableData title="Street" >Uniplatz 12</#>
+        <#WETableData title="City"   >Magdeburg</#>
+        <#WETableData title="Country">Germany</#>
+      </#WETableRow>
+    
+      <#WETableRow>
+        <#WETableData title="Time" var:value="now" colspan="3" />
+      </#WETableRow>
+    
+    </#WETableView>
+  </#WEBatchPager>
+
+  <div class="inspector">
+    <#WOConditional var:condition="dg.selectedObject" negate="true">
+      <i>No object is selected</i>
+    </#WOConditional>
+    
+    <#WOConditional var:condition="dg.selectedObject">
+      <table border="0" width="100%">
+        <tr>
+          <td>Name:</td>
+          <td>
+            <#WOString var:value="dg.selectedObject.firstname" />
+            <#WOString var:value="dg.selectedObject.name" />
+          </td>
+        </tr>
+        <tr>
+          <td>Mobile:</td>
+          <td><#WOString var:value="dg.selectedObject.mobile" /></td>
+        </tr>
+        <tr>
+          <td>Object:</td>
+          <td><#WOString var:value="dg.selectedObject" /></td>
+        </tr>
+      </table>
+    </#WOConditional>
+  </div>
+  
+  <div class="clear"></div>
+  
+  <style>
+  div.inspector {
+    border:      1px solid #AAAAAA;
+    width:       40%;
+    margin-left: 2px;
+    float:       left;
+    padding:     8px;
+  }
+  div.inspector td {
+    font-size: 9pt;
+    vertical-align: top;
+  }
+  
+  div.clear {
+    clear: both;
+  }
+  </style>
+  
+  <style>
+  div.WEBatchPager {
+    border: 1px solid #AAAAAA;
+    width:  350px;
+    min-width: 22em; /* w/o that the div can become smaller than the table */
+  }
+  div.WEBatchPagerTitle, div.WEBatchPagerButtons {
+    font-size: 10pt;
+  }
+  div.WEBatchPagerButtons {
+    padding: 1px 1px 1px 1px;
+  }
+  div.WEBatchPagerButtons img {
+    padding-left: 1px;
+  }
+  span.WEBatchPagerButtonLabel {
+    padding-left:  2px;
+    padding-right: 2px;
+  }
+  
+  table#tv2 { width: 100%; }
+  table#tv2 tr th { /* header */
+    background-color: #CCCCCC;
+    font-weight: bold;
+    color:       #444444;
+    width:       33%;
+    white-space: nowrap;
+  }
+  table#tv2 tr th a { /* sort links */
+    text-decoration: none;
+  }
+  
+  table#tv2 tr.even { background-color: #E8E8E8; }
+  table#tv2 tr.odd  { background-color: #D8D8D8; }
+
+  table#tv2 tr.selected { background-color: #999999; }
+  
+  /* common settings for all rows, cells, headers */
+  table#tv2 tr td, table#tv2 tr th {
+    padding:    4px 4px 6px 6px; /* top right bottom left */
+    font-size:  9pt;
+    text-align: left;
+  }
+  
+  /* we want to indent the first cells of the second and third row */
+  table#tv2 tr.td1 td.td0, table#tv2 tr.td2 td.td0,
+  table#tv2 tr.th1 th.th0, table#tv2 tr.th2 th.th0
+  {
+    padding-left: 20px;
+    padding-top:  0px;
+  }
+  
+  /* add a bit of space to the right of the sort buttons */
+  tr.th img {
+    padding-right: 1px;
+    margin-left:   -3px; /* this moves the image links out of place */
+  }
+  </style>
+</#Frame>

@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>Hello Entity: <#WOString var:value="entity.name"/></title>
+    <style>
+      body, td {
+        background-color: white;
+        font-family:      Verdana, Helvetica, sans-serif; 
+        font-size:        9pt;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <#WOHyperlink actionClass="AllEntities" action="default">[All Entities]</#>
+    |
+    <#WOHyperlink actionClass="Main" action="default">[Main]</#>
+    <hr />
+
+    <h3>Entity: <#WOString var:value="entity.name"/></h3>
+    
+    <table border="0">
+      <#WORepetition var:list="entity.attributes" var:item="item">
+        <tr>
+          <td valign="top" align="left">
+            <!-- 
+              An attribute has a name and an external name (the name of the
+              table column).
+              -->
+            <#WOString var:value="item.name"/>
+            
+            <#WOConditional var:condition="item.isReadOnly">
+              <small>(read only)</small>
+            </#WOConditional>
+          </td>
+        </tr>
+      </#WORepetition>
+    </table>
+  </body>
+</html>

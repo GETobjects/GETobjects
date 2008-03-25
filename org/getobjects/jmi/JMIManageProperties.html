@@ -1,0 +1,17 @@
+<#JMIManageFrame>
+  
+  <table border="0" cellpadding="4" cellspacing="0" width="50%">
+    <tr bgcolor="#CCCCCC">
+      <td width="35%">Name</td>
+      <td>Value</td>
+    </tr>
+    
+    <#WORepetition var:list="propertyNames" var:item="propertyName">
+      <tr>
+        <td><#WOString var:value="propertyName"/></td>
+        <td><#WOString ognl:value="properties.get(propertyName)"/></td>
+      </tr>
+    </#WORepetition>
+  </table>
+  
+</#JMIManageFrame>

@@ -1,0 +1,54 @@
+<#WOHtml> <!--  we use this because it does the DOCTYPE stuff -->
+  <head>
+    <title>HelloThumbnail</title>
+  </head>
+  
+  <body>
+    <h1>Hello Thumbnail</h1>
+    
+    <!-- Note: we do not generate the wosid because we only need the
+         session for image delivery, not for form processing. If all
+         thumbs are delivered, the server can expire the session.
+         In production systems we don't usually want to do this, but here
+         it avoids some session related expiration/restart issues.
+      -->
+    <#WOForm action="post" enctype = "multipart/form-data" ?wosid="false">
+
+      Upload an image:
+      <#WOFileUpload name="upload"
+          var:data="data"
+          var:filePath="filename"
+          var:contentType="contentType" />
+
+      <#WOSubmitButton name="ok" value="ok" />
+
+      <hr />
+      Uploaded File:
+      <#get var:value="filename" />
+      <br />
+      Uploaded Size:
+      <#get var:value="dataLength" />
+      <br />
+      Uploaded Type:
+      <#get var:value="contentType" />
+      
+      <#if var:condition="session.sourceImage">
+        <hr>
+        Image:<br>
+        <code><#get var:value="session.sourceImage" /></code>
+        <br>
+      
+        <#WOImage action="sourceImage" />
+        
+        <!-- This is kinda interesting on the server because all those
+             methods access the source image using the session, they
+             compete for the session checkout. -->
+        <#WOImage action="thumbnail" ?height="128" valign="top" />
+        <#WOImage action="thumbnail" ?height="64"  valign="top" />
+        <#WOImage action="thumbnail" ?height="32"  valign="top" />
+        <#WOImage action="thumbnail" ?height="16"  valign="top" />
+      </#if>
+
+    </#WOForm>
+  </body>
+</#WOHtml>

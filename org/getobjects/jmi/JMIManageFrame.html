@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <meta name="author" content="OpenGroupware.org"/>
+    <meta name="robots" content="stop"/>
+    
+    <link href="mailto:helge.hess@opengroupware.org" rev="made"/>
+    
+    <link href="/-ControlPanel/Products/jmi/JMI.css"
+          rel="stylesheet" type="text/css" />
+    
+    <script type="text/javascript"
+            src="/-ControlPanel/Products/jmi/prototype.js"></script>
+    
+    <#JMIExposeClientObjectToJS/>
+    
+    <script type="text/javascript"
+            src="/-ControlPanel/Products/jmi/JMI.js"></script>
+  </head>
+
+  <body bgcolor="white" link="#000099" alink="#000099" vlink="#000099"
+        marginwidth="0" marginheight="0"
+        style="padding-top: 8px;"
+  >
+    <table border="0" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td class="jmiTitleRow">
+          <b><#WOString var:value="clientJoClass.className"/> at:</b>
+          
+          <a href="/-manage_workspace">[ROOT]</a>
+    
+          <#WORepetition var:list="parentObjectArray"
+                          var:item="item" var:index="index">
+            / <#a ognl:href="itemURL + '-manage_workspace'"
+             ><#WOString var:value="item.nameInContainer"/></#a>
+          </#WORepetition>
+          
+           / <#WOString var:value="clientObject.nameInContainer"/>
+        </td>
+      </tr>
+      
+      <tr>
+        <td valign="top" class="jmiContentSection">
+          <#JMIManageWorkspaceHeader>
+            <#WOComponentContent />
+          </#JMIManageWorkspaceHeader>
+        </td>
+        
+        <td class="jmiActionColumn">
+        
+          <#WOConditional var:condition="hasFactories">
+            <div class="jmiActionSection">
+              <h1>Add Object ...</h1>
+              <div>
+                <#WORepetition var:list="factories" var:item="item">
+                  <#a var:href="item.action"
+                    ><#WOString var:value="item.label"/></#a><br />
+                </#WORepetition>
+              </div>
+            </div>
+          </#WOConditional>
+
+            <div class="jmiActionSection">
+              <!-- TODO: make dynamic -->
+              <h1>Actions ...</h1>
+              <div>
+                <a href="#"
+                   onclick="$('objectItemsMethod').value='-manage_renameForm';
+                            $('objectItems').submit()"
+                  >Rename ...</a>
+                <br />
+                <a href="#" onclick="jmiCutCopyObjects(this, 'cut')">Cut</a>
+                <br />
+                <a href="#" onclick="jmiCutCopyObjects(this, 'copy')">Copy</a>
+                <br />
+                <a href="#" onclick="jmiCutCopyObjects(this, 'clip')">Clip</a>
+                <br />
+                <a href="#"
+                   onclick="if (confirm('Really delete?')) {
+                     $('objectItemsMethod').value='-manage_delObjects';
+                     $('objectItems').submit();
+                   }"
+                  >Delete ...</a>
+                <br />
+
+                <!-- testing -->
+                <!-- 
+                <a href="#"
+                   onclick="clientObject.invokeOnLocation('-manage_properties')"
+                  >Test 1 ...</a>
+                <br />
+                <a href="#"
+                   onclick="clientObject.invokeOnLocation('-manage_properties',
+                     $H({ 'a': 1, 'b': 'hello' }) )"
+                  >Test 2 ...</a>
+                <br />
+                <a href="#"
+                   onclick="clientObject['-manage_properties'](
+                     $H({ 'a': 1, 'b': 'hello' }) )"
+                  >Test 3 ...</a>
+                -->
+              </div>
+            </div>
+
+          <#WOFragment name="jmiPasteboard" elementName="div"
+                       class="jmiActionSection">
+            <h1>Pasteboard ...</h1>
+            <div><#JMIPasteboard/></div>
+          </#WOFragment>
+          
+          <!-- debugging
+            <div class="jmiActionSection">
+              <h1>Cookies ...</h1>
+              <div>
+                <#WORepetition var:list="context.request.cookies" var:item="item">
+                  [<#WOString var:value="item.name"/>]<br />
+                </#WORepetition>
+              </div>
+            </div>
+          -->
+          &nbsp;
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

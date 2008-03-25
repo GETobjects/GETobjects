@@ -1,0 +1,74 @@
+<#WOFragment name="listpager" elementName="div">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tbody>
+      <tr>
+        <td>
+          <table border="0" cellpadding="3" cellspacing="0" width="100%">
+            <tbody>
+              <tr class="jotvtitlerow">
+                <td align="left" valign="middle">
+          Folder contains <#WOString var:value="displayGroup.count"/> items
+                </td>
+                <td align="right" valign="middle">
+        <#WOConditional var:condition="displayGroup.hasMultipleBatches">
+        <div class="WEBatchPagerButtons" style="white-space: nowrap;">
+          <#WOConditional var:condition="displayGroup.isFirstBatch"
+           ><img src="/-ControlPanel/Products/jmi/batch-first-off.gif" border="0" align="top"
+           ><img src="/-ControlPanel/Products/jmi/batch-prev-off.gif" border="0" align="top"
+          /></#WOConditional
+          ><#WOConditional var:condition="displayGroup.isFirstBatch" negate="1"
+            ><#WELinkToRemote var:href="href" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              var:?dg_sort="displayGroup.queryValueForSortOrderings"
+              ?batchindex="1"
+            ><img src="/-ControlPanel/Products/jmi/batch-first.gif" border="0" align="top" 
+            /></#WOHyperlink
+            ><#WELinkToRemote var:href="href" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              var:?dg_batchindex="displayGroup.previousBatchIndex"
+              var:?dg_sort="displayGroup.queryValueForSortOrderings"
+            ><img src="/-ControlPanel/Products/jmi/batch-prev.gif" border="0" align="top" 
+            /></#WOHyperlink
+          ></#WOConditional
+          
+          ><#WOString
+            var:value="displayGroup" formatterClass="JMIBatchPositionFormat"
+            class="WEBatchPagerButtonLabel "
+          
+          /><#WOConditional var:condition="displayGroup.isLastBatch"
+           ><img src="/-ControlPanel/Products/jmi/batch-next-off.gif" border="0" align="top"
+           ><img src="/-ControlPanel/Products/jmi/batch-last-off.gif" border="0" align="top"
+          /></#WOConditional
+          ><#WOConditional var:condition="displayGroup.isLastBatch" negate="1"
+           ><#WELinkToRemote var:href="href" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              var:?dg_batchindex="displayGroup.nextBatchIndex"
+              var:?dg_sort="displayGroup.queryValueForSortOrderings"
+            ><img src="/-ControlPanel/Products/jmi/batch-next.gif" border="0" align="top"
+             /></#WOHyperlink
+           ><#WELinkToRemote var:href="href" fragment="listpager"
+              var:?dg_batchsize="displayGroup.batchSize"
+              var:?dg_batchindex="displayGroup.batchCount"
+              var:?dg_sort="displayGroup.queryValueForSortOrderings"
+            ><img src="/-ControlPanel/Products/jmi/batch-last.gif" border="0" align="top" 
+            /></#WOHyperlink
+          ></#WOConditional>
+        </div>
+        </#WOConditional>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      
+      <tr>
+        <td></td>
+      </tr>
+      
+      <tr>
+        <td><#WOComponentContent /></td>
+      </tr>
+    </tbody>
+  </table>
+</#WOFragment>
