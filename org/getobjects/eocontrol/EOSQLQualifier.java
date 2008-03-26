@@ -23,7 +23,6 @@ package org.getobjects.eocontrol;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
@@ -110,9 +109,6 @@ public class EOSQLQualifier extends EOQualifier {
         if (_vals instanceof NSKeyValueCodingAdditions) {
           bound[i] =
             ((NSKeyValueCodingAdditions)_vals).valueForKeyPath(v.key());
-        }
-        else if (_vals instanceof Map) {
-          bound[i] = ((Map)_vals).get(v.key());
         }
         else {
           bound[i] =
