@@ -1,14 +1,14 @@
 /*
   Copyright (C) 2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of GETobjects (Go).
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -30,15 +30,15 @@ import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.ofs.config.JoConfigKeys;
-import org.getobjects.ofs.fs.IOFSFileInfo;
-import org.getobjects.ofs.fs.IOFSFileManager;
 
 /**
  * OFSDatabaseDataSourceFolder
  * <p>
  * Wraps an EODataSource.
  */
-public class OFSDatabaseDataSourceFolder extends OFSFolder {
+public class OFSDatabaseDataSourceFolder extends OFSFolder
+  implements IOFSContextObject
+{
 
   protected IJoContext joctx;
   
@@ -50,20 +50,13 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder {
   public EOEntity         entity;
   public EOQualifier      qualifier;
   public EOSortOrdering[] sortOrderings;
-  
 
-  public Object awakeFromRestoration
-    (final OFSRestorationFactory _factory, final Object _container,
-     final IOFSFileManager _fm, final IOFSFileInfo _file,
-     final IJoContext _ctx)
-  {
-    super.awakeFromRestoration(_factory, _container, _fm, _file, _ctx);
-    this.joctx = _ctx; // need it for the config
-    
-    // this.applyBindings(_ctx);
-    return this;
+  public void _setContext(final IJoContext _ctx) {
+    this.joctx = _ctx;
   }
-  
+  public IJoContext context() {
+    return this.joctx;
+  }
   
   /* derived */
   
@@ -99,8 +92,10 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder {
         log.error("unknown qualifier value: " + o);
 
       /* resolve qualifier bindings */
-      if (this.qualifier.hasUnresolvedBindings())
-        this.qualifier.qualifierWithBindings(this.evaluationContext(), false);
+      if (this.qualifier.hasUnresolvedBindings()) {
+        this.qualifier = 
+          this.qualifier.qualifierWithBindings(this.evaluationContext(), false);
+      }
     }
     return this.qualifier;
   }

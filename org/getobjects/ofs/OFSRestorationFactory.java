@@ -181,6 +181,11 @@ public class OFSRestorationFactory extends NSObject {
     else if (o != null)
       log().warn("restored object is not an OFS object: " + o);
     
+    /* ensure the object has the IJoContext if it depends on it */
+    
+    if (o instanceof IOFSContextObject)
+      ((IOFSContextObject)o)._setContext(_ctx);
+    
     /* trigger lifecycle */
     
     if (o instanceof IOFSLifecycleObject) {
