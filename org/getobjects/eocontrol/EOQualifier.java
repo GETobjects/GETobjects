@@ -378,7 +378,7 @@ public class EOQualifier extends NSObject implements Cloneable {
    * @return EOQualifier representing the disjoin, usually an EOOrQualifier
    */
   public EOQualifier or(final String _q, final Object... _args) {
-    return _q != null ? this.or(EOQualifier.parseV(_q, _args)) : null;
+    return _q != null ? this.or(EOQualifier.parseV(_q, _args)) : this;
   }
   
   /**
@@ -402,7 +402,7 @@ public class EOQualifier extends NSObject implements Cloneable {
    * @return EOQualifier representing the conjoin, usually an EAndQualifier
    */
   public EOQualifier and(final String _q, final Object... _args) {
-    return _q != null ? this.and(EOQualifier.parseV(_q, _args)) : null;
+    return _q != null ? this.and(EOQualifier.parseV(_q, _args)) : this;
   }
   
   /**
