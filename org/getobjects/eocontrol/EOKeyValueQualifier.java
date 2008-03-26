@@ -23,7 +23,6 @@ package org.getobjects.eocontrol;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import org.getobjects.foundation.NSJavaRuntime;
@@ -267,9 +266,6 @@ public class EOKeyValueQualifier extends EOQualifier
       if (_vals instanceof NSKeyValueCodingAdditions) {
         boundValue =
           ((NSKeyValueCodingAdditions)_vals).valueForKeyPath(boundKey);
-      }
-      else if (_vals instanceof Map) {
-        boundValue = ((Map)_vals).get(boundKey);
       }
       else {
         boundValue =
