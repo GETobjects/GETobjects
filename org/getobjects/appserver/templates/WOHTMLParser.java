@@ -416,13 +416,13 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     //        wo:str
     
     // TBD: move to a properties file
-    if (_name.equals("str"))           return "WOString";
-    if (_name.equals("textfield"))     return "WOTextField";
-    if (_name.equals("text"))          return "WOText";
-    if (_name.equals("form"))          return "WOForm";
-    if (_name.equals("popup"))         return "WOPopUpButton";
-    if (_name.equals("hiddenfield"))   return "WOHiddenField";
-    if (_name.equals("passwordfield")) return "WOPasswordField";
+    if (_name.equals("str"))         return "WOString";
+    if (_name.equals("textfield"))   return "WOTextField";
+    if (_name.equals("text"))        return "WOText";
+    if (_name.equals("form"))        return "WOForm";
+    if (_name.equals("popup"))       return "WOPopUpButton";
+    if (_name.equals("hiddenfield")) return "WOHiddenField";
+    if (_name.equals("password"))    return "WOPasswordField";
     // wo:if is handled in WOWrapperTemplateBuilder
     return _name;
   }
