@@ -92,7 +92,7 @@ public class OFSDatabaseObjectFolder extends OFSFolder
         log.error("unknown qualifier value: " + o);
 
       /* resolve qualifier bindings */
-      if (this.qualifier.hasUnresolvedBindings()) {
+      if (this.qualifier != null && this.qualifier.hasUnresolvedBindings()) {
         this.qualifier = 
           this.qualifier.qualifierWithBindings(this.evaluationContext(), true);
       }
