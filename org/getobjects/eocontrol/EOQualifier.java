@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.foundation.NSKeyValueHolder;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
 
@@ -242,8 +243,8 @@ public class EOQualifier extends NSObject implements Cloneable {
   
   /**
    * Returns a qualifier which has its bindings resolved against the given
-   * '_vals' object. The object is usually a Map, but can be any other object
-   * accessible using KVC.
+   * '_vals' object. The object is usually a Map or NSKeyValueHolder, but can be
+   * any other object accessible using KVC.
    * <p>
    * Note that qualifiers w/o bindings just return self.
    * 
@@ -253,6 +254,24 @@ public class EOQualifier extends NSObject implements Cloneable {
    */
   public EOQualifier qualifierWithBindings(Object _vals, boolean _requiresAll) {
     return this;
+  }
+  
+  /**
+   * Returns a qualifier which has its bindings resolved against the given
+   * key/value pairs.
+   * <p>
+   * Note that qualifiers w/o bindings just return self.
+   * <p>
+   * Example:<pre>
+   *   q = q.qualifierWithBindings("now", new Date());</pre>
+   * 
+   * @param _vals        - the object containing the bindings
+   * @param _requiresAll - whether all bindings are required
+   * @return an EOQualifier with the bindings resolved
+   */
+  public EOQualifier qualifierWithBindings(Object... _keysAndValues) {
+    return this.qualifierWithBindings(
+        new NSKeyValueHolder(_keysAndValues), true);
   }
   
   /* utility */
