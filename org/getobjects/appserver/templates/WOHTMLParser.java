@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.elements.WOStaticHTMLElement;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.NSPropertyListParser;
 import org.getobjects.foundation.UData;
 import org.getobjects.foundation.UString;
 
@@ -405,26 +406,21 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     
     this.idx = pos;
   }
+
+  /* list of aliases */
+
+  @SuppressWarnings("unchecked")
+  private static Map<String, String> elementNameAliasMap =
+    (Map<String, String>)NSPropertyListParser.parse(
+        WOWrapperTemplateBuilder.class, "WOShortNameAliases.plist");
   
-  protected String replaceShortWOName(String _name) {
+  protected String replaceShortWOName(final String _name) {
     // TBD: WOnder also supports wo:textfield instead of wo:WOTextField. We
     //      can't deal with this in the WOWrapperTemplateBuilder because this
-    //      already lost the 'wo' prefix
-    // TBD: find out all combinations supported by wonder
-    //        wo:textfield
-    //        wo:if
-    //        wo:str
-    
-    // TBD: move to a properties file
-    if (_name.equals("str"))         return "WOString";
-    if (_name.equals("textfield"))   return "WOTextField";
-    if (_name.equals("text"))        return "WOText";
-    if (_name.equals("form"))        return "WOForm";
-    if (_name.equals("popup"))       return "WOPopUpButton";
-    if (_name.equals("hiddenfield")) return "WOHiddenField";
-    if (_name.equals("password"))    return "WOPasswordField";
-    // wo:if is handled in WOWrapperTemplateBuilder
-    return _name;
+    //      already lost the 'wo' prefix (and we don't want to do it for
+    //      arbitrary names.
+    String newName = elementNameAliasMap.get(_name);
+    return newName != null ? newName : _name;
   }
   
   /**
