@@ -1,0 +1,22 @@
+{
+  /* WOWrapperTemplateBuilder also handles some variants, eg wo:string,
+     wo:if */
+  component-content = WOComponentContent;
+  str         = WOString;
+  textfield   = WOTextField;
+  searchfield = WOSearchField;
+  checkbox    = WOCheckBox;
+  text        = WOText;
+  textarea    = WOText;
+  form        = WOForm;
+  popup       = WOPopUpButton;
+  hiddenfield = WOHiddenField;
+  hyperlink   = WOHyperlink;
+  password    = WOPasswordField;
+  fragment    = WOFragment;
+  radio       = WORadioButton;
+  reset       = WOResetButton;
+  submit      = WOSubmitButton;
+  param       = WOParam;
+  image       = WOImage;
+}
