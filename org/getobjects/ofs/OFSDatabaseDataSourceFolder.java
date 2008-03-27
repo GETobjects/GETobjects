@@ -20,7 +20,6 @@
 */
 package org.getobjects.ofs;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.getobjects.appserver.publisher.IJoContext;
@@ -29,6 +28,8 @@ import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
+import org.getobjects.foundation.NSKeyValueCodingAdditions;
+import org.getobjects.foundation.NSKeyValueHolder;
 import org.getobjects.ofs.config.JoConfigKeys;
 
 /**
@@ -63,12 +64,11 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
   public Map<String, Object> config() {
     return this.configurationInContext(this.joctx);
   }
-  public Map evaluationContext() {
-    Map<String, Object> m = new HashMap<String, Object>(4);
-    m.put("configObject", this);
-    m.put("config",       this.config());
-    m.put("context",      this.joctx);
-    return m;
+  public NSKeyValueCodingAdditions evaluationContext() {
+    return new NSKeyValueHolder(
+        "configObject", this,
+        "config",       this.config(),
+        "context",      this.joctx);
   }
   
   public String entityName() {
