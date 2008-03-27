@@ -18,7 +18,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.appserver.elements;
 
 import java.text.ParseException;
@@ -49,6 +48,7 @@ import org.getobjects.appserver.core.WOResponse;
  *   value          [io] - object
  *   disabled       [in] - boolean</pre>
  * Bindings (WOTextField):<pre>
+ *   readonly       [in] - boolean
  *   size           [in] - int
  *   trim           [in] - boolean</pre>
  * Bindings (WOFormatter):<pre>
@@ -60,6 +60,7 @@ import org.getobjects.appserver.core.WOResponse;
  */
 public class WOTextField extends WOInput {
   
+  protected WOAssociation readonly;
   protected WOAssociation size;
   protected WOAssociation trim;
   protected WOFormatter   formatter;
@@ -69,6 +70,7 @@ public class WOTextField extends WOInput {
   {
     super(_name, _assocs, _template);
     
+    this.readonly  = grabAssociation(_assocs, "readonly");
     this.size      = grabAssociation(_assocs, "size");
     this.trim      = grabAssociation(_assocs, "trim");
     this.formatter = WOFormatter.formatterForAssociations(_assocs);
@@ -140,6 +142,12 @@ public class WOTextField extends WOInput {
             _ctx.generateEmptyAttributes() ? null : "disabled");
       }
     }
+    if (this.readonly != null) {
+      if (this.readonly.booleanValueInComponent(cursor)) {
+        _r.appendAttribute("readonly",
+            _ctx.generateEmptyAttributes() ? null : "readonly");
+      }
+    }
     
     if (this.coreAttributes != null)
       this.coreAttributes.appendToResponse(_r, _ctx);
@@ -163,6 +171,7 @@ public class WOTextField extends WOInput {
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
-    this.appendAssocToDescription(_d, "size", this.size);
+    this.appendAssocToDescription(_d, "readonly", this.readonly);
+    this.appendAssocToDescription(_d, "size",     this.size);
   }  
 }
