@@ -239,25 +239,42 @@ public class EOQualifierParser extends NSObject {
 
     /* process formats */
     if (id.length() > 1 && id.startsWith("%")) {
+      // the id itself is a format, eg: "%@ LIKE 'Hello*'"
       if ((id = this.nextNonNullStringArgument(id)) == null)
         return null;
     }
     
-    /* OK, now we check for operations */
 
     if (!this.skipSpaces()) {
-      this.addError("expected operation after identifier?!");
-      return null; /* EOF */
+      /* ok, it was just the ID. We treat this as a boolean kvqualifier,
+       * eg: "isArchived"
+       */
+      return new EOKeyValueQualifier(id, Boolean.TRUE);
     }
+    
+    /* check whether the qualifier is closed, that is, whether we are bool */
+    
+    if (this.match(TOK_AND) || this.match(TOK_OR) || this.match(')')) {
+      /* ok, it was just the ID. We treat this as a boolean kvqualifier,
+       * eg: "isArchived AND code > 10"
+       *     "(code > 10 AND isArchived) AND is New"
+       */
+      return new EOKeyValueQualifier(id, Boolean.TRUE);
+    }
+    
+    /* OK, now we check for operations */
     
     String operation = this.parseOperation();
     if (operation == null) {
-      this.addError("expected operation after identifier?!");
-      return null;
+      /* ok, it was just the ID and some spaces, no operation. We treat this as
+       * a boolean kvqualifier, eg: "isArchived  "
+       */
+      return new EOKeyValueQualifier(id, Boolean.TRUE);
     }
 
     /* process formats */
     if (operation.length() > 1 && operation.startsWith("%")) {
+      // the operation is a pattern, eg: "value %@ 5", "<" 
       if ((operation = this.nextNonNullStringArgument(operation)) == null)
         return null;
     }
@@ -421,7 +438,7 @@ public class EOQualifierParser extends NSObject {
   }
   
   protected EOQualifier buildCompoundQualifier
-    (String _operation, List<EOQualifier> _qualifiers)
+    (final String _operation, final List<EOQualifier> _qualifiers)
   {
     if (_qualifiers        == null) return null;
     if (_qualifiers.size() == 0)    return null;
@@ -429,9 +446,9 @@ public class EOQualifierParser extends NSObject {
     if (_qualifiers.size() == 1)
       return _qualifiers.get(0);
     
-    if ("AND".equals(_operation))
+    if (STOK_AND.equals(_operation))
       return new EOAndQualifier(_qualifiers);
-    if ("OR".equals(_operation))
+    if (STOK_OR.equals(_operation))
       return new EOOrQualifier(_qualifiers);
     
     /* Note: we could make this extensible */
@@ -584,6 +601,23 @@ public class EOQualifierParser extends NSObject {
     return id;
   }
   
+  /**
+   * Parses those qualifier operations:<pre>
+   *   =   =
+   *   &lt;   &lt;
+   *   &gt;   &gt;
+   *   =&gt;  =&gt;
+   *   =&lt;  =&lt;
+   *   != !=
+   *   &lt;=  =&lt;
+   *   &lt&gt;  &lt&gt;
+   *   &gt;=  =&gt;
+   *   &gt;&lt;  &lt&gt;</pre>
+   * If none matches, parseIdentifier is called.
+   * 
+   * <p>
+   * @return the operation or identifier
+   */
   protected String parseOperation() {
     if (this.idx + 2 /* allow for some space */ >= this.string.length)
       return null; /* EOF */
@@ -882,7 +916,16 @@ public class EOQualifierParser extends NSObject {
     return true;
   }
   
-  protected final boolean match(char _c) {
+  /**
+   * Returns true if the current parsing position matches the char. This does
+   * NOT consume the char (use consumeIfMatch for that).
+   * Example:<pre>
+   *   if (this.match(')')) return ...</pre>
+   * 
+   * @param _c
+   * @return
+   */
+  protected final boolean match(final char _c) {
     if (this.idx >= this.string.length)
       return false; /* not enough space */
     
@@ -907,6 +950,9 @@ public class EOQualifierParser extends NSObject {
   
   /* tokens */
   
+  protected static final String STOK_AND = "AND";
+  protected static final String STOK_OR  = "OR";
+  
   protected static final char[] TOK_NOT   = { 'N', 'O', 'T' };
   protected static final char[] TOK_NULL  = { 'N', 'U', 'L', 'L' };
   protected static final char[] TOK_null  = { 'n', 'u', 'l', 'l' };
@@ -915,6 +961,8 @@ public class EOQualifierParser extends NSObject {
   protected static final char[] TOK_YES   = { 'Y', 'E', 'S' };
   protected static final char[] TOK_NO    = { 'N', 'O' };
   protected static final char[] TOK_SQL   = { 'S', 'Q', 'L', '[' };
+  protected static final char[] TOK_AND   = { 'A', 'N', 'D' };
+  protected static final char[] TOK_OR    = { 'O', 'R' };
   
   protected static final char[] TOK_STAR_TRUE = {
     '*', 't', 'r', 'u', 'e', '*'
