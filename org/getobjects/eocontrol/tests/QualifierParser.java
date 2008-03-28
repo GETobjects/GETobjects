@@ -148,6 +148,61 @@ public class QualifierParser {
                aq.qualifiers()[1] instanceof EOOrQualifier);
   }
   
+  @Test public void testSimpleBoolKeyValueQualifier() {
+    EOQualifier q = EOQualifier.qualifierWithQualifierFormat("isArchived");
+    assertNotNull("could not parse qualifier", q);
+
+    assertTrue("did not parse a key/value qualifier",
+               q instanceof EOKeyValueQualifier);
+  }
+  
+  @Test public void testBoolKeyValueAndFrontQualifier() {
+    EOQualifier q = EOQualifier.qualifierWithQualifierFormat
+      ("isArchived AND code > 3");
+    assertNotNull("could not parse qualifier", q);
+
+    assertTrue("did not parse an AND qualifier",
+               q instanceof EOAndQualifier);
+    EOAndQualifier aq = (EOAndQualifier)q;
+    
+    assertTrue("first qualifier is not a key/value qualifier",
+        aq.qualifiers()[0] instanceof EOKeyValueQualifier);
+    assertTrue("second qualifier is not a key/value qualifier",
+        aq.qualifiers()[1] instanceof EOKeyValueQualifier);
+  }
+  
+  @Test public void testBoolKeyValueAndBackQualifier() {
+    EOQualifier q = EOQualifier.qualifierWithQualifierFormat
+      ("code > 3 AND isArchived");
+    assertNotNull("could not parse qualifier", q);
+
+    assertTrue("did not parse an AND qualifier",
+               q instanceof EOAndQualifier);
+    EOAndQualifier aq = (EOAndQualifier)q;
+    
+    assertTrue("first qualifier is not a key/value qualifier",
+        aq.qualifiers()[0] instanceof EOKeyValueQualifier);
+    assertTrue("second qualifier is not a key/value qualifier",
+        aq.qualifiers()[1] instanceof EOKeyValueQualifier);
+  }
+  
+  @Test public void testBoolKeyValueAndParenQualifier() {
+    EOQualifier q = EOQualifier.qualifierWithQualifierFormat
+      ("(isArchived) AND code > 3 AND (isUsed)");
+    assertNotNull("could not parse qualifier", q);
+
+    assertTrue("did not parse an AND qualifier",
+               q instanceof EOAndQualifier);
+    EOAndQualifier aq = (EOAndQualifier)q;
+    
+    assertTrue("first qualifier is not a key/value qualifier",
+        aq.qualifiers()[0] instanceof EOKeyValueQualifier);
+    assertTrue("second qualifier is not a key/value qualifier",
+        aq.qualifiers()[1] instanceof EOKeyValueQualifier);
+    assertTrue("third qualifier is not a key/value qualifier",
+        aq.qualifiers()[2] instanceof EOKeyValueQualifier);
+  }
+  
   @Test public void testSQLQualifier() {
     EOQualifier q = EOQualifier.qualifierWithQualifierFormat
       ("SQL[lastname = $lastname AND balance = $balance]");
