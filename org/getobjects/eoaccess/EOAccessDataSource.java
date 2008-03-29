@@ -233,11 +233,11 @@ public abstract class EOAccessDataSource extends EODataSource
     return this.iteratorForObjects(this.fetchSpecificationForFetch());
   }
   
-  public Iterator iteratorForSQL(String _sql) {
+  public Iterator iteratorForSQL(final String _sql) {
     if (_sql == null || _sql.length() == 0)
       return null;
     
-    EOFetchSpecification fs =
+    final EOFetchSpecification fs =
       new EOFetchSpecification(this.entityName, null /* qualifier */, null);
     
     Map<String, Object> hints = new HashMap<String, Object>(1);
@@ -247,7 +247,7 @@ public abstract class EOAccessDataSource extends EODataSource
     return this.iteratorForObjects(fs);
   }
   
-  public List fetchObjectsForSQL(String _sql) {
+  public List fetchObjectsForSQL(final String _sql) {
     return this.iteratorToList(this.iteratorForSQL(_sql));
   }
   
@@ -257,10 +257,8 @@ public abstract class EOAccessDataSource extends EODataSource
    * spec with the given key/value pairs.
    * 
    * <p>
-   * Example:
-   * <p><code>
-   *   List persons = ds.fetchObjects("myContacts", "contactId", 12345);
-   * </code></p>
+   * Example:<pre>
+   *   List persons = ds.fetchObjects("myContacts", "contactId", 12345);</pre>
    * <p>
    * This will lookup the EOFetchSpecification named <code>myContacts</code> in
    * the EOEntity of the datasource. It then calls
@@ -301,29 +299,54 @@ public abstract class EOAccessDataSource extends EODataSource
     return this.iteratorToList(this.iteratorForObjects(fs));
   }
   
-  public List fetchObjectsForIds(String _idName, List _ids) {
-    if (_ids        == null) return null;
-    if (_ids.size() == 0) return new ArrayList(0);
+  /**
+   * Fetches objects where the given attribute matches the given IDs.
+   * Example:<pre>
+   *   List names = new ArrayList();
+   *   names.add("Duck");
+   *   names.add("Mouse");
+   *   ds.fetchObjectsForIds("lastname", names);</pre>
+   * or:<pre>
+   *   ds.fetchObjectsForIds("id", pkeys);</pre>
+   * For the latter there is also a shortcut: fetchObjectsForIds(List).
+   * 
+   * @param _idName - name of the 
+   * @param _values - values to match
+   * @return a List of objects
+   */
+  public List fetchObjectsForIds(final String _idName, final List _values) {
+    if (_values        == null) return null;
+    if (_values.size() == 0) return new ArrayList(0);
     
     EOQualifier q = new EOKeyValueQualifier
-      (_idName, EOQualifier.ComparisonOperation.CONTAINS, _ids);
+      (_idName, EOQualifier.ComparisonOperation.CONTAINS, _values);
     
-    EOFetchSpecification fs = this.fetchSpecificationForFetch();
-    EOQualifier aux = this.auxiliaryQualifier();
+    final EOFetchSpecification fs  = this.fetchSpecificationForFetch();
+    final EOQualifier          aux = this.auxiliaryQualifier();
     if (aux != null) q = new EOAndQualifier(aux, q);
     fs.setQualifier(q);
     
     return this.iteratorToList(this.iteratorForObjects(fs));
   }
   
-  public List fetchObjectsForIds(List _ids) {
-    EOEntity findEntity = this.entity();
+  /**
+   * Fetches objects where the primary key matches the given IDs.
+   * Example:<pre>
+   *   ds.fetchObjectsForIds(pkeys);</pre>
+   * 
+   * @param _idName - name of the 
+   * @param _values - values to match
+   * @return a List of objects
+   */
+  public List fetchObjectsForIds(final List _ids) {
+    // TBD: generics
+    final EOEntity findEntity = this.entity();
     if (findEntity == null) {
       log.error("did not find entity, cannot construct fetchspec");
       return null;
     }
     
-    String[] pkeys = findEntity.primaryKeyAttributeNames();
+    final String[] pkeys = findEntity.primaryKeyAttributeNames();
     if (pkeys == null) {
       log.error("did not find primary keys, cannot construct fetchspec");
       return null;
@@ -335,17 +358,32 @@ public abstract class EOAccessDataSource extends EODataSource
   /* finders */
   // TODO: move out to 'Finder' objects which are also used by KVC
   
+  /**
+   * Returns an EOFetchSpecification which qualifies by the given primary key
+   * values. Example:<pre>
+   *   EODatabaseDataSource ds = new EODatabaseDataSource(oc, "Persons");
+   *   EOFetchSpecification fs = ds.fetchSpecificationForFind(10000);</pre>
+   * This returns a fetchspec which will return the Person with primary key
+   * '10000'.
+   * <p>
+   * This method acquires a fetchspec by calling fetchSpecificationForFetch(),
+   * it then applies the primarykey qualifier and the auxiliaryQualifier if
+   * one is set. Finally it resets sorting and pushes a fetch limit of 1.
+   * 
+   * @param _pkeyVals - the primary key value(s)
+   * @return an EOFetchSpecification to fetch the record with the given key
+   */
   public EOFetchSpecification fetchSpecificationForFind(Object[] _pkeyVals) {
     if (_pkeyVals == null || _pkeyVals.length < 1)
       return null;
     
-    EOEntity findEntity = this.entity();
+    final EOEntity findEntity = this.entity();
     if (findEntity == null) {
       log.error("did not find entity, cannot construct find fetchspec");
       return null;
     }
     
-    String[] pkeys = findEntity.primaryKeyAttributeNames();
+    final String[] pkeys = findEntity.primaryKeyAttributeNames();
     if (pkeys == null || pkeys.length == 0) {
       // TODO: hm, should we invoke a 'primary key find' policy here? (like
       //       matching 'id' or 'tablename_id')
@@ -370,8 +408,8 @@ public abstract class EOAccessDataSource extends EODataSource
     
     /* construct fetch specification */
     
-    EOFetchSpecification fs = this.fetchSpecificationForFetch();
-    EOQualifier aux = this.auxiliaryQualifier();
+    final EOFetchSpecification fs  = this.fetchSpecificationForFetch();
+    final EOQualifier          aux = this.auxiliaryQualifier();
     if (aux != null) q = new EOAndQualifier(aux, q);
     fs.setQualifier(q);
     fs.setSortOrderings(null); /* no sorting, makes DB faster */
@@ -380,6 +418,14 @@ public abstract class EOAccessDataSource extends EODataSource
     return fs;
   }
   
+  /**
+   * Calls iteratorForObjects() with the given fetch specification. If the
+   * fetch specification has no limit of 1, this copies the spec and sets that
+   * limit.
+   * 
+   * @param _fs - the fetch specification
+   * @return the first record matching the fetchspec
+   */
   public Object find(EOFetchSpecification _fs) {
     if (_fs == null) return null;
     
@@ -388,19 +434,22 @@ public abstract class EOAccessDataSource extends EODataSource
       _fs.setFetchLimit(1);
     }
     
-    Iterator ch = this.iteratorForObjects(_fs);
+    final Iterator ch = this.iteratorForObjects(_fs);
     if (ch == null) {
       log.error("could not open iterator for fetch: " + _fs);
       return null;
     }
     
-    Object object = ch.next();
+    final Object object = ch.next();
     
+    this.findIsDoneWithIterator(ch);
+    
+    return object;
+  }
+  protected void findIsDoneWithIterator(final Iterator _ch) {
     /* Note: we do not close the Iterator, so if its an external resource,
      *       you should override the find method in your subclass!
      */
-    
-    return object;
   }
   
   /**
