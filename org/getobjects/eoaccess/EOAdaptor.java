@@ -20,6 +20,7 @@
 */
 package org.getobjects.eoaccess;
 
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -244,7 +245,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
 
   public boolean hasOpenChannels() {
     /* Note: this only tracks pooled connections */
-    int coCount, availCount;
+    final int coCount, availCount;
     synchronized (this) {
       coCount    = this.checkedOutChannels.size();
       availCount = this.availableChannels.size();
@@ -284,8 +285,8 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    *   opening failed or the timeout expired.
    */
   protected EOAdaptorChannel openChannelFromPool(int _attempt) {
-    boolean isDebugOn = log.isDebugEnabled();
-    boolean isInfoOn  = log.isInfoEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
+    final boolean isInfoOn  = log.isInfoEnabled();
     if (isInfoOn)
       log.info("open channel from pool: (attempt=" + _attempt + ")");
 
@@ -334,7 +335,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   protected EOAdaptorChannel primaryWaitForChannel(int _attempt) {
     // TODO: improve method name
 
-    int coCount, availCount;
+    final int coCount, availCount;
     synchronized (this) {
       coCount    = this.checkedOutChannels.size();
       availCount = this.availableChannels.size();
@@ -351,7 +352,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     /* wait a while for a connection to become available */
 
     boolean gotInterrupted = false;
-    long startTime = new Date().getTime();
+    final long startTime = new Date().getTime();
 
     EOAdaptorChannel channel = null;
     synchronized(this) {
@@ -421,7 +422,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     if (_channel == null)
       return;
 
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     if (isDebugOn)
       log.info("releasing channel: " + _channel);
 
@@ -515,7 +516,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     catch (SQLException e) {
       log.error("failed to create new SQL connection", e);
 
-      int coCount, availCount;
+      final int coCount, availCount;
       synchronized (this) {
         coCount    = this.checkedOutChannels.size();
         availCount = this.availableChannels.size();
@@ -546,7 +547,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * @return The fresh EOAdaptorChannel or null if something went wrong.
    */
   public EOAdaptorChannel openChannelAndRegisterInPool() {
-    EOAdaptorChannel channel = this.openChannel();
+    final EOAdaptorChannel channel = this.openChannel();
     if (channel == null)
       return null;
 
@@ -601,7 +602,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   }
 
   public void maintainPool() {
-    boolean debugOn = log.isDebugEnabled();
+    final boolean debugOn = log.isDebugEnabled();
 
     /* scan pool for connections which should be closed */
     if (debugOn) log.debug("running maintenance ...");
@@ -684,7 +685,15 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     }
   }
 
-  protected EOAdaptorChannel findChannelForConnection(Connection _c) {
+  /**
+   * Locates the EOAdaptorChannel which wraps the given connection. This works
+   * by scanning the checkedOutChannels ivar.
+   * 
+   * @param _c - the JDBC Connection object to check
+   * @return the EOAdaptorChannel which manages the Connection, or null
+   */
+  protected EOAdaptorChannel findChannelForConnection(final Connection _c) {
+    // TBD: unused, can be dropped?
     for (EOAdaptorChannel entry: this.checkedOutChannels) {
       if (entry.connection == _c)
         return entry;
@@ -692,7 +701,19 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return null;
   }
 
-  protected boolean shouldKeepChannel(EOAdaptorChannel _channel) {
+  /**
+   * Checks whether the EOAdaptorChannel should be put into the connection
+   * pool.
+   * This checks whether the number of connections exceeds the 'maxConnection'
+   * setting, it checks whether the channel is closed and it checks whether the
+   * age of the channel exceeds the 'maxChannelAgeInSeconds'.
+   * <p>
+   * IMPORTANT: must run in a synchronized section.
+   * 
+   * @param _channel - the EOAdaptorChannel
+   * @return true if the channel should be reused, false otherwise
+   */
+  protected boolean shouldKeepChannel(final EOAdaptorChannel _channel) {
     // Note: must be run inside a monitor!
 
     if (_channel == null)
@@ -730,27 +751,24 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * The fetched rows are returned, or null on error. There is no way
    * to retrieve error exceptions using this method.
    * <p>
-   * Example:<br>
-   * <code>
-   * List records = adaptor.performSQL("SELECT * FROM sessiong_log");<br>
-   * System.out.println("db rows: " + records);
-   * </code>
-   *
+   * Example:<pre>
+   *   List records = adaptor.performSQL("SELECT * FROM sessiong_log");
+   *   System.out.println("db rows: " + records);</pre>
    *
    * @param _sql - the SQL to execute
    * @return a List of Maps representing the database records or null on error
    */
-  public List<Map<String, Object>> performSQL(String _sql) {
+  public List<Map<String, Object>> performSQL(final String _sql) {
     // TODO: fix return type
     if (_sql == null || _sql.length() == 0)
       return null;
 
-    EOAdaptorChannel channel = this.openChannelFromPool();
+    final EOAdaptorChannel channel = this.openChannelFromPool();
     if (channel == null) return null;
 
-    List<Map<String, Object>> result = channel.performSQL(_sql);
+    final List<Map<String, Object>> result = channel.performSQL(_sql);
     if (result == null) { /* failed with some error */
-      Exception error = channel.consumeLastException();
+      final Exception error = channel.consumeLastException();
       if (error != null)
         log.warn("performSQL() failed: " + _sql, error);
 
@@ -768,26 +786,24 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * The number of affected rows is returned, or -1 on error. There is no way
    * to retrieve error exceptions using this method.
    * <p>
-   * Example:<br>
-   * <code>
-   * int affected = adaptor.performUpdateSQL("DELETE FROM session_log");<br>
-   * System.out.println("we deleted " + affected + " rows in the DB!");
-   * </code>
+   * Example:<pre>
+   *   int affected = adaptor.performUpdateSQL("DELETE FROM session_log");
+   *   System.out.println("we deleted " + affected + " rows in the DB!");</pre>
    *
    *
    * @param _sql - the SQL (UPDATE/INSERT/DELETE) to execute
    * @return number of affected records or -1 on error
    */
-  public int performUpdateSQL(String _sql) {
+  public int performUpdateSQL(final String _sql) {
     if (_sql == null || _sql.length() == 0)
       return -1;
 
-    EOAdaptorChannel channel = this.openChannelFromPool();
+    final EOAdaptorChannel channel = this.openChannelFromPool();
     if (channel == null) return -1;
 
     int result = channel.performUpdateSQL(_sql);
     if (result < 0) { /* failed with some error */
-      Exception error = channel.consumeLastException();
+      final Exception error = channel.consumeLastException();
       if (error != null)
         log.warn("performUpdateSQL() failed: " + _sql, error);
 
@@ -799,9 +815,17 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return result;
   }
 
-  // TODO: fix return type
+  /**
+   * Convenience method which fetches exactly one record. Example:<pre>
+   *   Map record = adaptor.fetchRecord("persons", "company_id", 10000);</pre>
+   * 
+   * @param _table - name of table, eg 'persons'
+   * @param _field - column to check, usually the primary key (eg 'id')
+   * @param _value - value of the column
+   * @return the record as a Map, or null if the record was not found
+   */
   public Map<String, Object> fetchRecord
-    (String _table, String _field, Object _value)
+    (final String _table, final String _field, final Object _value)
   {
     if (_table.length() < 1 || _field.length() < 1)
       return null;
@@ -810,8 +834,8 @@ public class EOAdaptor extends NSObject implements NSDisposable {
 
     /* generate SQL */
 
-    EOSQLExpression e = this.expressionFactory().createExpression(null);
-    StringBuilder sql = new StringBuilder(255);
+    final EOSQLExpression e = this.expressionFactory().createExpression(null);
+    final StringBuilder sql = new StringBuilder(255);
 
     sql.append("SELECT * FROM ");
     sql.append(e.sqlStringForSchemaObjectName(_table));
@@ -823,7 +847,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
 
     /* run query */
 
-    List<Map<String, Object>> records = this.performSQL(sql.toString());
+    final List<Map<String, Object>> records = this.performSQL(sql.toString());
     if (records == null)
       return null;
 
@@ -840,11 +864,11 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return records.get(0);
   }
 
-  public boolean insertRow(String _table, Map<String, Object> _record) {
+  public boolean insertRow(final String _table, Map<String, Object> _record) {
     if (_table == null || _record == null)
       return false;
 
-    EOAdaptorChannel channel = this.openChannelFromPool();
+    final EOAdaptorChannel channel = this.openChannelFromPool();
     if (channel == null) return false;
 
     if (!channel.insertRow(_table, _record)) {
@@ -863,7 +887,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     if (_table == null || _record == null)
       return false;
 
-    EOAdaptorChannel channel = this.openChannelFromPool();
+    final EOAdaptorChannel channel = this.openChannelFromPool();
     if (channel == null) return false;
 
     if (!channel.updateRow(_table, _pkey, _value, _record)) {
@@ -875,10 +899,11 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return true;
   }
 
+  
   /* quoting SQL expressions */
   // TODO: maybe we want to move that to an own per-adaptor object?
 
-  public String stringByQuotingIdentifier(String _id) {
+  public String stringByQuotingIdentifier(final String _id) {
     // TBD: could use getIdentifierQuoteString() of java.sql.DatabaseMetaData
     if (_id == null) return null;
 
@@ -887,7 +912,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   }
 
   public boolean escapeIntoBuffer
-    (StringBuilder _sb, String _value, char _quoteChar)
+    (final StringBuilder _sb, final String _value, final char _quoteChar)
   {
     if (_value == null)
       return false;
@@ -913,7 +938,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return true;
   }
 
-  public String escape(String _value, char _quoteChar) {
+  public String escape(final String _value, final char _quoteChar) {
     if (_value == null)
       return null;
     if (_value.length() == 0)
@@ -939,6 +964,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   public EOSchemaGeneration synchronizationFactory() {
     return new EOSynchronizationFactory(this);
   }
+  
 
   /* model support */
 
@@ -949,7 +975,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return this.modelPattern != null;
   }
 
-  public void setModelPattern(EOModel _pattern) {
+  public void setModelPattern(final EOModel _pattern) {
     synchronized(this) {
       if (_pattern == null) {
         this.modelPattern = null;
@@ -1145,21 +1171,26 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   /* maintenance timer */
 
   private static class MaintenanceTimerTask extends TimerTask {
-    private EOAdaptor adaptor;
+    private WeakReference<EOAdaptor> adaptor;
 
-    public MaintenanceTimerTask(EOAdaptor _adaptor) {
-      this.adaptor = _adaptor;
+    public MaintenanceTimerTask(final EOAdaptor _adaptor) {
+      this.adaptor = new WeakReference<EOAdaptor>(_adaptor);
     }
 
     @Override
     public void run() {
-      this.adaptor.maintainPool();
+      final EOAdaptor lAdaptor = this.adaptor.get();
+      if (lAdaptor != null)
+        lAdaptor.maintainPool();
+      else
+        this.cancel();
     }
   }
 
   /* description */
 
-  public void appendAttributesToDescription(StringBuilder _d) {
+  @Override
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     int coCount, availCount, mOpCount, mRelCount;
