@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -18,7 +18,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.eoaccess;
 
 import java.util.Map;
@@ -33,7 +32,9 @@ import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.UMap;
 
 /**
- * Used to query EOEnterpriseObjects from an EODatabase. You usually create an
+ * Used to query EOEnterpriseObjects from an EODatabase.
+ * <p>
+ * W/o it you usually create an
  * EODatabase object with an EOAdaptor and then use that database object to
  * acquire an EODatabaseChannel.
  *  
@@ -51,19 +52,19 @@ import org.getobjects.foundation.UMap;
  * @see EOFetchSpecification
  * @see EOAdaptorDataSource
  */
-/*
- * TODO: document
- * Note: Hm, the fetch-specification also has an entity name. Should it
- *       override the entityName when its set?
- */
 public class EOActiveDataSource extends EOAccessDataSource
   implements NSDisposable
 {
+  /*
+   * TODO: document
+   * Note: Hm, the fetch-specification also has an entity name. Should it
+   *       override the entityName when its set?
+   */
   protected static final Log log = LogFactory.getLog("EOActiveDataSource");
     
   protected EODatabase database;
 
-  public EOActiveDataSource(EODatabase _db, String _entityName) {
+  public EOActiveDataSource(final EODatabase _db, final String _entityName) {
     this.database       = _db;
     this.entityName     = _entityName;
     this.isFetchEnabled = true;
@@ -140,15 +141,15 @@ public class EOActiveDataSource extends EOAccessDataSource
       _fs.setFetchLimit(1);
     }
     
-    EODatabaseChannel ch = this.iteratorForObjects(_fs);
+    final EODatabaseChannel ch = this.iteratorForObjects(_fs);
     if (ch == null) {
       log.error("could not open iterator for fetch: " + _fs);
       return null;
     }
     
-    Object object = ch.fetchObject();
+    final Object object = ch.fetchObject();
     ch.cancelFetch();
-    ch.dispose(); ch = null; // TBD: should we really dispose the channel?
+    ch.dispose(); // TBD: should we really dispose the channel?
     return object;
   }
   
@@ -156,8 +157,8 @@ public class EOActiveDataSource extends EOAccessDataSource
   /* change operations */
   
   public Object createObject() {
-    EOEntity e     = this.entity();
-    Class    clazz = this.database.classForEntity(e);
+    final EOEntity e     = this.entity();
+    final Class    clazz = this.database.classForEntity(e);
     
     Object eo = NSJavaRuntime.NSAllocateObject(clazz, EOEntity.class, e);
     if (eo != null) {
@@ -173,18 +174,18 @@ public class EOActiveDataSource extends EOAccessDataSource
 
   // hm, in this case we could act like an EOEditingContext and queue changes
   
-  public Exception updateObject(Object _object) {
+  public Exception updateObject(final Object _object) {
     if (_object == null)
       return null;
     
     if (_object instanceof EOActiveRecord) {
-      EOActiveRecord ar = ((EOActiveRecord)_object);
+      final EOActiveRecord ar = ((EOActiveRecord)_object);
       if (this.database != null) ar.setDatabase(this.database);
       return ((EOActiveRecord)_object).save();
     }
     
     if (_object instanceof EOValidation) {
-      Exception e = ((EOValidation)_object).validateForUpdate();
+      final Exception e = ((EOValidation)_object).validateForUpdate();
       if (e != null) return e;
     }
     
@@ -194,13 +195,13 @@ public class EOActiveDataSource extends EOAccessDataSource
     return this.database.performDatabaseOperation(op);
   }
 
-  public Exception insertObject(Object _object) {
+  public Exception insertObject(final Object _object) {
     if (_object == null)
       return null;
 
     Exception error = null;
     if (_object instanceof EOActiveRecord) {
-      EOActiveRecord ar = ((EOActiveRecord)_object);
+      final EOActiveRecord ar = ((EOActiveRecord)_object);
       
       /* those can happen if the record was not allocated by us */
       if (this.database != null) ar.setDatabase(this.database);
@@ -231,18 +232,20 @@ public class EOActiveDataSource extends EOAccessDataSource
     return null /* everything OK */;
   }
 
-  public Exception deleteObject(Object _object) {
+  public Exception deleteObject(final Object _object) {
+    // TBD: - support primary keys values as an argument
+    //      - support EOGlobalIDs
     if (_object == null)
       return null;
     
     if (_object instanceof EOActiveRecord) {
-      EOActiveRecord ar = ((EOActiveRecord)_object);
+      final EOActiveRecord ar = ((EOActiveRecord)_object);
       if (this.database != null) ar.setDatabase(this.database);
       return ar.delete();
     }
     
     if (_object instanceof EOValidation) {
-      Exception e = ((EOValidation)_object).validateForDelete();
+      final Exception e = ((EOValidation)_object).validateForDelete();
       if (e != null) return e;
     }
 
@@ -255,19 +258,29 @@ public class EOActiveDataSource extends EOAccessDataSource
   
   /* adaptor operations */
   
-  public Exception perform(EOAdaptorOperation[] _ops) {
+  /**
+   * Performs the given EOAdaptorOperations in the database.
+   * <p>
+   * This is done by retrieving the EOAdaptor from the associated database. Then
+   * a channel is opened and performAdaptorOperations() is called. Afterwards
+   * the channel is released.
+   */
+  public Exception perform(final EOAdaptorOperation[] _ops) {
     if (_ops == null)
       return new NSException("missing entity for perform");
     
-    EOAdaptor adaptor = this.database.adaptor();
-    EOAdaptorChannel adChannel = adaptor.openChannelFromPool();
+    final EOAdaptor adaptor = this.database.adaptor();
+    final EOAdaptorChannel adChannel = adaptor.openChannelFromPool();
     if (adChannel == null)
       return new NSException("could not open adaptor channel");
     
     // TBD: what about transactions?!
     
-    Exception error = adChannel.performAdaptorOperations(_ops);
-    adaptor.releaseChannel(adChannel); adChannel = null;
+    final Exception error = adChannel.performAdaptorOperations(_ops);
+    if (error != null)
+      adaptor.releaseAfterError(adChannel, error);
+    else
+      adaptor.releaseChannel(adChannel);
     
     return error;
   }
@@ -279,10 +292,10 @@ public class EOActiveDataSource extends EOAccessDataSource
    * 
    * @param _opName the name of the operation to be performed
    * @param _binds  optional binding values for the operation
-   * @return
+   * @return null on success, the error otherwise
    */
   public Exception perform(String _opName, Map<String, Object> _binds) {
-    EOEntity entity = this.entity();
+    final EOEntity entity = this.entity();
     if (entity == null) {
       // TODO: improve error
       return new NSException("missing entity for perform");
@@ -290,7 +303,7 @@ public class EOActiveDataSource extends EOAccessDataSource
     
     /* lookup operations in entity */
     
-    EOAdaptorOperation[] ops = entity.adaptorOperationsNamed(_opName);
+    final EOAdaptorOperation[] ops = entity.adaptorOperationsNamed(_opName);
     if (ops == null)
       return new NSException("did not find operations to perform: " + _opName);
     
@@ -309,6 +322,15 @@ public class EOActiveDataSource extends EOAccessDataSource
     return this.perform(ops);
   }
   
+  /**
+   * This method performs a given, named adaptor operation. The operation is
+   * retrieved from the entity using the given name, its then bound using the
+   * given bindings.
+   * 
+   * @param _opName - the name of the operation to be performed
+   * @param _valuesAndMoreKeys - optional binding values for the operation
+   * @return null on success, the error otherwise
+   */
   @SuppressWarnings("unchecked")
   public Exception perform(String _opName, Object... _valuesAndMoreKeys) {
     return this.perform(_opName, UMap.createArgs(_valuesAndMoreKeys));
