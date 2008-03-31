@@ -49,7 +49,7 @@ import org.getobjects.foundation.UMap;
  *   <li>EOActiveDataSource
  *   <li>EOAdaptorDataSource
  * </ol>
- * All of those datasources are very similiar in the operations they provided,
+ * All of those datasources are very similiar in the operations they provide,
  * but they differ in the feature set and overhead.
  * <p>
  * EODatabaseDataSource works on top of an EOEditingContext. It has the biggest
