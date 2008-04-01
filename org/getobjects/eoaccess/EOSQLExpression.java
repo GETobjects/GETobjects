@@ -55,7 +55,14 @@ import org.getobjects.foundation.UList;
 /**
  * EOSQLExpression
  * <p>
- * This class is used to generate SQL.
+ * This class is used to generate adaptor specific SQL. Usually for mapped
+ * qualifiers and records (but it also works for 'raw' values if the entity is
+ * missing).
+ * <br>
+ * For example this class maps EOQualifier's to their SQL representation. This
+ * requires proper quoting of values and mapping of attribute names to columns
+ * names. 
+ * 
  * <p>
  * The final generation (prepare...) is triggered by the EOAdaptorChannel when
  * it is asked to perform an adaptor operation. It turns the EOAdaptorOperation

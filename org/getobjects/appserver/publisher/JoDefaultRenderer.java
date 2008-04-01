@@ -156,7 +156,7 @@ public class JoDefaultRenderer extends NSObject implements IJoObjectRenderer {
     if (_ctx.response() == _response) /* response is already active */
       return null; /* everything OK */
     
-    // TODO
+    // TODO: copy status, headers, content
     log.error("custom WOResponse'es not yet supported: " + _response);
     return new NSException("unimplemented: cannot render response");
   }
