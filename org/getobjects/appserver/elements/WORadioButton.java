@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -46,10 +46,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   <pre>&lt;input type="radio" name="products" value="iPhone" /&gt;</pre>
  * 
  * Bindings (WOInput):<pre>
- *   id       [in] - string
- *   name     [in] - string
- *   value    [io] - object
- *   disabled [in] - boolean</pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
  * Bindings:<pre>
  *   selection [io] - object
  *   checked   [io] - boolean</pre>
@@ -59,8 +61,8 @@ public class WORadioButton extends WOInput {
   protected WOAssociation selection;
   protected WOAssociation checked;
 
-  public WORadioButton(String _name, Map<String, WOAssociation> _assocs,
-                       WOElement _template)
+  public WORadioButton
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
 
@@ -71,8 +73,8 @@ public class WORadioButton extends WOInput {
   /* responder */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
+    final Object cursor = _ctx.cursor();
     
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor))
@@ -81,8 +83,8 @@ public class WORadioButton extends WOInput {
     
     /* retrieve form values */
 
-    String formName  = this.elementNameInContext(_ctx);
-    String formValue = _rq.stringFormValueForKey(formName);
+    final String formName  = this.elementNameInContext(_ctx);
+    final String formValue = _rq.stringFormValueForKey(formName);
     if (formValue == null) {
       /* radio buttons are special, they are selected based upon there value */ 
       log.debug("got not form value for radio button elem: " + formName);
@@ -91,11 +93,11 @@ public class WORadioButton extends WOInput {
     
     /* retrieve model values */
     
-    if (this.value == null) { /* nothing to push to */
+    if (this.readValue == null) { /* nothing to push to */
       log.error("missing value binding for element: " + this);
       return;
     }
-    Object v  = this.value.valueInComponent(cursor);
+    Object v  = this.readValue.valueInComponent(cursor);
     String vs = v.toString();
     
     /* check whether we are the selected radio button */
@@ -128,20 +130,23 @@ public class WORadioButton extends WOInput {
     }
   }
   
+  
+  /* generate response */
+  
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
     // Note: we MUST have a value binding
-    if (this.value == null) {
+    if (this.readValue == null) {
       _r.appendContentString("[ERROR: radio w/o value binding]");
       log.error("missing value binding for radio button: " + this);
       return;
     }
     
-    Object cursor   = _ctx.cursor();
-    String formName = this.elementNameInContext(_ctx);
+    final Object cursor   = _ctx.cursor();
+    final String formName = this.elementNameInContext(_ctx);
       
     _r.appendBeginTag("input");
     _r.appendAttribute("type", "radio");
@@ -151,7 +156,7 @@ public class WORadioButton extends WOInput {
 
     _r.appendAttribute("name", formName);
     
-    Object v  = this.value.valueInComponent(cursor);
+    Object v  = this.readValue.valueInComponent(cursor);
     String vs = v.toString();
     _r.appendAttribute("value", vs);
     
@@ -171,7 +176,7 @@ public class WORadioButton extends WOInput {
     }
     else if (this.selection != null) {
       /* compare selection with value */
-      Object s = this.selection.valueInComponent(cursor);
+      final Object s = this.selection.valueInComponent(cursor);
       if (v == s)
         _r.appendAttribute("checked", "checked");
       else if (v != null && v.equals(s))
@@ -196,7 +201,7 @@ public class WORadioButton extends WOInput {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "selection", this.selection);

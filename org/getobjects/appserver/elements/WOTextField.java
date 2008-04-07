@@ -43,10 +43,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   &lt;input type="text" name="firstname" value="Donald" /&gt;</pre>
  * 
  * Bindings (WOInput):<pre>
- *   id             [in] - string
- *   name           [in] - string
- *   value          [io] - object
- *   disabled       [in] - boolean</pre>
+ *   id             [in]  - string
+ *   name           [in]  - string
+ *   value          [io]  - object
+ *   readValue      [in]  - object (different value for generation)
+ *   writeValue     [out] - object (different value for takeValues)
+ *   disabled       [in]  - boolean</pre>
  * Bindings (WOTextField):<pre>
  *   readonly       [in] - boolean
  *   size           [in] - int
@@ -123,8 +125,8 @@ public class WOTextField extends WOInput {
     
     _r.appendAttribute("name", this.elementNameInContext(_ctx));
     
-    if (this.value != null) {
-      final Object ov = this.value.valueInComponent(cursor);
+    if (this.readValue != null) {
+      final Object ov = this.readValue.valueInComponent(cursor);
       final String s  = this.formValueForObject(ov, _ctx);
       if (s != null)
         _r.appendAttribute("value", s);

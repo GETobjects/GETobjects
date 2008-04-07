@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -46,10 +46,11 @@ import org.getobjects.appserver.elements.links.WOLinkGenerator;
  *   &lt;input type="image" name="ok" src="/images/ok.gif" /&gt;</pre>
  * 
  * Bindings (WOInput):<pre>
- *   id        [in] - string
- *   name      [in]  - string
- *   value     [io]  - object
- *   disabled  [in]  - boolean</pre>
+ *   id         [in] - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   writeValue [out] - String: x=273&y=283
+ *   disabled   [in]  - boolean</pre>
  *   
  * Bindings:<pre>
  *   action    [in]  - action
@@ -89,8 +90,8 @@ public class WOImageButton extends WOInput {
     this.link = WOLinkGenerator
       .rsrcLinkGeneratorForAssociations("src", _assocs);
     
-    if (this.value != null)
-      log.warn("WOImageButton does not use 'value' binding ...");
+    if (this.readValue != null)
+      log.warn("WOImageButton does not use 'value' bindings for reads ...");
     if (this.action != null && this.pageName != null)
       log.warn("Both, 'action' and 'pageName' bindings are specified ..");
   }
@@ -98,25 +99,26 @@ public class WOImageButton extends WOInput {
   /* request handling */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
+    final Object cursor = _ctx.cursor();
     
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor))
         return;
     }
     
-    String baseId = this.elementNameInContext(_ctx);
-    String xVal   = _rq.stringFormValueForKey(baseId + ".x");
-    String yVal   = _rq.stringFormValueForKey(baseId + ".x");
+    final String baseId = this.elementNameInContext(_ctx);
+    final String xVal   = _rq.stringFormValueForKey(baseId + ".x");
+    final String yVal   = _rq.stringFormValueForKey(baseId + ".x");
     
     if (xVal != null && xVal.length() > 0 && this.x != null)
       this.x.setIntValue(Integer.parseInt(xVal), cursor);
     if (yVal != null && yVal.length() > 0 && this.y != null)
       this.x.setIntValue(Integer.parseInt(xVal), cursor);
     
-    if (this.value != null && this.value.isValueSettableInComponent(cursor))
-      this.value.setValue("x=" + xVal + "&y=" + yVal, cursor);
+    if (this.writeValue != null && 
+        this.writeValue.isValueSettableInComponent(cursor))
+      this.writeValue.setValue("x=" + xVal + "&y=" + yVal, cursor);
     
     if (xVal != null && yVal != null) {
       if (this.action != null || this.pageName != null)
@@ -125,9 +127,9 @@ public class WOImageButton extends WOInput {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     // TODO: can we share the code with WOSubmitButton?
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
     
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor))
@@ -143,11 +145,9 @@ public class WOImageButton extends WOInput {
       return this.action.valueInComponent(cursor);
     
     if (this.pageName != null) {
-      String pname;
-      
-      pname = this.pageName.stringValueInComponent(cursor);
+      String pname = this.pageName.stringValueInComponent(cursor);
       if (pname == null) {
-        // TODO: print a log
+        log.info("'pageName' binding returned no value!");
         return null;
       }
       
@@ -157,12 +157,15 @@ public class WOImageButton extends WOInput {
     return null;
   }
   
+  
+  /* generate response */
+  
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
-    Object cursor = _ctx.cursor(); 
+    final Object cursor = _ctx.cursor(); 
 
     _r.appendBeginTag("input");
     _r.appendAttribute("type",  "image");
@@ -190,10 +193,11 @@ public class WOImageButton extends WOInput {
     _r.appendBeginTagClose(_ctx.closeAllElements());
   }
   
+  
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "action",   this.action);

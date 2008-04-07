@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -58,8 +58,8 @@ public class WOSubmitButton extends WOInput {
   protected WOAssociation action;
   protected WOAssociation pageName;
   
-  public WOSubmitButton(String _name, Map<String, WOAssociation> _assocs,
-                        WOElement _template)
+  public WOSubmitButton
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     
@@ -78,8 +78,8 @@ public class WOSubmitButton extends WOInput {
   /* handle request */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
+    final Object cursor = _ctx.cursor();
     
     // System.err.println("TAKE VALS: " + this + ": " + _ctx.elementID());
     
@@ -90,8 +90,9 @@ public class WOSubmitButton extends WOInput {
     
     Object formValue = _rq.formValueForKey(this.elementNameInContext(_ctx));
     
-    if (this.value != null && this.value.isValueSettableInComponent(cursor))
-      this.value.setValue(formValue, cursor);
+    if (this.writeValue != null && 
+        this.writeValue.isValueSettableInComponent(cursor))
+      this.writeValue.setValue(formValue, cursor);
     
     if (formValue != null) {
       if (this.action != null || this.pageName != null)
@@ -100,7 +101,7 @@ public class WOSubmitButton extends WOInput {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     Object cursor = _ctx.cursor();
     
     if (this.disabled != null) {
@@ -153,11 +154,11 @@ public class WOSubmitButton extends WOInput {
   /* generate response */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
 
     _r.appendBeginTag("input");
     _r.appendAttribute("type",  "submit");
@@ -167,9 +168,9 @@ public class WOSubmitButton extends WOInput {
 
     _r.appendAttribute("name",  this.elementNameInContext(_ctx));
     
-    if (this.value != null) {
+    if (this.readValue != null) {
       _r.appendAttribute("value",
-          this.value.stringValueInComponent(cursor));
+          this.readValue.stringValueInComponent(cursor));
     }
     
     if (this.disabled != null) {
@@ -187,10 +188,11 @@ public class WOSubmitButton extends WOInput {
     _r.appendBeginTagClose(_ctx.closeAllElements());
   }
   
+  
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "action",   this.action);

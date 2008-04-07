@@ -43,10 +43,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   &lt;input type="hidden" name="hideme" value="abc123" /&gt;</pre>
  * <p>
  * Bindings (WOInput):<pre>
- *   id       [in] - string
- *   name     [in] - string
- *   value    [io] - object
- *   disabled [in] - boolean</pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
  */
 public class WOHiddenField extends WOInput {
 
@@ -59,11 +61,11 @@ public class WOHiddenField extends WOInput {
   /* responder */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
-    Object cursor = _ctx.cursor(); 
+    final Object cursor = _ctx.cursor(); 
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor))
         return;
@@ -76,8 +78,8 @@ public class WOHiddenField extends WOInput {
     String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
     if (lid != null) _r.appendAttribute("id", lid);
     
-    if (this.value != null) {
-      String s = this.value.stringValueInComponent(cursor);
+    if (this.readValue != null) {
+      String s = this.readValue.stringValueInComponent(cursor);
       if (s != null)
         _r.appendAttribute("value", s);
     }

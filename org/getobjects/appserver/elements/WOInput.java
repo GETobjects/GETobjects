@@ -18,7 +18,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.appserver.elements;
 
 import java.text.ParseException;
@@ -37,18 +36,21 @@ import org.getobjects.appserver.core.WORequest;
  * Abstract superclass for elements which participate in FORM processing.
  * <p>
  * Bindings:<pre>
- *   id       [in] - string
- *   name     [in] - string
- *   value    [io] - object
- *   disabled [in] - boolean
- *   idname   [in] - string   - set id and name bindings in one step</pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean
+ *   idname     [in]  - string   - set id and name bindings in one step</pre>
  */
 public abstract class WOInput extends WOHTMLDynamicElement {
   protected static final Log log = LogFactory.getLog("WOForms");
   
   protected WOAssociation eid;
   protected WOAssociation name;
-  protected WOAssociation value;
+  protected WOAssociation readValue;
+  protected WOAssociation writeValue;
   protected WOAssociation disabled;
   protected WOElement     coreAttributes;
 
@@ -57,10 +59,15 @@ public abstract class WOInput extends WOHTMLDynamicElement {
   {
     super(_name, _assocs, _template);
     
-    this.eid      = grabAssociation(_assocs, "id");
-    this.name     = grabAssociation(_assocs, "name");
-    this.value    = grabAssociation(_assocs, "value");
-    this.disabled = grabAssociation(_assocs, "disabled");
+    WOAssociation value = grabAssociation(_assocs, "value");
+    this.eid        = grabAssociation(_assocs, "id");
+    this.name       = grabAssociation(_assocs, "name");
+    this.disabled   = grabAssociation(_assocs, "disabled");
+    this.readValue  = grabAssociation(_assocs, "readValue");
+    this.writeValue = grabAssociation(_assocs, "writeValue");
+    
+    if (this.readValue  == null) this.readValue  = value;
+    if (this.writeValue == null) this.writeValue = value;
     
     this.coreAttributes =
       WOHTMLElementAttributes.buildIfNecessary(_name + "_core", _assocs);
@@ -129,11 +136,11 @@ public abstract class WOInput extends WOHTMLDynamicElement {
         return;
     }
     
-    if (this.value == null) { /* nothing to push to */
+    if (this.writeValue == null) { /* nothing to push to */
       log.info("missing value binding for element: " + this);
       return;
     }
-    if (!this.value.isValueSettableInComponent(cursor)) {
+    if (!this.writeValue.isValueSettableInComponent(cursor)) {
       log.info("value binding cannot be set for element: " + this);
       return;
     }
@@ -192,9 +199,9 @@ public abstract class WOInput extends WOHTMLDynamicElement {
     
     if (log.isDebugEnabled()) {
       log.debug("push field " + formName + " value: " + formValue + 
-                     " => " + this.value);
+                     " => " + this.writeValue);
     }
-    this.value.setValue(formValue, cursor);
+    this.writeValue.setValue(formValue, cursor);
   }
   
   
@@ -211,6 +218,14 @@ public abstract class WOInput extends WOHTMLDynamicElement {
       this.appendAssocToDescription(_d, "id",    this.eid);
       this.appendAssocToDescription(_d, "name",  this.name);
     }
-    this.appendAssocToDescription(_d, "value", this.value);
+    
+    if (this.readValue == this.writeValue)
+      this.appendAssocToDescription(_d, "value", this.readValue);
+    else {
+      if (this.readValue != null)
+        this.appendAssocToDescription(_d, "readValue", this.readValue);
+      if (this.writeValue != null)
+        this.appendAssocToDescription(_d, "writeValue", this.writeValue);
+    }
   }  
 }

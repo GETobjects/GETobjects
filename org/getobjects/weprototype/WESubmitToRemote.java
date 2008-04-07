@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -49,16 +49,17 @@ public class WESubmitToRemote extends WOInput {
        null /* link generator */);
   }
   
+  
   /* handle requests */
   
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (this.onClick != null)
       this.onClick.takeValuesFromRequest(_rq, _ctx);
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     if (_ctx.elementID().equals(_ctx.senderID())) {
       if (this.onClick != null)
         return this.onClick.invokeAction(_rq, _ctx);
@@ -67,14 +68,15 @@ public class WESubmitToRemote extends WOInput {
     return null;
   }
   
+  
   /* generate response */
     
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
     
-    Object cursor = _ctx.cursor(); 
+    final Object cursor = _ctx.cursor(); 
     String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
     
     /* start anker */
@@ -84,9 +86,9 @@ public class WESubmitToRemote extends WOInput {
     if (lid != null) _r.appendAttribute("id", lid);
     _r.appendAttribute("name",  this.elementNameInContext(_ctx));
     
-    if (this.value != null) {
+    if (this.readValue != null) {
       _r.appendAttribute("value",
-          this.value.stringValueInComponent(cursor));
+          this.readValue.stringValueInComponent(cursor));
     }
     
     if (this.disabled != null) {
