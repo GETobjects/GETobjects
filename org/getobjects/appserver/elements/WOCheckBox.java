@@ -61,10 +61,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   safeGuard [in] - boolean</pre> 
  *   
  * Bindings (WOInput):<pre>
- *   id        [in] - string
- *   name      [in] - string
- *   value     [io] - object
- *   disabled  [in] - boolean</pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
  */
 public class WOCheckBox extends WOInput {
   // TBD: should we support a label? (<label for=id>label</label>)
@@ -73,8 +75,8 @@ public class WOCheckBox extends WOInput {
   protected WOAssociation checked;
   protected WOAssociation safeGuard;
 
-  public WOCheckBox(String _name, Map<String, WOAssociation> _assocs,
-                    WOElement _template)
+  public WOCheckBox
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
 
@@ -86,7 +88,7 @@ public class WOCheckBox extends WOInput {
   /* responder */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     /*
      * Checkboxes are special in their form-value handling. If the form is
      * submitted and the checkbox is checked, a 'YES' value is transferred in
@@ -98,16 +100,16 @@ public class WOCheckBox extends WOInput {
      *       form that contains the checkbox!
      *       Best workaround for now is to run takeValues only for POST.
      */
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
     
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor))
         return;
     }
     
-    String  formName  = this.elementNameInContext(_ctx);
-    Object  formValue = _rq.formValueForKey(formName);
-    boolean doIt      = true;
+    final String formName  = this.elementNameInContext(_ctx);
+    final Object formValue = _rq.formValueForKey(formName);
+    boolean doIt = true;
     
     if (this.safeGuard==null || this.safeGuard.booleanValueInComponent(cursor)){
       /* we are configured to have a safeguard, check whether its submitted */
@@ -120,18 +122,21 @@ public class WOCheckBox extends WOInput {
     }
     
     // TODO: document why we don't reset the value if missing
-    if (doIt && formValue != null && this.value != null) {
-      if (this.value.isValueSettableInComponent(cursor))
-        this.value.setValue(formValue, cursor);
+    if (doIt && formValue != null && this.writeValue != null) {
+      if (this.writeValue.isValueSettableInComponent(cursor))
+        this.writeValue.setValue(formValue, cursor);
     }
   }
   
+  
+  /* generate response */
+  
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
-    Object cursor = _ctx.cursor(); 
+    final Object cursor = _ctx.cursor(); 
     String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
     
     String cbname = this.elementNameInContext(_ctx);
@@ -141,8 +146,8 @@ public class WOCheckBox extends WOInput {
     _r.appendAttribute("name", cbname);
     
     String v = null;
-    if (this.value != null)
-      v = this.value.stringValueInComponent(cursor);
+    if (this.readValue != null)
+      v = this.readValue.stringValueInComponent(cursor);
     if (v == null || v.length() == 0)
       v = "1";
     _r.appendAttribute("value", v);
@@ -183,7 +188,7 @@ public class WOCheckBox extends WOInput {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "selection", this.selection);

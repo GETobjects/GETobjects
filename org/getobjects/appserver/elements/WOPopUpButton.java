@@ -51,11 +51,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   &lt;/select&gt;</pre>
  * 
  * Bindings (WOInput):<pre>
- *   id       [in] - string
- *   name     [in]  - string
- *   value    [io]  - object
- *   disabled [in]  - boolean
- * </pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
  * Bindings:<pre>
  *   list              [in]  - List
  *   item              [out] - object
@@ -135,7 +136,7 @@ public class WOPopUpButton extends WOInput {
     if (this.list != null)
       objects = WOListWalker.listForValue(this.list.valueInComponent(cursor));
     
-    if (this.value != null) {
+    if (this.writeValue != null) {
       /* has a 'value' binding, walk list to find object */
       
       for (int i = 0, toGo = objects.size(); i < toGo; i++) {
@@ -145,7 +146,7 @@ public class WOPopUpButton extends WOInput {
         if (this.item != null && this.item.isValueSettableInComponent(cursor))
           this.item.setValue(lItem, cursor);
         
-        cv = this.value.stringValueInComponent(cursor);
+        cv = this.readValue.stringValueInComponent(cursor);
         if (formValue.equals(cv)) {
           object = lItem;
           break; /* found it, 'object' locvar is filled */
@@ -201,8 +202,8 @@ public class WOPopUpButton extends WOInput {
   
   /* generate response */
   
-  public void appendOptionsToResponse(WOResponse _r, WOContext _ctx) {
-    Object  cursor          = _ctx.cursor();
+  public void appendOptionsToResponse(final WOResponse _r, WOContext _ctx) {
+    final Object cursor     = _ctx.cursor();
     boolean escapesHTML     = true;
     boolean hasSettableItem;
     String  previousGroup   = null;
@@ -294,8 +295,8 @@ public class WOPopUpButton extends WOInput {
         
         Object v;
         String vs;
-        if (this.value != null) {
-          v  = this.value.valueInComponent(cursor);
+        if (this.readValue != null) {
+          v  = this.readValue.valueInComponent(cursor);
           vs = v != null ? v.toString() : null;
         }
         else {
@@ -412,8 +413,8 @@ public class WOPopUpButton extends WOInput {
         /* determine value (DUP above) */
         
         Object v;
-        if (this.value != null) {
-          v  = this.value.valueInComponent(cursor);
+        if (this.readValue != null) {
+          v  = this.readValue.valueInComponent(cursor);
           vs = v != null ? v.toString() : null;
         }
         else {
@@ -457,14 +458,14 @@ public class WOPopUpButton extends WOInput {
   }
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled()) {
       if (this.template != null)
         this.template.appendToResponse(_r, _ctx);
       return;
     }
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
 
     /* start tag */
     
@@ -501,10 +502,11 @@ public class WOPopUpButton extends WOInput {
     _r.appendEndTag("select");
   }
   
+  
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "list", this.list);

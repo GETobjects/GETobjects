@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -44,19 +44,21 @@ import org.getobjects.appserver.core.WOResponse;
  *   <pre>&lt;input type="password" name="password" value="abc123" /&gt;</pre>
  * 
  * Bindings (WOInput):<pre>
- *   id       [in] - string
- *   name     [in] - string
- *   value    [io] - object
- *   disabled [in] - boolean</pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
  * Bindings:<pre>
- *   size     [in] - int</pre>
+ *   size       [in]  - int</pre>
  */
 public class WOPasswordField extends WOInput {
   
   protected WOAssociation size;
 
-  public WOPasswordField(String _name, Map<String, WOAssociation> _assocs,
-                         WOElement _template)
+  public WOPasswordField
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     
@@ -67,11 +69,11 @@ public class WOPasswordField extends WOInput {
   /* generate response */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
-    Object cursor = _ctx.cursor(); 
+    final Object cursor = _ctx.cursor(); 
 
     _r.appendBeginTag("input");
     _r.appendAttribute("type", "password");
@@ -81,10 +83,13 @@ public class WOPasswordField extends WOInput {
     
     _r.appendAttribute("name", this.elementNameInContext(_ctx));
     
-    if (this.value != null) {
-      String s = this.value.stringValueInComponent(cursor);
-      if (s != null)
+    if (this.readValue != null) {
+      // TBD: do we really want this?
+      String s = this.readValue.stringValueInComponent(cursor);
+      if (s != null) {
+        log.warn("WOPasswordField is delivering a value (consider writeValue)");
         _r.appendAttribute("value", s);
+      }
     }
     
     if (this.size != null) {
@@ -108,10 +113,11 @@ public class WOPasswordField extends WOInput {
     _r.appendBeginTagClose(_ctx.closeAllElements());
   }
   
+  
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "size", this.size);

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -60,8 +60,8 @@ public class WOText extends WOInput {
   // TODO: add formatters
   
 
-  public WOText(String _name, Map<String, WOAssociation> _assocs,
-                WOElement _template)
+  public WOText
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
 
@@ -70,27 +70,29 @@ public class WOText extends WOInput {
     // TODO: add formatters
   }
 
+  
   /* applying formatters */
   
   @Override
-  protected Object parseFormValue(Object _value, WOContext _ctx) {
+  protected Object parseFormValue(final Object _value, final WOContext _ctx) {
     // TODO: FIXME to support formatters
     return _value;
   }
   
-  protected String formValueForObject(Object _value, WOContext _ctx) {
+  protected String formValueForObject(Object _value, final WOContext _ctx) {
     // TODO: FIXME to support formatters
     return _value != null ? _value.toString() : null;
   }
   
+  
   /* responder */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
 
     _r.appendBeginTag("textarea");
     
@@ -126,8 +128,8 @@ public class WOText extends WOInput {
     
     /* content */
     
-    if (this.value != null) {
-      Object ov = this.value.valueInComponent(cursor);
+    if (this.readValue != null) {
+      Object ov = this.readValue.valueInComponent(cursor);
       String s  = this.formValueForObject(ov, _ctx);
       if (s != null) {
         // TODO: we might want to strip CR's
@@ -140,10 +142,11 @@ public class WOText extends WOInput {
     _r.appendEndTag("textarea");
   }
   
+  
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "rows", this.rows);

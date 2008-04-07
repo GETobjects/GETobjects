@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -36,16 +36,17 @@ public class WOResetButton extends WOInput {
     super(_name, _assocs, _template);
   }
   
+  
   /* generate response */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
     // TODO: warn if 'name' and 'disabled' are set?
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
     
     _r.appendBeginTag("input");
     _r.appendAttribute("type",  "reset");
@@ -54,7 +55,7 @@ public class WOResetButton extends WOInput {
     if (lid != null) _r.appendAttribute("id", lid);
 
     _r.appendAttribute("name",  this.elementNameInContext(_ctx));
-    _r.appendAttribute("value", this.value.stringValueInComponent(_ctx));
+    _r.appendAttribute("value", this.readValue.stringValueInComponent(_ctx));
     
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor)) {

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -34,10 +34,31 @@ import org.getobjects.appserver.core.WOResponse;
 /**
  * WOFileUpload
  * <p>
+ * Renders a file upload form element.
+ * 
+ * <p>
+ * Bindings:<pre>
+ *   filePath        [io]  - object
+ *   data            [io]  - byte[]
+ *   string          [in]  - String
+ *   size            [io]  - int
+ *   contentType     [out] - String
+ *   deleteAfterPush [in]  - bool
+ *   inputStream     [in]  - InputStream</pre>
+ *   
+ * Bindings (WOInput):<pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
+ * <p>
  * Note: the 'value' binding contains the raw, adaptor specific value. For
  *       example Apache Commons FileUpload FileItem object.
  */
 public class WOFileUpload extends WOInput {
+  // TBD: document more
   
   protected WOAssociation filePath;
   protected WOAssociation data;
@@ -47,8 +68,8 @@ public class WOFileUpload extends WOInput {
   protected WOAssociation deleteAfterPush;
   protected WOAssociation inputStream;
 
-  public WOFileUpload(String _name, Map<String, WOAssociation> _assocs,
-                      WOElement _template)
+  public WOFileUpload
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     
@@ -80,14 +101,14 @@ public class WOFileUpload extends WOInput {
   /* process requests */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
+    final Object cursor = _ctx.cursor();
 
     String formName  = this.elementNameInContext(_ctx);
     Object formValue = _rq.formValueForKey(formName);
     
-    if (this.value != null)
-      this.value.setValue(formValue, cursor);
+    if (this.writeValue != null)
+      this.writeValue.setValue(formValue, cursor);
     
     if (formValue == null) {
       if (this.filePath != null) this.filePath.setValue(null, cursor);
@@ -139,10 +160,11 @@ public class WOFileUpload extends WOInput {
       log.warn("cannot process WOFileUpload value: " + formValue);
   }
   
+  
   /* generate response */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
@@ -150,12 +172,12 @@ public class WOFileUpload extends WOInput {
         "type", "file",
         "name", this.elementNameInContext(_ctx));
 
-    Object cursor = _ctx.cursor(); 
+    final Object cursor = _ctx.cursor(); 
     String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
     if (lid != null) _r.appendAttribute("id", lid);
     
-    if (this.value != null) {
-      String s = this.value.stringValueInComponent(cursor);
+    if (this.readValue != null) {
+      String s = this.readValue.stringValueInComponent(cursor);
       if (s != null)
         _r.appendAttribute("value", s);
     }
