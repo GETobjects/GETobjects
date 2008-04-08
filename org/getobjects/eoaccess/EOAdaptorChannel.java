@@ -21,6 +21,7 @@
 
 package org.getobjects.eoaccess;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -260,6 +261,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     catch (SQLException e) {
       /**
        * PG: 0A000 = "cannot insert into a view" (INSERT on view)
+       * PG: 42804 = "column XYZ is of type numeric but expression is of type
+       *              character varying"
        */
       this.lastException = e;
       
@@ -367,6 +370,10 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
                 stmt.setBoolean(i + 1, (Boolean)value);
               else if (value instanceof Integer)
                 stmt.setInt(i + 1, (Integer)value);
+              else if (value instanceof Double)
+                stmt.setDouble(i + 1, (Double)value);
+              else if (value instanceof BigDecimal)
+                stmt.setBigDecimal(i + 1, (BigDecimal)value);
               else if (value instanceof Long)
                 stmt.setLong(i + 1, (Long)value);
               else if (value instanceof java.util.Date) {
