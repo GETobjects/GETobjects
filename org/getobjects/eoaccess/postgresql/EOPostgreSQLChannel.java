@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -35,11 +35,11 @@ import org.getobjects.eoaccess.EOAttribute;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eoaccess.EOSQLExpression;
 
-/*
+/**
  * EOPostgreSQLChannel
- * 
+ * <p>
  * A subclass of the EOAdaptorChannel which adds reflection features.
- * 
+ * <p>
  * TBD: how do we want to support schemas? The default PostgreSQL
  *      schema is 'public'.
  */
@@ -52,7 +52,7 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   /* process columns */
   
   protected Object handleColumnValue
-    (ResultSetMetaData _meta, int _coltype, Object _value)
+    (final ResultSetMetaData _meta, final int _coltype, final Object _value)
   {
     if (_coltype == 1111) {
       /* _aclitem
@@ -70,7 +70,7 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
     /* {=T/postgres,postgres=CT/postgres,OGo=CT/postgres} */
     if (_s == null) return null;
     
-    int len = _s.length();
+    final int len = _s.length();
     if (len < 2) return _s;
     
     if (_s.charAt(0) != '{')
@@ -78,8 +78,8 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
     
     // TBD: what happens when the role name contains a special char?
     _s = _s.substring(1, _s.length() - 1);
-    String[] parts = _s.split(",");
-    String[][] splitParts = new String[parts.length][3];
+    final String[] parts = _s.split(",");
+    final String[][] splitParts = new String[parts.length][3];
     
     for (int i = 0; i < parts.length; i++) {
       int eqIdx = parts[i].indexOf('=');
@@ -117,11 +117,11 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
     return this.fetchSingleStringRows(dbNameQuery, null /* first column */);
   }
 
-  public EOEntity describeEntityWithTableName(String _tableName) {
+  public EOEntity describeEntityWithTableName(final String _tableName) {
     // TBD: fetch schema name or add it to the method args?
     if (_tableName == null) return null;
 
-    List<Map<String,Object>> columnInfos =
+    final List<Map<String,Object>> columnInfos =
       this._fetchPGColumnsOfTable(_tableName);
     String[] pkeyNames =
       this._fetchPGPrimaryKeyNamesOfTable(_tableName);
@@ -146,11 +146,11 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   /* attributes */
   
   protected String[] attributeNamesFromColumnNames
-    (String[] _colnames, EOAttribute[] _attrs)
+    (final String[] _colnames, final EOAttribute[] _attrs)
   {
     if (_colnames == null || _attrs == null) return null;
     
-    String[] attrNames = new String[_colnames.length];
+    final String[] attrNames = new String[_colnames.length];
     for (int i = 0; i < attrNames.length; i++) {
       for (int j = 0; j < _attrs.length; j++) {
         if (_colnames[i].equals(_attrs[j].columnName())) {
@@ -163,17 +163,17 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   }
   
   protected EOAttribute[] attributesFromColumnInfos
-    (List<Map<String,Object>> _columnInfos)
+    (final List<Map<String,Object>> _columnInfos)
   {
     // map: a.attnum, a.attname, t.typname, a.attlen, a.attnotnull "
     if (_columnInfos == null) return null;
 
-    int count = _columnInfos.size();
+    final int count = _columnInfos.size();
     EOAttribute[] attributes = new EOAttribute[count];
 
     for (int i = 0; i < count; i++) {
-      Map<String,Object> colinfo = _columnInfos.get(i);
-      String colname = (String)colinfo.get("colname");
+      final Map<String,Object> colinfo = _columnInfos.get(i);
+      final String colname = (String)colinfo.get("colname");
       String exttype = (String)colinfo.get("exttype");
       
       exttype = exttype.toUpperCase();
@@ -224,18 +224,18 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   
   /* sequences */
   
-  public Integer nextNumberInSequence(String _sequence) {
+  public Integer nextNumberInSequence(final String _sequence) {
     // SQL: SELECT NEXTVAL('key_generator')
     EOSQLExpression e = this.adaptor.expressionFactory().createExpression(null);
     
-    StringBuilder sql = new StringBuilder(32);
+    final StringBuilder sql = new StringBuilder(64);
     sql.append("SELECT NEXTVAL(");
     sql.append(e.sqlStringForSchemaObjectName(_sequence));
     sql.append(")");
     
     /* acquire DB resources */
     
-    Statement  stmt = this._createStatement();
+    final Statement stmt = this._createStatement();
     if (stmt == null) return -1;
     
     int nextNumber = -1;
