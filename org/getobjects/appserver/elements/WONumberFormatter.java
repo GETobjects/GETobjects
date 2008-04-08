@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2007-2008 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of JOPE.
 
@@ -53,35 +53,40 @@ class WONumberFormatter extends WOFormatter {
   /* creating Format */
   
   @Override
-  public Format formatInContext(WOContext _ctx) {
+  public Format formatInContext(final WOContext _ctx) {
     // TODO: we should probably cache some formatter objects?
-    String fmt = this.format.stringValueInComponent(_ctx.cursor());
+    final String fmt = this.format.stringValueInComponent(_ctx.cursor());
     
     if (fmt == null)
       return null;
     
-    NumberFormat lf = NumberFormat.getInstance(_ctx.locale());
+    final NumberFormat lf = NumberFormat.getInstance(_ctx.locale());
     if (lf == null)
       return null;
     
-    if (lf instanceof DecimalFormat)
-      ((DecimalFormat)lf).applyPattern(fmt);
+    // TBD: NumberFormat supports min/max values, int-only and more
+    
+    if (lf instanceof DecimalFormat) {
+      DecimalFormat df = (DecimalFormat)lf;
+      df.applyPattern(fmt);
+      df.setParseBigDecimal(true);
+    }
     
     return lf;
   }
   
   /* helper for things the Java Format cannot process */
   
-  public String stringForObjectValue(Object _o, WOContext _ctx) {
+  public String stringForObjectValue(Object _o, final WOContext _ctx) {
     if (_o == null)
       return null;
     
-    Format fmt = this.formatInContext(_ctx);
+    final Format fmt = this.formatInContext(_ctx);
     if (fmt == null)
       return (_o != null ? _o.toString() : null);
     
     if (_o instanceof String) {
-      String s = (String)_o;
+      final String s = (String)_o;
       
       try {
         /* You might say that we could just return the string as-is. But not
