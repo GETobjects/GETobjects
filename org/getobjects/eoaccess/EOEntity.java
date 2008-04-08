@@ -171,6 +171,8 @@ public class EOEntity extends NSObject
   }
   
   public EOAttribute attributeNamed(final String _name) {
+    // TBD: optimize, used quite often. Eg we might want to take hashes. Also
+    //      optimize for misses
     if (_name == null) return null;
     if (this.attributes == null) return null;
     
@@ -223,34 +225,86 @@ public class EOEntity extends NSObject
     return attrs;
   }
   
+  
   /**
-   * Returns the names of class property attributes. Those are attributes which
-   * are exposed as a part of the EO.
-   * The class properties are a subset of the attributes array. 
+   * Returns the names of class property attributes and relationships. Those are
+   * attributes which are exposed as a part of the EO.
+   * <p>
+   * The class properties are a subset of the attributes and relship arrays. Eg
+   * in regular EOF applications you would not expose database specific details
+   * like primary and foreign keys as class properties.
    * 
    * @return an array of property names
    */
   public String[] classPropertyNames() {
-    // TBD: should this include relationship names?
     if (this.classPropertyNames != null)
       return this.classPropertyNames;
-    if (this.attributes == null) return null;
+    if (this.attributes == null && this.relationships == null)
+      return null;
     
     // TODO: currently we treat all attributes as class properties, could be a
     //       subset
-    this.classPropertyNames = new String[this.attributes.length];
-    for (int i = 0; i < this.attributes.length; i++) {
-      if ((this.classPropertyNames[i] = this.attributes[i].name()) == null)
-        this.classPropertyNames[i] = this.attributes[i].columnName();
-      
-      // System.err.println("CLS: " + this.classPropertyNames[i]);
+    
+    int attrCount = this.attributes    != null ? this.attributes.length    : 0;
+    int relCount  = this.relationships != null ? this.relationships.length : 0;
+    
+    this.classPropertyNames = new String[attrCount + relCount];
+    if (attrCount > 0) {
+      for (int i = 0; i < attrCount; i++) {
+        // use columnName of the attribute has no name set
+        if ((this.classPropertyNames[i] = this.attributes[i].name()) == null)
+          this.classPropertyNames[i] = this.attributes[i].columnName();
+      }
     }
+    for (int i = 0; i < relCount; i++)
+      this.classPropertyNames[attrCount + i] = this.relationships[i].name();
+    
     return this.classPropertyNames;
   }
   
+  /**
+   * Returns the EOAttribute or EORelationship class property with the given
+   * name.
+   * Note that this ONLY returns class properties, no attributes which are not
+   * marked as such (though usually all are ;-).
+   * 
+   * @param  _name - name of the class property
+   * @return the EOAttribute or EORelationship, or null if the name is no prop
+   */
+  public EOProperty classPropertyNamed(final String _name) {
+    String[] pns = this.classPropertyNames(); // ensure the array is built
+    if (pns != null) {
+      // TBD: optimize scan, we might want to store hashes
+      boolean found = false;
+      for (int i = pns.length - 1; i >= 0; i--) {
+        if (_name.equals(pns[i])) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return null; /* not a class property */
+    }
+    
+    /* lookup property object */
+    
+    EOProperty prop = this.attributeNamed(_name);
+    if (prop != null) return prop;
+
+    return this.relationshipNamed(_name);
+  }
+  
+  
+  /**
+   * Returns the attributes which are used for optimistic locking. Those are
+   * checked for changes when an UPDATE is attempted in the database.
+   * For example in OGo we only need the 'objectVersion' as a change marker.
+   * 
+   * @return array of EOAttributes which are used for optimistic locking
+   */
   public EOAttribute[] attributesUsedForLocking() {
     return this.attributesUsedForLocking;
   }
+  
   
   /* primary keys */
   
@@ -261,7 +315,13 @@ public class EOEntity extends NSObject
     return this.attributesWithNames(this.primaryKeyAttributeNames());
   }
   
-  public Map<String, Object> primaryKeyForRow(Object _row) {
+  /**
+   * Extracts the primary key values contained in the given row (usually a Map). 
+   * 
+   * @param  _row - a row
+   * @return a Map contained the keys/values of the primary keys
+   */
+  public Map<String, Object> primaryKeyForRow(final Object _row) {
     /* we do KVC on the row, so it can be any kind of object */
     if (_row == null) {
       log.warn("got no row to calculate primary key!");
@@ -280,34 +340,37 @@ public class EOEntity extends NSObject
     return pkey;
   }
   
-  public EOQualifier qualifierForPrimaryKey(Object _object) {
+  public EOQualifier qualifierForPrimaryKey(final Object _object) {
     /* we do KVC on the row, so it can be any kind of object */
-    Map<String, Object> pkey = this.primaryKeyForRow(_object);
+    final Map<String, Object> pkey = this.primaryKeyForRow(_object);
     if (pkey == null) return null;
     
     return EOQualifier.qualifierToMatchAllValues(pkey);
   }
   
-  public EOGlobalID globalIDForRow(Map<String, Object> _row) {
-    int count = (this.primaryKeyAttributeNames == null)
+  public EOGlobalID globalIDForRow(final Map<String, Object> _row) {
+    final int count = (this.primaryKeyAttributeNames == null)
       ? 0 : this.primaryKeyAttributeNames.length;
     if (count == 0)
       return null;
     
-    Object[] keyValues = new Object[count];
+    final Object[] keyValues = new Object[count];
     for (int i = 0; i < count; i++)
       keyValues[i] = _row.get(this.primaryKeyAttributeNames[i]);
     
     return EOKeyGlobalID.globalIDWithEntityName(this.name(), keyValues);
   }
   
+  
   /* relationships */
   
-  public EORelationship relationshipNamed(String _name) {
+  public EORelationship relationshipNamed(final String _name) {
+    // TBD: optimize, used quite often. Eg we might want to take hashes. Also
+    //      optimize for misses
     if (_name == null) return null;
     if (this.relationships == null) return null;
     
-    // TODO: we might want to check for keypathes?
+    // TODO: we might want to check for keypathes? Yes, definitely!
     
     for (int i = 0; i < this.relationships.length; i++) {
       if (_name.equals(this.relationships[i].name()))
@@ -320,7 +383,7 @@ public class EOEntity extends NSObject
     return this.relationships;
   }
   
-  public void connectRelationshipsInModel(EOModel _model) {
+  public void connectRelationshipsInModel(final EOModel _model) {
     if (this.relationships == null)
       return;
     
@@ -331,7 +394,7 @@ public class EOEntity extends NSObject
   
   /* fetch specifications */
   
-  public EOFetchSpecification fetchSpecificationNamed(String _name) {
+  public EOFetchSpecification fetchSpecificationNamed(final String _name) {
     if (_name == null) return null;
     if (this.fetchSpecifications == null) return null;
     return this.fetchSpecifications.get(_name);
@@ -344,7 +407,7 @@ public class EOEntity extends NSObject
   
   /* fetch specifications */
   
-  public EOAdaptorOperation[] adaptorOperationsNamed(String _name) {
+  public EOAdaptorOperation[] adaptorOperationsNamed(final String _name) {
     if (_name == null) return null;
     if (this.adaptorOperations == null) return null;
     return this.adaptorOperations.get(_name);
@@ -355,30 +418,51 @@ public class EOEntity extends NSObject
     return this.adaptorOperations.keySet().toArray(new String[0]); 
   }
   
+  
   /* containment */
   
-  public boolean referencesProperty(Object _property) {
+  /**
+   * Checks whether the given EOAttribute or EORelationship is managed by this
+   * object.
+   * 
+   * @param _property - an EOAttribute or EORelationship
+   */
+  public boolean referencesProperty(final Object _property) {
     if (_property == null) return false;
     
-    if (this.attributes != null) {
-      for (int i = 0; i < this.attributes.length; i++) {
-        if (this.attributes[i] == _property)
-          return true;
-        if (_property.equals(this.attributes[i]))
-          return true;
+    if (_property instanceof EOAttribute) {
+      if (this.attributes != null) {
+        for (int i = 0; i < this.attributes.length; i++) {
+          if (this.attributes[i] == _property)
+            return true;
+          if (_property.equals(this.attributes[i]))
+            return true;
+        }
       }
     }
+    else if (_property instanceof EORelationship) {
+      if (this.relationships != null) {
+        for (int i = 0; i < this.relationships.length; i++) {
+          if (this.relationships[i] == _property)
+            return true;
+          if (_property.equals(this.relationships[i]))
+            return true;
+          if (this.relationships[i].referencesProperty(_property))
+            return true;
+        }
+      }
+    }
+    else if (_property instanceof String) {
+      String propName = (String)_property;
+      
+      if (this.attributeNamed(propName) != null)
+        return true;
+      if (this.relationshipNamed(propName) != null)
+        return true;
+    }
+    else
+      log.error("unexpected key in referencesProperty(): " + _property);
     
-    if (this.relationships != null) {
-      for (int i = 0; i < this.relationships.length; i++) {
-        if (this.relationships[i] == _property)
-          return true;
-        if (_property.equals(this.relationships[i]))
-          return true;
-        if (this.relationships[i].referencesProperty(_property))
-          return true;
-      }
-    }
     return false;
   }
   
