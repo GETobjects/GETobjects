@@ -30,6 +30,8 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOSession;
 import org.getobjects.eoaccess.EOActiveRecord;
+import org.getobjects.eoaccess.EOEntity;
+import org.getobjects.eoaccess.EOProperty;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSObject;
 import org.mozilla.javascript.Context;
@@ -84,6 +86,15 @@ public class JSWrapFactory extends WrapFactory {
       
       if (_javaObject instanceof WORequest)
         return new JSRequestAdapter(_scope, _javaObject, _staticType);
+      
+      if (_javaObject instanceof EOEntity)
+        return new EOEntityAdapter(_scope, _javaObject, _staticType);
+      
+      if (_javaObject instanceof EOProperty)
+        // TBD: own wrappers for relships and attrs?
+        return new EOPropertyAdapter(_scope, _javaObject, _staticType);
+      
+      /* fallback extra vars */
       
       if (_javaObject instanceof INSExtraVariables)
         return new JSExtraVarAdapter(_scope, _javaObject, _staticType);

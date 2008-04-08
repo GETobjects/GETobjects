@@ -80,6 +80,9 @@ public abstract class JSEntityObjectAdapter extends NativeJavaObject {
     if (log != null && log.isDebugEnabled())
       log.debug("ADAPTOR HAS?: " + _name + " from " + this.javaObject);
     
+    if (_name.equals("entity"))
+      return true;
+    
     EOEntity entity = this.entity();
     if (entity != null) {
       if (entity.classPropertyNamed(_name) != null)
@@ -112,6 +115,15 @@ public abstract class JSEntityObjectAdapter extends NativeJavaObject {
   @Override
   public Object get(final String _name, final Scriptable _start) {
     EOEntity entity = this.entity();
+
+    if (_name.equals("entity")) {
+      Context cx = Context.getCurrentContext();
+      return cx.getWrapFactory().wrap(cx,
+          this  /* scope? */,
+          entity /* Java object to be wrapped for JS */,
+          null  /* static type? */); 
+    }
+    
     if (entity == null || (entity.classPropertyNamed(_name) == null)) {
       /* not a class property, use super implementation (regular Java stuff) */
       return super.get(_name, _start);
