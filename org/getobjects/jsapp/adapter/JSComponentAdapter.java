@@ -74,7 +74,7 @@ public class JSComponentAdapter extends JSExtraVarAdapter {
   /* remap some things to properties */
 
   @Override
-  public boolean has(String _name, Scriptable _start) {
+  public boolean has(final String _name, final Scriptable _start) {
     int  len = _name.length();
     char c0  = len > 0 ? _name.charAt(0) : 0;
     
