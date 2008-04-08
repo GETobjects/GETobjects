@@ -29,6 +29,7 @@ import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOSession;
+import org.getobjects.eoaccess.EOActiveRecord;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSObject;
 import org.mozilla.javascript.Context;
@@ -66,6 +67,9 @@ public class JSWrapFactory extends WrapFactory {
     /* wrap specific, known NSObjects */
 
     if (_javaObject instanceof NSObject) {
+      if (_javaObject instanceof EOActiveRecord)
+        return new JSActiveRecordAdapter(_scope, _javaObject, _staticType);
+      
       if (_javaObject instanceof WOComponent)
         return new JSComponentAdapter(_scope, _javaObject, _staticType);
 

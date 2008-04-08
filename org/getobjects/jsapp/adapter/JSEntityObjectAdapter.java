@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2007-2008 Helge Hess
+ * Copyright (C) 2008 Helge Hess
  *
- * This file is part of JOPE.
+ * This file is part of Go.
  *
- * JOPE is free software; you can redistribute it and/or modify it under the
+ * Go is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2, or (at your option) any later version.
  *
- * JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+ * Go is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
@@ -20,7 +20,8 @@ package org.getobjects.jsapp.adapter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.foundation.INSExtraVariables;
+import org.getobjects.eoaccess.EOEntity;
+import org.getobjects.foundation.NSKeyValueCoding;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -29,39 +30,44 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 
 /**
- * Wrap an extra-var object (WOComponent, WOSession etc) in JavaScript. The
- * basic idea is that *all* JavaScript slots are stored in extra-vars of the
- * WOComponent.
- * This includes functions and all 'var's of a script compiled against this
- * 'scope'.
+ * JSActiveRecordAdapter
+ * <p>
+ * Wraps an EOActiveRecord. The EOEntity of the object is used to determine
+ * the properties of the object. Those properties are mapped straight to JS
+ * properties and are resolved using KVC.
+ * In short: every classProperty in the EOEntity will become a JavaScript
+ * property (no set/get accessors needed).
  * <p>
  * Its inspired by the NativeMapAdapter.
  */
-public class JSExtraVarAdapter extends NativeJavaObject {
+public abstract class JSEntityObjectAdapter extends NativeJavaObject {
   // Note: 'implements Wrapper' (aka call 'unwrap()' to unwrap)
   private static final long serialVersionUID = 1L;
   protected static final Log log = LogFactory.getLog("JSBridge");
 
 
-  public JSExtraVarAdapter() {
+  public JSEntityObjectAdapter() {
   }
 
-  public JSExtraVarAdapter(Scriptable _scope, Object _javaObject, Class _type){
+  public JSEntityObjectAdapter(Scriptable _scope, Object _javaObject, Class _type){
     super(_scope, _javaObject, _type);
   }
 
-  public JSExtraVarAdapter
+  public JSEntityObjectAdapter
     (Scriptable _scope, Object _javaObject, Class _type, boolean _isAdapter)
   {
     super(_scope, _javaObject, _type, _isAdapter);
   }
 
+
   /* accessors */
   
   @Override
   public String getClassName() {
-    return "JSExtraVarAdapter"; 
+    return "JSEntityObjectAdapter"; 
   }
+
+  public abstract EOEntity entity();
   
   
   /* slots */
@@ -74,20 +80,23 @@ public class JSExtraVarAdapter extends NativeJavaObject {
     if (log != null && log.isDebugEnabled())
       log.debug("ADAPTOR HAS?: " + _name + " from " + this.javaObject);
     
+    EOEntity entity = this.entity();
+    if (entity != null) {
+      if (entity.classPropertyNamed(_name) != null)
+        return true;
+    }
+    
+    /* TBD: we could also allow arbitary additional props
     if (((INSExtraVariables)this.javaObject).objectForKey(_name) != null)
       return true;
+    */
     
-    if (super.has(_name, _start))
-      return true;
-
-    Scriptable proto = this.jsSharedScope();
-    return (proto == null) ? false : proto.has(_name, _start);
+    return super.has(_name, _start);
   }
   
   /**
-   * Get the value of a property. First check the superclass for methods of the
-   * Java class (will be returned as Callables), then check for WOComponent
-   * extra variables.
+   * Get the value of a property. First checks the EOEntity for the value, if
+   * it has one, KVC is used. Otherwise the superclass is checked.
    * <p>
    * The values that may be returned are limited to the following:
    * <UL>
@@ -102,39 +111,20 @@ public class JSExtraVarAdapter extends NativeJavaObject {
    */
   @Override
   public Object get(final String _name, final Scriptable _start) {
-    Object value = super.get(_name, _start); 
-    if (value != Scriptable.NOT_FOUND) 
-      return value; 
+    EOEntity entity = this.entity();
+    if (entity == null || (entity.classPropertyNamed(_name) == null)) {
+      /* not a class property, use super implementation (regular Java stuff) */
+      return super.get(_name, _start);
+    }
     
-    value = ((INSExtraVariables)this.javaObject).objectForKey(_name); 
+    /* OK, its a class property, map */
+    
+    Object value = ((NSKeyValueCoding)this.javaObject).valueForKey(_name); 
     if (log != null && log.isDebugEnabled()) {
       log.debug("ADAPTOR GET '" + _name + "': " + value +
           "\n  from " + this.javaObject);
     }
 
-    if (value == null || value == Scriptable.NOT_FOUND) {
-      /* Specialty: check prototype! We need to wrap Functions to get invoked
-       * in our context.
-       */
-      Scriptable proto = this.jsSharedScope();
-      if (proto == null)
-        return Scriptable.NOT_FOUND;
-      
-      value = proto.get(_name, _start /* this should be us? */);
-      if (value instanceof BaseFunction) {
-        /* instanceof Function fails against 'JavaClass' objects
-         * this is usually a IdFunctionObject, but sometimes something generated,
-         * eg: primaryNoteObject: org.mozilla.javascript.gen.c8@46f6f0
-         */
-        // System.err.println("WRAP proto call: " + _name + ": " + v);
-        return new JSBoundFunction(
-            this /* we are both, 'this' and the scope for our funcs */,
-            (Function)value);
-      }
-      
-      return value;
-    }
-    
     if (value instanceof BaseFunction /* just pure JS funcs */) {
       /* instanceof Function fails against 'JavaClass' objects
        * this is usually a IdFunctionObject, but sometimes something generated,
@@ -162,14 +152,9 @@ public class JSExtraVarAdapter extends NativeJavaObject {
         null  /* static type? */); 
   }
   
-  protected Scriptable jsSharedScope() {
-    return null; /* default is no shared scope */
-  }
-  
   @Override
   public Object[] getIds() {
-    // hm, return all IDs, our JOPE API does not support that. We would need to
-    // merge with super?
+    // hm, return all IDs. We would need to merge EOEntity props with super.
     //return ((IWOExtraVariables)this.javaObject).varDict().keySet().toArray();
     if (log != null && log.isDebugEnabled())
       log.error("GETIDS on " + this.javaObject);
@@ -179,6 +164,13 @@ public class JSExtraVarAdapter extends NativeJavaObject {
   
   @Override
   public void put(final String _name, final Scriptable _start, Object _value) {
+    EOEntity entity = this.entity();
+    if (entity == null || (entity.classPropertyNamed(_name) == null)) {
+      /* not a class property, use super implementation (regular Java stuff) */
+      super.put(_name, _start, _value);
+      return;
+    }
+
     try {
       // hm, here we get Undefined!
       Object v;
@@ -202,7 +194,7 @@ public class JSExtraVarAdapter extends NativeJavaObject {
             " on " + this.javaObject);
       }
       
-      ((INSExtraVariables)this.javaObject).setObjectForKey(v, _name); 
+      ((NSKeyValueCoding)this.javaObject).takeValueForKey(v, _name); 
     } 
     catch(RuntimeException e) {
       Context.throwAsScriptRuntimeEx(e); 
@@ -211,12 +203,7 @@ public class JSExtraVarAdapter extends NativeJavaObject {
   
   @Override
   public void delete(final String _name) {
-    try {
-      ((INSExtraVariables)this.javaObject).removeObjectForKey(_name);
-    } 
-    catch (RuntimeException e) {
-      Context.throwAsScriptRuntimeEx(e); 
-    } 
+    super.delete(_name);
   }
 
   
