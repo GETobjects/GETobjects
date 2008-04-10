@@ -154,7 +154,7 @@ public class JoObjectRequestHandler extends WORequestHandler {
    * @return the resulting WOResponse
    */
   @Override
-  public WOResponse handleRequest(WORequest _rq) {
+  public WOResponse handleRequest(final WORequest _rq) {
     /*
      * Note: this is different to WO, we always use JoObjects to handle requests
      *       and the a WORequestHandler object is just a special kind of
@@ -303,11 +303,11 @@ public class JoObjectRequestHandler extends WORequestHandler {
     return r;
   }
   
-  protected void savePageWhenRequired(WOContext _ctx) {
+  protected void savePageWhenRequired(final WOContext _ctx) {
     if (!_ctx.isSavePageRequired())
       return;
     
-    WOComponent page = _ctx.page();
+    final WOComponent page = _ctx.page();
     if (page == null) {
       log.warn("requested save page, but got no page in context:" + _ctx);
       return;
@@ -318,7 +318,7 @@ public class JoObjectRequestHandler extends WORequestHandler {
      *  anymore).
      * Well, it works with cookie based session-ids.
      */
-    WOSession sn = _ctx.session();
+    final WOSession sn = _ctx.session();
     if (sn == null) {
       /* this should never happen because the URL already requests a SID*/
       log.error("got no session to save page ...");

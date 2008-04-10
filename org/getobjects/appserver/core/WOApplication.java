@@ -204,7 +204,7 @@ public class WOApplication extends NSObject
    * @param _path - the path to be looked up
    * @return the Object where the JoLookup process will start
    */
-  public Object rootObjectInContext(WOContext _ctx, String[] _path) {
+  public Object rootObjectInContext(final WOContext _ctx, String[] _path) {
     return this;
   }
 
@@ -234,7 +234,7 @@ public class WOApplication extends NSObject
    * @param _rq - the WORequest to dispatch
    * @return the resulting WOResponse
    */
-  public WOResponse handleRequest(WORequest _rq) {
+  public WOResponse handleRequest(final WORequest _rq) {
     return new JoObjectRequestHandler(this).handleRequest(_rq);
   }
 
@@ -261,15 +261,15 @@ public class WOApplication extends NSObject
    * @param _rq - a WORequest
    * @return a WOResponse
    */
-  public WOResponse dispatchRequest(WORequest _rq) {
+  public WOResponse dispatchRequest(final WORequest _rq) {
     WOResponse r = null;
-    int rqId = this.requestCounter.incrementAndGet();
+    final int rqId = this.requestCounter.incrementAndGet();
     this.activeDispatchCount.incrementAndGet();
 
     if (profile.isInfoEnabled())
       this.logRequestStart(_rq, rqId);
 
-    WORequestHandler rh;
+    final WORequestHandler rh;
     
     if (this.useHandlerRequestDispatch()) {
       /*
