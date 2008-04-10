@@ -26,8 +26,29 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.publisher.IJoCallable;
 import org.getobjects.appserver.publisher.IJoContext;
 import org.getobjects.appserver.publisher.IJoObject;
+import org.getobjects.foundation.NSObject;
 
-public abstract class WORequestHandler implements IJoObject, IJoCallable {
+/**
+ * WORequestHandler
+ * <p>
+ * Abstract superclass for request handlers. Request handlers are objects which
+ * decide what to do with a given request. That is, how to decode the URL and
+ * how to map the URL to the controller objects.
+ * <p>
+ * There are four basic request handlers:
+ * <ul>
+ *   <li>WODirectActionRequestHandler
+ *   <li>WOComponentRequestHandler
+ *   <li>WOResourceRequestHandler
+ *   <li>JoObjectRequestHandler
+ * </ul>
+ * Technically the first three are superflous in Go because of the
+ * JoObjectRequestHandler. They are left in place for compatibility
+ * reasons.
+ */
+public abstract class WORequestHandler extends NSObject
+  implements IJoObject, IJoCallable
+{
   protected static final Log log = LogFactory.getLog("WOApplication");
   
   protected WOApplication application;
@@ -38,7 +59,7 @@ public abstract class WORequestHandler implements IJoObject, IJoCallable {
   
   /* session handling */
   
-  public String sessionIDFromRequest(WORequest _rq) {
+  public String sessionIDFromRequest(final WORequest _rq) {
     /* this is overridden by the WOComponentRequestHandler */
     return _rq != null ? _rq.sessionID() : null;
   }
@@ -47,7 +68,7 @@ public abstract class WORequestHandler implements IJoObject, IJoCallable {
     return true;
   }
   
-  public boolean autocreateSession(WOContext _ctx) {
+  public boolean autocreateSession(final WOContext _ctx) {
     // TODO: implement
     return false;
   }
@@ -55,13 +76,13 @@ public abstract class WORequestHandler implements IJoObject, IJoCallable {
   /* request handling */
   
   public abstract WOResponse handleRequest
-    (WORequest _rq, WOContext _ctx, WOSession _s);
+    (final WORequest _rq, final WOContext _ctx, final WOSession _s);
   
   public boolean doesRejectFavicon() {
     return true;
   }
 
-  public WOResponse handleRequest(WORequest _rq) {
+  public WOResponse handleRequest(final WORequest _rq) {
     // TODO: this is deprecated, we want to do everything with JoObject
     //       lookups
     WOContext  ctx;
@@ -211,7 +232,7 @@ public abstract class WORequestHandler implements IJoObject, IJoCallable {
    * @param _ctx    - the JOPE context used for tracking the object lookup
    * @return a result, usually, but not necessarily a WOResponse
    */
-  public Object callInContext(Object _object, IJoContext _ctx) {
+  public Object callInContext(final Object _object, final IJoContext _ctx) {
     if (_ctx == null)
       return null;
     
@@ -228,7 +249,7 @@ public abstract class WORequestHandler implements IJoObject, IJoCallable {
    * @param _ctx - the IJoContext the call shall happen in
    * @return true if the object is callable in the given context
    */
-  public boolean isCallableInContext(IJoContext _ctx) {
+  public boolean isCallableInContext(final IJoContext _ctx) {
     /* we are callable in WOContext's */
     return _ctx != null && _ctx instanceof WOContext;
   }
