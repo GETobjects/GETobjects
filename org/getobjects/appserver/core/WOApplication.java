@@ -538,7 +538,11 @@ public class WOApplication extends NSObject
         for (String qk: qks) {
           sb.append(" ");
           sb.append(qk);
-          String v = _rq.stringFormValueForKey(qk);
+          
+          // do not log passwords
+          String v = (qk.startsWith("pass") || qk.startsWith("pwd"))
+            ? "XXX"
+            : _rq.stringFormValueForKey(qk);
           if (v != null && v.length() > 0) {
             if (v.length() > 16) v = v.substring(0, 14) + "..";
             sb.append("=");
