@@ -88,7 +88,7 @@ public class NSObject extends Object
       return;
     }
   }
-  public Object valueForKey(String _key) {
+  public Object valueForKey(final String _key) {
     // IMPORTANT: keep consistent with DefaultImp.valueForKey()!!
     try { // TODO: avoid this exception handler
       final IPropertyAccessor accessor =
@@ -107,11 +107,11 @@ public class NSObject extends Object
     }
   }
   
-  public void takeValueForKeyPath(Object _value, String _keyPath) {
+  public void takeValueForKeyPath(final Object _value, final String _keyPath) {
     NSKeyValueCodingAdditions.DefaultImplementation.
       takeValueForKeyPath(this, _value, _keyPath);
   }
-  public Object valueForKeyPath(String _keyPath) {
+  public Object valueForKeyPath(final String _keyPath) {
     return NSKeyValueCodingAdditions.DefaultImplementation.
              valueForKeyPath(this, _keyPath);    
   }
@@ -127,7 +127,7 @@ public class NSObject extends Object
    * 
    * @param _map - the key/value pairs to be applied on the object
    */
-  public void takeValuesFromDictionary(Map<String, Object> _map) {
+  public void takeValuesFromDictionary(final Map<String, Object> _map) {
     if (_map == null)
       return;
     
@@ -144,7 +144,7 @@ public class NSObject extends Object
    * @param _keys - keys to be extracted
    * @return a Map containg the values for the keys, null if _keys is null
    */
-  public Map<String, Object> valuesForKeys(String[] _keys) {
+  public Map<String, Object> valuesForKeys(final String[] _keys) {
     if (_keys == null)
       return null;
     
