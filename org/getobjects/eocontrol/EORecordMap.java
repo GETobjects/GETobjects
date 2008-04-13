@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.kvc.MissingPropertyException;
@@ -105,8 +106,8 @@ public class EORecordMap extends AbstractMap<String, Object>
         }
       }
     }
-    /* did not find key (throw exception?) */
-    return null;
+    
+    throw new NSException("given key is not a fetch result: " + _key);
   }
 
   @Override
