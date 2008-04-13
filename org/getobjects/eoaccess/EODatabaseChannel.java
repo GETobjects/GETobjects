@@ -317,6 +317,24 @@ public class EODatabaseChannel extends NSObject
     return flattened;
   }
   
+  public EOAttribute[] selectListForFetchSpecification
+    (final EOEntity _entity, final EOFetchSpecification _fs)
+  {
+    String[] fetchKeys = _fs != null ? _fs.fetchAttributeNames() : null;
+
+    if (fetchKeys == null) {
+      if (_entity != null)
+        return _entity.attributes();
+      return null; /* will trigger '*' fetch? */
+    }
+    
+    if (_entity != null)
+      return _entity.attributesWithNames(fetchKeys);
+    
+    // TBD: generate EOAttrs for fetchKeys
+    return null;
+  }
+  
   /**
    * This method prepares the channel for a fetch and initiates the fetch. Once
    * called, the channel has various instance variables configured and the
@@ -352,12 +370,8 @@ public class EODatabaseChannel extends NSObject
       return new Exception("did not find entity for fetch!");
     }
     
-    EOAttribute[] selectList = null;
-    if (_fs != null && this.currentEntity != null) {
-      selectList = _fs.fetchAttributeNames() != null
-        ? this.currentEntity.attributesWithNames(_fs.fetchAttributeNames())
-        : this.currentEntity.attributes();
-    }
+    final EOAttribute[] selectList =
+      this.selectListForFetchSpecification(this.currentEntity, _fs);
 
     if (isDebugOn) {
       log.debug("  entity: " + this.currentEntity.name());
@@ -395,7 +409,7 @@ public class EODatabaseChannel extends NSObject
       
       /* Note: custom queries are detected by the adaptor */
       results = this.adChannel.selectAttributes
-        (null /* let the channel extract the attrs from the fetchspec */,
+        (selectList, /* was null to let the channel do the work, why? */
          _fs, this.isLocking, this.currentEntity);
       
       if (results == null) {
