@@ -78,7 +78,7 @@ public class EODatabaseChannel extends NSObject
   
   /* accessors */
   
-  public void setCurrentEntity(EOEntity _entity) {
+  public void setCurrentEntity(final EOEntity _entity) {
     this.currentEntity = _entity;
   }
   public EOEntity currentEntity() {
@@ -331,9 +331,9 @@ public class EODatabaseChannel extends NSObject
    *   the error.
    */
   public Exception primarySelectObjectsWithFetchSpecification
-    (EOFetchSpecification _fs, EOObjectTrackingContext _ec)
+    (final EOFetchSpecification _fs, final EOObjectTrackingContext _ec)
   {
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     
     if (isDebugOn) log.debug("primary select: " + _fs);
     
@@ -352,16 +352,16 @@ public class EODatabaseChannel extends NSObject
       return new Exception("did not find entity for fetch!");
     }
     
-    EOAttribute[] attributes = null;
+    EOAttribute[] selectList = null;
     if (_fs != null && this.currentEntity != null) {
-      attributes = _fs.fetchAttributeNames() != null
+      selectList = _fs.fetchAttributeNames() != null
         ? this.currentEntity.attributesWithNames(_fs.fetchAttributeNames())
         : this.currentEntity.attributes();
     }
 
     if (isDebugOn) {
       log.debug("  entity: " + this.currentEntity.name());
-      log.debug("  attrs:  "+UString.componentsJoinedByString(attributes, ","));
+      log.debug("  attrs:  "+UString.componentsJoinedByString(selectList, ","));
     }
     
     this.makeNoSnapshots = false;
@@ -434,7 +434,7 @@ public class EODatabaseChannel extends NSObject
    *   the error.
    */
   public Exception selectObjectsWithFetchSpecification
-    (EOFetchSpecification _fs, EOObjectTrackingContext _ec)
+    (final EOFetchSpecification _fs, final EOObjectTrackingContext _ec)
   {
     String[] prefetchRelPathes =
       _fs != null ? _fs.prefetchingRelationshipKeyPaths() : null;
