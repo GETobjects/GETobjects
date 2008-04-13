@@ -407,7 +407,7 @@ public class EOSQLExpression extends NSObject {
    * The result of the method is stored in the 'this.statement' ivar.
    * 
    * <p>
-   * @param _attrs - the attributes to fetch, or null to fetch all
+   * @param _attrs - the attributes to fetch, or null to fetch all (* SELECT)
    * @param _lock  - whether the rows/table should be locked in the database
    * @param _fspec - the EOFetchSpecification containing the qualifier, etc
    */
@@ -1119,17 +1119,38 @@ public class EOSQLExpression extends NSObject {
     return _left + op + _right;
   }
   
+  
   /* basic construction */
   
-  public void appendItemToListString(String _item, StringBuilder _sb) {
+  /**
+   * Just adds the given _item String to the StringBuilder _sb. If the Builder
+   * is not empty, a ", " is added before the item.
+   * <p>
+   * Used to assemble SELECT lists, eg:<pre>
+   *   c_last_name, c_first_name</pre>
+   *   
+   * @param _item - String to add
+   * @param _sb   - StringBuilder containing the items
+   */
+  public void appendItemToListString(final String _item, StringBuilder _sb) {
     if (_sb.length() > 0)
       _sb.append(", ");
     _sb.append(_item);
   }
   
+  
   /* formatting */
   
-  public String formatSQLString(String _sql, String _format) {
+  /**
+   * If the _format is null or contains no '%' character, the _sql is returned
+   * as-is.<br>
+   * Otherwise the '%P' String in the format is replaced with the _sql.
+   * 
+   * @param _sql    - SQL base expression (eg 'c_last_name')
+   * @param _format - pattern (eg 'UPPER(%P)')
+   * @return SQL string with the pattern applied
+   */
+  public String formatSQLString(final String _sql, final String _format) {
     //System.err.println("FORMAT " + _sql + " WITH " + _format);
     if (_format == null)
       return _sql;
@@ -1141,7 +1162,15 @@ public class EOSQLExpression extends NSObject {
     return _format.replace("%P", _sql);
   }
   
-  public String formatStringValue(String _v) {
+  /**
+   * Escapes the given String and embeds it into single quotes.
+   * Example:<pre>
+   *   Hello World => 'Hello World'</pre>
+   * 
+   * @param _v - String to escape and quote (eg Hello World)
+   * @return the SQL escaped and quoted String (eg 'Hello World')
+   */
+  public String formatStringValue(final String _v) {
     // TODO: whats the difference to sqlStringForString?
     if (_v == null)
       return "NULL";
@@ -1149,7 +1178,16 @@ public class EOSQLExpression extends NSObject {
     return "'" + escapeSQLString(_v) + "'";
   }
 
+  /**
+   * Escapes the given String and embeds it into single quotes.
+   * Example:<pre>
+   *   Hello World => 'Hello World'</pre>
+   * 
+   * @param _v - String to escape and quote (eg Hello World)
+   * @return the SQL escaped and quoted String (eg 'Hello World')
+   */
   public String sqlStringForString(String _v) {
+    // TBD: whats the difference to formatStringValue()? check docs
     if (_v == null)
       return "NULL";
 
@@ -1164,7 +1202,7 @@ public class EOSQLExpression extends NSObject {
    * @param _value - some Number object
    * @return the SQL representation of the given Number (or NULL for null)
    */
-  public String sqlStringForNumber(Number _value) {
+  public String sqlStringForNumber(final Number _value) {
     return (_value == null) ? "NULL" : _value.toString();
   }
   /**
@@ -1173,7 +1211,7 @@ public class EOSQLExpression extends NSObject {
    * @param _v - some Boolean object
    * @return the SQL representation of the given Boolean (or NULL for null)
    */
-  public String sqlStringForBoolean(Boolean _v) {
+  public String sqlStringForBoolean(final Boolean _v) {
     return (_v == null) ? "NULL" : (_v.booleanValue() ? "TRUE" : "FALSE");
   }
   
@@ -1184,7 +1222,7 @@ public class EOSQLExpression extends NSObject {
    * @param _attr - an EOAttribute containing formatting details
    * @return the SQL representation of the given Date (or NULL for null)
    */
-  public String formatDateValue(Date _v, EOAttribute _attr) {
+  public String formatDateValue(final Date _v, final EOAttribute _attr) {
     // TODO: fixme. Use format specifications as denoted in the attribute
     // TODO: is this called? Probably the formatting should be done using a
     //       binding in the JDBC adaptor
@@ -1231,7 +1269,7 @@ public class EOSQLExpression extends NSObject {
     
     /* process lists */
 
-    Class itemClazz = _v.getClass().getComponentType();
+    final Class itemClazz = _v.getClass().getComponentType();
     if (itemClazz != null) { /* array */
       if (itemClazz == java.lang.Integer.TYPE) {
         int[] nums = (int[])_v;
@@ -1255,11 +1293,11 @@ public class EOSQLExpression extends NSObject {
     }
     
     if (_v instanceof Collection) {
-      Collection c = (Collection)_v;
+      final Collection c = (Collection)_v;
       if (c.size() <= 0)
         return "( )"; /* empty list */
       
-      StringBuilder sql = new StringBuilder(256);
+      final StringBuilder sql = new StringBuilder(256);
       sql.append("( ");
       boolean isFirst = true;
       for (Object o: c) {
@@ -1273,7 +1311,7 @@ public class EOSQLExpression extends NSObject {
     }
     
     if (_v instanceof EOKeyGlobalID) {
-      Object[] vals = ((EOKeyGlobalID)_v).keyValues();
+      final Object[] vals = ((EOKeyGlobalID)_v).keyValues();
       if (vals == null || vals.length == 0) {
         log.error("got EOKeyGlobalID w/o values: " + _v);
         return null;
@@ -1339,7 +1377,7 @@ public class EOSQLExpression extends NSObject {
     if (_value instanceof EORawSQLValue)
       return _value.toString();
     
-    EOAttribute attribute = (this.entity != null)
+    final EOAttribute attribute = (this.entity != null)
       ? this.entity.attributeNamed(_keyPath) : null;
 
     boolean useBind = false;
@@ -1474,32 +1512,58 @@ public class EOSQLExpression extends NSObject {
   
   /* attributes */
   
-  public String sqlStringForAttributeNamed(final String _name) {
-    if (_name == null) return null;
+  /**
+   * Returns the SQL expression for the attribute with the given name. The name
+   * can be a keypath, eg "customer.address.street".
+   * <p>
+   * The method calls sqlStringForAttributePath() for key pathes,
+   * or sqlStringForAttribute() for direct matches.
+   * 
+   * @param _keyPath - the name of the attribute (eg 'name' or 'address.city')
+   * @return the SQL (eg 'BASE.c_name' or 'T3.c_city')
+   */
+  public String sqlStringForAttributeNamed(final String _keyPath) {
+    if (_keyPath == null) return null;
     
     /* Note: this implies that attribute names may not contain dots, which
      *       might be an issue with user generated tables.
      */
-    if (_name.indexOf('.') != -1) {
+    if (_keyPath.indexOf('.') != -1) {
       /* its a keypath */
-      if (log.isDebugEnabled()) log.debug("gen SQL for keypath: " + _name);
-      return this.sqlStringForAttributePath(_name.split("\\."));
+      if (log.isDebugEnabled()) log.debug("gen SQL for keypath: " + _keyPath);
+      return this.sqlStringForAttributePath(_keyPath.split("\\."));
     }
     
     if (this.entity == null)
-      return _name; /* just reuse the name for model-less operation */
+      return _keyPath; /* just reuse the name for model-less operation */
     
-    final EOAttribute attribute = this.entity.attributeNamed(_name);
+    final EOAttribute attribute = this.entity.attributeNamed(_keyPath);
     if (attribute == null) {
       if (log.isInfoEnabled())
-        log.info("could not lookup attribute in model: " + _name);
-      return _name;
+        log.info("could not lookup attribute in model: " + _keyPath);
+      return _keyPath;
     }
     
     /* Note: this already adds the table alias */
     return this.sqlStringForAttribute(attribute);
   }
   
+  /**
+   * Returns the SQL expression for the given attribute in the given
+   * relationship path. Usually the path is empty (""), leading to a
+   * BASE.column reference.
+   * <p>
+   * Example:<pre>
+   *   attr = lastName/c_last_name, relPath = ""
+   *   =&gt; BASE.c_last_name
+   *   
+   *   attr = address.city, relPath = "address"
+   *   =&gt; T3.c_city</pre>
+   * 
+   * @param _attr    - the EOAttribute
+   * @param _relPath - the relationship path, eg "" for the base entity
+   * @return a SQL string, like: "BASE.c_last_name"
+   */
   public String sqlStringForAttribute(EOAttribute _attr, String _relPath) {
     // TODO: this does not exist in WO, not sure how its supposed to work,
     //       maybe we should also maintain an _attr=>relPath map? (probably
@@ -1513,6 +1577,13 @@ public class EOSQLExpression extends NSObject {
       s = this.relationshipPathToAlias.get(_relPath) + "." + s;
     return s;
   }
+  /**
+   * Returns the SQL string for a BASE attribute (using the "" relationship
+   * path).
+   * 
+   * @param _attr - the EOAttribute in the base entity
+   * @return a SQL string, like: "BASE.c_last_name"
+   */
   public String sqlStringForAttribute(final EOAttribute _attr) {
     return this.sqlStringForAttribute(_attr, "" /* relship path, BASE */);
   }
@@ -1521,10 +1592,13 @@ public class EOSQLExpression extends NSObject {
   /**
    * This method generates the SQL column reference for a given attribute path.
    * For example employments.person.address.city might resolve to T3.city,
-   * while a plain street would resolve to BASE.street.  
+   * while a plain street would resolve to BASE.street.
+   * <p>
+   * It is called by sqlStringForAttributeNamed() if it detects a dot ('.') in
+   * the attribute name (eg customer.address.street).
    * 
-   * @param _path - the attribute path to resolve
-   * @return a SQL expression for the qualifier
+   * @param _path - the attribute path to resolve (eg customer.address.city)
+   * @return a SQL expression for the qualifier (eg T0.c_city)
    */
   public String sqlStringForAttributePath(final String[] _path) {
     if (_path == null || _path.length == 0)
