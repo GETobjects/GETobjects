@@ -62,6 +62,33 @@ public class EORecordMap extends AbstractMap<String, Object>
   
   /* basic ops */
   
+  /**
+   * Changes the key of some value. This is used during column=>attribute
+   * mapping.
+   * <p>
+   * CAREFUL: this modifies the key in ALL 'associated' records (eg all results
+   * of a single fetch).
+   * 
+   * @param _oldKey - key to replace (eg c_first_name)
+   * @param _newKey - new key to use (eg firstName)
+   * @return true if the key was found (and got switched), false if not
+   */
+  public boolean switchKey(final String _oldKey, final String _newKey) {
+    final int oldHash = _oldKey.hashCode();
+    
+    for (int i = this.size - 1; i >= 0; i--) {
+      if (this.keyHashes[i] == oldHash) {
+        /* same hash */
+        if (this.keys[i] == _oldKey || _oldKey.equals(this.keys[i])) {
+          this.keys[i]      = _newKey;
+          this.keyHashes[i] = _newKey.hashCode();
+          return true; /* DONE */
+        }
+      }
+    }
+    return false;
+  }
+  
   @Override
   public Object put(final String _key, final Object _value) {
     if (_key == null)
@@ -95,6 +122,21 @@ public class EORecordMap extends AbstractMap<String, Object>
       }
     }
     return null;
+  }
+  
+  @Override
+  public boolean containsKey(final Object _key) {
+    if (_key == null) return false;
+    
+    final int keyHash = _key.hashCode();
+    for (int i = this.size - 1; i >= 0; i--) {
+      if (this.keyHashes[i] == keyHash) {
+        /* same hash */
+        if (this.keys[i] == _key || _key.equals(this.keys[i]))
+          return true;
+      }
+    }
+    return false;
   }
   
   

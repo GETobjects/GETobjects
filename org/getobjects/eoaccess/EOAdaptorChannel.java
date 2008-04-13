@@ -32,7 +32,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +41,7 @@ import org.getobjects.eocontrol.EOAndQualifier;
 import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOQualifierVariable;
+import org.getobjects.eocontrol.EORecordMap;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSObject;
@@ -119,6 +119,15 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   
   /* EOSQLStatements */
   
+  /**
+   * A primary fetch method.
+   * <p>
+   * Creates a PreparedStatement from the statement and the bindings of the
+   * EOSQLExpression.
+   * <p>
+   * @param _s - the EOSQLExpression to execute
+   * @return the fetch results as a List of Maps
+   */
   public List<Map<String, Object>> evaluateQueryExpression(EOSQLExpression _s) {
     this.lastException = null;
     
@@ -160,24 +169,30 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       /* Collect meta data, calling meta inside fetches is rather expensive,
        * even though the PG JDBC adaptor also has some cache.
        */
-      ResultSetMetaData meta = rs.getMetaData();
-      int      columnCount = meta.getColumnCount();
-      String[] colNames = new String[columnCount];
-      int[]    colTypes = new int[columnCount];
+      // TBD: we should setup a EOFixedResultMap using that information. The
+      //      map would share hashes and attrname arrays.
+      //      TBD: find out how to do the mapping
+      final ResultSetMetaData meta = rs.getMetaData();
+      final int      columnCount = meta.getColumnCount();
+      final String[] colNames  = new String[columnCount];
+      final int[]    colHashes = new int[columnCount];
+      final int[]    colTypes  = new int[columnCount];
       for (int i = 1; i <= columnCount; i++) {
-        colNames[i - 1] = meta.getColumnName(i);
-        colTypes[i - 1] = meta.getColumnType(i);
+        colNames [i - 1] = meta.getColumnName(i);
+        colHashes[i - 1] = colNames[i - 1].hashCode();
+        colTypes [i - 1] = meta.getColumnType(i);
       }
       
       /* loop over results and convert them to records */
       records = new ArrayList<Map<String, Object>>(128);
       while (rs.next()) {
-        Map<String, Object> record;
+        // TBD: setup an EOFixedResultMap (which is then just filled)
+        EORecordMap record = new EORecordMap(colNames, colHashes);
         
         // TODO: somehow add model information
-        record = this.convertCurrentResultSetRowToMap
-          (rs, colNames, colTypes, null /* attrs */);
-        if (record != null) records.add(record);
+        boolean ok = this.fillRecordMapFromResultSet
+          (record, rs, colNames, colTypes, null /* attrs */);
+        if (ok) records.add(record);
       }
     }
     catch (SQLException e) {
@@ -502,23 +517,25 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       /* Collect meta data, calling meta inside fetches is rather expensive,
        * even though the PG JDBC adaptor also has some cache.
        */
-      ResultSetMetaData meta = rs.getMetaData();
-      int      columnCount = meta.getColumnCount();
-      String[] colNames = new String[columnCount];
-      int[]    colTypes = new int[columnCount];
+      final ResultSetMetaData meta = rs.getMetaData();
+      final int      columnCount = meta.getColumnCount();
+      final String[] colNames = new String[columnCount];
+      final int[]    colHashes = new int[columnCount];
+      final int[]    colTypes = new int[columnCount];
       for (int i = 1; i <= columnCount; i++) {
-        colNames[i - 1] = meta.getColumnName(i);
-        colTypes[i - 1] = meta.getColumnType(i);
+        colNames [i - 1] = meta.getColumnName(i);
+        colHashes[i - 1] = colNames[i - 1].hashCode();
+        colTypes [i - 1] = meta.getColumnType(i);
       }
       
       /* loop over results and convert them to records */
       records = new ArrayList<Map<String, Object>>(128);
       while (rs.next()) {
-        Map<String, Object> record;
+        EORecordMap record = new EORecordMap(colNames, colHashes);
         
-        record = this.convertCurrentResultSetRowToMap
-          (rs, colNames, colTypes, null /*attrs*/);
-        if (record != null) records.add(record);
+        boolean ok = this.fillRecordMapFromResultSet
+          (record, rs, colNames, colTypes, null /*attrs*/);
+        if (ok) records.add(record);
       }
     }
     catch (SQLException e) {
@@ -1041,6 +1058,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     EOSQLExpression expr = this.adaptor.expressionFactory()
       .selectExpressionForAttributes(_attrs, _lock, _fs, _e);
     
+    
     /* perform fetch */
     
     List<Map<String, Object>> rows = this.evaluateQueryExpression(expr);
@@ -1052,6 +1070,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     //System.err.println("ROWS: " + rows);
     
+    
     /* map row names */
     // TODO: this should be already done when converting the JDBC resultset */
     
@@ -1061,19 +1080,16 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       this.attributesWhichRequireRowNameMapping(_attrs);
     
     if (attributesToMap != null) {
-      for (int i = 0; i < rows.size(); i++) {
-        Map<String, Object> row = rows.get(i);
-        
-        // hack: modification is in-place (has columnName==name issues)
-        for (int j = 0; j < attributesToMap.length; j++) {
-          Object v = row.remove(attributesToMap[j].columnName());
-          row.put(attributesToMap[j].name(), v);
-          
-          //log.error("map attribute: " + attributesToMap[j]);
-        }
-      }
+      /* Just get the first row and patch it. The keys/hash arrays are shared
+       * between all the resulting records.
+       * Kinda hackish, but hey! ;-)
+       */
+      EORecordMap row = (EORecordMap)rows.get(0);
+      
+      for (EOAttribute a: attributesToMap)
+        row.switchKey(a.columnName(), a.name());
     }
-    else
+    else if (log.isDebugEnabled())
       log.debug("did not map any row attributes ...");
     //System.err.println("ROWS: " + rows);
     
@@ -1254,25 +1270,32 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     return _value;
   }
   
-  // TODO: this might be a nice utility function, but its better to convert
-  //       to some SQL record which implements the Map interface plus some
-  //       more.
-  // TODO: queries against the meta data are actually expensive. If the attrs
-  //       array is missing or incomplete, we should fill it from the metadata
-  //       *once*.
-  protected Map<String,Object> convertCurrentResultSetRowToMap
-    (ResultSet _rs, String[] _colNames, int[] _colTypes, EOAttribute[] _attrs)
+  /**
+   * Called by evaluateQueryExpression() AND by performSQL() to convert a
+   * result set into a record.
+   * 
+   * @param _rs       - the JDBC result set
+   * @param _colNames - the JDBC column names
+   * @param _colTypes - the JDBC column types
+   * @param _attrs    - possibly empty array of EOAttribute's
+   * @return the new record
+   * @throws SQLException
+   */
+  protected boolean fillRecordMapFromResultSet
+    (Map<String,Object> record,
+     ResultSet _rs, String[] _colNames, int[] _colTypes, EOAttribute[] _attrs)
     throws SQLException
   {
-    if (_rs   == null) return null;
+    // TODO: this might be a nice utility function, but its better to convert
+    //       to some SQL record which implements the Map interface plus some
+    //       more.
+    // TODO: queries against the meta data are actually expensive. If the attrs
+    //       array is missing or incomplete, we should fill it from the metadata
+    //       *once*.
+    if (_rs == null) return false;
     
-    boolean isDebugOn   = log.isDebugEnabled();
-    int     columnCount = _colNames.length;
-    
-    /* Note: we do store NULL columns as 'null' values! Thats possible with a
-     * Java Map :-)
-     */
-    Map<String, Object> record = new HashMap<String,Object>(columnCount);
+    final boolean isDebugOn   = log.isDebugEnabled();
+    final int     columnCount = _colNames.length;
     
     if (isDebugOn)
       log.debug("map ResultSet to Map (" + columnCount + " columns):");
@@ -1349,7 +1372,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       
       record.put(l, v);
     }
-    return record;
+    return true;
   } 
   
   protected void _setStatementParameter
