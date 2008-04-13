@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.eocontrol.EOValueEvaluation;
+import org.getobjects.foundation.NSKeyValueCodingAdditions;
 
 /**
  * EOAttribute
@@ -51,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  *  transformation, so it _can_ use an index)
  */
 public class EOAttribute extends EOProperty
-  implements EOSQLExpression.SQLValue
+  implements EOSQLExpression.SQLValue, EOValueEvaluation
 {
   protected static final Log log = LogFactory.getLog("EOModel");
 
@@ -314,6 +316,13 @@ public class EOAttribute extends EOProperty
     return sql;
   }
   
+  /* EOValueEvaluation */
+  
+  public Object valueForObject(final Object _o) {
+    String key = this.name();
+    if (key == null) key = this.columnName();
+    return NSKeyValueCodingAdditions.Utility.valueForKeyPath(_o, key);
+  }
   
   /* description */
   

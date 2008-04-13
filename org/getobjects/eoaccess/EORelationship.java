@@ -20,6 +20,7 @@
 */
 package org.getobjects.eoaccess;
 
+import org.getobjects.eocontrol.EOValueEvaluation;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 
 /**
@@ -28,7 +29,7 @@ import org.getobjects.foundation.NSKeyValueCodingAdditions;
  * An EORelationship connects two EOEntities using EOJoins. It is one-way,
  * so you need to have separate EORelationship objects for each direction.
  */
-public class EORelationship extends EOProperty {
+public class EORelationship extends EOProperty implements EOValueEvaluation {
 
   protected String   name;
   protected EOEntity entity;
@@ -351,6 +352,11 @@ public class EORelationship extends EOProperty {
   static final int LeftOuterJoin  = 3;
   static final int RightOuterJoin = 4;
   
+  /* EOValueEvaluation */
+  
+  public Object valueForObject(final Object _o) {
+    return NSKeyValueCodingAdditions.Utility.valueForKeyPath(_o, this.name());
+  }
   
   /* description */
   
