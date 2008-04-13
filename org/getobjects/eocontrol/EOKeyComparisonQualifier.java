@@ -102,6 +102,9 @@ public class EOKeyComparisonQualifier extends EOQualifier
 
     return comparisonSupport.compareOperation(this.operation, lv, rv);
   }
+  public Object valueForObject(final Object _object) {
+    return this.evaluateWithObject(_object) ? Boolean.TRUE : Boolean.FALSE;
+  }
 
   /* keys */
   

@@ -33,7 +33,7 @@ import java.util.List;
  *   firstname = 'Donald' AND lastname = 'Duck'</pre>
  */
 public class EOAndQualifier extends EOCompoundQualifier
-  implements EOQualifierEvaluation
+  implements EOQualifierEvaluation, EOValueEvaluation
 {
   public EOAndQualifier(List<EOQualifier> _qs) {
     super(_qs);
@@ -81,13 +81,16 @@ public class EOAndQualifier extends EOCompoundQualifier
   
   /* evaluation */
   
-  public boolean evaluateWithObject(Object _object) {
+  public boolean evaluateWithObject(final Object _object) {
     for (int i = 0; i < this.qualifiers.length; i++) {
       EOQualifierEvaluation eval = (EOQualifierEvaluation)this.qualifiers[i];
       if (!eval.evaluateWithObject(_object))
         return false;
     }
     return true;
+  }
+  public Object valueForObject(final Object _object) {
+    return this.evaluateWithObject(_object) ? Boolean.TRUE : Boolean.FALSE;
   }
   
   /* project WOnder style helpers */

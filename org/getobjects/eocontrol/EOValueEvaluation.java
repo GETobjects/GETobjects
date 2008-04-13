@@ -34,5 +34,5 @@ public interface EOValueEvaluation {
    * @param _object - the object to retrieve a value from
    * @return the value
    */
-  public Object valueForObject(Object _object);
+  public Object valueForObject(final Object _object);
 }
