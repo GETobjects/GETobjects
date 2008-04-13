@@ -45,7 +45,7 @@ public class EOCase extends NSObject implements EOValueEvaluation {
   
   public EOCase() {
   }
-  public EOCase(Object _elseValue) {
+  public EOCase(final Object _elseValue) {
     this.defaultValue = _elseValue;
   }
   public EOCase(EOQualifier[] _conditions, Object[] _values, Object _else) {
@@ -62,7 +62,7 @@ public class EOCase extends NSObject implements EOValueEvaluation {
   
   /* accessors */
   
-  public void setDefaultValue(Object _value) {
+  public void setDefaultValue(final Object _value) {
     this.defaultValue = _value;
   }
   public Object defaultValue() {
@@ -120,7 +120,7 @@ public class EOCase extends NSObject implements EOValueEvaluation {
    * @param _requireAll - whether all bindings MUST be resolved
    * @return a new EOCase
    */
-  public EOCase caseWithBindings(Object _bindings, boolean _requireAll) {
+  public EOCase caseWithBindings(final Object _bindings, boolean _requireAll) {
     EOCase newCase = (EOCase)this.clone();
     newCase.resolveBindings(_bindings, _requireAll);
     return newCase;
@@ -134,7 +134,7 @@ public class EOCase extends NSObject implements EOValueEvaluation {
    * @param _bindings - object holding bindings which will be retrieved via KVC
    * @param _requireAll - whether all bindings MUST be resolved
    */
-  public void resolveBindings(Object _bindings, boolean _requireAll) {
+  public void resolveBindings(final Object _bindings, boolean _requireAll) {
     if (this.conditions == null)
       return;
     
