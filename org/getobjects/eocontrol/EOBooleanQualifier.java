@@ -48,6 +48,9 @@ public class EOBooleanQualifier extends EOQualifier
   public boolean evaluateWithObject(Object _object) {
     return this.value;
   }
+  public Object valueForObject(final Object _object) {
+    return this.evaluateWithObject(_object) ? Boolean.TRUE : Boolean.FALSE;
+  }
 
   /* bindings */
   

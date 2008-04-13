@@ -52,6 +52,9 @@ public class EONotQualifier extends EOQualifier
   public boolean evaluateWithObject(Object _object) {
     return !((EOQualifierEvaluation)this.qualifier).evaluateWithObject(_object);
   }
+  public Object valueForObject(final Object _object) {
+    return this.evaluateWithObject(_object) ? Boolean.TRUE : Boolean.FALSE;
+  }
   
   /* keys */
   

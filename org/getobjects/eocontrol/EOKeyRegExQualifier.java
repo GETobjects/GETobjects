@@ -70,6 +70,9 @@ public class EOKeyRegExQualifier extends EOQualifier
     
     return this.regex.matcher(matchValue).matches();
   }
+  public Object valueForObject(final Object _object) {
+    return this.evaluateWithObject(_object) ? Boolean.TRUE : Boolean.FALSE;
+  }
   
   protected String matchStringFromObject(Object _object) {
     Object objectValue;

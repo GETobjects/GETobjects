@@ -94,6 +94,9 @@ public class EOOrQualifier extends EOCompoundQualifier
     }
     return false;
   }
+  public Object valueForObject(final Object _object) {
+    return this.evaluateWithObject(_object) ? Boolean.TRUE : Boolean.FALSE;
+  }
   
   /* project WOnder style helpers */
   
