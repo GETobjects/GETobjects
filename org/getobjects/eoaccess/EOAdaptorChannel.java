@@ -1063,7 +1063,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     List<Map<String, Object>> rows = this.evaluateQueryExpression(expr);
     
-    if (_fs != null && _fs.fetchesRawRows())
+    if (_fs != null && _fs.fetchesRawRows()) // TBD: no mapping for raw rows?!
       return rows;
     if (rows == null || rows.size() == 0)
       return rows;
