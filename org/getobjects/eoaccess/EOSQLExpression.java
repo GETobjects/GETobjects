@@ -37,8 +37,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.eocontrol.EOAndQualifier;
 import org.getobjects.eocontrol.EOBooleanQualifier;
+import org.getobjects.eocontrol.EOCase;
 import org.getobjects.eocontrol.EOCompoundQualifier;
 import org.getobjects.eocontrol.EOFetchSpecification;
+import org.getobjects.eocontrol.EOKey;
 import org.getobjects.eocontrol.EOKeyComparisonQualifier;
 import org.getobjects.eocontrol.EOKeyGlobalID;
 import org.getobjects.eocontrol.EOKeyValueQualifier;
@@ -48,6 +50,7 @@ import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOQualifierVariable;
 import org.getobjects.eocontrol.EOSQLQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
+import org.getobjects.eocontrol.EOValueEvaluation;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UList;
@@ -707,8 +710,10 @@ public class EOSQLExpression extends NSObject {
    */
   public void addSelectListAttribute(final EOAttribute _attribute) {
     if (_attribute == null) return;
+    
     String s = this.sqlStringForAttribute(_attribute);
     s = this.formatSQLString(s, _attribute.readFormat());
+    
     this.appendItemToListString(s, this.listString);
   }
   
@@ -2121,6 +2126,47 @@ public class EOSQLExpression extends NSObject {
     return s;
   }
   
+  
+  /* expressions */
+  
+  /**
+   * This method 'renders' expressions as SQL. This is similiar to an
+   * EOQualifier, but can lead to non-bool values. In fact, an EOQualifier
+   * can be used here (leads to a true/false value).
+   * <p>
+   * The feature is that value expressions can be used in SELECT lists. Instead
+   * of plain EOAttribute's, we can select stuff like SUM(lineItems.amount).
+   * <p>
+   * Usually you need to embed the actual in an EONamedExpression, so that the
+   * value has a distinct name in the resulting dictionary. 
+   * 
+   * @param _expr - the expression to render (EOAttribute, EOKey, EOQualifier,
+   *                EOCase, EOAggregate, EONamedExpression)
+   * @return SQL code which calculates the expression
+   */
+  public String sqlStringForValueExpression(final EOValueEvaluation _expr) {
+    if (_expr == null)
+      return null;
+    
+    if (_expr instanceof EOAttribute) {
+      EOAttribute a = (EOAttribute)_expr;
+      return this.formatSQLString(this.sqlStringForAttribute(a),a.readFormat());
+    }
+
+    if (_expr instanceof EOKey)
+      return this.sqlStringForAttributeNamed(((EOKey)_expr).key());
+
+    if (_expr instanceof EOQualifier)
+      return this.sqlStringForQualifier((EOQualifier)_expr);
+    
+    if (_expr instanceof EOCase) {
+      log.error("EOCase generation not supported yet: " + _expr);
+      return null;
+    }
+    
+    log.error("unsupported expression: " + _expr);
+    return null;
+  }
   
   /* aliases */
   
