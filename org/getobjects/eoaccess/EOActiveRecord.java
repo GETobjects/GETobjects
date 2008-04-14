@@ -437,6 +437,8 @@ public class EOActiveRecord extends EOCustomObject
       Object v = this.storedValueForKey(k);
       if (v == null)
         _d.append("<null>");
+      else if (v instanceof Boolean)
+        _d.append(((Boolean)v).booleanValue() ? "T" : "F");
       else if (v instanceof Number || v instanceof String)
         _d.append(v);
       else if (v instanceof Date)
