@@ -409,7 +409,7 @@ public class EODatabaseChannel extends NSObject
       
       /* Note: custom queries are detected by the adaptor */
       results = this.adChannel.selectAttributes
-        (selectList, /* was null to let the channel do the work, why? */
+        (null, // selectList, /* was null to let the channel do the work, why? */
          _fs, this.isLocking, this.currentEntity);
       
       if (results == null) {
@@ -879,7 +879,7 @@ public class EODatabaseChannel extends NSObject
       if (isDebugOn) log.debug("    return raw row: " + row);
       return row;
     }
-    
+       
     Class clazz = this.currentClass != null // TBD: other way around?
       ? this.currentClass
       : this.objectClassForRow(row);;
