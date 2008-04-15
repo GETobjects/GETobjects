@@ -282,6 +282,12 @@ public class EOAttribute extends EOProperty
       if (_entity != null) {
         if (_entity.firstAttributeWithColumnName(colname) != null)
           continue;
+        
+        /* eg: 'name'='description' in the model (Company) vs column='name'
+         *     in the schema */
+        if (_entity.attributeNamed(colname) != null) // TBD
+          // TBD: better keep the other attr and rename it
+          continue;
       }
       
       /* clone and add */
