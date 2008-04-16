@@ -40,8 +40,12 @@ import org.getobjects.eoaccess.derby.EODerbyAdaptor;
 import org.getobjects.eoaccess.frontbase.EOFrontbaseAdaptor;
 import org.getobjects.eoaccess.mysql.EOMySQLAdaptor;
 import org.getobjects.eoaccess.postgresql.EOPostgreSQLAdaptor;
+import org.getobjects.eocontrol.EOFetchSpecification;
+import org.getobjects.eocontrol.EOQualifier;
+import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.UMap;
 import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
 
@@ -779,7 +783,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
       if (error != null)
         log.warn("performSQL() failed: " + _sql, error);
 
-      this.releaseChannel(channel, false /* do not keep channel */);
+      this.releaseAfterError(channel, error); /* do not keep channel */
       return null;
     }
 
@@ -787,6 +791,109 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return result;
   }
 
+  /**
+   * Translates the EOFetchSpecification into a SQL query and evaluates it
+   * using a channel.
+   * 
+   * @param _fs - the EOFetchSpecification to perform
+   * @return null on error, or a List containing the raw fetch results
+   */
+  public List<Map<String, Object>> performSQL(final EOFetchSpecification _fs) {
+    if (_fs == null)
+      return null;
+    
+    final EOSQLExpression e = this.expressionFactory().createExpression(null);
+    e.prepareSelectExpressionWithAttributes(null, _fs.locksObjects(), _fs);
+
+    final EOAdaptorChannel channel = this.openChannelFromPool();
+    if (channel == null) return null;
+
+    final List<Map<String, Object>> result = channel.evaluateQueryExpression(e);
+    if (result == null) { /* failed with some error */
+      final Exception error = channel.consumeLastException();
+      if (error != null)
+        log.warn("performSQL() failed: " + e, error);
+
+      this.releaseAfterError(channel, error); /* do not keep channel */
+      return null;
+    }
+
+    this.releaseChannel(channel);
+    return result;
+  }
+  
+
+  /**
+   * Creates a pattern EOFetchSpecification and evaluates it using a channel.
+   * <p>
+   * Possible arguments:
+   * <ul>
+   *   <li>q / qualifier
+   *   <li>sort
+   *   <li>distinct
+   * </ul>
+   * All remaining keys are evaluated as qualifier bindings.
+   * <p>
+   * Examples:<pre>
+   *   ad.performSQL("SELECT * FROM accounts WHERE %(where)s",
+   *     "q", "name LIKE $query", "query", F("q"));</pre>  
+   * 
+   * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
+   * @param arguments and bindings in a varargs array
+   * @return null on error, or a List containing the raw fetch results
+   */
+  @SuppressWarnings("unchecked")
+  public List<Map<String, Object>> performSQL
+    (final String _sqlpat, final Object... _args)
+  {
+    EOQualifier      q   = null;
+    EOSortOrdering[] sos = null;
+    boolean          distinct = false;
+    Number           limit    = null;
+    Number           offset   = null;
+    Object o;
+    
+    final Map<String, Object> args = UMap.createArgs(_args);
+    
+    if ((o = args.remove("qualifier")) == null)
+      o = args.remove("q");
+    if (o instanceof String)
+      q = EOQualifier.parse((String)o);
+    else if (o instanceof EOQualifier)
+      q = (EOQualifier)o;
+
+    if ((o = args.remove("sort")) != null) {
+      if (o instanceof String)
+        sos = EOSortOrdering.parse((String)o);
+      else if (o instanceof EOSortOrdering[])
+        sos = (EOSortOrdering[])o;
+    }
+
+    if ((o = args.remove("distinct")) != null)
+      distinct = UObject.boolValue(o);
+    
+    if ((o = args.remove("offset")) != null)
+      offset = UObject.intValue(o);
+    if ((o = args.remove("limit")) != null)
+      limit = UObject.intValue(o);
+    
+    if (q != null && args.size() > 0)
+      q = q.qualifierWithBindings(args, false /* do not require all */);
+    
+    EOFetchSpecification fs = new EOFetchSpecification();
+    fs.setQualifier(q);
+    fs.setSortOrderings(sos);
+    fs.setFetchesRawRows(true);
+    fs.setFetchesReadOnly(true);
+    fs.setUsesDistinct(distinct);
+    if (offset != null) fs.setFetchOffset(offset.intValue());
+    if (limit  != null) fs.setFetchLimit(limit.intValue());
+    if (_sqlpat != null)
+      fs.setHint(EOSQLExpression.EOCustomQueryExpressionHintKey, _sqlpat);
+    
+    return performSQL(fs);
+  }
+  
   /**
    * This is a quick&dirty method to perform updates in the database. It
    * acquires a channel from the pool, runs the SQL and gives back the channel.
