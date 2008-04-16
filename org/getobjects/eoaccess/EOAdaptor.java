@@ -754,6 +754,13 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * Example:<pre>
    *   List records = adaptor.performSQL("SELECT * FROM sessiong_log");
    *   System.out.println("db rows: " + records);</pre>
+   * <p>
+   * <strong>Careful</strong>:
+   * Do not introduce SQL injection issues by adding unquoted values
+   * to the SQL string! Use the EOSQLExpression class for database independend
+   * quoting, eg:<pre>
+   *   EOSQLExpression e = ad.expressionFactory().createExpression(null);
+   *   s = e.formatValueForAttribute(";DELETE * FROM accounts", null);</pre>
    *
    * @param _sql - the SQL to execute
    * @return a List of Maps representing the database records or null on error
@@ -842,7 +849,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     sql.append(" WHERE ");
     sql.append(e.sqlStringForSchemaObjectName(_field));
     sql.append(" = ");
-    sql.append(e.formatValueForAttribute(_value, null));
+    sql.append(e.formatValueForAttribute(_value, null /* attribute */));
     sql.append(" LIMIT 2"); /* 2 so that we can detect multiple records */
 
     /* run query */
@@ -903,6 +910,19 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   /* quoting SQL expressions */
   // TODO: maybe we want to move that to an own per-adaptor object?
 
+  /**
+   * Method used for quoting identifiers. Identifiers are things like
+   * table or column names.
+   * In modern database they can contain almost any UTF-8 characters, as long
+   * as they are properly quoted.
+   * <p>
+   * Example:<pre>
+   *   CREATE TABLE "Hello World" ( "my primary key" INT );</pre>
+   * 
+   * Most databases use double quotes (") as the quote. MySQL uses a backtick.
+   * Also remember that quoted identifiers are resolved in a case sensitive
+   * way with PostgreSQL (but unquoted are case insensitive!).
+   */
   public String stringByQuotingIdentifier(final String _id) {
     // TBD: could use getIdentifierQuoteString() of java.sql.DatabaseMetaData
     if (_id == null) return null;
@@ -924,10 +944,11 @@ public class EOAdaptor extends NSObject implements NSDisposable {
          c = localParser.next())
     {
       if (c == _quoteChar) {
+        // TBD: buggy? Just quotes single-quotes?
         _sb.append('\'');
         _sb.append('\'');
       }
-      else if (c == '\\') {
+      else if (c == '\\') { // escape backslash with double-backslash (why?)
         _sb.append('\\');
         _sb.append('\\');
       }
