@@ -836,7 +836,12 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * <p>
    * Examples:<pre>
    *   ad.performSQL("SELECT * FROM accounts WHERE %(where)s",
-   *     "q", "name LIKE $query", "query", F("q"));</pre>  
+   *     "q", "name LIKE $query", "query", F("q"));
+   *   this.results = this.application.db.adaptor().performSQL(
+   *     "SELECT DISTINCT function FROM employment" +
+   *     " %(where)s ORDER BY function ASC %(limit)s",
+   *     "limit", limit, "q", "function LIKE '" + this.F("q").trim() + "*'");
+   * </pre>  
    * 
    * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
    * @param arguments and bindings in a varargs array

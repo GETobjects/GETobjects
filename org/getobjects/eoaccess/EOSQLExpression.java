@@ -80,7 +80,7 @@ import org.getobjects.foundation.UList;
  * but the assembly will be done using the SQL pattern.
  * <p>
  * Example:<pre>
- *   SELECT COUNT(*) FROM %(tables)s WHERE %(where)s %(limit)s</pre>
+ *   SELECT COUNT(*) FROM %(tables)s %(where)s %(limit)s</pre>
  *   
  * Keys:<pre>
  *   select       eg SELECT or SELECT DISTINCT
