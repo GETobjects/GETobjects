@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -27,17 +27,19 @@ import org.getobjects.eocontrol.EOQualifier;
 
 public class EOMySQLExpression extends EOSQLExpression {
 
-  public EOMySQLExpression(EOEntity _entity) {
+  public EOMySQLExpression(final EOEntity _entity) {
     super(_entity);
   }
 
   /* database SQL */
   
+  @Override
   public String externalNameQuoteCharacter() {
     /* backtick for MySQL */
     return "`";
   }
   
+  @Override
   public String sqlStringForSelector
     (EOQualifier.ComparisonOperation _op, Object _value, boolean _allowNull)
   {
