@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -50,12 +50,14 @@ public class EOPostgreSQLAdaptor extends EOAdaptor {
     }
   }
 
+  @Override
   protected boolean loadDriver() {
     return primaryLoadDriver();
   }
   
   /* custom channels */
 
+  @Override
   protected EOAdaptorChannel primaryCreateChannelForConnection(Connection _c) {
     /* can be overridden by subclasses to provide specific channels */
     return new EOPostgreSQLChannel(this, _c);
@@ -63,6 +65,7 @@ public class EOPostgreSQLAdaptor extends EOAdaptor {
   
   /* quoting SQL expressions */
 
+  @Override
   public Class defaultExpressionClass() {
     return EOPostgreSQLExpression.class;
   }

@@ -117,6 +117,7 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
     return this.fetchSingleStringRows(dbNameQuery, null /* first column */);
   }
 
+  @Override
   public EOEntity describeEntityWithTableName(final String _tableName) {
     // TBD: fetch schema name or add it to the method args?
     if (_tableName == null) return null;
@@ -224,6 +225,7 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   
   /* sequences */
   
+  @Override
   public Integer nextNumberInSequence(final String _sequence) {
     // SQL: SELECT NEXTVAL('key_generator')
     EOSQLExpression e = this.adaptor.expressionFactory().createExpression(null);

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -33,6 +33,7 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
 
   /* database specific SQL */
   
+  @Override
   public String sqlStringForSelector
     (EOQualifier.ComparisonOperation _op, Object _value, boolean _allowNull)
   {
