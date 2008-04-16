@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of JOPE.
 
@@ -38,6 +38,7 @@ public class EOMySQLAdaptor extends EOAdaptor {
   
   /* JDBC driver */
 
+  @Override
   protected boolean loadDriver() {
     try {
       // The newInstance() call is a work around for some
@@ -52,6 +53,7 @@ public class EOMySQLAdaptor extends EOAdaptor {
   
   /* adaptor specific objects */
 
+  @Override
   protected EOAdaptorChannel primaryCreateChannelForConnection(Connection _c) {
     /* can be overridden by subclasses to provide specific channels */
     return new EOMySQLChannel(this, _c);
@@ -59,11 +61,13 @@ public class EOMySQLAdaptor extends EOAdaptor {
   
   /* quoting SQL expressions */
 
+  @Override
   public Class defaultExpressionClass() {
     return EOMySQLExpression.class;
   }
   
-  public String stringByQuotingIdentifier(String _id) {
+  @Override
+  public String stringByQuotingIdentifier(final String _id) {
     /* MySQL uses back-quotes for quoting identifiers */
     if (_id == null) return null;
     return "`" + escape(_id, '`') + "`";

@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -36,32 +36,34 @@ import org.getobjects.eoaccess.EOAttribute;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eoaccess.EOSQLExpression;
 
-/*
+/**
  * EOMySQLChannel
- * 
- * Notes:
+ * <p>
+ * Notes:<pre>
  * - for autoReconnect the connections have to be in autoCommit(true) mode to 
  *   reconnect
  * - MySQL/J sets SQLException.getSQLState() to '08S01' on network connectivity
  *   issues
- *   - AutoReconnect has a _lot_ of overhead
+ *   - AutoReconnect has a _lot_ of overhead</pre>
  */
 public class EOMySQLChannel extends EOAdaptorChannel {
 
-  public EOMySQLChannel(EOAdaptor _adaptor, Connection _c) {
+  public EOMySQLChannel(final EOAdaptor _adaptor, final Connection _c) {
     super(_adaptor, _c);
   }
   
   /* reflection */
   
+  @Override
   public String[] describeTableNames() {
     return describeTableNames(null /* all tables */);
   }
   
-  public EOEntity describeEntityWithTableName(String _tableName) {
+  @Override
+  public EOEntity describeEntityWithTableName(final String _tableName) {
     if (_tableName == null) return null;
 
-    List<Map<String,Object>> columnInfos =
+    final List<Map<String,Object>> columnInfos =
       this._fetchMySQLColumnsOfTable(_tableName);
     
     if (columnInfos == null) /* error */
@@ -87,7 +89,7 @@ public class EOMySQLChannel extends EOAdaptorChannel {
   {
     if (_columnInfos == null) return null;
 
-    List<String> pkeys = new ArrayList<String>(2);
+    final List<String> pkeys = new ArrayList<String>(2);
     for (int i = 0; i < _columnInfos.size(); i++) {
       Object v = _columnInfos.get(i).get("Key");
       if (v == null) continue;
@@ -100,16 +102,16 @@ public class EOMySQLChannel extends EOAdaptorChannel {
   }
   
   protected EOAttribute[] attributesFromColumnInfos
-    (List<Map<String,Object>> _columnInfos)
+    (final List<Map<String,Object>> _columnInfos)
   {
     if (_columnInfos == null) return null;
 
-    int count = _columnInfos.size();
-    EOAttribute[] attributes = new EOAttribute[count];
+    final int count = _columnInfos.size();
+    final EOAttribute[] attributes = new EOAttribute[count];
 
     for (int i = 0; i < count; i++) {
-      Map<String,Object> colinfo = _columnInfos.get(i);
-      String colname = (String)colinfo.get("Field");
+      final Map<String,Object> colinfo = _columnInfos.get(i);
+      final String colname = (String)colinfo.get("Field");
       String exttype = (String)colinfo.get("Type");
       int    width   = 0;
       
@@ -144,20 +146,21 @@ public class EOMySQLChannel extends EOAdaptorChannel {
   
   /* MySQL reflection */
   
-  protected String[] privilegesArrayFromString(String _privs) {
+  protected String[] privilegesArrayFromString(final String _privs) {
     /* eg: select,insert,update,references */
     if (_privs == null) return null;
     return _privs.split(",");
   }
   
-  public String[] describeTableNames(String _like) {
+  public String[] describeTableNames(final String _like) {
     String sql = "SHOW TABLES";
     if (_like != null)
       sql += " LIKE '" + _like + "'"; // TODO: escape?
     return this.fetchSingleStringRows(sql, null);
   }
   
-  public String[] describeDatabaseNames(String _like) {
+  @Override
+  public String[] describeDatabaseNames(final String _like) {
     String sql = "SHOW DATABASES";
     if (_like != null)
       sql += " LIKE '" + _like + "'"; // TODO: escape?
@@ -166,14 +169,14 @@ public class EOMySQLChannel extends EOAdaptorChannel {
   
   public List<Map<String,Object>> _fetchMySQLColumnsOfTable(String _table) {
     // keys: Field, Type, Collation, Null, Key, Default, Extra, Privileges                      | Comment |
-    List<Map<String, Object>> records =
+    final List<Map<String, Object>> records =
       this.performSQL("SHOW FULL COLUMNS FROM " + _table);
     
     // TODO: make that EOAttribute's
     return records;
   }
   
-  public List<Map<String,Object>> _fetchMySQLCollations(String _like) {
+  public List<Map<String,Object>> _fetchMySQLCollations(final String _like) {
     String sql = "SHOW COLLATION";
     if (_like != null)
       sql += " LIKE '" + _like + "'"; // TODO: escape?
@@ -181,7 +184,7 @@ public class EOMySQLChannel extends EOAdaptorChannel {
     return this.performSQL(sql);
   }
   
-  public List<Map<String,Object>> _fetchMySQLCharacterSets(String _like) {
+  public List<Map<String,Object>> _fetchMySQLCharacterSets(final String _like) {
     String sql = "SHOW CHARACTER SET";
     if (_like != null)
       sql += " LIKE '" + _like + "'"; // TODO: escape?
@@ -194,7 +197,7 @@ public class EOMySQLChannel extends EOAdaptorChannel {
     return this.performSQL("SHOW PRIVILEGES");
   }
   
-  public String _fetchMySQLTableCreateStatementForTable(String _table) {
+  public String _fetchMySQLTableCreateStatementForTable(final String _table) {
     return this.fetchSingleString("SHOW CREATE TABLE " + _table,
                                   "Create Table");
   }
@@ -209,7 +212,7 @@ public class EOMySQLChannel extends EOAdaptorChannel {
     return this.performSQL("SHOW FULL PROCESS LIST");
   }
   
-  public Map<String, Object> _fetchMySQLStatus(String _like) {
+  public Map<String, Object> _fetchMySQLStatus(final String _like) {
     String sql = "SHOW STATUS";
     if (_like != null)
       sql += " LIKE '" + _like + "'"; // TODO: escape?
@@ -226,7 +229,7 @@ public class EOMySQLChannel extends EOAdaptorChannel {
     return this.fetchKeyValueRows(sql);
   }
 
-  public List<Map<String,Object>> _fetchMySQLTableStatus(String _like) {
+  public List<Map<String,Object>> _fetchMySQLTableStatus(final String _like) {
     // keys: Name, Engine, Version, Row_format, Rows, Avg_row_length,
     //       Data_length, Max_data_length, Index_length, Data_free,
     //       Auto_increment, Create_time, Update_time, Check_time, Collation,
@@ -241,17 +244,17 @@ public class EOMySQLChannel extends EOAdaptorChannel {
   
   /* utility */
   
-  protected String fetchSingleString(String _sql, String _columnName) {
-    String[] rows = this.fetchSingleStringRows(_sql, _columnName);
+  protected String fetchSingleString(final String _sql, String _columnName) {
+    final String[] rows = this.fetchSingleStringRows(_sql, _columnName);
     if (rows == null) return null;
     if (rows.length == 0) return null;
     return rows[0];
   }
 
-  protected Map<String, Object> fetchKeyValueRows(String _sql) {
+  protected Map<String, Object> fetchKeyValueRows(final String _sql) {
     /* acquire DB resources */
     
-    Statement  stmt = this._createStatement();
+    final Statement stmt = this._createStatement();
     if (stmt == null) return null;
     
     /* perform query */
@@ -282,7 +285,8 @@ public class EOMySQLChannel extends EOAdaptorChannel {
   
   /* sequences */
 
-  public Integer nextNumberInSequence(String _sequence) {
+  @Override
+  public Integer nextNumberInSequence(final String _sequence) {
     /* generate SQL */
     
     EOSQLExpression e = this.adaptor.expressionFactory().createExpression(null);
@@ -297,7 +301,7 @@ public class EOMySQLChannel extends EOAdaptorChannel {
     
     /* acquire DB resources */
     
-    Statement  stmt = this._createStatement();
+    final Statement stmt = this._createStatement();
     if (stmt == null) return -1;
     
     int nextNumber = -1;
