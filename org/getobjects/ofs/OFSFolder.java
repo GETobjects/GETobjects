@@ -731,8 +731,8 @@ public class OFSFolder extends OFSBaseObject
     /* setup config context */
     
     String   objId = this.idFromName(_name, _ctx);
-    String[] childPath = addStringToStringArray(this.storagePath, objId);
-    String[] childLoc  = addStringToStringArray(this.pathInContainer(), _name);
+    String[] childPath = UString.addStringToStringArray(this.storagePath, objId);
+    String[] childLoc  = UString.addStringToStringArray(this.pathInContainer(), _name);
     
     JoConfigContext configContext = new JoConfigContext(_ctx,
         "location", childLoc,
@@ -753,20 +753,6 @@ public class OFSFolder extends OFSBaseObject
     
     return (Map)cfg;
   }
-  
-  private static final String[] addStringToStringArray
-    (final String[] _path, final String _str)
-  {
-    final int len = _path != null ? _path.length : 0;
-    final String[] newPath = new String[len + 1];
-    if (len > 0)
-      System.arraycopy(_path, 0, newPath, 0, len);
-    newPath[len] = _str;
-    return newPath;
-  }
-  
-  
-  /* resource manager */
   
   /**
    * Lookup and cache a resource manager for the folder.
