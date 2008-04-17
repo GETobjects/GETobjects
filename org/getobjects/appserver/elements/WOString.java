@@ -297,6 +297,15 @@ public class WOString extends WOHTMLDynamicElement {
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
-    this.appendAssocToDescription(_d, "value", this.value);
+    this.appendAssocToDescription(_d, "value",          this.value);
+    this.appendAssocToDescription(_d, "valuePattern",   this.valuePattern);
+    this.appendAssocToDescription(_d, "valueWhenEmpty", this.valueWhenEmpty);
+    this.appendAssocToDescription(_d, "escapeHTML",     this.escapeHTML);
+    this.appendAssocToDescription(_d, "insertBR",       this.insertBR);
+    
+    if (this.formatter != null) {
+      _d.append(" formatter=");
+      _d.append(this.formatter);
+    }
   }
 }

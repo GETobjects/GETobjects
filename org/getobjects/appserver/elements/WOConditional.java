@@ -181,7 +181,7 @@ public class WOConditional extends WODynamicElement {
 
   /* evaluate */
   
-  protected boolean doShowInContext(WOContext _ctx) {
+  protected boolean doShowInContext(final WOContext _ctx) {
     if (this.condition == null) {
       log.error("association has no 'condition' binding!");
       return false;
@@ -238,10 +238,11 @@ public class WOConditional extends WODynamicElement {
     return doNegate ? !doShow : doShow;
   }
   
+  
   /* handle request */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (!this.doShowInContext(_ctx) || this.template == null)
       return;
     
@@ -251,7 +252,7 @@ public class WOConditional extends WODynamicElement {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     /* Note: In SOPE this works a bit different. SOPE encodes the on/off state
      *       in the element-id. This way the condition doesn't need to be
      *       evaluated.
@@ -262,16 +263,17 @@ public class WOConditional extends WODynamicElement {
       return null;
     
     _ctx.appendElementIDComponent("1");
-    Object v = this.template.invokeAction(_rq, _ctx);
+    final Object v = this.template.invokeAction(_rq, _ctx);
     _ctx.deleteLastElementIDComponent();
     
     return v;
   }
   
+  
   /* generate response */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (!this.doShowInContext(_ctx) || this.template == null) {
       log.debug("not showing a conditional ...");
       return;
@@ -283,7 +285,7 @@ public class WOConditional extends WODynamicElement {
   }
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (!this.doShowInContext(_ctx) || this.template == null) {
       log.debug("not showing a conditional ...");
       return;
@@ -292,5 +294,18 @@ public class WOConditional extends WODynamicElement {
     _ctx.appendElementIDComponent("1");
     _walker.processTemplate(this, this.template, _ctx);
     _ctx.deleteLastElementIDComponent();
+  }
+
+
+  /* description */
+
+  @Override
+  public void appendAttributesToDescription(final StringBuilder _d) {
+    super.appendAttributesToDescription(_d);
+    
+    this.appendAssocToDescription(_d, "condition", this.condition);
+    this.appendAssocToDescription(_d, "negate",    this.negate);
+    this.appendAssocToDescription(_d, "value",     this.value);
+    this.appendAssocToDescription(_d, "match",     this.match);
   }
 }
