@@ -1356,4 +1356,16 @@ public class UString {
     }
     return llen == j ? _s : new String(buf, 0, j);
   }
+
+
+  public static final String[] addStringToStringArray
+    (final String[] _path, final String _str)
+  {
+    final int len = _path != null ? _path.length : 0;
+    final String[] newPath = new String[len + 1];
+    if (len > 0)
+      System.arraycopy(_path, 0, newPath, 0, len);
+    newPath[len] = _str;
+    return newPath;
+  }
 }
