@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.associations.WOCheckRoleAssociation;
 import org.getobjects.appserver.associations.WOKeyAssociation;
 import org.getobjects.appserver.associations.WOKeyPathAssociation;
 import org.getobjects.appserver.associations.WOKeyPathPatternAssociation;
@@ -233,6 +234,7 @@ public abstract class WOAssociation extends NSObject
    *   <li>plist  - WOAssociation.associationWithValue
    *   <li>q      - WOQualifierAssociation
    *   <li>regex  - WORegExAssociation
+   *   <li>role   - WOCheckRoleAssociation
    *   <li>rsrc   - WOResourceURLAssociation
    *   <li>var    - WOAssociation.associationWithKeyPath
    *   <li>varpat - WOKeyPathPatternAssociation
@@ -301,6 +303,8 @@ public abstract class WOAssociation extends NSObject
           assoc = new WOResourceURLAssociation(_value);
         else if (_prefix.equals("regex"))
           assoc = new WORegExAssociation(_value);
+        else if (_prefix.equals("role"))
+          assoc = new WOCheckRoleAssociation(_value);
         break;
         
       case 'v':
