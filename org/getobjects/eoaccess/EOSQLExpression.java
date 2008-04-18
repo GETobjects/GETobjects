@@ -50,7 +50,6 @@ import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOQualifierVariable;
 import org.getobjects.eocontrol.EOSQLQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
-import org.getobjects.eocontrol.EOExpressionEvaluation;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UList;
@@ -1378,7 +1377,7 @@ public class EOSQLExpression extends NSObject {
    * @param _keyPath
    * @return
    */
-  public String sqlStringForValue(Object _value, String _keyPath) {
+  public String sqlStringForValue(Object _value, final String _keyPath) {
     if (_value instanceof EORawSQLValue)
       return _value.toString();
     
@@ -1853,7 +1852,7 @@ public class EOSQLExpression extends NSObject {
    * @param _q - the EOSQLQualifier to be converted
    * @return the SQL for the qualifier, or null on error
    */
-  public String sqlStringForRawQualifier(EOSQLQualifier _q) {
+  public String sqlStringForRawQualifier(final EOSQLQualifier _q) {
     if (_q == null) return null;
     
     // TODO: Do something inside the parts? Pattern replacement?
@@ -1897,12 +1896,12 @@ public class EOSQLExpression extends NSObject {
    * @param _q - the EOKeyValueQualifier
    * @return the SQL or null if the SQL could not be generated
    */
-  public String sqlStringForKeyValueQualifier(EOKeyValueQualifier _q) {
+  public String sqlStringForKeyValueQualifier(final EOKeyValueQualifier _q) {
     if (_q == null) return null;
     
-    String      k  = _q.key();
+    final String k  = _q.key();
+    Object v  = _q.value();
     EOAttribute a  = this.entity != null ? this.entity.attributeNamed(k) : null;
-    Object      v  = _q.value();
     String      sqlCol;
     
     /* generate lhs */
@@ -1924,7 +1923,7 @@ public class EOSQLExpression extends NSObject {
     // TODO: do something about caseInsensitiveLike (TO_UPPER?), though in
     //       PostgreSQL and MySQL this is already covered by special operators
     
-    EOQualifier.ComparisonOperation opsel = _q.operation();
+    final EOQualifier.ComparisonOperation opsel = _q.operation();
     String op = this.sqlStringForSelector(opsel, v, true);
     if (op == null) {
       log.error("got no operation for qualifier: " + _q);
@@ -2144,9 +2143,15 @@ public class EOSQLExpression extends NSObject {
    *                EOCase, EOAggregate, EONamedExpression)
    * @return SQL code which calculates the expression
    */
-  public String sqlStringForValueExpression(final EOExpressionEvaluation _expr) {
-    if (_expr == null)
-      return null;
+  public String sqlStringForExpression(final Object _expr) {
+    if (_expr == null ||
+        _expr instanceof String || 
+        _expr instanceof Number || 
+        _expr instanceof Boolean)
+    {
+      // TBD: not sure whether this is correct
+      return this.formatValue(_expr);
+    }
     
     if (_expr instanceof EOAttribute) {
       EOAttribute a = (EOAttribute)_expr;
@@ -2154,6 +2159,7 @@ public class EOSQLExpression extends NSObject {
     }
 
     if (_expr instanceof EOKey)
+      // TBD: check what sqlStringForKeyValueQualifier does?
       return this.sqlStringForAttributeNamed(((EOKey)_expr).key());
 
     if (_expr instanceof EOQualifier)
