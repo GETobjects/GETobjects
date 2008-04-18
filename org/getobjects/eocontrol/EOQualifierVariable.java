@@ -27,7 +27,7 @@ import org.getobjects.foundation.NSObject;
  * EOQualifierVariable
  * <p>
  * Used to define dynamic fields in a qualifier. Those can be resolved by
- * calling qualifierWithBindings() on an EOQualifier hierarchy.
+ * calling expressionWithBindings() on an EOExpression/EOQualifier hierarchy.
  * <p>
  * Syntax:<pre>
  *   $variable
@@ -37,7 +37,7 @@ public class EOQualifierVariable extends NSObject {
 
   protected String key;
   
-  public EOQualifierVariable(String _key) {
+  public EOQualifierVariable(final String _key) {
     this.key = _key;
   }
   
@@ -49,7 +49,7 @@ public class EOQualifierVariable extends NSObject {
   
   /* equals */
   
-  public boolean equals(Object _other) {
+  public boolean equals(final Object _other) {
     if (this   == _other) return true;
     if (_other == null) return false;
     if (!(_other instanceof EOQualifierVariable)) return false;
