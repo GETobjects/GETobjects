@@ -23,8 +23,6 @@ package org.getobjects.eocontrol;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.getobjects.foundation.NSObject;
-
 /**
  * EOCase
  * <p>
@@ -36,7 +34,9 @@ import org.getobjects.foundation.NSObject;
  *   END</pre>
  * A CASE expression returns a value after evaluation a set of conditions).
  */
-public class EOCase extends NSObject implements EOValueEvaluation {
+public class EOCase extends EOExpression
+  implements EOExpressionEvaluation, Cloneable
+{
   // TBD: support SQL generation?! (belongs into EOAccess)
 
   protected List<EOQualifier> conditions;
@@ -182,6 +182,9 @@ public class EOCase extends NSObject implements EOValueEvaluation {
   
   @Override
   public Object clone() {
+    // hm, EOExpressions are immutable, so we should return just this,
+    // but EOCase's are not immutable in the construction phase, so this
+    // should be OK
     return new EOCase(this.conditions(), this.values(), this.defaultValue());
   }
   

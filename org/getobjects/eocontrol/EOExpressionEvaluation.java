@@ -26,7 +26,7 @@ package org.getobjects.eocontrol;
  * <p>
  * Common interface of EOKey/EOCase to extract values from objects.
  */
-public interface EOValueEvaluation {
+public interface EOExpressionEvaluation {
 
   /**
    * See EOKey/EOCase for details.

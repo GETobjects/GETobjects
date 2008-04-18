@@ -65,32 +65,32 @@ public class EOGroupedList<E> extends ArrayList<E> {
   private static final long serialVersionUID = 1L;
   
   protected Map<Object, List<E>> groupedItems;
-  protected EOValueEvaluation    expression;
-  protected EOValueEvaluation[]  subexpressions;
+  protected EOExpressionEvaluation    expression;
+  protected EOExpressionEvaluation[]  subexpressions;
   protected boolean needsReGroup;
   
-  public EOGroupedList(EOValueEvaluation[] _exprs) {
+  public EOGroupedList(EOExpressionEvaluation[] _exprs) {
     super();
     this.groupedItems = new HashMap<Object, List<E>>(16);
     if (_exprs != null && _exprs.length > 0) {
       this.expression = _exprs[0];
       if (_exprs.length > 1) {
-        this.subexpressions = new EOValueEvaluation[_exprs.length - 1];
+        this.subexpressions = new EOExpressionEvaluation[_exprs.length - 1];
         System.arraycopy(_exprs, 1, this.subexpressions, 0, _exprs.length - 1);
       }
     }
   }
-  public EOGroupedList(EOValueEvaluation _expr) {
+  public EOGroupedList(EOExpressionEvaluation _expr) {
     super();
     this.groupedItems = new HashMap<Object, List<E>>(16);
     this.expression   = _expr;
   }
-  public EOGroupedList(EOValueEvaluation _expr, int _capacity) {
+  public EOGroupedList(EOExpressionEvaluation _expr, int _capacity) {
     super(_capacity);
     this.groupedItems = new HashMap<Object, List<E>>(16);
     this.expression   = _expr;
   }
-  public EOGroupedList(EOValueEvaluation _expr, Collection<? extends E> _c) {
+  public EOGroupedList(EOExpressionEvaluation _expr, Collection<? extends E> _c) {
     super(_c);
     this.groupedItems = new HashMap<Object, List<E>>(16);
     this.expression   = _expr;

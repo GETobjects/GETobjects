@@ -33,7 +33,7 @@ import java.util.List;
  *   firstname = 'Donald' AND lastname = 'Duck'</pre>
  */
 public class EOAndQualifier extends EOCompoundQualifier
-  implements EOQualifierEvaluation, EOValueEvaluation
+  implements EOQualifierEvaluation, EOExpressionEvaluation
 {
   public EOAndQualifier(List<EOQualifier> _qs) {
     super(_qs);
