@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
@@ -167,79 +165,6 @@ public class EOQualifier extends EOExpression {
   }
   
   
-  /* keys (do not mix up with bindings, keys are the keys of the object */
-  
-  /**
-   * Returns the keys used in the qualifier.
-   * <p>
-   * This method just calls addQualifierKeysToSet() which should be overridden
-   * by subclasses to add the keys they access.
-   * <p>
-   * Example:<pre>
-   *   name LIKE 'He*' AND number = '10000' AND city = $query</pre>
-   * This will return<pre>
-   *   [ 'name', 'number', 'city' ]</pre>
-   * <p>
-   * Note: do not mix that up with 'bindings'. In the example above just 'query'
-   * would be a binding.
-   * 
-   * @return a List of keys
-   */
-  public List<String> allQualifierKeys() {
-    final Set<String> keys = new HashSet<String>(16);
-    this.addQualifierKeysToSet(keys);
-    return new ArrayList<String>(keys);
-  }
-  /**
-   * Should be overridden by subclasses to add 'their' keys to the set.
-   * 
-   * @param keys_ - output parameter, this is where the method puts its keys
-   */
-  public void addQualifierKeysToSet(final Set<String> keys_) {
-  }
-  
-  
-  /* bindings (do not mix up with keys, bindings are EOQualifierVariable's) */
-
-  /**
-   * Checks a qualifier for unresolved bindings. This is (potentially) faster
-   * than collecting all keys using bindingKeys() and then checking the size.
-   */
-  public boolean hasUnresolvedBindings() {
-    final Set<String> keys = new HashSet<String>(16);
-    this.addBindingKeysToSet(keys);
-    return keys.size() > 0;
-  }
-  
-  /**
-   * Returns the list of unresolved qualifier variable names. For example a
-   * qualifier like:
-   *   <pre>lastname LIKE $q</pre>
-   * will return the List ['q'].
-   * <p>
-   * The returned List is distinct, that is, there won't be any duplicate keys
-   * in it.
-   * 
-   * @return a List of Strings
-   */
-  public List<String> bindingKeys() {
-    final Set<String> keys = new HashSet<String>(16);
-    this.addBindingKeysToSet(keys);
-    return new ArrayList<String>(keys);
-  }
-  
-  /**
-   * This method is used to add unresolved bindings to a set of keys. Usually
-   * overridden by subclasses.
-   * 
-   * @param _keys - the set of keys
-   */
-  public void addBindingKeysToSet(final Set<String> _keys) {
-  }
-  
-  public String keyPathForBindingKey(final String _variable) {
-    return null;
-  }
   
   /**
    * Returns a qualifier which has its bindings resolved against the given
@@ -273,6 +198,12 @@ public class EOQualifier extends EOExpression {
     return this.qualifierWithBindings(
         new NSKeyValueHolder(_keysAndValues), true);
   }
+
+  public EOExpression expressionWithBindings
+    (final Object _vals, final boolean _requiresAll)
+  {
+    return this.qualifierWithBindings(_vals, _requiresAll);
+  }
   
   /* utility */
   
@@ -283,12 +214,12 @@ public class EOQualifier extends EOExpression {
    * @param _in - the Collection to be filtered
    * @return a List of objects matching the qualifier 
    */
-  public List filterCollection(Collection _in) {
+  public List filterCollection(final Collection _in) {
     if (_in == null)
       return null;
     
-    EOQualifierEvaluation eval = (EOQualifierEvaluation)this;
-    ArrayList<Object> result = new ArrayList<Object>(_in.size());
+    final EOQualifierEvaluation eval = (EOQualifierEvaluation)this;
+    final ArrayList<Object> result = new ArrayList<Object>(_in.size());
     for (Object item: _in) {
       if (eval.evaluateWithObject(item))
         result.add(item);
@@ -296,81 +227,6 @@ public class EOQualifier extends EOExpression {
     
     result.trimToSize();
     return result;
-  }
-  
-  
-  /* string representation */
-  
-  /**
-   * Overridden by subclasses to append their string representation to the
-   * given qualifier.
-   * <p>
-   * Note: the default implementation returns 'false'. Qualifiers which want
-   * to have an external representation must override this method.
-   * 
-   * @return true/false - depending on whether the generation was successful
-   */
-  public boolean appendStringRepresentation(final StringBuilder _sb) {
-    return false;
-  }
-  
-  /**
-   * Prepares a StringBuilder and calls appendStringRepresentation() to
-   * generate the String representation of the EOQualifier.
-   * 
-   * @return the String representation of the qualifier
-   */
-  public String stringRepresentation() {
-    final StringBuilder sb = new StringBuilder(256);
-    if (!this.appendStringRepresentation(sb))
-      return null;
-    return sb.toString();
-  }
-  
-  protected void appendIdentifierToStringRepresentation
-    (final StringBuilder _sb, final String _id)
-  {
-    // TODO: should we surround ids by double-quotes like in SQL?
-    _sb.append(_id);
-  }
-  
-  /**
-   * Appends a constant value or qualifier variable to the String
-   * representation of a qualifier.
-   * 
-   * @param _sb - the string representation being build
-   * @param _o  - the value to add
-   * @return true if it worked, false otherwise
-   */
-  protected boolean appendConstantToStringRepresentation
-    (final StringBuilder _sb, final Object _o)
-  {
-    if (_o == null)
-      _sb.append("NULL");
-    else if (_o instanceof EOQualifierVariable) {
-      _sb.append("$");
-      _sb.append(((EOQualifierVariable)_o).key());
-    }
-    else if (_o instanceof Number)
-      _sb.append(_o);
-    else if (_o instanceof Boolean) {
-      if (((Boolean)_o).booleanValue())
-        _sb.append("true");
-      else
-        _sb.append("false");
-    }
-    else if (_o instanceof String) {
-      final String s = ((String)_o).replace("'", "\\'");
-      _sb.append("'");
-      _sb.append(s);
-      _sb.append("'");
-    }
-    else {
-      // TODO: log error
-      this.appendConstantToStringRepresentation(_sb, _o.toString());
-    }
-    
-    return true;
   }
   
   
@@ -432,14 +288,6 @@ public class EOQualifier extends EOExpression {
    */
   public EOQualifier not() {
     return new EONotQualifier(this);
-  }
-  
-  
-  /* description */
-  
-  @Override
-  public void appendAttributesToDescription(final StringBuilder _d) {
-    super.appendAttributesToDescription(_d);
   }
   
   

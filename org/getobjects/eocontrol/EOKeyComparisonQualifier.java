@@ -109,7 +109,7 @@ public class EOKeyComparisonQualifier extends EOQualifier
   /* keys */
   
   @Override
-  public void addQualifierKeysToSet(final Set<String> _keys) {
+  public void addReferencedKeysToSet(final Set<String> _keys) {
     if (_keys == null) return;
     if (this.leftKey  != null) _keys.add(this.leftKey);
     if (this.rightKey != null) _keys.add(this.rightKey);

@@ -59,9 +59,9 @@ public class EONotQualifier extends EOQualifier
   /* keys */
   
   @Override
-  public void addQualifierKeysToSet(Set<String> _keys) {
+  public void addReferencedKeysToSet(Set<String> _keys) {
     if (this.qualifier != null)
-      this.qualifier.addQualifierKeysToSet(_keys);
+      this.qualifier.addReferencedKeysToSet(_keys);
   }
   
   /* bindings */

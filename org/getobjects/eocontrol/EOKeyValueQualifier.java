@@ -215,7 +215,7 @@ public class EOKeyValueQualifier extends EOQualifier
   /* keys */
   
   @Override
-  public void addQualifierKeysToSet(Set<String> _keys) {
+  public void addReferencedKeysToSet(Set<String> _keys) {
     if (_keys == null) return;
     if (this.key != null) _keys.add(this.key);
   }
