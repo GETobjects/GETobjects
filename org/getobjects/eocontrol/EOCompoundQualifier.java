@@ -55,13 +55,13 @@ public abstract class EOCompoundQualifier extends EOQualifier {
   /* keys */
   
   @Override
-  public void addQualifierKeysToSet(Set<String> _keys) {
+  public void addReferencedKeysToSet(Set<String> _keys) {
     if (_keys == null) return;
     if (this.qualifiers == null) return;
     for (int i = 0; i < this.qualifiers.length; i++) {
       if (this.qualifiers[i] == null) continue;
       
-      this.qualifiers[i].addQualifierKeysToSet(_keys);
+      this.qualifiers[i].addReferencedKeysToSet(_keys);
     }
   }
   
