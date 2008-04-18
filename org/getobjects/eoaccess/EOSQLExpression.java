@@ -1386,6 +1386,8 @@ public class EOSQLExpression extends NSObject {
 
     boolean useBind = false;
     
+    // TBD: check whether the value is an EOExpression?
+    
     if (_value instanceof EOQualifierVariable)
       useBind = true;
     else if ((_value != null && _value.getClass().isArray()) || 
@@ -1905,6 +1907,7 @@ public class EOSQLExpression extends NSObject {
     String      sqlCol;
     
     /* generate lhs */
+    // TBD: use sqlStringForExpression with EOKey?
     
     if ((sqlCol = this.sqlStringForAttributeNamed(k)) == null) {
       log.warn("got no SQL string for attribute of LHS " + k + ": " + _q);
@@ -2007,6 +2010,7 @@ public class EOSQLExpression extends NSObject {
         }
       }
     
+      // this does bind stuff if enabled
       sb.append(this.sqlStringForValue(v, k));
     }
     
