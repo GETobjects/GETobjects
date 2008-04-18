@@ -164,17 +164,28 @@ public class EOCase extends EOExpression
    */
   public Object valueForObject(final Object _object) {
     // TBD: do any special NULL processing?
-    if (this.conditions == null)
-      return this.defaultValue;
+    Object v = null;
     
-    final int len = this.conditions.size();
-    for (int i = 0; i < len; i++) {
-      EOQualifierEvaluation qe = (EOQualifierEvaluation)this.conditions.get(i);
-      if (qe.evaluateWithObject(_object))
-        return this.values != null ? this.values.get(i) : null;
+    if (this.conditions == null)
+      v = this.defaultValue;
+    else {
+      final int len = this.conditions.size();
+      int i;
+      for (i = 0; i < len; i++) {
+        EOQualifierEvaluation qe = (EOQualifierEvaluation)this.conditions.get(i);
+        if (qe.evaluateWithObject(_object)) {
+          v = this.values != null ? this.values.get(i) : null;
+          break;
+        }
+      }
+      if (i == len)
+        v = this.defaultValue;
     }
     
-    return this.defaultValue;
+    if (v instanceof EOExpressionEvaluation)
+      v = ((EOExpressionEvaluation)v).valueForObject(_object);
+    
+    return v;
   }
   
   
