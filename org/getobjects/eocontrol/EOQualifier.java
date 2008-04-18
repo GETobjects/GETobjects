@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSKeyValueHolder;
-import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
 
 /**
@@ -56,7 +55,8 @@ import org.getobjects.foundation.UObject;
  * objects. To do that, qualifiers support the EOQualifierEvaluation
  * interface.
  */
-public class EOQualifier extends NSObject implements Cloneable {
+public class EOQualifier extends EOExpression {
+  @SuppressWarnings("hiding")
   protected static final Log log = LogFactory.getLog("EOQualifier");
   
   /* parsing */
@@ -534,15 +534,6 @@ public class EOQualifier extends NSObject implements Cloneable {
       case CASE_INSENSITIVE_LIKE: return "caseInsensitiveLike:";
       default: return null;
     }
-  }
-  
-  
-  /* Cloneable */
-  
-  @Override
-  protected Object clone() throws CloneNotSupportedException {
-    /* qualifiers are immutable */
-    return this;
   }
   
   

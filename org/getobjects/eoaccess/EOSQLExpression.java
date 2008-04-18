@@ -50,7 +50,7 @@ import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOQualifierVariable;
 import org.getobjects.eocontrol.EOSQLQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
-import org.getobjects.eocontrol.EOValueEvaluation;
+import org.getobjects.eocontrol.EOExpressionEvaluation;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UList;
@@ -2144,7 +2144,7 @@ public class EOSQLExpression extends NSObject {
    *                EOCase, EOAggregate, EONamedExpression)
    * @return SQL code which calculates the expression
    */
-  public String sqlStringForValueExpression(final EOValueEvaluation _expr) {
+  public String sqlStringForValueExpression(final EOExpressionEvaluation _expr) {
     if (_expr == null)
       return null;
     

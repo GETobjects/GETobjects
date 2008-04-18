@@ -25,16 +25,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
-import org.getobjects.foundation.NSObject;
 
 /**
  * EOKey
  * <p>
  * EOKey is used to build EOQualifiers and other EO objects for enterprise
  * object properties.
+ * <p>
  * Inspired by the awesome WOnder project ;-)
  */
-public class EOKey<T> extends NSObject implements Cloneable, EOValueEvaluation {
+public class EOKey<T> extends EOExpression implements EOExpressionEvaluation {
   
   protected String keyPath;
   
