@@ -29,6 +29,11 @@ import org.mozilla.javascript.Scriptable;
  * EOPropertyAdapter
  * <p>
  * Special API for EOEntity objects. Plain properties are exposed as such.
+ * Properties:
+ * <ul>
+ *   <li>name
+ *   <li>relationshipPath
+ * </ul>
  */
 public class EOPropertyAdapter extends NativeJavaObject {
   private static final long serialVersionUID = 1L;
