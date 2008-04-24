@@ -129,7 +129,7 @@ public abstract class WOMessage extends NSObject
     return this.httpVersion;
   }
 
-  public void setUserInfo(Map _ui) {
+  public void setUserInfo(final Map _ui) {
     this.userInfo = _ui;
   }
   public Map userInfo() {
@@ -146,7 +146,7 @@ public abstract class WOMessage extends NSObject
    * @param _v   - the values (eg [ 'text/html', 'text/plain' ])
    * @param _key - the name of the header (eg 'accept')
    */
-  public void setHeadersForKey(List<String> _v, String _key) {
+  public void setHeadersForKey(final List<String> _v, final String _key) {
     if (_v == null) {
       this.removeHeadersForKey(_key);
       return;
@@ -165,7 +165,7 @@ public abstract class WOMessage extends NSObject
    * @param _v   - the value to add (eg 'text/html')
    * @param _key - the name of the header (eg 'accept')
    */
-  public void appendHeader(String _v, String _key) {
+  public void appendHeader(final String _v, final String _key) {
     if (_v == null || _key == null)
       return;
     
@@ -186,7 +186,7 @@ public abstract class WOMessage extends NSObject
    * 
    * @param _key - the name of the header to clear
    */
-  public void removeHeadersForKey(String _key) {
+  public void removeHeadersForKey(final String _key) {
     if (_key == null) return;
     if (this.headers == null) return;
     this.headers.remove(_key);
@@ -198,7 +198,7 @@ public abstract class WOMessage extends NSObject
    * @param _key - the name of the header to retrieve (eg 'accept')
    * @return the values of the header (eg [ 'text/html', 'text/plain'])
    */
-  public List<String> headersForKey(String _key) {
+  public List<String> headersForKey(final String _key) {
     if (_key == null || this.headers == null) /* we never return null */
       return new ArrayList<String>(0);
     List<String> v = this.headers.get(_key);
@@ -213,7 +213,7 @@ public abstract class WOMessage extends NSObject
     return this.headers.keySet();
   }
 
-  public void setHeaderForKey(String _v, String _key) {
+  public void setHeaderForKey(final String _v, final String _key) {
     List<String> lheaders;
     if (_v == null)
       lheaders = null;
@@ -223,8 +223,8 @@ public abstract class WOMessage extends NSObject
     }
     this.setHeadersForKey(lheaders, _key);
   }
-  public String headerForKey(String _key) {
-    List<String> lheaders = this.headersForKey(_key);
+  public String headerForKey(final String _key) {
+    final List<String> lheaders = this.headersForKey(_key);
     if (lheaders == null)
       return null;
     if (lheaders.size() == 0)
@@ -246,13 +246,13 @@ public abstract class WOMessage extends NSObject
       return new ArrayList<WOCookie>(0);
     return this.cookies;
   }
-  public void addCookie(WOCookie _cookie) {
+  public void addCookie(final WOCookie _cookie) {
     if (_cookie == null) return;
     if (this.cookies == null)
       this.cookies = new ArrayList<WOCookie>(4);
     this.cookies.add(_cookie);
   }
-  public void removeCookie(WOCookie _cookie) {
+  public void removeCookie(final WOCookie _cookie) {
     if (this.cookies == null) return;
     this.cookies.remove(_cookie);
   }
@@ -276,7 +276,7 @@ public abstract class WOMessage extends NSObject
   protected static String defaultEncoding    = "utf-8";
   protected static String defaultURLEncoding = "utf-8";
 
-  public static void setDefaultEncoding(String _v) {
+  public static void setDefaultEncoding(final String _v) {
     defaultEncoding = _v;
   }
   public static String defaultEncoding() {
@@ -293,7 +293,7 @@ public abstract class WOMessage extends NSObject
 
   /* content representations */
 
-  public void setContentEncoding(String _enc) {
+  public void setContentEncoding(final String _enc) {
     this.contentEncoding = _enc;
   }
   public String contentEncoding() {
@@ -406,7 +406,7 @@ public abstract class WOMessage extends NSObject
     return this.isStreaming();
   }
 
-  public void setContent(byte[] _contents) {
+  public void setContent(final byte[] _contents) {
     if (!(this.outputStream instanceof ByteArrayOutputStream)) {
       /* was a real stream */
       throw new NSException("Cannot set content of streamed WOMessage!");
@@ -425,7 +425,7 @@ public abstract class WOMessage extends NSObject
   protected Exception flushStringBuffer() {
     if (this.stringBuffer != null && this.stringBuffer.length() > 0) {
       try {
-        byte[] a = this.stringBuffer.toString()
+        final byte[] a = this.stringBuffer.toString()
           .getBytes(this.contentEncoding());
         
         try {
@@ -493,9 +493,11 @@ public abstract class WOMessage extends NSObject
    * @param _len  - number of bytes to write, if below <0, all bytes are written
    * @return null if everything went fine, the Exception otherwise
    */
-  public Exception appendContentData(byte[] _data, int _len) {
+  public Exception appendContentData(final byte[] _data, int _len) {
     if (_data == null || _len == 0)
       return null;
+    else if (_len < 0)
+      _len = _data.length;
 
     if (this.stringBuffer != null) this.flushStringBuffer();
 
@@ -521,7 +523,7 @@ public abstract class WOMessage extends NSObject
    * @param _s - the String to add
    * @return null if everything was awesome-O, the Exception otherwise
    */
-  public Exception appendContentString(String _s) {
+  public Exception appendContentString(final String _s) {
     if (_s == null || _s.length() == 0)
       return null;
     
@@ -537,7 +539,7 @@ public abstract class WOMessage extends NSObject
    * @param _c - the char to add
    * @return null if everything is green, the Exception otherwise.
    */
-  public Exception appendContentCharacter(char _c) {
+  public Exception appendContentCharacter(final char _c) {
     if (this.stringBuffer == null) this._ensureStringBuffer();
     this.stringBuffer.append(_c);
     return null;
@@ -552,7 +554,7 @@ public abstract class WOMessage extends NSObject
    * @param s - the string to be appended
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendContentHTMLString(String s) {
+  public Exception appendContentHTMLString(final String s) {
     if (s == null) return null;
     // TBD: directly pass StringBuffer to stringByEscaping ...
     return this.appendContentString(UString.stringByEscapingHTMLString(s));
@@ -582,7 +584,7 @@ public abstract class WOMessage extends NSObject
    * @param js - the script to be appended
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendContentScript(WOJavaScriptWriter js) {
+  public Exception appendContentScript(final WOJavaScriptWriter js) {
     if (js == null) return null;
     
     StringBuilder sb = this.stringBuffer != null
@@ -613,7 +615,7 @@ public abstract class WOMessage extends NSObject
    * @param _tagName - the name of the tag which should be generated
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendBeginTag(String _tagName) {
+  public Exception appendBeginTag(final String _tagName) {
     if (this.stringBuffer == null) this._ensureStringBuffer();
     this.stringBuffer.append('<');
     this.stringBuffer.append(_tagName);
@@ -634,11 +636,11 @@ public abstract class WOMessage extends NSObject
    * @param _attrs   - a varargs list of key/value pairs
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendBeginTag(String _tagName, Object... _attrs) {
+  public Exception appendBeginTag(final String _tagName, Object... _attrs) {
     if (this.stringBuffer == null) this._ensureStringBuffer();
     
     if (_attrs != null) {
-      StringBuilder sb = this.stringBuffer;
+      final StringBuilder sb = this.stringBuffer;
 
       sb.append('<');
       sb.append(_tagName);
@@ -695,13 +697,13 @@ public abstract class WOMessage extends NSObject
     }
     return this.appendContentString(" />");
   }
-  public Exception appendBeginTagClose(boolean _doClose) {
+  public Exception appendBeginTagClose(final boolean _doClose) {
     return _doClose
       ? this.appendContentString(" />")
       : this.appendContentCharacter('>');
   }
 
-  public Exception appendEndTag(String _tagName) {
+  public Exception appendEndTag(final String _tagName) {
     if (this.stringBuffer != null) {
       this.stringBuffer.append("</");
       this.stringBuffer.append(_tagName);
@@ -721,16 +723,18 @@ public abstract class WOMessage extends NSObject
    * @param _attrValue
    * @return null if everything went fine, the exception on errors
    */
-  public Exception appendAttribute(String _attrName, String _attrValue) {
+  public Exception appendAttribute(final String _attrName, String _attrValue) {
     Exception error;
 
     if (this.stringBuffer != null) {
       this.stringBuffer.append(' ');
       this.stringBuffer.append(_attrName);
-      this.stringBuffer.append("=\"");
-      if ((error = this.appendContentHTMLAttributeValue(_attrValue)) != null)
-        return error;
-      this.stringBuffer.append('"');
+      if (_attrValue != null) {
+        this.stringBuffer.append("=\"");
+        if ((error = this.appendContentHTMLAttributeValue(_attrValue)) != null)
+          return error;
+        this.stringBuffer.append('"');
+      }
       return null;
     }
 
@@ -762,7 +766,9 @@ public abstract class WOMessage extends NSObject
    * @param _attrValue
    * @return null if everything went fine, the exception on errors
    */
-  public Exception appendAttribute(String _attrName, int _value) {
+  public Exception appendAttribute(final String _attrName, final int _value) {
+    // TBD: this should be really different. In 'old' HTML we don't need to
+    //      quote the Integer?!
     return this.appendAttribute(_attrName, String.valueOf(_value));
   }
 
@@ -779,7 +785,7 @@ public abstract class WOMessage extends NSObject
    * @param _v - the String to be HTML escaped
    * @return the escaped String
    */
-  public static String stringByEscapingHTMLString(String _v) {
+  public static String stringByEscapingHTMLString(final String _v) {
     return UString.stringByEscapingHTMLString(_v);
   }
   /**
@@ -789,24 +795,24 @@ public abstract class WOMessage extends NSObject
    * @param _v - the String to be HTML-attribute escaped
    * @return the escaped String
    */
-  public static String stringByEscapingHTMLAttributeValue(String _v) {
+  public static String stringByEscapingHTMLAttributeValue(final String _v) {
     return UString.stringByEscapingHTMLAttributeValue(_v);
   }
 
   
   /* Appendable */
 
-  public Appendable append(CharSequence _s) throws IOException {
+  public Appendable append(final CharSequence _s) throws IOException {
     this.appendContentHTMLString(_s.toString());
     return this;
   }
-  public Appendable append(CharSequence _s, int _start, int _end)
+  public Appendable append(final CharSequence _s, int _start, int _end)
     throws IOException
   {
     this.appendContentHTMLString(_s.subSequence(_start, _end).toString());
     return this;
   }
-  public Appendable append(char _c) throws IOException {
+  public Appendable append(final char _c) throws IOException {
     // TBD: check for regular chars before creating a string
     this.appendContentHTMLString(new String(new char[] { _c }));
     return this;
@@ -815,18 +821,18 @@ public abstract class WOMessage extends NSObject
   
   /* CharSequence */
 
-  public char charAt(int _idx) {
-    String s = this.contentString();
+  public char charAt(final int _idx) {
+    final String s = this.contentString();
     return s != null ? s.charAt(_idx) : 0;
   }
 
   public int length() {
-    String s = this.contentString();
+    final String s = this.contentString();
     return s != null ? s.length() : 0;
   }
 
-  public CharSequence subSequence(int _start, int _end) {
-    String s = this.contentString();
+  public CharSequence subSequence(final int _start, final int _end) {
+    final String s = this.contentString();
     return s != null ? s.subSequence(_start, _end) : null;
   }
 
@@ -841,7 +847,7 @@ public abstract class WOMessage extends NSObject
     "Nov", "Dec"
   };
 
-  public static String httpFormatDate(GregorianCalendar _cal) {
+  public static String httpFormatDate(final GregorianCalendar _cal) {
     /*
      * Most likely some Java lib already provides this formatter ... It
      * basically always formats UTC in the English locale and therefore can be
@@ -854,7 +860,7 @@ public abstract class WOMessage extends NSObject
 
     _cal.setTimeZone(gmt);
 
-    StringBuilder sb = new StringBuilder(32);
+    final StringBuilder sb = new StringBuilder(32);
     sb.append(httpDayNames[_cal.get(Calendar.DAY_OF_WEEK) - 1]);
     sb.append(", ");
     int t =  _cal.get(Calendar.DAY_OF_MONTH);
@@ -905,7 +911,7 @@ public abstract class WOMessage extends NSObject
 
   /* description */
 
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     if (this.headers != null) {
