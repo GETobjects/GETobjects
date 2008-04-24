@@ -10,6 +10,7 @@
   textarea    = WOText;
   form        = WOForm;
   popup       = WOPopUpButton;
+  browser     = WOBrowser;
   hiddenfield = WOHiddenField;
   hyperlink   = WOHyperlink;
   password    = WOPasswordField;
