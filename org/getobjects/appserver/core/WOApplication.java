@@ -540,13 +540,30 @@ public class WOApplication extends NSObject
           sb.append(qk);
           
           // do not log passwords
-          String v = (qk.startsWith("pass") || qk.startsWith("pwd"))
-            ? "XXX"
-            : _rq.stringFormValueForKey(qk);
-          if (v != null && v.length() > 0) {
-            if (v.length() > 16) v = v.substring(0, 14) + "..";
-            sb.append("=");
-            sb.append(v);
+          if (qk.startsWith("pass") || qk.startsWith("pwd")) {
+            sb.append("=HIDE");
+            continue;
+          }
+          
+          Object[] vs = _rq.formValuesForKey(qk);
+          if (vs != null && vs.length > 0) {
+            sb.append('=');
+            boolean isFirst = true;
+            for (Object v: vs) {
+              if (isFirst) isFirst = false;
+              else sb.append(",");
+              
+              if (v == null) {
+                sb.append(",[null]");
+                continue;
+              }
+              
+              String s = v.toString();
+              if (s.length() > 0) {
+                if (s.length() > 16) s = s.substring(0, 14) + "..";
+                sb.append(s);
+              }
+            }
           }
         }
         sb.append(" ]");

@@ -22,6 +22,7 @@
 package org.getobjects.appserver.elements;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UObject;
 
 /**
@@ -219,6 +221,289 @@ public class WOBrowser extends WOPopUpButton {
   
   /* generate response */
   
+  @Override
+  public void appendOptionsToResponse(final WOResponse _r, WOContext _ctx) {
+    final Object cursor     = _ctx.cursor();
+    boolean escapesHTML     = true;
+    boolean hasSettableItem;
+    String  previousGroup   = null;
+    
+    if (this.escapeHTML != null)
+      escapesHTML = this.escapeHTML.booleanValueInComponent(cursor);
+    
+    hasSettableItem = (this.item != null)
+      ? this.item.isValueSettableInComponent(cursor) : false;
+    
+    /* determine selected object */
+    
+    boolean    byVal = false; /* true if the 'selectedValue' binding is used */
+    Object     sel   = null;
+    Object[]   selArray = null;
+    Collection selCollection = null;
+    boolean isMultiple = this.multiple != null
+      ? this.multiple.booleanValueInComponent(cursor) : false;
+    
+    if (this.selection == null) {
+      if (this.selectedValue != null) {
+        byVal = true;
+        sel   = this.selectedValue.valueInComponent(cursor);
+      }
+    }
+    else if (this.selectedValue != null) {
+      byVal = true;
+      sel   = this.selectedValue.valueInComponent(cursor);
+      log.warn("both, 'selection' and 'selectedValue' bindings active.");
+    }
+    else
+      sel = this.selection.valueInComponent(cursor);
+    
+    if (isMultiple) {
+      if (sel instanceof Object[])
+        selArray = (Object[])sel;
+      else if (sel instanceof Collection)
+        selCollection = (Collection)sel;
+    }
+    
+    /* process noSelectionString option */
+    
+    String nilStr = null;
+    if (this.noSelectionString != null)
+      nilStr = this.noSelectionString.stringValueInComponent(cursor);
+    
+    if (nilStr != null) {
+      if (this.itemGroup != null) {
+        String group;
+        
+        if (hasSettableItem)
+          this.item.setValue(null, cursor);
+        
+        group = this.itemGroup.stringValueInComponent(cursor);
+        
+        if (group != null) {
+          _r.appendBeginTag("optgroup");
+          _r.appendContentString(" label=\"");
+          if (escapesHTML)
+            _r.appendContentHTMLString(group);
+          else
+            _r.appendContentString(group);
+          _r.appendContentCharacter('"');
+          _r.appendBeginTagEnd();
+          
+          previousGroup = group;
+        }
+      }
+      
+      _r.appendBeginTag("option");
+      _r.appendAttribute("value", WONoSelectionString);
+      _r.appendBeginTagEnd();
+      
+      if (escapesHTML)
+        _r.appendContentHTMLString(nilStr);
+      else
+        _r.appendContentString(nilStr);
+      _r.appendEndTag("option");
+      // FIXME (stephane) Shouldn't we set the 'selected' if
+      //                  selArray/selValueArray is empty?
+    }
+    
+    /* loop over options */
+    
+    boolean foundSelection = false;
+    int toGo = 0;
+    if (this.list != null) {
+      // TBD: should we process this using the list
+      List array =
+        WOListWalker.listForValue(this.list.valueInComponent(cursor));
+      if (array != null) toGo = array.size();
+      
+      for (int i = 0; i < toGo; i++) {
+        Object object = array.get(i);
+        
+        if (hasSettableItem)
+          this.item.setValue(object, cursor);
+        
+        /* determine value (DUP below) */
+        
+        Object v;
+        String vs;
+        if (this.readValue != null) {
+          v  = this.readValue.valueInComponent(cursor);
+          vs = v != null ? v.toString() : null;
+        }
+        else {
+          vs = "" + i; /* adds the repetition index as the value! */
+          v  = vs;
+        }
+        
+        /* determine selection (compare against value or item) */
+        
+        boolean isSelected;
+        if (isMultiple && (selArray != null || selCollection != null)) {
+          if (sel == null)
+            isSelected = false;
+          else if (selCollection != null && byVal)
+            isSelected = selCollection.contains(v);
+          else if (selCollection != null && !byVal)
+            isSelected = selCollection.contains(object);
+          else if (selArray != null && byVal)
+            isSelected = UList.contains(selArray, v);
+          else if (selArray != null && !byVal)
+            isSelected = UList.contains(selArray, object);
+          else
+            isSelected = false;
+        }
+        else {
+          if (sel == (byVal ? v : object)) // Note: also matches null==null
+            isSelected = true;
+          else if (sel == null || (byVal ? v : object) == null)
+            isSelected = false;
+          else
+            isSelected = sel.equals(byVal ? v : object);
+        }
+        
+        /* display string */
+        
+        String displayV = null;
+        if (this.string != null)
+          displayV = this.string.stringValueInComponent(cursor);
+        else if (object != null)
+          displayV = object.toString();
+        else
+          displayV = "<null>"; /* <> will get escaped below */
+        
+        /* grouping */
+        
+        String group = null;
+        if (this.itemGroup != null)
+          group = this.itemGroup.stringValueInComponent(cursor);
+        
+        if (group != null) {
+          boolean groupChanged = false;
+          
+          if (previousGroup == null)
+            groupChanged = true;
+          else if (!group.equals(previousGroup)) {
+            _r.appendEndTag("optgroup");
+            groupChanged = true;
+          }
+          if (groupChanged) {
+            _r.appendBeginTag("optgroup");
+            _r.appendContentString(" label=\"");
+            if (escapesHTML)
+              _r.appendContentHTMLString(group);
+            else
+              _r.appendContentString(group);
+            _r.appendContentCharacter('"');
+            _r.appendBeginTagEnd();
+            
+            previousGroup = group;
+          }
+        }
+        else if (previousGroup != null) {
+          _r.appendEndTag("optgroup");
+          previousGroup = null;
+        }
+        
+        /* option tag */
+        
+        _r.appendBeginTag("option");
+        _r.appendAttribute("value", vs);
+        if (isSelected) {
+          foundSelection = true;
+          _r.appendAttribute("selected",
+              _ctx.generateEmptyAttributes() ? null : "selected");
+        }
+        _r.appendBeginTagEnd();
+        
+        if (escapesHTML)
+          _r.appendContentHTMLString(displayV);
+        else
+          _r.appendContentString(displayV);
+        
+        _r.appendEndTag("option");
+      }
+    }
+    
+    /* close optgroups */
+    
+    if (previousGroup != null)
+      _r.appendEndTag("optgroup");
+    
+    /* process selections which where missing in the list */
+    
+    if (!foundSelection && sel != null) {
+      // TBD
+      String vs;
+      Object object = null;
+      
+      if (byVal) {
+        /* Note: 'selection' might be available! (comparison by value has a
+         * higher priority.
+         */
+        if (hasSettableItem) {
+          if (this.selection != null) {
+            object = this.selection.valueInComponent(cursor);
+            this.item.setValue(object, cursor);
+          }
+        }
+        
+        vs = sel.toString(); /* the value is what we detected */
+      }
+      else {
+        /* This means the 'selection' binding was set, but not the
+         * 'selectedValue' one. 'sel' will point to the item.
+         */
+        object = sel;
+        if (hasSettableItem)
+          this.item.setValue(object, cursor);
+        
+        /* determine value (DUP above) */
+        
+        Object v;
+        if (this.readValue != null) {
+          v  = this.readValue.valueInComponent(cursor);
+          vs = v != null ? v.toString() : null;
+        }
+        else {
+          vs = "" + toGo; /* repetition index as the value! */
+          v  = vs;
+        }
+      }
+      
+      /* display string */
+      
+      String displayV = null;
+      if (this.string != null)
+        displayV = this.string.stringValueInComponent(cursor);
+      else if (object != null)
+        displayV = object.toString();
+      else if (vs != null) /* just the value */
+        displayV = vs;
+      else
+        displayV = "<null>"; /* <> will get escaped below */
+
+      /* option tag */
+      
+      _r.appendBeginTag("option");
+      _r.appendAttribute("value", vs);
+      _r.appendAttribute("selected",
+          _ctx.generateEmptyAttributes() ? null : "selected");
+      _r.appendBeginTagEnd();
+      
+      if (escapesHTML)
+        _r.appendContentHTMLString(displayV);
+      else
+        _r.appendContentString(displayV);
+      
+      _r.appendEndTag("option");
+    }
+    
+    /* reset item */
+    
+    if (hasSettableItem)
+      this.item.setValue(null /* reset */, cursor);
+  }
+
   @Override
   public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled()) {
