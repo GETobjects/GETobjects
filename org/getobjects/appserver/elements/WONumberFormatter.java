@@ -46,7 +46,7 @@ class WONumberFormatter extends WOFormatter {
   
   protected WOAssociation format = null;
   
-  public WONumberFormatter(WOAssociation _fmt) {
+  public WONumberFormatter(final WOAssociation _fmt) {
     this.format = _fmt;
   }
   
@@ -77,6 +77,7 @@ class WONumberFormatter extends WOFormatter {
   
   /* helper for things the Java Format cannot process */
   
+  @Override
   public String stringForObjectValue(Object _o, final WOContext _ctx) {
     if (_o == null)
       return null;
@@ -86,7 +87,11 @@ class WONumberFormatter extends WOFormatter {
       return (_o != null ? _o.toString() : null);
     
     if (_o instanceof String) {
-      final String s = (String)_o;
+      String s = (String)_o;
+      
+      s = s.trim();
+      if (s.length() == 0)
+        return null;
       
       try {
         /* You might say that we could just return the string as-is. But not
@@ -102,7 +107,7 @@ class WONumberFormatter extends WOFormatter {
     }
     
     if (!(_o instanceof Number)) {
-      log.warn("object to format is not a number: " + _o);
+      log.warn("object to format is not a number: " + _o.getClass());
       return _o.toString();
     }
     
@@ -112,7 +117,7 @@ class WONumberFormatter extends WOFormatter {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.format != null)
