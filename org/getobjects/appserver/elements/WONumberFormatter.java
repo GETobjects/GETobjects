@@ -24,6 +24,7 @@ package org.getobjects.appserver.elements;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
@@ -76,6 +77,24 @@ class WONumberFormatter extends WOFormatter {
   }
   
   /* helper for things the Java Format cannot process */
+  
+  /* treat empty strings like null */
+  
+  @Override
+  public Object objectValueForString(String _s, final WOContext _ctx)
+    throws ParseException
+  {
+    // trimming should never hurt in date strings
+    if (_s != null) {
+      _s = _s.trim();
+      
+      // and empty strings are never parsed anyways ...
+      if (_s.length() == 0)
+        _s = null;
+    }
+    
+    return super.objectValueForString(_s, _ctx);
+  }
   
   @Override
   public String stringForObjectValue(Object _o, final WOContext _ctx) {
