@@ -79,6 +79,9 @@ public class JSContextAdapter extends JSExtraVarAdapter {
         if (len == 9  && "component".equals(_name))    return true;
         if (len == 12 && "clientObject".equals(_name)) return true;
         break;
+      case 'e':
+        if (len == 9 && "elementID".equals(_name)) return true;
+        break;
       case 'f':
         if (len == 10 && "fragmentID".equals(_name)) return true;
         break;
@@ -94,6 +97,8 @@ public class JSContextAdapter extends JSExtraVarAdapter {
         break;
       case 'l':
         if (len == 3 && "log".equals(_name)) return true;
+        if (len == 9 && "languages".equals(_name)) return true;
+        if (len == 6 && "locale".equals(_name)) return true;
         break;
       case 'p':
         if (len == 4 && "page".equals(_name)) return true;
@@ -104,6 +109,13 @@ public class JSContextAdapter extends JSExtraVarAdapter {
         break;
       case 's':
         if (len == 7 && "session".equals(_name)) return true;
+        if (len == 8 && "senderID".equals(_name)) return true;
+        break;
+      case 't':
+        if (len == 8 && "timezone".equals(_name)) return true;
+        break;
+      case 'q':
+        if (len == 8 && "querySession".equals(_name)) return true;
         break;
     }
     
@@ -129,6 +141,10 @@ public class JSContextAdapter extends JSExtraVarAdapter {
           dp = ((WOContext)this.javaObject).component();
         else if (len == 12 && "clientObject".equals(_name))
           dp = ((WOContext)this.javaObject).clientObject();
+        break;
+      case 'e':
+        if (len == 9 && "elementID".equals(_name))
+          dp = ((WOContext)this.javaObject).elementID();
         break;
       case 'f':
         if (len == 10 && "fragmentID".equals(_name))
@@ -157,6 +173,10 @@ public class JSContextAdapter extends JSExtraVarAdapter {
       case 'l':
         if (len == 3 && "log".equals(_name))
           dp = ((WOContext)this.javaObject).component().log();
+        else if (len == 9 && "languages".equals(_name))
+          dp = ((WOContext)this.javaObject).languages().toArray(new String[0]);
+        else if (len == 6 && "locale".equals(_name))
+          dp = ((WOContext)this.javaObject).locale();
         break;
       case 'p':
         if (len == 4 && "page".equals(_name))
@@ -171,6 +191,16 @@ public class JSContextAdapter extends JSExtraVarAdapter {
       case 's':
         if (len == 7 && "session".equals(_name))
           dp = ((WOContext)this.javaObject).session();
+        else if (len == 8 && "senderID".equals(_name))
+          dp = ((WOContext)this.javaObject).senderID();
+        break;
+      case 't':
+        if (len == 8 && "timezone".equals(_name))
+          dp = ((WOContext)this.javaObject).timezone();
+        break;
+      case 'q':
+        if (len == 8 && "querySession".equals(_name))
+          dp = ((WOContext)this.javaObject).querySession();
         break;
     }
     
