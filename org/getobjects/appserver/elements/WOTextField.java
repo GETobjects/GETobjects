@@ -54,7 +54,8 @@ import org.getobjects.appserver.core.WOResponse;
  *   size           [in] - int
  *   trim           [in] - boolean</pre>
  * Bindings (WOFormatter):<pre>
- *   dateformat     [in] - a dateformat
+ *   calformat      [in] - a dateformat (returns Calendar)
+ *   dateformat     [in] - a dateformat (returns Data)
  *   numberformat   [in] - a numberformat
  *   formatterClass [in] - Class or class name of a formatter to use
  *   formatter      [in] - java.text.Format used to format the value or the

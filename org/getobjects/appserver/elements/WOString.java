@@ -54,7 +54,8 @@ import org.getobjects.foundation.UString;
  *   escapeHTML     [in] - boolean (set to false to avoid HTML escaping)
  *   insertBR       [in] - boolean (replace newlines with &lt;br/&gt; tags)
  *   %value         [in] - string (pattern in %(keypath)s syntax)
- *   dateformat     [in] - a dateformat
+ *   calformat      [in] - a dateformat (returns Calendar)
+ *   dateformat     [in] - a dateformat (returns Data)
  *   numberformat   [in] - a numberformat
  *   formatterClass [in] - Class or class name of a formatter to use
  *   formatter      [in] - java.text.Format used to format the value or the
