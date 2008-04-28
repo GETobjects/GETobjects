@@ -52,6 +52,7 @@ import org.getobjects.eocontrol.EOSQLQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.NSTimeRange;
 import org.getobjects.foundation.UList;
 
 /**
@@ -1891,6 +1892,13 @@ public class EOSQLExpression extends NSObject {
     return "NOT ( " + qs + " )";
   }
   
+  public String sqlTrueExpression() {
+    return "1 = 1";
+  }
+  public String sqlFalseExpression() {
+    return "1 = 0";
+  }
+  
   /**
    * Generates the SQL for an EOKeyValueQualifier. This qualifier compares a
    * column against some constant value using some operator.
@@ -1901,10 +1909,12 @@ public class EOSQLExpression extends NSObject {
   public String sqlStringForKeyValueQualifier(final EOKeyValueQualifier _q) {
     if (_q == null) return null;
     
+    /* continue with regular code */
+    
     final String k  = _q.key();
-    Object v  = _q.value();
     EOAttribute a  = this.entity != null ? this.entity.attributeNamed(k) : null;
     String      sqlCol;
+    Object v  = _q.value();
     
     /* generate lhs */
     // TBD: use sqlStringForExpression with EOKey?
@@ -1935,15 +1945,14 @@ public class EOSQLExpression extends NSObject {
     
     StringBuilder sb = new StringBuilder(64);
     sb.append(sqlCol);
-    sb.append(" ");
-    sb.append(op);
-    sb.append(" ");
     
-    /* generate value */
+    /* generate operator and value */
 
     if (op.startsWith("IS") && v == null) {
       /* IS NULL or IS NOT NULL */
-      sb.append("NULL");
+      sb.append(" ");
+      sb.append(op);
+      sb.append(" NULL");
     }
     else if (op.equals("IN")) {
       if (v instanceof EOQualifierVariable) {
@@ -1975,10 +1984,11 @@ public class EOSQLExpression extends NSObject {
         if (len == 0) {
           /* An 'IN ()' does NOT work in PostgreSQL, weird. We treat such a
            * qualifier as always false. */
-          sb = new StringBuilder("1 = 2");
+          sb.setLength(0);
+          sb.append(this.sqlFalseExpression());
         }
         else {
-          sb.append(" (");
+          sb.append(" IN (");
 
           boolean isFirst = true;
           for (Object subvalue: c) {
@@ -1991,15 +2001,103 @@ public class EOSQLExpression extends NSObject {
           sb.append(")");
         }
       }
+      else if (v instanceof NSTimeRange) {
+        // TBD: range query ..
+        // eg: birthday IN 2008-09-10 00:00 - 2008-09-11 00:00
+        // => birthday >= $start AND birthDay < $end
+        // TBD: DATE, TIME vs DATETIME ...
+        NSTimeRange range = (NSTimeRange)v;
+        
+        if (range.isEmpty()) {
+          sb.setLength(0);
+          sb.append(this.sqlFalseExpression());
+        }
+        else {
+          Date date = range.fromDate();
+          if (date != null) {
+            sb.append(" ");
+            sb.append(this.sqlStringForSelector(
+                EOQualifier.ComparisonOperation.GREATER_THAN_OR_EQUAL,
+                date, false /* no null */));
+            sb.append(" ");
+            sb.append(this.sqlStringForValue(date, k));
+            
+            if ((date = range.toDate()) != null) {
+              sb.append(" AND ");
+              sb.append(sqlCol);
+            }
+          }
+          else
+            date = range.toDate();
+          
+          if (date != null) {
+            sb.append(" ");
+            sb.append(this.sqlStringForSelector(
+                EOQualifier.ComparisonOperation.LESS_THAN,
+                date, false /* no null */));
+            sb.append(" ");
+            sb.append(this.sqlStringForValue(date, k));
+          }
+        }
+      }
       else {
         /* Note: 'IN ( NULL )' at least works in PostgreSQL */
         log.warn("value of IN qualifier was no list: " + v);
-        sb.append(" (");
+        sb.append(" IN (");
         sb.append(this.sqlStringForValue(v, k));
         sb.append(")");
       }
     }
+    else if (v instanceof NSTimeRange) {
+      NSTimeRange range = (NSTimeRange)v;
+      Date date;
+      
+      if (opsel == EOQualifier.ComparisonOperation.GREATER_THAN) {
+        if (range.isEmpty()) { /* empty range, always greater */
+          sb.setLength(0);
+          sb.append(this.sqlTrueExpression());
+        }
+        else if ((date = range.toDate()) != null) {
+          /* to dates are exclusive, hence check for >= */
+          sb.append(" ");
+          sb.append(this.sqlStringForSelector(
+              EOQualifier.ComparisonOperation.GREATER_THAN_OR_EQUAL,
+              date, false /* no null */));
+          sb.append(" ");
+          sb.append(this.sqlStringForValue(date, k));
+        }
+        else { /* open end, can't be greater */
+          sb.setLength(0);
+          sb.append(this.sqlFalseExpression());
+        }
+      }
+      else if (opsel == EOQualifier.ComparisonOperation.LESS_THAN) {
+        if (range.isEmpty()) { /* empty range, always smaller */
+          sb.setLength(0);
+          sb.append(this.sqlTrueExpression());
+        }
+        else if ((date = range.fromDate()) != null) {
+          /* from dates are inclusive, hence check for < */
+          sb.append(" ");
+          sb.append(op);
+          sb.append(" ");
+          sb.append(this.sqlStringForValue(date, k));
+        }
+        else { /* open start, can't be smaller */
+          sb.setLength(0);
+          sb.append(this.sqlFalseExpression());
+        }
+      }
+      else {
+        log.error("NSTimeRange not yet supported as a value for op: " + op);
+        return null;
+      }
+    }
     else {
+      sb.append(" ");
+      sb.append(op);
+      sb.append(" ");
+      
       /* a regular value */
       if (v != null) {
         if (opsel == EOQualifier.ComparisonOperation.LIKE ||
