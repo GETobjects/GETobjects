@@ -59,9 +59,11 @@ public abstract class WOFormatter extends NSObject {
   public static WOFormatter formatterForAssociations
     (final Map<String, WOAssociation> _assocs)
   {
-    final WOAssociation dateformat, numberformat, formatter, formatterClass;
+    final WOAssociation numberformat, formatter, formatterClass;
+    final WOAssociation dateformat, calformat;
     
     dateformat     = WODynamicElement.grabAssociation(_assocs,"dateformat");
+    calformat      = WODynamicElement.grabAssociation(_assocs,"calformat");
     numberformat   = WODynamicElement.grabAssociation(_assocs,"numberformat");
     formatter      = WODynamicElement.grabAssociation(_assocs,"formatter");
     formatterClass = WODynamicElement.grabAssociation(_assocs,"formatterClass");
@@ -70,7 +72,9 @@ public abstract class WOFormatter extends NSObject {
     //       compound formatter and return that.
 
     if (dateformat != null)
-      return new WODateFormatter(dateformat);
+      return new WODateFormatter(dateformat, false /* return Date */);
+    if (calformat != null)
+      return new WODateFormatter(calformat, true /* return Calendar */);
     
     if (numberformat != null)
       return new WONumberFormatter(numberformat);

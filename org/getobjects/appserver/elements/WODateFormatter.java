@@ -25,6 +25,7 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -61,9 +62,11 @@ class WODateFormatter extends WOFormatter {
   /* optimization for constant formats */
   protected String        fmtString;
   protected boolean       isCustomFormat;
+  protected boolean       returnCalendar;
   
-  public WODateFormatter(final WOAssociation _fmt) {
+  public WODateFormatter(final WOAssociation _fmt, boolean _returnCal) {
     this.format = _fmt;
+    this.returnCalendar = _returnCal;
     if (_fmt != null) {
       if (_fmt.isValueConstant()) {
         this.fmtString      = _fmt.stringValueInComponent(null /* cursor */);
@@ -99,6 +102,13 @@ class WODateFormatter extends WOFormatter {
     return true;
   }
   
+  /**
+   * Returns a java.text.Format object suitable for the bindings in the given
+   * context.
+   * 
+   * @param _ctx - the WOContext
+   * @return a java.text.Format, or null if none could be built
+   */
   @Override
   public Format formatInContext(final WOContext _ctx) {
     // TODO: we should probably cache some formatter objects?
@@ -188,7 +198,22 @@ class WODateFormatter extends WOFormatter {
         _s = null;
     }
     
-    return super.objectValueForString(_s, _ctx);
+    Object v = super.objectValueForString(_s, _ctx);
+    
+    if (this.returnCalendar) {
+      if (v instanceof Date) {
+        Calendar cal = Calendar.getInstance(_ctx.locale());
+        cal.setTime((Date)v);
+        v = cal;
+      }
+      else if (v instanceof Number) {
+        Calendar cal = Calendar.getInstance(_ctx.locale());
+        cal.setTimeInMillis(((Number)v).longValue());
+        v = cal;
+      }
+    }
+    
+    return v;
   }
   
   
