@@ -33,7 +33,7 @@ public class NSTimeRange extends NSObject
   implements Cloneable, Comparable
 {
   /* Note: from/to are sorted */
-  protected long    fromTime; // ms
+  protected long    fromTime; // ms since 1970-01-01 00:00:00 GMT
   protected long    toTime;   // ms, EXCLUSIVE
   protected boolean isEmpty;
 
