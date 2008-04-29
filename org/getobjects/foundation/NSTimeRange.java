@@ -22,6 +22,7 @@ package org.getobjects.foundation;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * NSTimeRange
@@ -36,7 +37,7 @@ public class NSTimeRange extends NSObject
   protected long    toTime;   // ms, EXCLUSIVE
   protected boolean isEmpty;
 
-  public NSTimeRange(long _from, long _to) {
+  public NSTimeRange(final long _from, final long _to) {
     super();
     if (_from <= _to) {
       this.fromTime = _from;
@@ -49,7 +50,23 @@ public class NSTimeRange extends NSObject
     this.isEmpty  = _from == _to;
   }
   
-  public NSTimeRange(Calendar _from, Calendar _to) {
+  public NSTimeRange(final Date _from, final Date _to) {
+    this.fromTime = _from == null ? 0 : _from.getTime();
+    this.toTime   = _to   == null ? 0 : _to.getTime();
+    this.isEmpty  = _to   == null || this.fromTime == this.toTime;
+  }
+  public NSTimeRange(final Date _from, final int _durationInSeconds) {
+    this.fromTime = _from == null ? 0 : _from.getTime();
+    this.toTime   = this.fromTime + (_durationInSeconds * 1000);
+    if (_durationInSeconds < 0) {
+      long x = this.fromTime;
+      this.fromTime = this.toTime;
+      this.toTime = x;
+    }
+    this.isEmpty  = _durationInSeconds == 0 || this.fromTime == this.toTime;
+  }
+  
+  public NSTimeRange(final Calendar _from, Calendar _to) {
     super();
     
     /* ensure proper ordering */
@@ -63,7 +80,7 @@ public class NSTimeRange extends NSObject
     this.toTime  = _to == null ? 0 : _to.getTimeInMillis();
     this.isEmpty = _to == null || this.fromTime == this.toTime;
   }
-  public NSTimeRange(Calendar _from, int _durationInSeconds) {
+  public NSTimeRange(Calendar _from, final int _durationInSeconds) {
     super();
     
     if (_from == null) _from = Calendar.getInstance(); // not recommended
@@ -510,6 +527,12 @@ public class NSTimeRange extends NSObject
     final long to = workingCopy.getTimeInMillis();
     return new NSTimeRange(from, to);
   }
+  public static NSTimeRange getDayRange(final Date _date, final TimeZone _tz) {
+    if (_date == null) return null;
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.setTime(_date);
+    return getDayRange(cal);
+  }
   
   /**
    * Returns an NSTimeRange which covers a full, 7 day week. The week is
@@ -546,6 +569,12 @@ public class NSTimeRange extends NSObject
     
     final long to = workingCopy.getTimeInMillis();
     return new NSTimeRange(from, to);
+  }
+  public static NSTimeRange getWeekRange(final Date _date, final TimeZone _tz) {
+    if (_date == null) return null;
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.setTime(_date);
+    return getWeekRange(cal);
   }
   
   /**
@@ -585,6 +614,12 @@ public class NSTimeRange extends NSObject
     final long to = workingCopy.getTimeInMillis();
     return new NSTimeRange(from, to);
   }
+  public static NSTimeRange getMonthRange(final Date _date, final TimeZone _tz){
+    if (_date == null) return null;
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.setTime(_date);
+    return getMonthRange(cal);
+  }
   
   /**
    * Returns an NSTimeRange which covers a full year. The year is
@@ -622,6 +657,12 @@ public class NSTimeRange extends NSObject
     
     final long to = workingCopy.getTimeInMillis();
     return new NSTimeRange(from, to);
+  }
+  public static NSTimeRange getYearRange(final Date _date, final TimeZone _tz) {
+    if (_date == null) return null;
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.setTime(_date);
+    return getYearRange(cal);
   }
 
   /**
