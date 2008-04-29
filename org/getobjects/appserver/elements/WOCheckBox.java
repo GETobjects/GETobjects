@@ -129,20 +129,20 @@ public class WOCheckBox extends WOInput {
         this.writeValue.setValue(formValue, cursor);
     }
 
-    if (this.selection != null) {
+    if (this.selection != null && doIt) {
       Object sel = this.selection.valueInComponent(cursor);
       Object rv  = formValue;
       if (this.readValue != null)
         rv = this.readValue.valueInComponent(cursor);
       
       if (sel instanceof Collection) {
-        if (doIt)
+        if (formValue != null)
           ((Collection)sel).add(rv);
         else
           ((Collection)sel).remove(rv);
       }
       else if (doIt) /* push simple value */
-        this.selection.setValue(rv, cursor);
+        this.selection.setValue(formValue != null ? rv : null, cursor);
     }
   }
   
