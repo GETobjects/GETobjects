@@ -510,23 +510,23 @@ public class WOWrapperTemplateBuilder extends WOTemplateBuilder
       
       /* if attribute, wraps the element in a WOConditional */
       if (_assocs.containsKey("if")) {
-        Map assocs = new HashMap(1);
-        assocs.put("condition", _assocs.remove("if"));
+        Map<String, WOAssociation> assocs = new HashMap(1);
+        assocs.put("condition", (WOAssociation)_assocs.remove("if"));
         _element = new WOConditional("if-attr", assocs, _element);
       }
       
       /* ifnot attribute, wraps the element in a WOConditional */
       if (_assocs.containsKey("ifnot")) {
-        Map assocs = new HashMap(2);
-        assocs.put("condition", _assocs.remove("ifnot"));
-        assocs.put("negate", Boolean.TRUE);
+        Map<String, WOAssociation> assocs = new HashMap(2);
+        assocs.put("condition", (WOAssociation)_assocs.remove("ifnot"));
+        assocs.put("negate", WOAssociation.associationWithValue(Boolean.TRUE));
         _element = new WOConditional("ifnot-attr", assocs, _element);
       }
       
       /* foreach attribute, wraps the element in a WORepetition */
       if (_assocs.containsKey("foreach")) {
-        Map assocs = new HashMap(2);
-        assocs.put("list", _assocs.remove("foreach"));
+        Map<String, WOAssociation> assocs = new HashMap(2);
+        assocs.put("list", (WOAssociation)_assocs.remove("foreach"));
         assocs.put("item", WOAssociation.associationWithKeyPath("item"));
         _element = new WORepetition("foreach-attr", assocs, _element);
       }
