@@ -21,6 +21,7 @@
 
 package org.getobjects.appserver.elements;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.getobjects.appserver.core.WOAssociation;
@@ -56,7 +57,7 @@ import org.getobjects.appserver.core.WOResponse;
  *   
  * <p>
  * Bindings:<pre>
- *   selection [io] - object
+ *   selection [io] - object / Collection
  *   checked   [io] - boolean
  *   safeGuard [in] - boolean</pre> 
  *   
@@ -87,6 +88,7 @@ public class WOCheckBox extends WOInput {
   
   /* responder */
 
+  @SuppressWarnings("unchecked")
   @Override
   public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     /*
@@ -126,6 +128,22 @@ public class WOCheckBox extends WOInput {
       if (this.writeValue.isValueSettableInComponent(cursor))
         this.writeValue.setValue(formValue, cursor);
     }
+
+    if (this.selection != null) {
+      Object sel = this.selection.valueInComponent(cursor);
+      Object rv  = formValue;
+      if (this.readValue != null)
+        rv = this.readValue.valueInComponent(cursor);
+      
+      if (sel instanceof Collection) {
+        if (doIt)
+          ((Collection)sel).add(rv);
+        else
+          ((Collection)sel).remove(rv);
+      }
+      else if (doIt) /* push simple value */
+        this.selection.setValue(rv, cursor);
+    }
   }
   
   
@@ -139,32 +157,39 @@ public class WOCheckBox extends WOInput {
     final Object cursor = _ctx.cursor(); 
     String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
     
-    String cbname = this.elementNameInContext(_ctx);
+    final String cbname = this.elementNameInContext(_ctx);
     _r.appendBeginTag("input");
     _r.appendAttribute("type", "checkbox");
     if (lid != null) _r.appendAttribute("id", lid);
     _r.appendAttribute("name", cbname);
     
-    String v = null;
+    Object v = null;
     if (this.readValue != null)
-      v = this.readValue.stringValueInComponent(cursor);
-    if (v == null || v.length() == 0)
-      v = "1";
-    _r.appendAttribute("value", v);
+      v = this.readValue.valueInComponent(cursor);
+    _r.appendAttribute("value", v != null ? v.toString() : "1");
     
     if (this.disabled != null) {
-      if (this.disabled.booleanValueInComponent(_ctx.cursor())) {
+      if (this.disabled.booleanValueInComponent(cursor)) {
         _r.appendAttribute("disabled",
             _ctx.generateEmptyAttributes() ? null : "disabled");
       }
     }
 
-    if (this.checked != null) {
-      if (this.checked.booleanValueInComponent(_ctx.cursor())) {
-        _r.appendAttribute("checked",
-            _ctx.generateEmptyAttributes() ? null : "checked");
-      }
+    boolean isChecked = false;
+    if (this.checked != null)
+      isChecked = this.checked.booleanValueInComponent(cursor);
+    else if (this.selection != null) {
+      Object sel = this.selection.valueInComponent(cursor);
+      if (v == sel || (v != null && v.equals(sel)))
+        isChecked = true;
+      else if (v != null && (sel instanceof Collection))
+        isChecked = ((Collection)sel).contains(v);
     }
+    if (isChecked) {
+      _r.appendAttribute("checked",
+          _ctx.generateEmptyAttributes() ? null : "checked");
+    }
+
     
     if (this.coreAttributes != null)
       this.coreAttributes.appendToResponse(_r, _ctx);
