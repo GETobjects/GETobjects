@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2007 Helge Hess <helge.hess@opengroupware.org>
+ * Copyright (C) 2007-2008 Helge Hess <helge.hess@opengroupware.org>
  *
- * This file is part of JOPE.
+ * This file is part of Go.
  *
- * JOPE is free software; you can redistribute it and/or modify it under the
+ * Go is free software; you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2, or (at your option) any later version.
  *
- * JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+ * Go is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
@@ -18,6 +18,7 @@
  */
 package org.getobjects.foundation;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -62,7 +63,7 @@ public class UObject extends NSObject {
    *   <li>otherwise it calls toString() on the object
    * </ul>
    */
-  public static final String extractString(Object _object) {
+  public static final String extractString(final Object _object) {
     // TBD: should be moved elsewhere? Hm, yes. UString maybe? or UObject?
 
     if (_object == null)
@@ -117,7 +118,7 @@ public class UObject extends NSObject {
    *   <li>otherwise it returns the object as-is
    * </ul>
    */
-  public static final Object extractValue(Object _object) {
+  public static final Object extractValue(final Object _object) {
     // TBD: should be moved elsewhere?
 
     if (_object == null)
@@ -165,7 +166,7 @@ public class UObject extends NSObject {
    *   <li>all other objects
    * </ul>
    */
-  public static boolean boolValue(Object v) {
+  public static boolean boolValue(final Object v) {
     if (v == null)
       return false;
 
@@ -195,7 +196,7 @@ public class UObject extends NSObject {
     return true;
   }
 
-  public static int intValue(Object v) {
+  public static int intValue(final Object v) {
     if (v == null)
       return 0;
 
@@ -204,11 +205,15 @@ public class UObject extends NSObject {
 
     if (v instanceof String) {
       /* Note: we return 0 for empty strings */
-      if (((String)v).length() == 0)
+      String s = (String)v;
+      if (s.length() == 0)
         return 0;
 
       try {
-        return Integer.parseInt((String)v);
+        if (s.indexOf('.') >= 0)
+          return new BigDecimal(s).intValue();
+        
+        return Integer.parseInt(s);
       }
       catch (NumberFormatException e) {
         return 0;
@@ -218,7 +223,7 @@ public class UObject extends NSObject {
     return intValue(v.toString());
   }
 
-  public static String stringValue(Object v) {
+  public static String stringValue(final Object v) {
     if (v == null)
       return null;
 
@@ -241,7 +246,7 @@ public class UObject extends NSObject {
    * @param _v - an arbitrary object
    * @return true if the object is considered 'empty', false if not
    */
-  public static boolean isEmpty(Object _v) {
+  public static boolean isEmpty(final Object _v) {
     if (_v == null)
       return true;
 
@@ -250,7 +255,7 @@ public class UObject extends NSObject {
 
     if (_v instanceof String) {
       /* we trim for convenience, should be what one usually wants */
-      String s = ((String)_v).trim();
+      final String s = ((String)_v).trim();
       return s.length() == 0;
     }
 
@@ -265,16 +270,16 @@ public class UObject extends NSObject {
     return false;
   }
 
-  public static boolean isNotEmpty(Object _v) {
+  public static boolean isNotEmpty(final Object _v) {
     return !isEmpty(_v);
   }
 
   // fast variants for strings
-  public static boolean isEmpty(String _v) {
+  public static boolean isEmpty(final String _v) {
     if (_v == null) return true;
     return _v.trim().length() == 0;
   }
-  public static boolean isNotEmpty(String _v) {
+  public static boolean isNotEmpty(final String _v) {
     return !isEmpty(_v);
   }
 }
