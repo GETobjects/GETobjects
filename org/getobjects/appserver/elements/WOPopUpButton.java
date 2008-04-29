@@ -81,6 +81,7 @@ public class WOPopUpButton extends WOInput {
   protected WOAssociation escapeHTML;
   protected WOAssociation itemGroup;
   protected WOElement     template;
+  protected WOFormatter   formatter;
 
   public WOPopUpButton
     (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
@@ -95,6 +96,8 @@ public class WOPopUpButton extends WOInput {
     this.selectedValue     = grabAssociation(_assocs, "selectedValue");
     this.escapeHTML        = grabAssociation(_assocs, "escapeHTML");
     this.itemGroup         = grabAssociation(_assocs, "itemGroup");
+
+    this.formatter = WOFormatter.formatterForAssociations(_assocs);
     
     if (this.list == null)
       log.warn("missing 'list' binding in WOPopUpButton");
@@ -317,12 +320,20 @@ public class WOPopUpButton extends WOInput {
         /* display string */
         
         String displayV = null;
-        if (this.string != null)
-          displayV = this.string.stringValueInComponent(cursor);
-        else if (object != null)
-          displayV = object.toString();
-        else
-          displayV = "<null>"; /* <> will get escaped below */
+        if (this.string != null) {
+          if (this.formatter != null) {
+            displayV = this.formatter.stringForObjectValue(
+                this.string.valueInComponent(cursor), _ctx);
+          }
+          else
+            displayV = this.string.stringValueInComponent(cursor);
+        }
+        else {
+          if (this.formatter != null)
+            displayV = this.formatter.stringForObjectValue(object, _ctx);
+          else
+            displayV = object != null ? object.toString() : "<null>";
+        }
         
         /* grouping */
         
