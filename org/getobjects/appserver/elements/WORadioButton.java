@@ -68,6 +68,9 @@ public class WORadioButton extends WOInput {
 
     this.selection = grabAssociation(_assocs, "selection");
     this.checked   = grabAssociation(_assocs, "checked");
+    
+    if (this.name != null && this.name == _assocs.get("id"))
+      log.warn("WORadioButton with the same binding for id and name: " + this);
   }
 
   /* responder */
@@ -97,8 +100,8 @@ public class WORadioButton extends WOInput {
       log.error("missing value binding for element: " + this);
       return;
     }
-    Object v  = this.readValue.valueInComponent(cursor);
-    String vs = v.toString();
+    final Object v  = this.readValue.valueInComponent(cursor);
+    final String vs = v.toString();
     
     /* check whether we are the selected radio button */
     
