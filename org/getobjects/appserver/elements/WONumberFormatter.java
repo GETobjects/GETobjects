@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Locale;
 
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
@@ -46,9 +47,11 @@ import org.getobjects.appserver.core.WOContext;
 class WONumberFormatter extends WOFormatter {
   
   protected WOAssociation format = null;
+  protected int numberType = 0; // 1=pcurrency, 2=percent, 3=int
   
-  public WONumberFormatter(final WOAssociation _fmt) {
-    this.format = _fmt;
+  public WONumberFormatter(final WOAssociation _fmt, final int _type) {
+    this.format     = _fmt;
+    this.numberType = _type;
   }
   
   /* creating Format */
@@ -61,7 +64,26 @@ class WONumberFormatter extends WOFormatter {
     if (fmt == null)
       return null;
     
-    final NumberFormat lf = NumberFormat.getInstance(_ctx.locale());
+    final Locale locale = _ctx != null ? _ctx.locale() : null;
+    final Format lf;
+    
+    switch (this.numberType) {
+      case 1:
+        lf = NumberFormat.getCurrencyInstance(locale);
+        break;
+      case 2:
+        lf = NumberFormat.getPercentInstance(locale);
+        break;
+      case 3:
+        lf = NumberFormat.getIntegerInstance(locale);
+        break;
+      case 4:
+        lf = NumberFormat.getNumberInstance(locale);
+        break;
+      default:
+        lf = NumberFormat.getInstance(locale);
+        break;
+    }
     if (lf == null)
       return null;
     

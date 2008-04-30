@@ -56,7 +56,10 @@ import org.getobjects.appserver.core.WOResponse;
  * Bindings (WOFormatter):<pre>
  *   calformat      [in] - a dateformat (returns Calendar)
  *   dateformat     [in] - a dateformat (returns Data)
- *   numberformat   [in] - a numberformat
+ *   numberformat   [in] - a numberformat (NumberFormat.getInstance())
+ *   currencyformat [in] - a numberformat (NumberFormat.getCurrencyInstance())
+ *   percentformat  [in] - a numberformat (NumberFormat.getPercentInstance())
+ *   intformat      [in] - a numberformat (NumberFormat.getIntegerInstance())
  *   formatterClass [in] - Class or class name of a formatter to use
  *   formatter      [in] - java.text.Format used to format the value or the
  *                         format for the formatterClass</pre>

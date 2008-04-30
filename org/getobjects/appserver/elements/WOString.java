@@ -53,10 +53,14 @@ import org.getobjects.foundation.UString;
  *   valueWhenEmpty [in] - object
  *   escapeHTML     [in] - boolean (set to false to avoid HTML escaping)
  *   insertBR       [in] - boolean (replace newlines with &lt;br/&gt; tags)
- *   %value         [in] - string (pattern in %(keypath)s syntax)
+ *   %value         [in] - string (pattern in %(keypath)s syntax)</pre>
+ * Bindings (WOFormatter):<pre>
  *   calformat      [in] - a dateformat (returns Calendar)
  *   dateformat     [in] - a dateformat (returns Data)
- *   numberformat   [in] - a numberformat
+ *   numberformat   [in] - a numberformat (NumberFormat.getInstance())
+ *   currencyformat [in] - a numberformat (NumberFormat.getCurrencyInstance())
+ *   percentformat  [in] - a numberformat (NumberFormat.getPercentInstance())
+ *   intformat      [in] - a numberformat (NumberFormat.getIntegerInstance())
  *   formatterClass [in] - Class or class name of a formatter to use
  *   formatter      [in] - java.text.Format used to format the value or the
  *                         format for the formatterClass</pre>
