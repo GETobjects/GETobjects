@@ -1674,43 +1674,53 @@ public class EOSQLExpression extends NSObject {
         nextRel = rel = de.relationshipNamed(_path[i]);
         if (rel == null)
           log.error("did not find relationship " + _path[i] + " in: " + de);
+        else if (debugOn)
+          log.debug("    map path '" + relPath + "' to: " + rel);
         
         this.relationshipPathToRelationship.put(relPath, rel);
       }
+      else
+        rel = nextRel;
       
       /* find alias */
       
       alias = this.relationshipPathToAlias.get(relPath);
       if (alias != null) { /* we already have an alias */
         if (debugOn) log.debug("    existing alias: " + alias + " => "+relPath);
-        continue;
       }
-      
-      if (this.useAliases) {
-        /* produce an alias */
-        if (_path[i].startsWith("to") && _path[i].length() > 2) {
-          /* eg: toCustomer => Cu" */
-          alias = _path[i].substring(2);
-        }
-        else
-          alias = "T";
-        
-        if (this.relationshipPathToAlias.containsValue(alias)) {
-          /* search for next ID */
-          String balias = alias;
-          for (int cnt = 1; cnt < 100 /* limit */; cnt++) {
-            alias = balias + i;
-            if (!this.relationshipPathToAlias.containsValue(alias))
-              break;
-            alias = balias;
+      else {
+        if (this.useAliases) {
+          String pc = _path[i];
+          
+          /* produce an alias */
+          if (pc.startsWith("to") && _path[i].length() > 2) {
+            /* eg: toCustomer => Cu" */
+            alias = _path[i].substring(2);
+          }
+          else {
+            alias = pc.substring(0, 1).toUpperCase();
+            if (this.relationshipPathToAlias.containsValue(alias) && 
+                pc.length() > 1)
+              alias = pc.substring(0, 2).toUpperCase();
+          }
+
+          if (this.relationshipPathToAlias.containsValue(alias)) {
+            /* search for next ID */
+            String balias = alias;
+            for (int cnt = 1; cnt < 100 /* limit */; cnt++) {
+              alias = balias + i;
+              if (!this.relationshipPathToAlias.containsValue(alias))
+                break;
+              alias = balias;
+            }
           }
         }
+        else // TODO: check whether its correct
+          alias = rel.destinationEntity().name;
+        
+        if (debugOn) log.debug("    new alias: '" + alias + "' => " + relPath);
+        this.relationshipPathToAlias.put(relPath, alias);
       }
-      else
-        alias = rel.destinationEntity().name; // TODO: check whether its correct
-      
-      if (debugOn) log.debug("    new alias: '" + alias + "' => " + relPath);
-      this.relationshipPathToAlias.put(relPath, alias);
     }
     
     /* lookup attribute in last relationship */
