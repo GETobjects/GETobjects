@@ -145,11 +145,11 @@ public class EODatabase extends NSObject
    * @param _entityName name of the entity to lookup
    * @return an EOEntity object or null if the name could not be found
    */
-  public EOEntity entityNamed(String _entityName) {
+  public EOEntity entityNamed(final String _entityName) {
     if (this.adaptor == null)
       return null;
 
-    EOModel model = this.model();
+    final EOModel model = this.model();
     return model != null ? model.entityNamed(_entityName) : null;
   }
 
@@ -162,7 +162,7 @@ public class EODatabase extends NSObject
    * @param _object the object which we want to get an EOEntity for
    * @return the EOEntity assigned to the object or null if none is assigned
    */
-  public EOEntity entityForObject(Object _object) {
+  public EOEntity entityForObject(final Object _object) {
     if (_object == null)
       return null;
 
@@ -177,7 +177,7 @@ public class EODatabase extends NSObject
 
     /* check whether its a generic object */
 
-    Class clazz = _object.getClass();
+    final Class clazz = _object.getClass();
     if (clazz == EOActiveRecord.class) {
       /* can't determine entities for generic objects */
       return null;
@@ -197,7 +197,7 @@ public class EODatabase extends NSObject
    * @param _ename name of the entity which we want to have a datasource for
    * @return a new EOActiveDataSource object
    */
-  public EOAccessDataSource dataSourceForEntity(String _ename) {
+  public EOAccessDataSource dataSourceForEntity(final String _ename) {
     return this.dataSourceForEntity(null, _ename);
   }
 
@@ -207,7 +207,7 @@ public class EODatabase extends NSObject
    * @param _entity the entity which we want to have a datasource for
    * @return a new EOActiveDataSource object
    */
-  public EOAccessDataSource dataSourceForEntity(EOEntity _entity) {
+  public EOAccessDataSource dataSourceForEntity(final EOEntity _entity) {
     return this.dataSourceForEntity(_entity, null);
   }
 
@@ -220,13 +220,13 @@ public class EODatabase extends NSObject
    * @param _entity entity for which we want to determine the datasource class
    * @return an EOActiveDataSource subclass which shall be used for the entity
    */
-  public Class dataSourceClassForEntity(EOEntity _entity) {
+  public Class dataSourceClassForEntity(final EOEntity _entity) {
     if (_entity == null) {
       log.debug("got no entity to detect the database datasource!");
       return EOActiveDataSource.class;
     }
 
-    String dsClassName = _entity.dataSourceClassName();
+    final String dsClassName = _entity.dataSourceClassName();
     if (dsClassName == null || dsClassName.length() == 0) {
       if (log.isDebugEnabled())
         log.debug("entity has no custom datasource class assigned: " + _entity);
@@ -242,7 +242,7 @@ public class EODatabase extends NSObject
   }
 
   public EOAccessDataSource dataSourceForEntity
-    (EOEntity _entity, String _ename)
+    (final EOEntity _entity, String _ename)
   {
     EOEntity entity = _entity;
     if (entity == null && _ename != null)
@@ -283,12 +283,12 @@ public class EODatabase extends NSObject
     return ds;
   }
 
-  public List objectsWithFetchSpecification(EOFetchSpecification _fs) {
+  public List objectsWithFetchSpecification(final EOFetchSpecification _fs) {
     if (_fs == null)
       return null;
 
+    final EOAccessDataSource ds = this.dataSourceForEntity(_fs.entityName());
     List results = null;
-    EOAccessDataSource ds = this.dataSourceForEntity(_fs.entityName());
     try {
       ds.setFetchSpecification(_fs);
       results = ds.fetchObjects();
@@ -301,12 +301,12 @@ public class EODatabase extends NSObject
     return results;
   }
 
-  public Exception performDatabaseOperation(EODatabaseOperation _op) {
+  public Exception performDatabaseOperation(final EODatabaseOperation _op) {
     if (_op == null)
       return null; /* nothing to do */
 
+    final EODatabaseChannel channel = new EODatabaseChannel(this);
     Exception error = null;
-    EODatabaseChannel channel = new EODatabaseChannel(this);
     try {
       error = channel.performDatabaseOperations
         (new EODatabaseOperation[] { _op } );
@@ -317,9 +317,19 @@ public class EODatabase extends NSObject
     return error;
   }
 
+  
   /* class lookup context (can be used if the subclass lives in the EO pkg) */
 
-  public Class lookupClass(String _name) {
+  /**
+   * The EODatabase lookupClass method first checks relative to the package
+   * of the EODatabase subclass.
+   * For example if your OGoDatabase subclass lives in org.ogo.db, a class
+   * OGoPerson will be looked up as 'org.ogo.db.OGoPerson'.
+   * If this lookup fails, a global lookup is performed.
+   * <p>
+   * Note: you can pass in other NSClassLookupContext objects!
+   */
+  public Class lookupClass(final String _name) {
     if (_name == null)
       return null;
 
@@ -336,6 +346,7 @@ public class EODatabase extends NSObject
     return null;
   }
 
+  
   /* low level adaptor creation method */
 
   /**
@@ -400,6 +411,7 @@ public class EODatabase extends NSObject
     return adaptor;
   }
 
+  
   /* dispose */
 
   public void dispose() {
@@ -408,9 +420,10 @@ public class EODatabase extends NSObject
     this.adaptor = null;
   }
 
+  
   /* description */
 
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     if (this.adaptor != null) _d.append(" adaptor=" + this.adaptor);

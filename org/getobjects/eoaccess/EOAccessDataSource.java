@@ -237,6 +237,8 @@ public abstract class EOAccessDataSource extends EODataSource
     if (_sql == null || _sql.length() == 0)
       return null;
     
+    // TBD: shouldn't we just use the fetchspec and add the hint? This way the
+    //      hint has access to everything?
     final EOFetchSpecification fs =
       new EOFetchSpecification(this.entityName, null /* qualifier */, null);
     
