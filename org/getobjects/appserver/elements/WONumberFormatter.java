@@ -59,15 +59,25 @@ class WONumberFormatter extends WOFormatter {
   @Override
   public Format formatInContext(final WOContext _ctx) {
     // TODO: we should probably cache some formatter objects?
-    final String fmt = this.format.stringValueInComponent(_ctx.cursor());
+    final Object fmt = this.format.valueInComponent(_ctx.cursor());
     
     if (fmt == null)
       return null;
     
     final Locale locale = _ctx != null ? _ctx.locale() : null;
     final Format lf;
+
+    int type;
+    if (fmt.equals("percent"))
+      type = 2;
+    else if (fmt.equals("currency"))
+      type = 1;
+    else if (fmt.equals("integer"))
+      type = 3;
+    else
+      type = this.numberType;
     
-    switch (this.numberType) {
+    switch (type) {
       case 1:
         lf = NumberFormat.getCurrencyInstance(locale);
         break;
@@ -91,7 +101,10 @@ class WONumberFormatter extends WOFormatter {
     
     if (lf instanceof DecimalFormat) {
       DecimalFormat df = (DecimalFormat)lf;
-      df.applyPattern(fmt);
+      
+      if (fmt instanceof String)
+        df.applyPattern((String)fmt);
+      
       df.setParseBigDecimal(true);
     }
     
