@@ -59,31 +59,41 @@ public abstract class WOFormatter extends NSObject {
   public static WOFormatter formatterForAssociations
     (final Map<String, WOAssociation> _assocs)
   {
-    final WOAssociation numberformat, formatter, formatterClass;
-    final WOAssociation dateformat, calformat;
-    
-    dateformat     = WODynamicElement.grabAssociation(_assocs,"dateformat");
-    calformat      = WODynamicElement.grabAssociation(_assocs,"calformat");
-    numberformat   = WODynamicElement.grabAssociation(_assocs,"numberformat");
-    formatter      = WODynamicElement.grabAssociation(_assocs,"formatter");
-    formatterClass = WODynamicElement.grabAssociation(_assocs,"formatterClass");
-    
     // TODO: warn about multiple formatters, OR: wrap multiple formatters in an
     //       compound formatter and return that.
-
-    if (dateformat != null)
-      return new WODateFormatter(dateformat, false /* return Date */);
-    if (calformat != null)
-      return new WODateFormatter(calformat, true /* return Calendar */);
+    final WOAssociation  formatterClass;
+    WOAssociation fmt;
     
-    if (numberformat != null)
-      return new WONumberFormatter(numberformat);
+    /* specific formatters */
+    
+    fmt = WODynamicElement.grabAssociation(_assocs,"dateformat");
+    if (fmt != null) return new WODateFormatter(fmt, false /* return Date */);
+
+    fmt = WODynamicElement.grabAssociation(_assocs,"calformat");
+    if (fmt != null) return new WODateFormatter(fmt, true /* Calendar */);
+    
+    fmt = WODynamicElement.grabAssociation(_assocs,"numberformat");
+    if (fmt != null) return new WONumberFormatter(fmt, 0);
+    
+    fmt = WODynamicElement.grabAssociation(_assocs,"currencyformat");
+    if (fmt != null) return new WONumberFormatter(fmt, 1 /* currency */);
+    
+    fmt = WODynamicElement.grabAssociation(_assocs,"percentformat");
+    if (fmt != null) return new WONumberFormatter(fmt, 2 /* percent */);
+    
+    fmt = WODynamicElement.grabAssociation(_assocs,"intformat");
+    if (fmt != null) return new WONumberFormatter(fmt, 3 /* integer */);
+    
+    /* generic formatter */
+    
+    formatterClass = WODynamicElement.grabAssociation(_assocs,"formatterClass");
+    fmt            = WODynamicElement.grabAssociation(_assocs,"formatter");
     
     if (formatterClass != null)
-      return new WOClassFormatter(formatterClass, formatter);
+      return new WOClassFormatter(formatterClass, fmt);
     
-    if (formatter != null)
-      return new WOObjectFormatter(formatter);
+    if (fmt != null)
+      return new WOObjectFormatter(fmt);
     
     if (log.isInfoEnabled())
       log.info("did not find formatter bindings in given assocs: " + _assocs);
