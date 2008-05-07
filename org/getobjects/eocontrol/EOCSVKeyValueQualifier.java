@@ -21,6 +21,7 @@
 package org.getobjects.eocontrol;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.UList;
@@ -48,6 +49,9 @@ public class EOCSVKeyValueQualifier extends EOQualifier
   }
   public EOCSVKeyValueQualifier(String _key, Object _value) {
     this(_key, new String[] { _value != null ? _value.toString() : null}, ",");
+  }
+  public EOCSVKeyValueQualifier(String _key, List<String> _values, String _sep){
+    this(_key, _values != null ? _values.toArray(new String[0]) : null, _sep);
   }
   
   /* accessors */
@@ -149,4 +153,23 @@ public class EOCSVKeyValueQualifier extends EOQualifier
     return true; /* contained all values */
   }
   
+  
+  /* description */
+
+  @Override
+  public void appendAttributesToDescription(StringBuilder _d) {
+    super.appendAttributesToDescription(_d);
+    
+    _d.append(" key=");
+    _d.append(this.key);
+    
+    if (this.values == null || this.values.length == 0)
+      _d.append(" no-values");
+    else {
+      _d.append(this.matchAny ? " any" : " all");
+      
+      _d.append(" values=");
+      _d.append(UString.componentsJoinedByString(this.values, ","));
+    }
+  }
 }
