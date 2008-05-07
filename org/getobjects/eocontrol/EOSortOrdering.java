@@ -189,8 +189,25 @@ public class EOSortOrdering extends NSObject {
       return new ArrayList(_col); /* always return a copy! */
     
     ArrayList<Object> result = new ArrayList<Object>(_col.size());
+    result.addAll(_col);
     sort(result, _sos);
     return result;
+  }
+  /**
+   * Sorts a Collection based on the single sort ordering. This first creates a
+   * list using the given object and then performs the inline
+   * EOSortOrdering.sort().
+   * <p>
+   * This method always returns a fresh List and never reuses the Collection
+   * which is passed in. 
+   * 
+   * @param _col - the Collection of KVC objects to be sorted
+   * @return a List which contains the objects sorted by the given criteria
+   */
+  public List sortedList(final Collection _col) {
+    if (_col == null)
+      return null;
+    return sortedList(_col, new EOSortOrdering[] { this });
   }
   
   /* searching */
