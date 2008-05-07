@@ -76,7 +76,59 @@ public class UString {
   }
 
   // Note: use String.split instead of componentsSeparatedByDelimiter
+  
+  /**
+   * This is very similiar to String.split(), but split() takes a regex, which
+   * is often the wrong thing (one would need to escape custom separators).
+   * 
+   * @param _csv - the string to split
+   * @param _sep - the separator to split at
+   * @return a List of partial strings
+   */
+  public static List<String> componentsListSeparatedByString
+    (final String _csv, final String _sep)
+  {
+    int csvlen, seplen;
+    
+    if (_csv == null)
+      return null;
+    if (_sep==null || (seplen=_sep.length())==0 || (csvlen=_csv.length())==0) {
+      List<String> l = new ArrayList<String>(1);
+      l.add(_csv);
+      return l;
+    }
+    
+    ArrayList<String> l = new ArrayList<String>(16);
+    int pos, nextSep;
+    for (pos = 0; pos < csvlen && (nextSep = _csv.indexOf(_sep, pos)) >= 0; ) {
+      String s = _csv.substring(pos, nextSep);
+      l.add(s);
+      pos = nextSep + seplen;
+    }
+    if (pos < csvlen)
+      l.add(_csv.substring(pos));
+    
+    l.trimToSize();
+    return l;
+  }
+  /**
+   * This is very similiar to String.split(), but split() takes a regex, which
+   * is often the wrong thing (one would need to escape custom separators).
+   * 
+   * @param _csv - the string to split
+   * @param _sep - the separator to split at
+   * @return an array of partial strings
+   */
+  public static String[] componentsSeparatedByString(String _csv, String _sep) {
+    if (_csv == null)
+      return null;
+    if (_sep==null || _csv.length() == 0)
+      return new String[] { _csv };
 
+    List<String> parts = componentsListSeparatedByString(_csv, _sep);
+    return parts != null ? parts.toArray(new String[parts.size()]) : null;
+  }
+  
   public static String componentsJoinedByString(Collection _l, String _sep) {
     if (_l == null)
       return null;
