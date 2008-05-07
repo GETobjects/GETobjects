@@ -1845,6 +1845,9 @@ public class EOSQLExpression extends NSObject {
     
     if (_q instanceof EOBooleanQualifier)
       return this.sqlStringForBooleanQualifier((EOBooleanQualifier)_q);
+
+    if (_q instanceof EOCSVKeyValueQualifier)
+      return this.sqlStringForCSVKeyValueQualifier((EOCSVKeyValueQualifier)_q);
     
     log.error("could not convert qualifier to SQL: " + _q);
     return null;

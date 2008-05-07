@@ -83,6 +83,7 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
 
     StringBuilder sql = new StringBuilder(256);
     boolean matchAny = _q.doesMatchAny();
+    String  sep      = _q.separator();
     
     // TBD: replace loop with PG array operation:
     //        contains: string_to_array(keywords,', ') @> ARRAY['VIP', 'Gold']
@@ -105,6 +106,8 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
       // stopped at the first array element which yields = 'VIP'.
       sql.append(" ANY ( string_to_array( ");
       sql.append(sqlCol);
+      sql.append(", ");
+      sql.append(this.sqlStringForString(sep));
       sql.append(" ) )");
       
       sql.append(" )");
