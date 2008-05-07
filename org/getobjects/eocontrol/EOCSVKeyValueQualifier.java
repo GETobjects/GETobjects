@@ -20,6 +20,8 @@
 */
 package org.getobjects.eocontrol;
 
+import java.util.ArrayList;
+
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UString;
@@ -58,6 +60,48 @@ public class EOCSVKeyValueQualifier extends EOQualifier
   }
   public String separator() {
     return this.separator;
+  }
+  public boolean doesMatchAny() {
+    return this.matchAny;
+  }
+  
+  /* rewrite */
+  
+  /**
+   * Returns a complex LIKE query which emulates the qualifier. This is used by
+   * EOSQLExpression for databases which do not have special CSV support (eg
+   * PostgreSQL does have server side support for splits).
+   * 
+   * @return a combination of AND/OR/LIKE qualifiers
+   */
+  public EOQualifier rewriteAsPlainQualifier() {
+    ArrayList<EOQualifier> checks =
+      new ArrayList<EOQualifier>(this.values.length);
+    
+    for (int i = 0; i < this.values.length; i++) {
+      // eg:
+      // "keywords = %@ OR keywords LIKE %@ OR " +
+      // "keywords LIKE %@ OR keywords LIKE %@",
+      EOQualifier prefix = new EOKeyValueQualifier(this.key,
+          EOQualifier.ComparisonOperation.LIKE,
+          this.values[i] + this.separator + "*");
+      EOQualifier suffix = new EOKeyValueQualifier(this.key,
+          EOQualifier.ComparisonOperation.LIKE,
+          "*" + this.separator + this.values[i]);
+      EOQualifier infix = new EOKeyValueQualifier(this.key,
+          EOQualifier.ComparisonOperation.LIKE,
+          this.separator + "*" + this.values[i] + this.separator + "*");
+      EOQualifier eq = new EOKeyValueQualifier(this.key,
+          EOQualifier.ComparisonOperation.EQUAL_TO, this.values[i]);
+      
+      checks.add(new EOOrQualifier(eq, prefix, suffix, infix));
+    }
+    
+    if (checks.size() == 1)
+      return checks.get(0);
+    
+    return this.doesMatchAny()
+      ? new EOOrQualifier(checks) : new EOAndQualifier(checks); 
   }
   
   /* in-memory evaluation */
