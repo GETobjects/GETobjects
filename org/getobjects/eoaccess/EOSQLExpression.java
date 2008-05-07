@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.eocontrol.EOAndQualifier;
 import org.getobjects.eocontrol.EOBooleanQualifier;
+import org.getobjects.eocontrol.EOCSVKeyValueQualifier;
 import org.getobjects.eocontrol.EOCase;
 import org.getobjects.eocontrol.EOCompoundQualifier;
 import org.getobjects.eocontrol.EOFetchSpecification;
@@ -2187,6 +2188,8 @@ public class EOSQLExpression extends NSObject {
       if (s == null || s.length() == 0)
         continue; /* do not add empty qualifiers as per doc */ // TBD: explain
       
+      // TBD: check for sqlTrueExpression, sqlFalseExpression?!
+      
       if (sb.length() > 0) sb.append(_op);
       sb.append("( ");
       sb.append(s);
@@ -2237,6 +2240,12 @@ public class EOSQLExpression extends NSObject {
     return s;
   }
   
+  public String sqlStringForCSVKeyValueQualifier(EOCSVKeyValueQualifier _q) {
+    if (_q == null) return null;
+    
+    /* the default implementation just builds a LIKE qualifier */
+    return this.sqlStringForQualifier(_q.rewriteAsPlainQualifier());
+  }
   
   /* expressions */
   
