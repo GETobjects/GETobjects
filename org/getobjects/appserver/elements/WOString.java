@@ -79,9 +79,10 @@ public class WOString extends WOHTMLDynamicElement {
   protected WOAssociation escapeHTML;
   protected WOAssociation insertBR;
   protected WOFormatter   formatter;
+  protected WOElement     coreAttributes;
 
-  public WOString(String _name, Map<String, WOAssociation> _assocs,
-                  WOElement _template)
+  public WOString
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     
@@ -92,6 +93,9 @@ public class WOString extends WOHTMLDynamicElement {
     this.insertBR       = grabAssociation(_assocs, "insertBR");
     
     this.formatter = WOFormatter.formatterForAssociations(_assocs);
+    
+    this.coreAttributes =
+      WOHTMLElementAttributes.buildIfNecessary(_name + "_core", _assocs);
   }
   
   public WOString(WOAssociation _value, boolean _escapeHTML) {
@@ -196,7 +200,8 @@ public class WOString extends WOHTMLDynamicElement {
     /* append */
     
     if (s != null && s.length() > 0) {
-      if (this.extraKeys != null && this.extraKeys.length > 0)
+      if ((this.extraKeys != null && this.extraKeys.length > 0) ||
+          this.coreAttributes != null)
         this.appendWrappedStringToResponse(_r, _ctx, s, doEscape);
       else if (doEscape)
         _r.appendContentHTMLString(s);
@@ -270,6 +275,9 @@ public class WOString extends WOHTMLDynamicElement {
     _r.appendBeginTag(elementName);
     
     /* render attributes */
+    
+    if (this.coreAttributes != null)
+      this.coreAttributes.appendToResponse(_r, _ctx);
     
     for (int i = 0; i < attrCount; i++) {
       if ("elementName".equals(this.extraKeys[i]))
