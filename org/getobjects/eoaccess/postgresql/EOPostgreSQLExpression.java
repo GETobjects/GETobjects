@@ -25,7 +25,9 @@ import org.getobjects.eoaccess.EOAttribute;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eoaccess.EOSQLExpression;
 import org.getobjects.eocontrol.EOCSVKeyValueQualifier;
+import org.getobjects.eocontrol.EOOverlapsQualifier;
 import org.getobjects.eocontrol.EOQualifier;
+import org.getobjects.foundation.NSTimeRange;
 
 public class EOPostgreSQLExpression extends EOSQLExpression {
 
@@ -45,6 +47,30 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
     return (_op == EOQualifier.ComparisonOperation.CASE_INSENSITIVE_LIKE)
       ? "ILIKE"
       : super.sqlStringForSelector(_op, _value, _allowNull);
+  }
+
+  @Override
+  public String sqlStringForOverlapsQualifier(final EOOverlapsQualifier _q) {
+    // (a, b) OVERLAPS (c, d)
+    // TBD: not always good because its less effective with indices?, we'll
+    //      check when we get perf issues
+    if (_q == null) return null;
+    
+    final StringBuilder sql = new StringBuilder(72);
+    
+    sql.append("( ");
+    sql.append(this.sqlStringForExpression(_q.startKeyExpression()));
+    sql.append(", ");
+    sql.append(this.sqlStringForExpression(_q.endKeyExpression()));
+    sql.append(" ) OVERLAPS ( ");
+    
+    NSTimeRange r = _q.range();
+    sql.append(this.sqlStringForValue(r.fromDate(), null /* hm */));
+    sql.append(", ");
+    sql.append(this.sqlStringForValue(r.toDate(), null /* hm */));
+    
+    sql.append(" )");
+    return sql.toString();
   }
 
   @Override

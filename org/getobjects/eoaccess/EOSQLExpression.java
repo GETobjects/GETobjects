@@ -47,6 +47,7 @@ import org.getobjects.eocontrol.EOKeyGlobalID;
 import org.getobjects.eocontrol.EOKeyValueQualifier;
 import org.getobjects.eocontrol.EONotQualifier;
 import org.getobjects.eocontrol.EOOrQualifier;
+import org.getobjects.eocontrol.EOOverlapsQualifier;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOQualifierVariable;
 import org.getobjects.eocontrol.EOSQLQualifier;
@@ -1848,12 +1849,14 @@ public class EOSQLExpression extends NSObject {
 
     if (_q instanceof EOCSVKeyValueQualifier)
       return this.sqlStringForCSVKeyValueQualifier((EOCSVKeyValueQualifier)_q);
+    if (_q instanceof EOOverlapsQualifier)
+      return this.sqlStringForOverlapsQualifier((EOOverlapsQualifier)_q);
     
     log.error("could not convert qualifier to SQL: " + _q);
     return null;
   }
   
-  public String sqlStringForBooleanQualifier(EOBooleanQualifier _q) {
+  public String sqlStringForBooleanQualifier(final EOBooleanQualifier _q) {
     // TBD: we could return an empty qualifier for true?
     return (_q == EOBooleanQualifier.falseQualifier)
       ? "1 = 2" : "1 = 1";
@@ -1900,7 +1903,14 @@ public class EOSQLExpression extends NSObject {
     return sb.toString();
   }
   
-  public String sqlStringForNegatedQualifier(EOQualifier _q) {
+  /**
+   * This method generates the SQL for the given qualifier and then negates it,
+   * but embedded it in a "NOT ( Q )". Should work across all databases.
+   * 
+   * @param _q - base qualifier, to be negated
+   * @return the SQL string or null if no SQL was generated for the qualifier
+   */
+  public String sqlStringForNegatedQualifier(final EOQualifier _q) {
     final String qs = this.sqlStringForQualifier(_q);
     if (qs == null || qs.length() == 0) return null;
     return "NOT ( " + qs + " )";
@@ -1923,28 +1933,20 @@ public class EOSQLExpression extends NSObject {
   public String sqlStringForKeyValueQualifier(final EOKeyValueQualifier _q) {
     if (_q == null) return null;
     
-    /* continue with regular code */
-    
-    final String k  = _q.key();
-    EOAttribute a  = this.entity != null ? this.entity.attributeNamed(k) : null;
-    String      sqlCol;
-    Object v  = _q.value();
+    String sqlCol = this.sqlStringForExpression(_q.leftExpression());
     
     /* generate lhs */
     // TBD: use sqlStringForExpression with EOKey?
     
-    if ((sqlCol = this.sqlStringForAttributeNamed(k)) == null) {
-      log.warn("got no SQL string for attribute of LHS " + k + ": " + _q);
-      return null;
-    }
-    if (a != null) sqlCol = this.formatSQLString(sqlCol, a.readFormat());
     if (sqlCol == null) {
-      log.warn("formatting attribute with read format returned null: "+a);
+      log.warn("got no SQL string for attribute of LHS " + _q.key() + ": " +_q);
       return null;
     }
     // TODO: unless the DB supports a specific case-search LIKE, we need
     //       to perform an upper
     
+    Object v  = _q.value();
+    final String k  = _q.key();
     
     /* generate operator */
     // TODO: do something about caseInsensitiveLike (TO_UPPER?), though in
@@ -2140,33 +2142,12 @@ public class EOSQLExpression extends NSObject {
   public String sqlStringForKeyComparisonQualifier(EOKeyComparisonQualifier _q){
     if (_q == null) return null;
 
-    final StringBuilder sb  = new StringBuilder(64);
-    final String lhs = _q.leftKey();
-    final String rhs = _q.rightKey();
-    EOAttribute  a;
-    String       s;
-
-    /* generate lhs */
-    
-    s = this.sqlStringForAttributeNamed(lhs);
-    a = this.entity != null ? this.entity.attributeNamed(lhs) : null;
-    if (a != null) s = this.formatSQLString(s, a.readFormat());
-    sb.append(s);
-    sb.append(" ");
-    
     /* generate operator */
     // TODO: do something about caseInsensitiveLike (TO_UPPER?)
-    
+    final StringBuilder sb  = new StringBuilder(64);
+    sb.append(this.sqlStringForExpression(_q.leftExpression()));
     sb.append(this.sqlStringForSelector(_q.operation(), null, false));
-    
-    /* generate rhs */
-
-    sb.append(" ");
-    s = this.sqlStringForAttributeNamed(rhs);
-    a = this.entity != null ? this.entity.attributeNamed(rhs) : null;
-    if (a != null) s = this.formatSQLString(s, a.readFormat());
-    sb.append(s);
-
+    sb.append(this.sqlStringForExpression(_q.rightExpression()));
     return sb.toString();
   }
   
@@ -2250,6 +2231,13 @@ public class EOSQLExpression extends NSObject {
     return this.sqlStringForQualifier(_q.rewriteAsPlainQualifier());
   }
   
+  public String sqlStringForOverlapsQualifier(EOOverlapsQualifier _q) {
+    if (_q == null) return null;
+    
+    /* the default implementation just builds the range qualifier manually */
+    return this.sqlStringForQualifier(_q.rewriteAsPlainQualifier());
+  }
+  
   /* expressions */
   
   /**
@@ -2284,7 +2272,7 @@ public class EOSQLExpression extends NSObject {
 
     if (_expr instanceof EOKey)
       // TBD: check what sqlStringForKeyValueQualifier does?
-      return this.sqlStringForAttributeNamed(((EOKey)_expr).key());
+      return this.sqlStringForKey((EOKey)_expr);
 
     if (_expr instanceof EOQualifier)
       return this.sqlStringForQualifier((EOQualifier)_expr);
@@ -2296,6 +2284,28 @@ public class EOSQLExpression extends NSObject {
     
     log.error("unsupported expression: " + _expr);
     return null;
+  }
+  
+  public String sqlStringForKey(final EOKey _key) {
+    final String k  = _key.key();
+    EOAttribute a  = this.entity != null ? this.entity.attributeNamed(k) : null;
+    String      sqlCol;
+    
+    /* generate lhs */
+    // TBD: use sqlStringForExpression with EOKey?
+    
+    if ((sqlCol = this.sqlStringForAttributeNamed(k)) == null) {
+      log.warn("got no SQL string for attribute of key " + k + ": " + _key);
+      return null;
+    }
+    if (a != null) sqlCol = this.formatSQLString(sqlCol, a.readFormat());
+    if (sqlCol == null) {
+      log.warn("formatting attribute with read format returned null: " + a);
+      return null;
+    }
+    // TODO: unless the DB supports a specific case-search LIKE, we need
+    //       to perform an upper
+    return sqlCol;
   }
   
   /* aliases */
