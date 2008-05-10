@@ -66,6 +66,47 @@ public class EOOverlapsQualifier extends EOQualifier
     return this.range;
   }
   
+  /* rewrite as plain qualifier */
+  
+  public EOQualifier rewriteAsPlainQualifier() {
+    if (this.rangeKey != null) {
+      log.error("range keys cannot be rewritten to plain qualifiers: " + this);
+      return null;
+    }
+    if (this.range == null) /* no range to check */
+      return null;
+    
+    /* remember, this requires proper ordering of the range keys */
+    EOKeyValueQualifier q1 = null;
+    EOKeyValueQualifier q2 = null;
+    
+    if (this.startKey != null) {
+      /* To overlap the beginning of the appointment must be before the end
+       * of the range. If its greater, the range is before the apt.
+       * The end of the range is EXCLUSIVE.
+       */
+      q1 = new EOKeyValueQualifier(
+          this.startKey,
+          EOQualifier.ComparisonOperation.LESS_THAN,
+          this.range.toDate());
+    }
+    if (this.endKey != null) {
+      /* To overlap the end of the appointment must be after the start
+       * of the range. If its smaller, the range is after the apt.
+       * The beginning of the range is INCLUSIVE.
+       */
+      q2 = new EOKeyValueQualifier(
+          this.endKey,
+          EOQualifier.ComparisonOperation.GREATER_THAN_OR_EQUAL,
+          this.range.fromDate());
+    }
+    
+    if (q1 == null && q2 == null) return null; /* is this reasonable? */
+    if (q2 == null) return q1;
+    if (q1 == null) return q2;
+    return new EOAndQualifier(q1, q2);
+  }  
+  
   /* evaluation */
 
   public boolean evaluateWithObject(final Object _object) {
