@@ -241,6 +241,12 @@ public class EOKey<T> extends EOExpression implements EOExpressionEvaluation {
   /* values */
   
   public Object rawValueInObject(final Object _o) {
+    if (_o == null)
+      return null;
+    
+    if (_o instanceof NSKeyValueCodingAdditions)
+      return ((NSKeyValueCodingAdditions)_o).valueForKeyPath(this.keyPath);
+    
     return NSKeyValueCodingAdditions.Utility.valueForKeyPath(_o, this.keyPath);
   }
   public Object rawValueInObject(final NSKeyValueCodingAdditions _o) {

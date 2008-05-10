@@ -226,6 +226,12 @@ public class EOExpression extends NSObject implements Cloneable {
     // TODO: should we surround ids by double-quotes like in SQL?
     _sb.append(_id);
   }
+  protected void appendIdentifierToStringRepresentation
+    (final StringBuilder _sb, final EOKey _id)
+  {
+    this.appendIdentifierToStringRepresentation
+      (_sb, _id != null ? _id.key() : null);
+  }
   
   /**
    * Appends a constant value or qualifier variable to the String
