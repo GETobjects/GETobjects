@@ -35,20 +35,32 @@ import org.getobjects.foundation.NSKeyValueCodingAdditions;
  *   businessAddress.street = homeAddress.street</pre>
  */
 public class EOKeyComparisonQualifier extends EOQualifier
-  implements EOQualifierEvaluation
+  implements EOQualifierEvaluation, EOExpressionEvaluation
 {
   //TODO: add operator
 
-  protected String leftKey  = null;
-  protected String rightKey = null;
+  protected EOKey leftKey;
+  protected EOKey rightKey;
   protected ComparisonOperation operation;
 
   public EOKeyComparisonQualifier
-    (String _leftKey, ComparisonOperation _op, String _rightKey)
+    (final EOKey _leftKey, final ComparisonOperation _op, final EOKey _rightKey)
   {
     this.leftKey   = _leftKey;
     this.rightKey  = _rightKey;
     this.operation = _op;
+  }
+  public EOKeyComparisonQualifier(final EOKey _leftKey, final EOKey _rightKey) {
+    this(_leftKey, ComparisonOperation.EQUAL_TO, _rightKey);
+  }
+  
+  /* string based constructors */
+
+  public EOKeyComparisonQualifier
+    (final String _leftKey, ComparisonOperation _op, final String _rightKey)
+  {
+    this(_leftKey != null ? new EOKey(_leftKey) : null, _op,
+         _rightKey != null ? new EOKey(_rightKey) : null);
   }
   public EOKeyComparisonQualifier(String _leftKey, String _rightKey) {
     this(_leftKey, ComparisonOperation.EQUAL_TO, _rightKey);
@@ -62,15 +74,22 @@ public class EOKeyComparisonQualifier extends EOQualifier
   /* accessors */
   
   public String leftKey() {
-    return this.leftKey;
+    return this.leftKey != null ? this.leftKey.key() : null;
   }
   
   public String rightKey() {
-    return this.rightKey;
+    return this.rightKey != null ? this.rightKey.key() : null;
   }
   
   public ComparisonOperation operation() {
     return this.operation;
+  }
+
+  public EOExpression leftExpression() {
+    return this.leftKey;
+  }
+  public EOExpression rightExpression() {
+    return this.rightKey;
   }
   
   /* evaluation */
@@ -84,14 +103,12 @@ public class EOKeyComparisonQualifier extends EOQualifier
     }
     else if (_object instanceof NSKeyValueCodingAdditions) {
       final NSKeyValueCodingAdditions ko = (NSKeyValueCodingAdditions)_object;
-      lv = ko.valueForKeyPath(this.leftKey);
-      rv = ko.valueForKeyPath(this.rightKey);
+      lv = this.leftKey  != null ? this.leftKey.valueForObject(ko)  : null;
+      rv = this.rightKey != null ? this.rightKey.valueForObject(ko) : null;
     }
     else {
-      lv = NSKeyValueCodingAdditions.Utility
-            .valueForKeyPath(_object, this.leftKey);
-      rv = NSKeyValueCodingAdditions.Utility
-            .valueForKeyPath(_object, this.rightKey);
+      lv = this.leftKey  != null ? this.leftKey.valueForObject(_object)  : null;
+      rv = this.rightKey != null ? this.rightKey.valueForObject(_object) : null;
     }
     
     EOQualifier.ComparisonSupport comparisonSupport;
@@ -111,8 +128,8 @@ public class EOKeyComparisonQualifier extends EOQualifier
   @Override
   public void addReferencedKeysToSet(final Set<String> _keys) {
     if (_keys == null) return;
-    if (this.leftKey  != null) _keys.add(this.leftKey);
-    if (this.rightKey != null) _keys.add(this.rightKey);
+    if (this.leftKey  != null) _keys.add(this.leftKey.key());
+    if (this.rightKey != null) _keys.add(this.rightKey.key());
   }
   
   /* bindings */

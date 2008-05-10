@@ -34,7 +34,7 @@ import org.getobjects.foundation.NSKeyValueCodingAdditions;
  * Compares a value of a given object with a constant.
  */
 public class EOKeyValueQualifier extends EOQualifier
-  implements EOQualifierEvaluation
+  implements EOQualifierEvaluation, EOExpressionEvaluation
 {
   // TBD: document
   // TBD: improve extendedOperation thing (required for SOPE compatibility)
