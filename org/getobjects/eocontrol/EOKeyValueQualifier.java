@@ -38,36 +38,59 @@ public class EOKeyValueQualifier extends EOQualifier
 {
   // TBD: document
   // TBD: improve extendedOperation thing (required for SOPE compatibility)
-  protected String key;
-  protected Object value;
+  protected EOKey  key;
+  protected Object value; // TBD: change to EOExpression
   protected ComparisonOperation operation;
   protected String extendedOperation;
+  
+  /* EOKey based constructors */
 
   public EOKeyValueQualifier
-    (final String _key, final ComparisonOperation _op, final Object _value)
+    (final EOKey _key, final ComparisonOperation _op, final Object _value)
   {
     this.key       = _key;
     this.value     = _value;
     this.operation = _op;
   }
-  public EOKeyValueQualifier(final String _key, final Object _value) {
+  public EOKeyValueQualifier(final EOKey _key, final Object _value) {
     this(_key, ComparisonOperation.EQUAL_TO, _value);
   }
-  public EOKeyValueQualifier(String _key, String _op, Object _value) {
+  public EOKeyValueQualifier(EOKey _key, String _op, Object _value) {
     this(_key, operationForString(_op), _value);
     
     if (this.operation == ComparisonOperation.UNKNOWN)
       this.extendedOperation = _op;
   }
-   
+  
+  /* String based constructors */
+  
+  public EOKeyValueQualifier
+    (final String _key, final ComparisonOperation _op, final Object _value)
+  {
+    this(_key != null ? new EOKey(_key) : null, _op, _value);
+  }
+  public EOKeyValueQualifier(final String _key, final Object _value) {
+    this(_key, ComparisonOperation.EQUAL_TO, _value);
+  }
+  public EOKeyValueQualifier(String _key, String _op, Object _value) {
+    this(_key != null ? new EOKey(_key) : null, _op, _value);
+  }   
+  
   
   /* accessors */
   
   public String key() {
-    return this.key;
+    return this.key != null ? this.key.key() : null;
   }
   public Object value() {
     return this.value;
+  }
+  
+  public EOExpression leftExpression() {
+    return this.key;
+  }
+  public EOExpression rightExpression() {
+    return EOConstant.constantForValue(this.value);
   }
   
   public ComparisonOperation operation() {
@@ -169,16 +192,7 @@ public class EOKeyValueQualifier extends EOQualifier
   public boolean evaluateWithObject(final Object _object) {
     final Object objectValue;
     
-    if (_object == null)
-      objectValue = null;
-    else if (_object instanceof NSKeyValueCodingAdditions) {
-      objectValue = ((NSKeyValueCodingAdditions)_object)
-        .valueForKeyPath(this.key);
-    }
-    else {
-      objectValue = NSKeyValueCodingAdditions.Utility
-        .valueForKeyPath(_object, this.key);
-    }
+    objectValue = this.key != null ? this.key.valueForObject(_object) : null;
     
     /* check for extended operations like hasPrefix: */
     
@@ -219,7 +233,7 @@ public class EOKeyValueQualifier extends EOQualifier
   @Override
   public void addReferencedKeysToSet(Set<String> _keys) {
     if (_keys == null) return;
-    if (this.key != null) _keys.add(this.key);
+    if (this.key != null) _keys.add(this.key.key());
   }
   
   
