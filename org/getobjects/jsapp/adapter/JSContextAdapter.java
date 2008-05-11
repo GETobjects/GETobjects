@@ -33,10 +33,25 @@ import org.mozilla.javascript.Scriptable;
  * This adapter exposes some WOContext methods as properties, namely:
  * <ul>
  *   <li>application
- *   <li>session
+ *   <li>activeUser
  *   <li>component
- *   <li>log (component.log)
+ *   <li>clientObject
+ *   <li>elementID
+ *   <li>fragmentID
  *   <li>hasSession
+ *   <li>isInForm
+ *   <li>isRenderingDisabled
+ *   <li>joTraversalPath
+ *   <li>log (component.log)
+ *   <li>languages
+ *   <li>locale
+ *   <li>page
+ *   <li>request
+ *   <li>response
+ *   <li>session
+ *   <li>senderID
+ *   <li>timezone
+ *   <li>querySession
  * </ul>
  */
 public class JSContextAdapter extends JSExtraVarAdapter {
