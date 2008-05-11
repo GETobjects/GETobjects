@@ -59,7 +59,7 @@ import org.getobjects.appserver.core.WOResponse;
  * Bindings:<pre>
  *   selection [io] - object / Collection
  *   checked   [io] - boolean
- *   safeGuard [in] - boolean</pre> 
+ *   safeGuard [in] - boolean (def: true, submit unchecked state)</pre> 
  *   
  * Bindings (WOInput):<pre>
  *   id         [in]  - string
