@@ -67,7 +67,7 @@ import org.getobjects.appserver.elements.links.WOLinkGenerator;
  * Regular bindings:
  * <pre>
  *   id                   [in] - string
- *   string               [in] - string
+ *   string / value       [in] - string
  *   target               [in] - string
  *   disabled             [in] - boolean (only render content, not the anker)
  *   disableOnMissingLink [in] - boolean</pre>
@@ -103,6 +103,7 @@ public class WOHyperlink extends WOHTMLDynamicElement {
     /* content */
     
     WOAssociation a = grabAssociation(_assocs, "string");
+    if (a == null) a = grabAssociation(_assocs, "value");
     if (a != null) {
       Map<String, WOAssociation> ecAssocs =
         new HashMap<String, WOAssociation>(4);
