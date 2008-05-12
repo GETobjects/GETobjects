@@ -259,6 +259,44 @@ public class UString {
   
   
   /* URL encoding */
+  
+  /**
+   * Checks whether the given String has a http://, https://, ftp:// or
+   * mailto:// prefix.
+   * This method is not exact since and performs no further validation. Its
+   * mostly to decide whether a prefix must be added to a generic String.
+   * 
+   * @param an arbitrary string, eg mailto:info@skyrix.de
+   * @return the protocol if the String looks like an URL, null otherwise
+   */
+  public static String getURLProtocol(String _s) {
+    int len;
+    if (_s == null || (len = _s.length()) < 7)
+      return null;
+    
+    switch (Character.toLowerCase(_s.charAt(0))) {
+      case 'h':
+        if (len > 7) {
+          _s = _s.toLowerCase();
+          if (_s.startsWith("http://"))  return "http";
+          if (_s.startsWith("https://")) return "https";
+        }
+        break;
+      case 'f':
+        if (len > 6) {
+          _s = _s.toLowerCase();
+          if (_s.startsWith("ftp://")) return "ftp";
+        }
+        break;
+      case 'm':
+        if (len > 8) {
+          _s = _s.toLowerCase();
+          if (_s.startsWith("mailto:")) return "mailto";
+        }
+        break;
+    }
+    return null;
+  }
 
   public static String stringByDecodingURLComponent(String _s, String _charset){
     if (_s == null) return null;
