@@ -145,21 +145,45 @@ public class JSExtraVarAdapter extends NativeJavaObject {
           this /* we are both, 'this' and the scope for our funcs */,
           (Function)value);
     }
-    
-    if (value instanceof Scriptable ||
-        value instanceof String ||
-        value instanceof Number ||
-        value instanceof Boolean)
-    {
-      /* Note: the WrapFactory somehow doesn't convert basetypes properly */
-      return value; // return JS stuff as-is!
-    }
 
+    if (value instanceof Scriptable)
+      return value;
+    
+    
+    // this is what is done by setJavaPrimitiveWrap()
+    // if we do it, we seem to loose the methods.
+    /* Note: the WrapFactory somehow doesn't convert basetypes properly */
+    //if (value instanceof String)
+    //  return new org.mozilla.javascript.NativeString((String)value);
+    // return JS stuff as-is!
+    if (value instanceof String) // TBD: fix me
+      return value; // our JS strings do not receive ANY methods!
+
+    if (value instanceof Number)
+      return value;
+    if (value instanceof Boolean)
+      return value;
+
+    
+    /* wrap Java object */
+    
     Context cx = Context.getCurrentContext();
-    return cx.getWrapFactory().wrap(cx,
+    Object res = cx.getWrapFactory().wrap(cx,
         this  /* scope? */,
         value /* Java object to be wrapped for JS */,
-        null  /* static type? */); 
+        null  /* static type? */);
+    
+    /*
+    if (value instanceof String) {
+    log.error("GET   " + _name + " value: " + value + " (" +
+        value.getClass() + ")");
+    
+    log.error("  GOT " + _name + " value: " + res + " (" +
+        res.getClass() + ")");
+    log.error("  X: " + ((Scriptable)res).get("length", _start));
+    }
+    */
+    return res;
   }
   
   protected Scriptable jsSharedScope() {

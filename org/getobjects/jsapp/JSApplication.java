@@ -80,6 +80,10 @@ public class JSApplication extends OFSApplication {
     ContextFactory.initGlobal(this.jsCtxFactory);
     this.jsWrapFactory = new JSWrapFactory();
     
+    // if this is enabled, String/Number/Boolean will be directly returned to
+    // JavaScript (as JS objects, not Java ones)
+    //this.jsWrapFactory.setJavaPrimitiveWrap(false); /* convert base types */
+    
     if (log.isInfoEnabled()) log.info("JSApplication: " + appRoot);
     
     /* Prepare a few global objects. */

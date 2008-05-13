@@ -41,6 +41,7 @@ import org.mozilla.javascript.Scriptable;
  *   <li>session
  *   <li>context
  *   <li>log
+ *   <li>labels
  *   <li>hasSession
  *   <li>name
  * </ul>
