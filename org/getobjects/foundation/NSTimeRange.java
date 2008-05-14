@@ -36,6 +36,8 @@ public class NSTimeRange extends NSObject
   protected long    fromTime; // ms since 1970-01-01 00:00:00 GMT
   protected long    toTime;   // ms, EXCLUSIVE
   protected boolean isEmpty;
+  
+  // TBD: support iCal duration strings
 
   public NSTimeRange(final long _from, final long _to) {
     super();
@@ -53,7 +55,9 @@ public class NSTimeRange extends NSObject
   public NSTimeRange(final Date _from, final Date _to) {
     this.fromTime = _from == null ? 0 : _from.getTime();
     this.toTime   = _to   == null ? 0 : _to.getTime();
-    this.isEmpty  = _to   == null || this.fromTime == this.toTime;
+    
+    /* Note: a missing _to (toTime=0) marks an OPEN range, not an empty one */
+    this.isEmpty  = _from == _to;
   }
   public NSTimeRange(final Date _from, final int _durationInSeconds) {
     this.fromTime = _from == null ? 0 : _from.getTime();
@@ -78,7 +82,8 @@ public class NSTimeRange extends NSObject
       _to = _from;
     }
     this.toTime  = _to == null ? 0 : _to.getTimeInMillis();
-    this.isEmpty = _to == null || this.fromTime == this.toTime;
+    /* Note: a missing _to (toTime=0) marks an OPEN range, not an empty one */
+    this.isEmpty = this.fromTime == this.toTime;
   }
   public NSTimeRange(Calendar _from, final int _durationInSeconds) {
     super();
@@ -187,10 +192,10 @@ public class NSTimeRange extends NSObject
     if (this.isEmpty)
       return false; /* TBD: should we 'contain' other empty ranges? */
     
-    if (_range.fromTime < this.fromTime)
+    if (this.fromTime > 0 && _range.fromTime < this.fromTime)
       return false;
     
-    if (_range.toTime >= this.toTime)
+    if (this.toTime > 0 && _range.toTime >= this.toTime)
       return false;
     
     return true;
@@ -210,10 +215,10 @@ public class NSTimeRange extends NSObject
       return false; /* TBD: should we 'contain' the exact 'from' instant? */
     
     final long dateTime = _date.getTimeInMillis();
-    if (dateTime < this.fromTime)
+    if (this.fromTime > 0 && dateTime < this.fromTime)
       return false;
-    if (dateTime >= this.toTime) /* Note: 'to' is *non-inclusive* */
-      return false;
+    if (this.toTime > 0 && dateTime >= this.toTime)
+      return false; /* Note: 'to' is *non-inclusive* */
     
     return true;
   }
@@ -232,10 +237,10 @@ public class NSTimeRange extends NSObject
       return false; /* TBD: should we 'contain' the exact 'from' instant? */
     
     final long dateTime = _date.getTime();
-    if (dateTime < this.fromTime)
+    if (this.fromTime > 0 && dateTime < this.fromTime)
       return false;
-    if (dateTime >= this.toTime) /* Note: 'to' is *non-inclusive* */
-      return false;
+    if (this.toTime > 0 && dateTime >= this.toTime)
+      return false; /* Note: 'to' is *non-inclusive* */
     
     return true;
   }
@@ -265,9 +270,10 @@ public class NSTimeRange extends NSObject
    * @return true if the whole range is before the given instant
    */
   public boolean before(final Object _o) {
-    // TBD: document
     if (_o == null)
       return false;
+    if (this.fromTime == 0)
+      return false; /* can't be before a range which has no start :-) */
     
     if (_o instanceof NSTimeRange)
       return this.fromTime < ((NSTimeRange)_o).fromTime;
@@ -310,9 +316,10 @@ public class NSTimeRange extends NSObject
    * @return true if the range starts before the given instant
    */
   public boolean startsBefore(final Object _o) {
-    // TBD: document
     if (_o == null)
       return false;
+    if (this.fromTime == 0)
+      return false; /* can't be before a range which has no start :-) */
     
     if (_o instanceof NSTimeRange)
       return this.fromTime < ((NSTimeRange)_o).fromTime;
@@ -334,6 +341,7 @@ public class NSTimeRange extends NSObject
   }
   
   public boolean endsBefore(final Object _o) {
+    // TBD: fix for null ranges
     if (_o == null)
       return false;
     
@@ -378,6 +386,7 @@ public class NSTimeRange extends NSObject
     if (this.isEmpty || _other.isEmpty)
       return false;
     
+    // TBD: fix for open ranges (fromTime/toTime == 0)
     if (this.fromTime < _other.fromTime) {
       /* we starts before other, check whether we end before the other starts */
       if (this.toTime <= _other.fromTime)
@@ -488,6 +497,10 @@ public class NSTimeRange extends NSObject
   @Override
   public boolean isEmpty() {
     return this.isEmpty;
+  }
+  
+  public boolean isOpenRange() {
+    return !this.isEmpty && (this.fromTime == 0 || this.toTime == 0);
   }
   
   
@@ -703,14 +716,20 @@ public class NSTimeRange extends NSObject
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
-    _d.append(" from=");
-    _d.append(new Date(this.fromTime));
+    if (this.fromTime > 0) {
+      _d.append(" from=");
+      _d.append(new Date(this.fromTime));
+    }
+    else if (!this.isEmpty)
+      _d.append(" open-from");
 
     if (this.isEmpty)
       _d.append(" empty");
-    else {
+    else if (this.toTime > 0) {
       _d.append(" to=");
       _d.append(new Date(this.toTime));
     }
+    else
+      _d.append(" open-end");
   }
 }
