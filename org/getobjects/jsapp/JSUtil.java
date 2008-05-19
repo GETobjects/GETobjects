@@ -290,9 +290,11 @@ public class JSUtil {
       if (jslog.isInfoEnabled())
         jslog.info("no shared scope, assigning one: " + _component);
       
+      ScriptableObject baseScope = new ImporterTopLevel(jscx, true /*sealed*/);
+      // Note: ImporterTopLevel calls initGlobals()
+      
       // TBD: directly use no-kvc scope?
-      _sharedScope = JSKeyValueCodingScope.wrap
-        (new ImporterTopLevel(jscx, true /* sealed */));
+      _sharedScope = JSKeyValueCodingScope.wrap(baseScope);
     }
     
     
@@ -305,7 +307,8 @@ public class JSUtil {
           /* parent scope, hm, required and then reset below */,
         _component       /* java object */,
         null             /* static type */);
-    scope.setPrototype(_sharedScope.scope);
+    
+    scope.setPrototype(_sharedScope.scope); /* this is the ImporterTopLevel */
     scope.setParentScope(null); /* we are a global variable root */
     
     
