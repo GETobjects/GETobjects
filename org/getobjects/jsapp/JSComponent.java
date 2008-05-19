@@ -56,7 +56,7 @@ public class JSComponent extends WOComponent {
       log().warn("JSComponent: no JS scope was predefined: " + this);
     return this.jsComponentScope;
   }
-  public void setJsScope(Scriptable _scope) {
+  public void setJsScope(final Scriptable _scope) {
     // called by applyScriptOnComponent
     if (this.jsComponentScope == _scope)
       return;
@@ -149,10 +149,10 @@ public class JSComponent extends WOComponent {
      */
     // TBD: should we pass method parameters instead?
     Object args[] = new Object[] {
-        Context.javaToJS(this.context().request(), locScope), /* request*/
-        Context.javaToJS(_name, locScope), /* name */
-        Context.javaToJS(this,  locScope), /* component */
-        Context.javaToJS(this.context(), locScope), /* context */
+        /* request   */ Context.javaToJS(this.context().request(), locScope),
+        /* name      */ Context.javaToJS(_name, locScope),
+        /* component */ Context.javaToJS(this,  locScope),
+        /* context   */ Context.javaToJS(this.context(), locScope)
     };
     
     Object jr;
@@ -166,6 +166,14 @@ public class JSComponent extends WOComponent {
        * 
        */
       jr = ((Function)jv).call(cx,
+          // TBD: buggy
+          // Setting the scope to locScope seems to loose use the String
+          // methods.
+          // BUT if we do NOT use locScope as the scope, we cannot access
+          // globals? (via dynamic scoping). We cannot use the shared scope,
+          // since then the shared scope would be modified
+          // hm, maybe we can't use Java objects as a scope, maybe they do
+          // not expose a proper prototype.
           locScope /* scope (where to start variable lookup) */,
           locScope /* this  (just the binding of 'this') */,
           args);
