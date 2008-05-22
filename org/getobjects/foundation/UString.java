@@ -81,12 +81,14 @@ public class UString {
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
    * 
-   * @param _csv - the string to split
-   * @param _sep - the separator to split at
+   * @param _csv  - the string to split
+   * @param _sep  - the separator to split at
+   * @param _trim - whether the parts should be trimmed (using String.trim())
+   * @param _removeEmpty - remove empty components from the result set
    * @return a List of partial strings
    */
   public static List<String> componentsListSeparatedByString
-    (final String _csv, final String _sep)
+    (String _csv, final String _sep, boolean _trim, boolean _removeEmpty)
   {
     int csvlen, seplen;
     
@@ -94,7 +96,9 @@ public class UString {
       return null;
     if (_sep==null || (seplen=_sep.length())==0 || (csvlen=_csv.length())==0) {
       List<String> l = new ArrayList<String>(1);
-      l.add(_csv);
+      if (_trim) _csv = _csv.trim();
+      if (!_removeEmpty || _csv.length() > 0)
+        l.add(_csv);
       return l;
     }
     
@@ -102,15 +106,35 @@ public class UString {
     int pos, nextSep;
     for (pos = 0; pos < csvlen && (nextSep = _csv.indexOf(_sep, pos)) >= 0; ) {
       String s = _csv.substring(pos, nextSep);
-      l.add(s);
+      if (_trim) s = s.trim();
+      if (!_removeEmpty || s.length() > 0)
+        l.add(s);
       pos = nextSep + seplen;
     }
-    if (pos < csvlen)
-      l.add(_csv.substring(pos));
+    if (pos < csvlen) {
+      String s = _csv.substring(pos);
+      if (_trim) s = s.trim();
+      if (!_removeEmpty || s.length() > 0)
+        l.add(s);
+    }
     
     l.trimToSize();
     return l;
   }
+  /**
+   * This is very similiar to String.split(), but split() takes a regex, which
+   * is often the wrong thing (one would need to escape custom separators).
+   * 
+   * @param _csv - the string to split
+   * @param _sep - the separator to split at
+   * @return a List of partial strings
+   */
+  public static List<String> componentsListSeparatedByString
+    (final String _csv, final String _sep)
+  {
+    return componentsListSeparatedByString(_csv, _sep, false, false);
+  }
+  
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
@@ -122,10 +146,37 @@ public class UString {
   public static String[] componentsSeparatedByString(String _csv, String _sep) {
     if (_csv == null)
       return null;
-    if (_sep==null || _csv.length() == 0)
+    if (_sep == null || _csv.length() == 0)
       return new String[] { _csv };
 
     List<String> parts = componentsListSeparatedByString(_csv, _sep);
+    return parts != null ? parts.toArray(new String[parts.size()]) : null;
+  }
+  /**
+   * This is very similiar to String.split(), but split() takes a regex, which
+   * is often the wrong thing (one would need to escape custom separators).
+   * 
+   * @param _csv - the string to split
+   * @param _sep - the separator to split at
+   * @param _trim - whether the parts should be trimmed (using String.trim())
+   * @param _removeEmpty - remove empty components from the result set
+   * @return an array of partial strings
+   */
+  public static String[] componentsSeparatedByString
+    (String _csv, String _sep, boolean _trim, boolean _removeEmpty)
+  {
+    if (_csv == null)
+      return null;
+    if (_sep == null || _sep.length() == 0) {
+      if (_trim) _csv = _csv.trim();
+      return _removeEmpty && _csv.length() == 0
+        ? emptyStringArray : new String[] { _csv };
+    }
+    if (_csv.length() == 0)
+      return _removeEmpty? emptyStringArray : new String[] { _csv };
+
+    List<String> parts = 
+      componentsListSeparatedByString(_csv, _sep, _trim, _removeEmpty);
     return parts != null ? parts.toArray(new String[parts.size()]) : null;
   }
   
@@ -1104,7 +1155,8 @@ public class UString {
     return sb.toString();
   }
 
-  private static final char[] emptyCharacterSet = new char[0];
+  private static final String[] emptyStringArray  = new String[0];
+  private static final char[]   emptyCharacterSet = new char[0];
 
   /**
    * Returns an array of chars which contains the characters of a and b.
