@@ -364,6 +364,13 @@ public class EOEntity extends NSObject
   
   /* relationships */
   
+  /**
+   * Returns the EORelationship object for the relationship with the given name.
+   * The name can be a keypath, for example 'employments.person'.
+   * 
+   * @param _name - the name of the relationship, eg 'employments'
+   * @return the matching EORelationship object or null
+   */
   public EORelationship relationshipNamed(final String _name) {
     // TBD: optimize, used quite often. Eg we might want to take hashes. Also
     //      optimize for misses
@@ -371,6 +378,20 @@ public class EOEntity extends NSObject
     if (this.relationships == null) return null;
     
     // TODO: we might want to check for keypathes? Yes, definitely!
+    int dotIdx = _name.indexOf('.');
+    if (dotIdx >= 0) {
+      /* OK, is a keypath, like "employments.person" */
+      if (dotIdx == 0)
+        return this.relationshipNamed(_name.substring(dotIdx + 1));
+      
+      EORelationship rel = this.relationshipNamed(_name.substring(0, dotIdx));
+      if (rel == null) return null;
+      
+      EOEntity dest = rel.destinationEntity();
+      if (dest == null) return null;
+      
+      return dest.relationshipNamed(_name.substring(dotIdx + 1));
+    }
     
     for (int i = 0; i < this.relationships.length; i++) {
       if (_name.equals(this.relationships[i].name()))
