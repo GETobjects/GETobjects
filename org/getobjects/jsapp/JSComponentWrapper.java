@@ -84,8 +84,10 @@ public class JSComponentWrapper extends OFSComponentWrapper {
     WOComponent lComp = super.instantiateComponent(_rm, _ctx);
 
     // TBD: cache script in this object
-    ScriptCacheEntry sce = this.loadScript(null);
+    ScriptCacheEntry sce = this.loadScript(null /* name */);
     if (sce != null) {
+      // Note: sce.script is usually empty! The .js file is executed against
+      //       the shared scope!
       JSUtil.applyScriptOnComponent
         (sce.script, sce.scriptScope /* shared scope */, lComp, _ctx);
     }

@@ -268,8 +268,8 @@ public class JSUtil {
   }
 
   public static void applyScriptOnComponent
-    (Script _script, JSKeyValueCodingScope _sharedScope,
-     NSKeyValueCoding _component, IJoContext _ctx)
+    (final Script _script, JSKeyValueCodingScope _sharedScope,
+     final NSKeyValueCoding _component, final IJoContext _ctx)
   {
     // TBD: we might want to scan the script source for additional information
     //      like Jo protections and such (or should the script execute
@@ -278,7 +278,7 @@ public class JSUtil {
     if (jslog != null && jslog.isDebugEnabled())
       jslog.debug("loading JavaScript into component: " + _script);
     
-    Context jscx = (_ctx instanceof JSContext)
+    final Context jscx = (_ctx instanceof JSContext)
       ? ((JSContext)_ctx).jsContext()
       : Context.getCurrentContext();
   
@@ -300,8 +300,8 @@ public class JSUtil {
     
     /* create JSComponentAdapter for _component */
     
-    WrapFactory wrapFactory = jscx.getWrapFactory();
-    Scriptable scope = (Scriptable)wrapFactory.wrap(
+    final WrapFactory wrapFactory = jscx.getWrapFactory();
+    final Scriptable scope = (Scriptable)wrapFactory.wrap(
         jscx,
         _sharedScope.scope
           /* parent scope, hm, required and then reset below */,
@@ -335,11 +335,11 @@ public class JSUtil {
     
     /* call init when available */
     
-    Object func = ScriptableObject.getProperty(scope, "init");
+    final Object func = ScriptableObject.getProperty(scope, "init");
     if (func instanceof Callable) {
       /* call function */
   
-      Scriptable wrappedCtx =
+      final Scriptable wrappedCtx =
         (Scriptable)wrapFactory.wrap(jscx, scope, _ctx, null);
   
       ((Callable)func).call(jscx,
