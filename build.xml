@@ -402,16 +402,18 @@
       <zipfileset src="${libs}/ognl-2.6.9.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/js-1.6r7.jar">
+      <zipfileset src="${libs}/js-1.7r1.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- WOFileUpload -->
       <zipfileset src="${libs}/commons-fileupload-1.2.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
+      <!--
       <zipfileset src="${libs}/commons-codec-1.3.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
+      -->
       <zipfileset src="${libs}/commons-io-1.3.2.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
@@ -450,8 +452,8 @@
       <fileset file="${libs}/Apache-LICENSE.txt" />
       <fileset file="${libs}/derby-LICENSE.txt" />
       <fileset file="${libs}/iText-MPL-1.1.txt" />
-      <fileset file="${libs}/jcommon-license.txt" />
-      <fileset file="${libs}/jfreechart-license.txt" />
+      <fileset file="${libs}/jcommon-license-LGPL.txt" />
+      <fileset file="${libs}/jfreechart-license-LGPL.txt" />
       <fileset file="${libs}/js-mozlicense.txt" />
       <fileset file="${libs}/ognl-license.txt" />
     </jar>
