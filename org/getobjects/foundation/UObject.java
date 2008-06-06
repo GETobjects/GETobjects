@@ -18,8 +18,14 @@
  */
 package org.getobjects.foundation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -223,14 +229,66 @@ public class UObject extends NSObject {
     return intValue(v.toString());
   }
 
-  public static String stringValue(final Object v) {
-    if (v == null)
+  public static String stringValue(final Object _v) {
+    if (_v == null)
       return null;
 
-    if (v instanceof String)
-      return (String)v;
+    if (_v instanceof String)
+      return (String)_v;
 
-    return v.toString();
+    return _v.toString();
+  }
+  
+  public static Date dateValue(final Object _v) {
+    if (_v == null)
+      return null;
+
+    if (_v instanceof Date)
+      return (Date)_v;
+    
+    if (_v instanceof Calendar)
+      return ((Calendar)_v).getTime();
+    
+    if (_v instanceof String) {
+      String s = ((String)_v).trim();
+      if (s.length() == 0)
+        return null;
+      
+      DateFormat df = DateFormat.getDateInstance();
+      try {
+        return df.parse(s);
+      }
+      catch (ParseException _e) {
+        System.err.println("WARN: could not parse string as datevalue: " + _v);
+        return null;
+      }
+    }
+    
+    if (_v instanceof Number)
+      return new Date(((Number)_v).longValue());
+    
+    /* other object */
+    
+    try {
+      Method m = _v.getClass().getMethod("dateValue");
+      if (m != null) {
+        Object v = m.invoke(_v);
+        if (v == null) return null;
+        if (v != _v) return UObject.dateValue(v);
+        System.err.println
+          ("WARN:  object returned itself in its dateValue() method!: " + v);
+        return null;
+      }
+    }
+    catch (SecurityException         e) {}
+    catch (NoSuchMethodException     e) {}
+    catch (IllegalArgumentException  e) {}
+    catch (IllegalAccessException    e) {}
+    catch (InvocationTargetException e) {}
+    
+    // TBD: use log
+    System.err.println("WARN: unexpected object in UObject.dateValue(): " + _v);
+    return null;
   }
 
   /**
