@@ -30,12 +30,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * UObject
  * <p>
  * Utility functions which work on all objects.
  */
 public class UObject extends NSObject {
+  protected static Log log = LogFactory.getLog("UObject");
 
   private UObject() {} /* do not allow construction */
 
@@ -254,12 +258,18 @@ public class UObject extends NSObject {
       if (s.length() == 0)
         return null;
       
+      /* Rhino hack */
+      if ("undefined".equals(s)) {
+        log.warn("attempt to extract dateValue from 'undefined' string: " + _v);
+        return null;
+      }
+      
       DateFormat df = DateFormat.getDateInstance();
       try {
         return df.parse(s);
       }
       catch (ParseException _e) {
-        System.err.println("WARN: could not parse string as datevalue: " + _v);
+        log.warn("could not parse string as datevalue: '" + _v + "'");
         return null;
       }
     }
@@ -275,8 +285,8 @@ public class UObject extends NSObject {
         Object v = m.invoke(_v);
         if (v == null) return null;
         if (v != _v) return UObject.dateValue(v);
-        System.err.println
-          ("WARN:  object returned itself in its dateValue() method!: " + v);
+        log.warn(
+          "object returned itself in its dateValue() method!: " + v);
         return null;
       }
     }
