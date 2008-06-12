@@ -133,8 +133,8 @@ public class WOHyperlink extends WOHTMLDynamicElement {
   /* responder */
   
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
-    /* links can take form values !!!! (for query-parameters) */
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
+    /* links can take form values!! (for query-parameters) */
     
     String oldId = null;
     String lid = _ctx.elementID();
@@ -160,8 +160,8 @@ public class WOHyperlink extends WOHTMLDynamicElement {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
+    final Object cursor = _ctx.cursor();
     
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor))
@@ -184,7 +184,7 @@ public class WOHyperlink extends WOHTMLDynamicElement {
     */
     
     Object result = null;
-    boolean isActive = lid.equals(_ctx.senderID());
+    final boolean isActive = lid.equals(_ctx.senderID());
     if (isActive) {
       if (this.link != null) {
         if (oldId != null) /* push own id */
@@ -219,14 +219,14 @@ public class WOHyperlink extends WOHTMLDynamicElement {
   /* generate response */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled()) {
       if (this.template != null)
         this.template.appendToResponse(_r, _ctx);
       return;
     }
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
     
     String oldid = null;
     String lid   = null;
@@ -243,7 +243,7 @@ public class WOHyperlink extends WOHTMLDynamicElement {
       /* process element id */
       
       if (this.eid != null) {
-        Object v = this.eid.valueInComponent(cursor);
+        final Object v = this.eid.valueInComponent(cursor);
         if (v instanceof Boolean) {
           /* the user requested the embed the automatically generated ID */
           lid = _ctx.elementID(); // hm, dont we need to check for true?
@@ -278,7 +278,7 @@ public class WOHyperlink extends WOHTMLDynamicElement {
       if (lid != null) _r.appendAttribute("id",   lid);
       
       if (this.target != null) {
-        String s = this.target.stringValueInComponent(cursor);
+        final String s = this.target.stringValueInComponent(cursor);
         _r.appendAttribute("target", s);
       }
 
@@ -312,7 +312,7 @@ public class WOHyperlink extends WOHTMLDynamicElement {
   }
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (this.template != null)
       _walker.processTemplate(this, this.template, _ctx);
   }
