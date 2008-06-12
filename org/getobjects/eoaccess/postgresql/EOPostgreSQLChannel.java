@@ -201,6 +201,23 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   /* PostgreSQL reflection */
   
   protected List<Map<String,Object>> _fetchPGColumnsOfTable(String _table) {
+    /* Sample result:
+     *  attnum |    colname     |   exttype   | attlen | attnotnull 
+     * --------+----------------+-------------+--------+------------
+     *       1 | receipt_id     | int4        |      4 | t
+     *       2 | object_version | int4        |      4 | t
+     *       3 | db_status      | varchar     |     -1 | t
+     *       4 | creation_date  | timestamptz |      8 | t
+     *       5 | creator_id     | int4        |      4 | t
+     *       6 | receipt_code   | varchar     |     -1 | f
+     *       7 | receipt_date   | timestamptz |      8 | f
+     *       8 | currency       | varchar     |     -1 | t
+     *       9 | start_amount   | numeric     |     -1 | t
+     *      10 | end_amount     | numeric     |     -1 | t
+     *      11 | subject        | varchar     |     -1 | t
+     *      12 | info           | varchar     |     -1 | f
+     *      13 | account_id     | int4        |      4 | f
+     */
     if (_table == null) return null;
     
     String sql = columnBaseQuery + " AND c.relname='" +  _table +
