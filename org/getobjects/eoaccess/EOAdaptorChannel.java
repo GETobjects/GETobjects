@@ -196,10 +196,12 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       }
     }
     catch (SQLException e) {
-      // MySQL: when it encounters network-connectivity issues during the
-      //        processing of a query it sets:
-      //        SQLException.getSQLState() to '08S01'
-      // PG: Syntax error is '42601'
+      /*
+       * getSQLState()
+       *   08S01 MySQL network-connect issues during the processing of a query
+       *   42601 PG    syntax error
+       *   42703 PG    column "number" does not exist
+       */
       this.lastException = e;
       
       if (records != null && records.size() == 0) {
@@ -221,8 +223,6 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       //       clean
       this._releaseResources(stmt, rs);
     }
-    
-    // TODO: compact array
 
     return records;
   }
