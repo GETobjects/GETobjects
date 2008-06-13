@@ -26,7 +26,9 @@ import java.util.Map;
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
+import org.getobjects.appserver.core.WOErrorReport;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.appserver.core.WOErrorReport.WOErrorItem;
 
 /**
  * WOTextField
@@ -50,25 +52,27 @@ import org.getobjects.appserver.core.WOResponse;
  *   writeValue     [out] - object (different value for takeValues)
  *   disabled       [in]  - boolean</pre>
  * Bindings (WOTextField):<pre>
- *   readonly       [in] - boolean
- *   size           [in] - int
- *   trim           [in] - boolean</pre>
+ *   readonly       [in]  - boolean
+ *   size           [in]  - int
+ *   trim           [in]  - boolean
+ *   errorItem      [out] - WOErrorItem</pre>
  * Bindings (WOFormatter):<pre>
- *   calformat      [in] - a dateformat (returns Calendar)
- *   dateformat     [in] - a dateformat (returns Data)
- *   numberformat   [in] - a numberformat (NumberFormat.getInstance())
- *   currencyformat [in] - a numberformat (NumberFormat.getCurrencyInstance())
- *   percentformat  [in] - a numberformat (NumberFormat.getPercentInstance())
- *   intformat      [in] - a numberformat (NumberFormat.getIntegerInstance())
- *   formatterClass [in] - Class or class name of a formatter to use
- *   formatter      [in] - java.text.Format used to format the value or the
- *                         format for the formatterClass</pre>
+ *   calformat      [in]  - a dateformat (returns Calendar)
+ *   dateformat     [in]  - a dateformat (returns Data)
+ *   numberformat   [in]  - a numberformat (NumberFormat.getInstance())
+ *   currencyformat [in]  - a numberformat (NumberFormat.getCurrencyInstance())
+ *   percentformat  [in]  - a numberformat (NumberFormat.getPercentInstance())
+ *   intformat      [in]  - a numberformat (NumberFormat.getIntegerInstance())
+ *   formatterClass [in]  - Class or class name of a formatter to use
+ *   formatter      [in]  - java.text.Format used to format the value or the
+ *                          format for the formatterClass</pre>
  */
 public class WOTextField extends WOInput {
   
   protected WOAssociation readonly;
   protected WOAssociation size;
   protected WOAssociation trim;
+  protected WOAssociation errorItem;
   protected WOFormatter   formatter;
 
   public WOTextField
@@ -120,21 +124,51 @@ public class WOTextField extends WOInput {
       return;
 
     final Object cursor = _ctx.cursor();
+    String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
+    String n   = this.elementNameInContext(_ctx);
+    
+    String      sv    = null;
+    WOErrorItem error = null;
+    
+    /* determine error item, we need this to render the b0rked value! */
+    
+    WOErrorReport er = _ctx.errorReport();
+    if (er != null) {
+      // TBD: lid is NOT the elementID! and we do not check the 'id' in
+      //      takevalues, BUT we might consolidate both IDs in one? ('id'
+      //      HTML value and the elementID, both are unique)
+      if (lid != null) error = er.errorForElementID(lid);
+      if (error == null && n != null) error = er.errorForName(n);
+    }
+    
+    /* push error item, if there is one for the element */
+    
+    if (this.errorItem != null)
+      this.errorItem.setValue(error, cursor);
+    
+    /* calculate the form value to render, can be the error value! */
+    
+    if (error != null) {
+      /* render raw error value (which was NOT pushed to the model) */
+      final Object v = error.value();
+      sv = v != null ? v.toString() : null;
+    }
+    else if (this.readValue != null) {
+      /* retrieve value from controller, and format it for output */
+      final Object ov = this.readValue.valueInComponent(cursor);
+      sv  = this.formValueForObject(ov, _ctx);
+    }
+    
+    /* begin rendering */
 
     _r.appendBeginTag("input");
     _r.appendAttribute("type", this.inputType());
 
-    String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
     if (lid != null) _r.appendAttribute("id", lid);
+    _r.appendAttribute("name", n);
     
-    _r.appendAttribute("name", this.elementNameInContext(_ctx));
-    
-    if (this.readValue != null) {
-      final Object ov = this.readValue.valueInComponent(cursor);
-      final String s  = this.formValueForObject(ov, _ctx);
-      if (s != null)
-        _r.appendAttribute("value", s);
-    }
+    if (this.readValue != null && sv != null)
+      _r.appendAttribute("value", sv); // TBD: only render with a binding?
     
     if (this.size != null) {
       final int s;

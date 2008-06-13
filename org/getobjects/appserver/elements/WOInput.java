@@ -152,15 +152,12 @@ public abstract class WOInput extends WOHTMLDynamicElement {
    * @return true if the caller should stop processing
    */
   protected boolean handleParseException
-    (final Object _formName, final Object _formValue,
+    (final String _formName, final Object _formValue,
      final Exception _e,     final WOContext _ctx)
   {
-    // TODO: add to some 'error report' object?
-    log.warn("failed to parse form value with Format: '" +
-        _formValue + "' (" + _formValue.getClass().getSimpleName() + ")", _e);
-    
     WOErrorReport report = _ctx != null ? _ctx.errorReport() : null;
     if (report != null) {
+      report.addError(null, _formName, _formValue, _e);
       return true; /* did handle error */
     }
     
@@ -170,6 +167,10 @@ public abstract class WOInput extends WOHTMLDynamicElement {
           this.writeValue.keyPath());
       return true; /* did handle error */
     }
+    
+    // TODO: add to some 'error report' object?
+    log.warn("failed to parse form value with Format: '" +
+        _formValue + "' (" + _formValue.getClass().getSimpleName() + ")", _e);
     
     if (_e != null) {
       if (_e instanceof RuntimeException)
@@ -184,7 +185,7 @@ public abstract class WOInput extends WOHTMLDynamicElement {
   
   protected boolean handleSetValueException
     (final Object _cursor,   final WOAssociation _association,
-     final Object _formName, final Object _formValue,
+     final String _formName, final Object _formValue,
      final Exception _e,     final WOContext _ctx) throws RuntimeException
   {
     // TODO: add to some 'error report' object?
@@ -193,6 +194,7 @@ public abstract class WOInput extends WOHTMLDynamicElement {
     
     WOErrorReport report = _ctx != null ? _ctx.errorReport() : null;
     if (report != null) {
+      report.addError(null, _formName, _formValue, _e);
       return true; /* did handle error */
     }
     
