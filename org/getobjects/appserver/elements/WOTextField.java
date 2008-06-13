@@ -149,9 +149,14 @@ public class WOTextField extends WOInput {
     /* calculate the form value to render, can be the error value! */
     
     if (error != null) {
-      /* render raw error value (which was NOT pushed to the model) */
-      final Object v = error.value();
-      sv = v != null ? v.toString() : null;
+      /* Render raw error value (which was NOT pushed to the model). Hm,
+       * could be a structured value (eg a Date) when the controller
+       * created the errorItem.
+       */
+      final Object ov = error.value();
+      sv = (ov instanceof String)
+        ? (String)ov
+        : this.formValueForObject(ov, _ctx);
     }
     else if (this.readValue != null) {
       /* retrieve value from controller, and format it for output */
