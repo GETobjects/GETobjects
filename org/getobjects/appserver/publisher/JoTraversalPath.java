@@ -30,6 +30,7 @@ import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WORequestJoPath;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UString;
 
 /**
@@ -199,15 +200,35 @@ public class JoTraversalPath extends NSObject implements NSDisposable {
    */
   public String[] pathToClientObject() {
     String[] p = this.path();
-    if (this.clientObject == this.object)
+    if (this.clientObject == this.object || this.clientObject == null)
       return p;
 
     if (p == null || p.length < 1)
       return p;
     
-    String[] pc = new String[p.length - 1];
-    System.arraycopy(p, 0, pc, 0, p.length - 1);
+    /* Note: this.objects starts with the root object! */
+    int clientObjectIdx =
+      UList.lastIndexOfObjectIdenticalTo(this.objects, this.clientObject);
     
+    int len;
+    
+    if (clientObjectIdx < 0) {
+      /* old implementation, probably wrong (eg confused with nested actions) */
+      len = p.length - 1; /* assumes the last path component is the action */
+    }
+    else {
+      /* OK, we have the index of the client object, derive the path. Eg the
+       * objects array:
+       *   [0] WOApplication, [1] Persons, [2] Person, [3] PersonView
+       * path:
+       *                      [0] persons/ [1] person/ [2] view
+       * clientObject: Person, index [2]
+       * means: copy two items: [persons, person], w/o 'view'
+       */
+      len = clientObjectIdx;
+    }
+    String[] pc = new String[len];
+    System.arraycopy(p, 0, pc, 0, len);
     return pc;
   }
   
