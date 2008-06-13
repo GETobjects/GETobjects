@@ -364,6 +364,22 @@ public class WOHTMLElementAttributes extends WODynamicElement {
     return styles;
   }
   
+  /**
+   * This method renders a few special object values, depending on the style
+   * key.
+   * <ul>
+   *   <li>'padding', 'margin', 'border':
+   *     the value can be a Map with 'top', 'right', 'bottom', 'left' keys
+   *   <li>Collection's are rendered as Strings with ", " between the values
+   *   <li>'visibility', 'display', 'clear':
+   *     the value can be a Boolean, it will render as 'visible'/'hidden',
+   *     'block'/'none' and 'both'/'none'
+   * </ul> 
+   * 
+   * @param _key   - name of the style element, eg 'visibility'
+   * @param _value - value to render
+   * @param _sb    - the output buffer
+   */
   public void appendStyleValue(String _key, Object _value, StringBuilder _sb) {
     if (_value instanceof String) {
       _sb.append(_value);
@@ -525,7 +541,7 @@ public class WOHTMLElementAttributes extends WODynamicElement {
             baseSet.add(s);
         }
       }
-      baseStyle = baseSet;
+      baseClass = baseSet;
     }
     
     if (baseClass instanceof String)
@@ -535,7 +551,8 @@ public class WOHTMLElementAttributes extends WODynamicElement {
     else if (baseClass != null)
       log().error("cannot render 'class' attribute value: " + baseClass);
     
-    /* generate content */
+    
+    /* generate content to WOResponse*/
     
     if (classString != null && classString.length() > 0)
       _r.appendAttribute("class", classString);
