@@ -62,7 +62,12 @@ public class WOErrorReport extends NSObject {
     return this.errors;
   }
   public boolean hasErrors() {
-    return (this.errors == null || this.errors.size() == 0) ? true : false;
+    return (this.errors == null || this.errors.size() == 0) ? false : true;
+  }
+  
+  @Override
+  public boolean isEmpty() {
+    return !this.hasErrors();
   }
   
   public List<WOErrorItem> errorsForElementID(final String _eid) {
