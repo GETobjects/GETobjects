@@ -315,6 +315,7 @@ public class UObject extends NSObject {
    * @return true if the object is considered 'empty', false if not
    */
   public static boolean isEmpty(final Object _v) {
+    // Note: do not use parameter overloading, confuses Rhino with null values.
     if (_v == null)
       return true;
 
@@ -331,7 +332,7 @@ public class UObject extends NSObject {
       return ((Collection)_v).size() == 0;
 
     if (_v.getClass().isArray()) {
-      // TBD: the case is propably wrong ...
+      // TBD: the cast is propably wrong ...
       return ((Object[])_v).length == 0;
     }
 
@@ -342,12 +343,4 @@ public class UObject extends NSObject {
     return !isEmpty(_v);
   }
 
-  // fast variants for strings
-  public static boolean isEmpty(final String _v) {
-    if (_v == null) return true;
-    return _v.trim().length() == 0;
-  }
-  public static boolean isNotEmpty(final String _v) {
-    return !isEmpty(_v);
-  }
 }
