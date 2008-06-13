@@ -88,9 +88,6 @@ public class WOTextField extends WOInput {
   protected Object parseFormValue(final Object _value, final WOContext _ctx)
     throws ParseException
   {
-    if (this.formatter == null)
-      return _value;
-    
     String s;
     
     if (_value != null) {
@@ -101,10 +98,13 @@ public class WOTextField extends WOInput {
     else
       s = null;
     
+    if (this.formatter == null)
+      return _value;
+    
     return this.formatter.objectValueForString(s, _ctx);
   }
   
-  protected String formValueForObject(Object _value, WOContext _ctx) {
+  protected String formValueForObject(Object _value, final WOContext _ctx) {
     if (this.formatter == null)
       return _value != null ? _value.toString() : null;
       
