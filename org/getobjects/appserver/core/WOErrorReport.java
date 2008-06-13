@@ -23,6 +23,7 @@ package org.getobjects.appserver.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -133,6 +134,36 @@ public class WOErrorReport extends NSObject {
     item.value     = _value;
     item.exception = _error;
     this.addErrorItem(item);
+  }
+
+  public void addError(final String _name, final Object _value) {
+    this.addError(null, _name, _value, null);
+  }
+  
+  public void addError(final String _name, final Object _value, String _error) {
+    this.addError(null, _name, _value, new NSException(_error));
+  }
+  
+  /**
+   * Marks a field with the given name as invalid. This only generates a new,
+   * empty erroritem if no error is registered for the field yet.
+   * 
+   * @param _name - name of the field, eg 'startdate'
+   */
+  public void markField(final String _name) {
+    if (this.errorForName(_name) == null)
+      this.addError(null, _name, null, null);
+  }
+  /**
+   * Marks a field with the given name as invalid. This only generates a new
+   * erroritem if no error is registered for the field yet.
+   * 
+   * @param _name  - name of the field, eg 'startdate'
+   * @param _value - buggy value of the field, eg 'murks'
+   */
+  public void markField(final String _name, final Object _value) {
+    if (this.errorForName(_name) == null)
+      this.addError(null, _name, _value, null);
   }
   
   
