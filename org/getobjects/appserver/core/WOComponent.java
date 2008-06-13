@@ -485,6 +485,11 @@ public class WOComponent extends WOElement
     return binding.valueInComponent(this.parent());
   }
   
+  public void validationFailedWithException
+    (final Throwable _error, final Object _value, final String _keyPath)
+  {
+  }
+  
   /**
    * Checks whether a binding with the given _name was specified in the
    * component.

@@ -82,6 +82,7 @@ public class WOContext extends WOCoreContext
   protected StringBuilder elementID;
   protected String        reqElementID;
   protected String        fragmentID;
+  protected WOErrorReport errorReport;
 
   /* JoObject support */
   protected JoTraversalPath joTraversalPath;
@@ -284,8 +285,31 @@ public class WOContext extends WOCoreContext
   public boolean isRenderingDisabled() {
     return this.isRenderingDisabled;
   }
+  
+  
+  /* error handling */
+  
+  public WOErrorReport errorReport() {
+    return this.errorReport;
+  }
+  public boolean hasErrorReport() {
+    return this.errorReport() != null;
+  }
+  public void pushErrorReport(final WOErrorReport _report) {
+    if (this.errorReport != null)
+      _report.setParentReport(this.errorReport);
+    this.errorReport = _report;
+  }
+  public WOErrorReport popErrorReport() {
+    WOErrorReport old = this.errorReport;
+    if (old != null)
+      this.errorReport = old.parentReport();
+    else
+      log.warn("popErrorReport called, but no report is active: " + this);
+    return old;
+  }
 
-
+  
   /* sessions */
 
   public boolean hasSession() {

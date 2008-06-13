@@ -26,8 +26,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOAssociation;
+import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
+import org.getobjects.appserver.core.WOErrorReport;
 import org.getobjects.appserver.core.WORequest;
 
 /**
@@ -103,6 +105,8 @@ public abstract class WOInput extends WOHTMLDynamicElement {
    * @return a 'name' for the form element
    */
   protected String elementNameInContext(final WOContext _ctx) {
+    // TBD: use this.eid binding?
+    
     if (this.name == null) {
       if (log.isDebugEnabled()) log.debug("input has no name binding, use eid");
       return _ctx.elementID();
@@ -119,12 +123,94 @@ public abstract class WOInput extends WOHTMLDynamicElement {
   
   /* taking form values */
   
+  /**
+   * This method is called by takeValuesFromRequest() to convert the given
+   * value to the internal representation. Which is usually done by a
+   * WOFormatter subclass.
+   * <p>
+   * If the method throws an exception, handleParseException() will get called
+   * to deal with it. The default implementation either adds the error to an
+   * WOErrorReport, or throws the exception as a runtime exception.
+   */
   @SuppressWarnings("unused")
   protected Object parseFormValue(final Object _value, final WOContext _ctx)
     throws ParseException
   {
     /* redefined in subclasses */
     return _value;
+  }
+  
+  /**
+   * This method is called if a format could not parse the input value (usually
+   * a String). For example a user entered some string in a textfield which has
+   * a numberformat attached.
+   * 
+   * @param _formName  - name of the form field
+   * @param _formValue - value transmitted by the browser
+   * @param _e         - the exception which was catched (ParseException)
+   * @param _ctx       - the WOContext
+   * @return true if the caller should stop processing
+   */
+  protected boolean handleParseException
+    (final Object _formName, final Object _formValue,
+     final Exception _e,     final WOContext _ctx)
+  {
+    // TODO: add to some 'error report' object?
+    log.warn("failed to parse form value with Format: '" +
+        _formValue + "' (" + _formValue.getClass().getSimpleName() + ")", _e);
+    
+    WOErrorReport report = _ctx != null ? _ctx.errorReport() : null;
+    if (report != null) {
+      return true; /* did handle error */
+    }
+    
+    WOComponent page = _ctx.component();
+    if (page != null) {
+      page.validationFailedWithException(_e, _formValue,
+          this.writeValue.keyPath());
+      return true; /* did handle error */
+    }
+    
+    if (_e != null) {
+      if (_e instanceof RuntimeException)
+        throw (RuntimeException)(_e);
+      
+      throw new RuntimeException("WOFormValueException", _e);
+      /* did handle error (by throwing the exception ;-) */
+    }
+    
+    return false; /* did NOT handle error */
+  }
+  
+  protected boolean handleSetValueException
+    (final Object _cursor,   final WOAssociation _association,
+     final Object _formName, final Object _formValue,
+     final Exception _e,     final WOContext _ctx) throws RuntimeException
+  {
+    // TODO: add to some 'error report' object?
+    log.warn("failed to push form value to object: '" +
+      _formValue + "' (" + _formValue.getClass().getSimpleName() + ")", _e);
+    
+    WOErrorReport report = _ctx != null ? _ctx.errorReport() : null;
+    if (report != null) {
+      return true; /* did handle error */
+    }
+    
+    WOComponent page = _ctx.component();
+    if (page != null) {
+      page.validationFailedWithException(_e, _formValue,
+          this.writeValue.keyPath());
+      return true; /* did handle error */
+    }
+
+    if (_e != null) {
+      if (_e instanceof RuntimeException)
+        throw (RuntimeException)(_e);
+      
+      throw new RuntimeException("WOSetValueException", _e);
+    }
+    
+    return true; /* did handle error */
   }
   
   @Override
@@ -167,7 +253,7 @@ public abstract class WOInput extends WOHTMLDynamicElement {
     if (formValue == null) {
       /* This one is tricky
        * 
-       * This only pushes values if the request actually specified a value
+       * It only pushes values if the request actually specified a value
        * for this field. For example if you have a WOTextField with name
        * 'q', this will push a value to the field:
        *   /Page/default?q=abc
@@ -176,12 +262,11 @@ public abstract class WOInput extends WOHTMLDynamicElement {
        * To push an empty value, you need to use
        *   /Page/default?q=
        * 
-       * TODO: does just q work as well?
-       * 
-       * Note: checkboxes do NOT submit values when they are not checked,
-       *       so they need special handling! (otherwise you won't be able
-       *       to "uncheck" a checkbox. Usually you do this at the top of
-       *       your component.
+       * TODO: does just q work as well? (/abc?q)
+       */
+      /* Note: HTML checkboxes do NOT submit values when they are not checked,
+       *       so they need special handling. Otherwise you won't be able
+       *       to "uncheck" a checkbox. This is implemented in WOCheckBox.
        */
       if (log.isDebugEnabled())
         log.debug("got not form value for form: " + formName);
@@ -192,16 +277,21 @@ public abstract class WOInput extends WOHTMLDynamicElement {
       formValue = this.parseFormValue(formValue, _ctx);
     }
     catch (ParseException e) {
-      // TODO: add to some 'error report' object?
-      log.warn("failed to parse form value with Format: '" +
-          formValue + "' (" + formValue.getClass().getSimpleName() + ")", e);
+      if (this.handleParseException(formName, formValue, e, _ctx))
+        return;
     }
     
     if (log.isDebugEnabled()) {
       log.debug("push field " + formName + " value: " + formValue + 
                      " => " + this.writeValue);
     }
-    this.writeValue.setValue(formValue, cursor);
+    try {
+      this.writeValue.setValue(formValue, cursor);
+    }
+    catch (Exception e) {
+      this.handleSetValueException
+        (cursor, this.writeValue, formName, formValue, e, _ctx);
+    }
   }
   
   

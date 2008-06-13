@@ -29,9 +29,11 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOElementWalker;
+import org.getobjects.appserver.core.WOErrorReport;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.elements.links.WOLinkGenerator;
+import org.getobjects.foundation.UObject;
 
 /**
  * WOForm
@@ -50,10 +52,11 @@ import org.getobjects.appserver.elements.links.WOLinkGenerator;
  *   &lt;/a&gt;</pre>
  * 
  * Bindings:<pre>
- *   id                 [in] - string (elementID and HTML DOM id)
- *   target             [in] - string
- *   method             [in] - string (POST/GET)
- *   forceTakeValues    [in] - boolean (whether the form *must* run takevalues)
+ *   id                 [in]  - string (elementID and HTML DOM id)
+ *   target             [in]  - string
+ *   method             [in]  - string (POST/GET)
+ *   errorReport        [i/o] - WOErrorReport (autocreated when null)
+ *   forceTakeValues    [in]  - boolean (whether the form *must* run takevalues)
  * </pre>
  * Bindings (WOLinkGenerator):<pre>
  *   href               [in] - string
@@ -78,6 +81,7 @@ public class WOForm extends WOHTMLDynamicElement {
   protected WOAssociation   target;
   protected WOAssociation   method;
   protected WOAssociation   forceTakeValues;
+  protected WOAssociation   errorReport;
   protected WOElement       template;
   protected WOLinkGenerator link;
   protected WOElement       coreAttributes;
@@ -90,6 +94,7 @@ public class WOForm extends WOHTMLDynamicElement {
     this.eid             = grabAssociation(_assocs, "id");
     this.target          = grabAssociation(_assocs, "target");
     this.method          = grabAssociation(_assocs, "method");
+    this.errorReport     = grabAssociation(_assocs, "errorReport");
     this.forceTakeValues = grabAssociation(_assocs, "forceTakeValues");
     this.link     = WOLinkGenerator.linkGeneratorForAssociations(_assocs);
     this.template = _template;
@@ -107,8 +112,43 @@ public class WOForm extends WOHTMLDynamicElement {
   
   /* responder */
   
+  protected WOErrorReport prepareErrorReportObject(final WOContext _ctx) {
+    if (this.errorReport == null) /* no error report requested */
+      return null;
+    
+    Object vr = this.errorReport.valueInComponent(_ctx.cursor());
+    
+    if (vr instanceof WOErrorReport)
+      return (WOErrorReport)vr;
+    
+    if (vr == null)
+      ;
+    else if (vr instanceof Boolean) {
+      if (!((Boolean)vr).booleanValue()) /* requested NO error report */
+        return null;
+    }
+    else if (vr instanceof String) {
+      if (!UObject.boolValue(vr)) /* requested NO error report */
+        return null;
+    }
+    else {
+      log.error("unexpected value in 'errorReport' binding: " + vr);
+      return null;
+    }
+    
+    /* build new error report and push it */
+    
+    final WOErrorReport er = new WOErrorReport();
+    if (er != null) {
+      final Object cursor = _ctx.cursor();
+      if (this.errorReport.isValueSettableInComponent(cursor))
+        this.errorReport.setValue(er, cursor);
+    }
+    return er;
+  }
+  
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (_ctx.isInForm())
       log.error("detected a nested form");
     
@@ -121,6 +161,9 @@ public class WOForm extends WOHTMLDynamicElement {
       oldId = lid;
       lid = v.toString();
     }
+    
+    WOErrorReport er = this.prepareErrorReportObject(_ctx);
+    if (er != null && _ctx != null) _ctx.pushErrorReport(er);
 
     _ctx.setIsInForm(true);
     try {
@@ -165,6 +208,9 @@ public class WOForm extends WOHTMLDynamicElement {
         /* restore old ID */
         _ctx._setElementID(oldId);
       }
+      
+      if (er != null && _ctx != null)
+        _ctx.popErrorReport();
     }
   }
   
@@ -229,7 +275,7 @@ public class WOForm extends WOHTMLDynamicElement {
             return result;
           }
 
-          log.error("no action configured for link invocation");
+          log.error("no action configured for link invocation: " + this);
         }
       }
       
@@ -254,7 +300,7 @@ public class WOForm extends WOHTMLDynamicElement {
   /* generate response */
   
   public void appendCoreAttributesToResponse
-    (String _id, WOResponse _r, WOContext _ctx)
+    (final String _id, final WOResponse _r, final WOContext _ctx)
   {
     Object cursor = _ctx != null ? _ctx.cursor() : null;
     
@@ -290,11 +336,15 @@ public class WOForm extends WOHTMLDynamicElement {
     _r.appendBeginTagEnd();
   }
   
+  
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isInForm())
       log.error("detected a nested form");
     
+    WOErrorReport er = this.prepareErrorReportObject(_ctx);
+    if (er != null && _ctx != null) _ctx.pushErrorReport(er);
+
     _ctx.setIsInForm(true);
     try {
       if (_ctx.isRenderingDisabled()) {
@@ -302,7 +352,7 @@ public class WOForm extends WOHTMLDynamicElement {
           this.template.appendToResponse(_r, _ctx);
       }
       else {
-        Object cursor = _ctx.cursor();
+        final Object cursor = _ctx.cursor();
         String lid = null, oldid = null;
         
         if (this.eid != null)
@@ -331,6 +381,8 @@ public class WOForm extends WOHTMLDynamicElement {
       if (!_ctx.isInForm())
         log.error("inconsistent form setup detected!");
       _ctx.setIsInForm(false);
+      
+      if (er != null && _ctx != null) _ctx.popErrorReport();
     }
   }
   
@@ -338,7 +390,7 @@ public class WOForm extends WOHTMLDynamicElement {
   /* generic template walking */
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (_ctx.isInForm())
       log.error("detected a nested form");
 
@@ -355,4 +407,18 @@ public class WOForm extends WOHTMLDynamicElement {
       _ctx.setIsInForm(false);
     }
   }
+
+  
+  /* description */
+  
+  @Override
+  public void appendAttributesToDescription(final StringBuilder _d) {
+    super.appendAttributesToDescription(_d);
+
+    this.appendAssocToDescription(_d, "id",          this.eid);
+    this.appendAssocToDescription(_d, "method",      this.method);
+    this.appendAssocToDescription(_d, "target",      this.target);
+    this.appendAssocToDescription(_d, "errorReport", this.errorReport);
+    this.appendAssocToDescription(_d, "forceTakeValues", this.forceTakeValues);
+  }  
 }
