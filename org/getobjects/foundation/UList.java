@@ -64,6 +64,52 @@ public class UList extends NSObject {
     
     return false;
   }
+
+  /**
+   * Searches the given array for the given object backwards and returns the
+   * index of the last slot containing that object.
+   * 'null' values are allowed. 
+   * 
+   * @param _array  - an array of objects
+   * @param _object - the object to be searched for (or null)
+   * @return the last index of object in the array, or -1 if it wasn't found
+   */
+  public static int lastIndexOfObjectIdenticalTo
+    (final Object[] _array, final Object _object)
+  {
+    if (_array == null || _array.length == 0)
+      return -1;
+    
+    for (int i = _array.length - 1; i >= 0; i--) {
+      if (_array[i] == _object)
+        return i;
+    }
+    return -1;
+  }
+  
+  /**
+   * Searches the given array for the given object backwards and returns the
+   * index of the last slot containing that object.
+   * 'null' values are allowed. 
+   * 
+   * @param _array  - an array of objects
+   * @param _object - the object to be searched for (or null)
+   * @return the last index of object in the array, or -1 if it wasn't found
+   */
+  public static int lastIndexOfObjectEqualTo(Object[] _array, Object _object) {
+    if (_array == null || _array.length == 0)
+      return -1;
+    
+    for (int i = _array.length - 1; i >= 0; i--) {
+      if (_array[i] == _object) /* identical or null */
+        return i;
+      if (_object == null || _array[i] == null)
+        continue; /* one of the two is null */
+      if (_array[i].equals(_object))
+        return i;
+    }
+    return -1;
+  }
   
   /**
    * This methods takes a list and separates it into a set of batches.
