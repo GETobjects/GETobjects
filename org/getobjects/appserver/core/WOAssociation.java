@@ -30,6 +30,7 @@ import org.getobjects.appserver.associations.WOKeyAssociation;
 import org.getobjects.appserver.associations.WOKeyPathAssociation;
 import org.getobjects.appserver.associations.WOKeyPathPatternAssociation;
 import org.getobjects.appserver.associations.WOLabelAssociation;
+import org.getobjects.appserver.associations.WONegateAssociation;
 import org.getobjects.appserver.associations.WOOgnlAssociation;
 import org.getobjects.appserver.associations.WOQualifierAssociation;
 import org.getobjects.appserver.associations.WORegExAssociation;
@@ -69,7 +70,7 @@ public abstract class WOAssociation extends NSObject
    * @param _keyPath - the keypath (eg "person.address.city")
    * @return the WOAssociation, usually a WOKeyPathAssociation
    */
-  public static WOAssociation associationWithKeyPath(String _keyPath) {
+  public static WOAssociation associationWithKeyPath(final String _keyPath) {
     if (_keyPath != null && _keyPath.indexOf('.') < 0) {
       // TBD: we could even have a few hardcoded assoc keys, eg 'item' to save
       //      objects
@@ -90,7 +91,7 @@ public abstract class WOAssociation extends NSObject
    * @param _value - the value, eg a String or a Number or a Map 
    * @return the WOAssociation, usually a WOValueAssociation
    */
-  public static WOAssociation associationWithValue(Object _value) {
+  public static WOAssociation associationWithValue(final Object _value) {
     return new WOValueAssociation(_value);
   }
   
@@ -138,7 +139,7 @@ public abstract class WOAssociation extends NSObject
    * 
    * @return true if the value of the association does not change
    */
-  public boolean isValueConstantInComponent(Object _cursor) {
+  public boolean isValueConstantInComponent(final Object _cursor) {
     return this.isValueConstant();
   }
   
@@ -150,14 +151,14 @@ public abstract class WOAssociation extends NSObject
    * 
    * @return true if the value of the association can be set, false otherwise
    */
-  public boolean isValueSettableInComponent(Object _cursor) {
+  public boolean isValueSettableInComponent(final Object _cursor) {
     return this.isValueSettable();
   }
   
   
   /* values */
   
-  public void setValue(Object _value, Object _cursor) {
+  public void setValue(final Object _value, final Object _cursor) {
     /* Note: crappy name due to WO compatibility */
   }
   
@@ -168,24 +169,24 @@ public abstract class WOAssociation extends NSObject
   
   /* specific values */
   
-  public void setBooleanValue(boolean _value, Object _cursor) {
+  public void setBooleanValue(final boolean _value, final Object _cursor) {
     this.setValue(_value ? Boolean.TRUE : Boolean.FALSE, _cursor);
   }
-  public boolean booleanValueInComponent(Object _cursor) {
+  public boolean booleanValueInComponent(final Object _cursor) {
     return UObject.boolValue(this.valueInComponent(_cursor));
   }
   
-  public void setIntValue(int _value, Object _cursor) {
+  public void setIntValue(final int _value, final Object _cursor) {
     this.setValue(new Integer(_value), _cursor);
   }
-  public int intValueInComponent(Object _cursor) {
+  public int intValueInComponent(final Object _cursor) {
     return UObject.intValue(this.valueInComponent(_cursor));
   }
   
-  public void setStringValue(String _value, Object _cursor) {
+  public void setStringValue(final String _value, final Object _cursor) {
     this.setValue(_value, _cursor);
   }
-  public String stringValueInComponent(Object _cursor) {
+  public String stringValueInComponent(final Object _cursor) {
     Object v = this.valueInComponent(_cursor);
     
     if (v == null)
@@ -203,11 +204,11 @@ public abstract class WOAssociation extends NSObject
   protected static ConcurrentHashMap<String, Class> prefixToAssoc =
     new ConcurrentHashMap<String, Class>(16);
   
-  public static Class getAssociationClassForPrefix(String _prefix) {
+  public static Class getAssociationClassForPrefix(final String _prefix) {
     return _prefix != null ? prefixToAssoc.get(_prefix) : null;
   }
   public static void registerAssociationClassForPrefix
-    (String _prefix, Class _class)
+    (final String _prefix, final Class _class)
   {
     if (_prefix == null || _prefix.length() == 0) {
       log.error("got no prefix in assoc-class registration!");
@@ -238,6 +239,7 @@ public abstract class WOAssociation extends NSObject
    *   <li>rsrc   - WOResourceURLAssociation
    *   <li>var    - WOAssociation.associationWithKeyPath
    *   <li>varpat - WOKeyPathPatternAssociation
+   *   <li>not    - WONegateAssociation on WOKeyPathAssociation
    * </ul>
    * If no prefix matches, associationWithValue will be used.
    * 
@@ -246,10 +248,8 @@ public abstract class WOAssociation extends NSObject
    * @param _value  - the value which needs to be put into the context
    */
   public static WOAssociation associationForPrefix
-    (String _prefix, String _name, String _value)
+    (final String _prefix, final String _name, final String _value)
   {
-    // TBD: its suboptimal that we refer to the associations subpackage. We
-    // probably want to have a configurable HashMap
     WOAssociation assoc = null;
     
     char c = _prefix.charAt(0);
@@ -266,8 +266,14 @@ public abstract class WOAssociation extends NSObject
         break;
         
       case 'l':
-        if (_prefix.equals("label"))
+        if (_prefix.equals("label") || _prefix.equals("loc"))
           assoc = new WOLabelAssociation(_value);
+        break;
+        
+      case 'n':
+        if (_prefix.equals("not"))
+          // TBD: inspect value for common _static_ values, eg 'true'?
+          assoc = new WONegateAssociation(new WOKeyPathAssociation(_value));
         break;
         
       case 'o':

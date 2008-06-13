@@ -33,6 +33,9 @@ import org.getobjects.foundation.NSObject;
  * WOAssociation objects. That is, if a value for a key is requested
  * using KVC, the facade will actually ask the WOAssociation mapped to
  * this key to return the value.
+ * <p>
+ * Again: this object is NOT a WOAssociation itself :-) It wraps access
+ * to another object using WOAssociations.
  */
 public class WOAssociationFacade extends NSObject {
   
@@ -56,13 +59,13 @@ public class WOAssociationFacade extends NSObject {
     return this.object;
   }
   
-  public void addMapping(String _key, IWOAssociation _assoc) {
+  public void addMapping(final String _key, final IWOAssociation _assoc) {
     if (this.keyToAssociation == null)
       this.keyToAssociation = new HashMap<String, IWOAssociation>(16);
     this.keyToAssociation.put(_key, _assoc);
   }
   
-  public void removeMapping(String _key) {
+  public void removeMapping(final String _key) {
     if (this.keyToAssociation != null)
       this.keyToAssociation.remove(_key);
   }
@@ -71,7 +74,7 @@ public class WOAssociationFacade extends NSObject {
   /* KVC */
 
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     if (this.keyToAssociation != null) {
       IWOAssociation a = this.keyToAssociation.get(_key);
       if (a != null) {
@@ -85,7 +88,7 @@ public class WOAssociationFacade extends NSObject {
   }
 
   @Override
-  public Object valueForKey(String _key) {
+  public Object valueForKey(final String _key) {
     if (this.keyToAssociation != null) {
       IWOAssociation a = this.keyToAssociation.get(_key);
       if (a != null) return a.valueInComponent(this.object);
