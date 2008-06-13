@@ -20,6 +20,7 @@
 */
 package org.getobjects.appserver.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.getobjects.foundation.NSObject;
@@ -39,6 +40,7 @@ public class WOErrorReport extends NSObject {
   protected WOErrorReport       parentReport;
   protected List<WOErrorReport> subReports;
   protected List<WOErrorItem>   errors;
+  protected WOErrorReportTrampoline trampoline;
   
   public WOErrorReport() {
   }
@@ -60,6 +62,109 @@ public class WOErrorReport extends NSObject {
   }
   public boolean hasErrors() {
     return (this.errors == null || this.errors.size() == 0) ? true : false;
+  }
+  
+  public List<WOErrorItem> errorsForElementID(final String _eid) {
+    if (this.errors == null || _eid == null)
+      return null;
+    
+    List<WOErrorItem> errs = null;
+    for (WOErrorItem item: this.errors) {
+      if (item.elementID == null) continue;
+      if (_eid.equals(item.elementID)) {
+        if (errs == null)
+          errs = new ArrayList<WOErrorItem>(4);
+        errs.add(item);
+      }
+    }
+    return errs;
+  }
+  public List<WOErrorItem> errorsForName(final String _name) {
+    if (this.errors == null || _name == null)
+      return null;
+    
+    List<WOErrorItem> errs = null;
+    for (WOErrorItem item: this.errors) {
+      if (item.name == null) continue;
+      if (_name.equals(item.name)) {
+        if (errs == null)
+          errs = new ArrayList<WOErrorItem>(4);
+        errs.add(item);
+      }
+    }
+    return errs;
+  }
+  public WOErrorItem errorForElementID(final String _eid) {
+    if (this.errors == null || _eid == null)
+      return null;
+    
+    for (WOErrorItem item: this.errors) {
+      if (item.elementID != null && _eid.equals(item.elementID))
+        return item;
+    }
+    return null;
+  }
+  public WOErrorItem errorForName(final String _name) {
+    if (this.errors == null || _name == null)
+      return null;
+    
+    for (WOErrorItem item: this.errors) {
+      if (item.name != null && _name.equals(item.name))
+        return item;
+    }
+    return null;
+  }
+  
+  public void addErrorItem(final WOErrorItem _item) {
+    if (_item == null)
+      return;
+    
+    if (this.errors == null)
+      this.errors = new ArrayList<WOErrorItem>(16);
+    this.errors.add(_item);
+  }
+  
+  public void addError
+    (String _eid, String _name, Object _value, Exception _error)
+  {
+    WOErrorItem item = new WOErrorItem();
+    item.elementID = _eid;
+    item.name      = _name;
+    item.value     = _value;
+    item.exception = _error;
+    this.addErrorItem(item);
+  }
+  
+  
+  /**
+   * Used to navigate to errors using NSKeyValueCoding.
+   * Example:<pre>
+   *   &lt;div .haserrs="errors.on.amount"&gt;</pre>
+   * 
+   * @return a trampoline object which can resolve errors
+   */
+  public WOErrorReportTrampoline on() {
+    if (this.trampoline == null)
+      this.trampoline = new WOErrorReportTrampoline(this);
+    return this.trampoline;
+  }
+
+  
+  /* description */
+  
+  @Override
+  public void appendAttributesToDescription(final StringBuilder _d) {
+    if (this.errors == null)
+      _d.append(" no-errors");
+    else {
+      _d.append(" errors=[");
+      
+      for (WOErrorItem item: this.errors)
+        _d.append(item);
+      
+      _d.append("]");
+    }
+    super.appendAttributesToDescription(_d);
   }
   
   
@@ -88,5 +193,61 @@ public class WOErrorReport extends NSObject {
       return this.value;
     }
     
+    /* description */
+    
+    @Override
+    public void appendAttributesToDescription(final StringBuilder _d) {
+      if (this.elementID != null) {
+        _d.append(" eid=");
+        _d.append(this.elementID);
+      }
+      if (this.name != null) {
+        _d.append(" name=");
+        _d.append(this.name);
+      }
+      if (this.value != null) {
+        _d.append(" value=");
+        _d.append(this.value);
+      }
+      if (this.exception != null) {
+        _d.append(" error=");
+        _d.append(this.exception);
+      }
+    }
+  }
+  
+  /* helpers */
+  
+  public class WOErrorReportTrampoline extends NSObject {
+    
+    protected WOErrorReport report;
+    
+    public WOErrorReportTrampoline(final WOErrorReport _report) {
+      this.report = _report;
+    }
+    
+    @Override
+    public Object valueForKey(final String _key) {
+      Object item = this.report.errorForElementID(_key);
+      if (item == null) item = this.report.errorsForName(_key);
+      return item;
+    }
+    
+    @Override
+    public void takeValueForKey(Object _value, String _key) {
+      // do nothing
+    }
+    
+    /* description */
+    
+    @Override
+    public void appendAttributesToDescription(final StringBuilder _d) {
+      if (this.report != null) {
+        _d.append(" report=");
+        _d.append(this.report);
+      }
+      else
+        _d.append(" no-report");
+    }
   }
 }
