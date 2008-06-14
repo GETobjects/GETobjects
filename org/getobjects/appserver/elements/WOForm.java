@@ -55,7 +55,7 @@ import org.getobjects.foundation.UObject;
  *   id                 [in]  - string (elementID and HTML DOM id)
  *   target             [in]  - string
  *   method             [in]  - string (POST/GET)
- *   errorReport        [i/o] - WOErrorReport (autocreated when null)
+ *   errorReport        [i/o] - WOErrorReport (autocreated when null) / bool
  *   forceTakeValues    [in]  - boolean (whether the form *must* run takevalues)
  * </pre>
  * Bindings (WOLinkGenerator):<pre>
@@ -112,13 +112,19 @@ public class WOForm extends WOHTMLDynamicElement {
   
   /* responder */
   
+  /**
+   * Returns a new or existing WOErrorReport object for the given WOContext.
+   * <p>
+   * Note: This does NOT touch the WOContext's active errorReport. Its only
+   *       used to setup new reports using the 'errorReport' binding.
+   */
   protected WOErrorReport prepareErrorReportObject(final WOContext _ctx) {
     if (this.errorReport == null) /* no error report requested */
       return null;
     
     Object vr = this.errorReport.valueInComponent(_ctx.cursor());
     
-    if (vr instanceof WOErrorReport)
+    if (vr instanceof WOErrorReport) /* an errorReport is already assigned */
       return (WOErrorReport)vr;
     
     if (vr == null)
@@ -299,6 +305,17 @@ public class WOForm extends WOHTMLDynamicElement {
   
   /* generate response */
   
+  /**
+   * Adds the opening &lt;form&gt; tag to the response, including parameters
+   * like:
+   * <ul>
+   *   <li>id
+   *   <li>action
+   *   <li>method
+   *   <li>target
+   * </ul>
+   * and those supported by {@link WOHTMLElementAttributes}.
+   */
   public void appendCoreAttributesToResponse
     (final String _id, final WOResponse _r, final WOContext _ctx)
   {
@@ -342,6 +359,7 @@ public class WOForm extends WOHTMLDynamicElement {
     if (_ctx.isInForm())
       log.error("detected a nested form");
     
+    /* Note: prepare does NOT touch the WOContext, eg extract a pushed report */
     WOErrorReport er = this.prepareErrorReportObject(_ctx);
     if (er != null && _ctx != null) _ctx.pushErrorReport(er);
 
