@@ -22,7 +22,7 @@ package org.getobjects.ofs;
 
 import java.util.Map;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
@@ -38,17 +38,17 @@ public class OFSDatabaseObjectFolder extends OFSFolder
   implements IOFSContextObject
 {
 
-  protected IJoContext joctx;
+  protected IGoContext joctx;
 
   protected EOQualifier qualifier;
   protected Object      object;
   
   /* accessors */
   
-  public void _setContext(final IJoContext _ctx) {
+  public void _setContext(final IGoContext _ctx) {
     this.joctx = _ctx;
   }
-  public IJoContext context() {
+  public IGoContext context() {
     return this.joctx;
   }
 

@@ -55,12 +55,12 @@ public class WOPackageLinker {
   /* used to protect against recursive loads */
   protected Set<String> packagesInLoad;
 
-  protected JoProductManager        joProductManager;
+  protected GoProductManager        joProductManager;
   protected List<WOResourceManager> resourceManagers;
 
   protected boolean enableCaching;
 
-  public WOPackageLinker(boolean _enableCaching, JoProductManager _pd) {
+  public WOPackageLinker(boolean _enableCaching, GoProductManager _pd) {
     this.enableCaching    = _enableCaching;
     this.joProductManager = _pd;
     this.resourceManagers = new ArrayList<WOResourceManager>(8);
@@ -93,7 +93,7 @@ public class WOPackageLinker {
 
     /* finally register application package as a product */
 
-    JoProductManager pm = _app.joProductManager();
+    GoProductManager pm = _app.joProductManager();
     if (pm != null)
       pm.loadProduct("MAIN", _app.getClass().getPackage().getName());
 

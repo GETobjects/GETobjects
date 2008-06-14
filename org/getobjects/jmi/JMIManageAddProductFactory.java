@@ -20,8 +20,8 @@
 */
 package org.getobjects.jmi;
 
-import org.getobjects.appserver.publisher.IJoClassValueFactory;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoClassValueFactory;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -36,14 +36,14 @@ import org.getobjects.foundation.NSObject;
  * passing it the context and context object.
  */
 public class JMIManageAddProductFactory extends NSObject
-  implements IJoClassValueFactory
+  implements IGoClassValueFactory
 {
   
   public JMIManageAddProductFactory() {
   }
 
   public Object valueForObjectInContext
-    (Object _object, String _name, IJoContext _ctx)
+    (Object _object, String _name, IGoContext _ctx)
   {
     return new JMIManageAddProduct(_object, _ctx);
   }

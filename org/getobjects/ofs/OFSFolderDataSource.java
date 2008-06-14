@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOQualifier;
@@ -24,9 +24,9 @@ public class OFSFolderDataSource extends EODataSource {
   protected static final Log log = LogFactory.getLog("JoOFS");
   
   protected OFSFolder folder;
-  protected IJoContext context;
+  protected IGoContext context;
   
-  public OFSFolderDataSource(OFSFolder _folder, IJoContext _ctx) {
+  public OFSFolderDataSource(OFSFolder _folder, IGoContext _ctx) {
     this.folder  = _folder;
     this.context = _ctx;
   }

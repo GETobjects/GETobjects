@@ -23,8 +23,8 @@ package org.getobjects.weextensions;
 
 import java.net.URL;
 
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.JoResource;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.GoResource;
 
 /* WOFramework
  * 
@@ -35,10 +35,10 @@ public class WOFramework {
   
   /* lookup */
 
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     URL url = this.getClass().getResource("www/" + _name);
     if (url == null) return null;
     
-    return new JoResource(url);
+    return new GoResource(url);
   }
 }

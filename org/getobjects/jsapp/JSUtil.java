@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.UString;
@@ -269,7 +269,7 @@ public class JSUtil {
 
   public static void applyScriptOnComponent
     (final Script _script, JSKeyValueCodingScope _sharedScope,
-     final NSKeyValueCoding _component, final IJoContext _ctx)
+     final NSKeyValueCoding _component, final IGoContext _ctx)
   {
     // TBD: we might want to scan the script source for additional information
     //      like Jo protections and such (or should the script execute

@@ -27,8 +27,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObject;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -36,7 +36,7 @@ import org.getobjects.foundation.NSObject;
  * objects which are not in use by requests. It maintains a checkin/checkout
  * queue to ensure that access to the sessions is serialized.
  */
-public abstract class WOSessionStore extends NSObject implements IJoObject {
+public abstract class WOSessionStore extends NSObject implements IGoObject {
   protected static final Log log = LogFactory.getLog("WOSessionStore");
   
   private static WOSessionStore serverSessionStore = new WOServerSessionStore();
@@ -190,7 +190,7 @@ public abstract class WOSessionStore extends NSObject implements IJoObject {
    * <p>
    * Note: do not use this, most likely the API will change.
    */
-  public Object lookupName(String _name, IJoContext _ctx, boolean _aquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {
     // TBD: this is probably useless. We really do not want an auto-checkout,
     //      do we? We might want to return a wrapper which can then perform
     //      a checkout or not.

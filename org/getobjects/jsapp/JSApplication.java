@@ -28,8 +28,8 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.core.WOSession;
-import org.getobjects.appserver.publisher.IJoAuthenticator;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoAuthenticator;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.jsapp.adapter.JSWrapFactory;
 import org.getobjects.ofs.OFSApplication;
@@ -234,7 +234,7 @@ public class JSApplication extends OFSApplication {
   /* replace Go lookup */
 
   @Override
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     Object v = JSUtil.callJSFuncWhenAvailable
       (this.jsScope(), this.extraAttributes, true /* check prototype */,
        this.jsContext(), "lookupName", new Object[] { _name, _ctx, _acquire });
@@ -244,7 +244,7 @@ public class JSApplication extends OFSApplication {
       : super_lookupName(_name, _ctx, _acquire);
   }
   public Object super_lookupName
-    (String _name, IJoContext _ctx, boolean _acquire)
+    (String _name, IGoContext _ctx, boolean _acquire)
   {
     return super.lookupName(_name, _ctx, _acquire);
   }
@@ -266,17 +266,17 @@ public class JSApplication extends OFSApplication {
   /* Subclassing API */
   
   @Override
-  public IJoAuthenticator authenticatorInContext(IJoContext _ctx) {
+  public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
     Object v = JSUtil.callJSFuncWhenAvailable
     (this.jsScope(), this.extraAttributes, true /* check prototype */,
      this.jsContext(),
      "authenticatorInContext", new Object[] { _ctx, _ctx });
 
   return (v != Scriptable.NOT_FOUND)
-    ? (IJoAuthenticator)v
+    ? (IGoAuthenticator)v
     : super_authenticatorInContext(_ctx);
   }
-  public IJoAuthenticator super_authenticatorInContext(IJoContext _ctx) {
+  public IGoAuthenticator super_authenticatorInContext(IGoContext _ctx) {
     return super.authenticatorInContext(_ctx);
   }
 

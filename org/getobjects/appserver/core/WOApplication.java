@@ -39,19 +39,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.elements.WOHTMLDynamicElement;
-import org.getobjects.appserver.products.JoProductManager;
+import org.getobjects.appserver.products.GoProductManager;
 import org.getobjects.appserver.products.WOPackageLinker;
-import org.getobjects.appserver.publisher.IJoAuthenticator;
-import org.getobjects.appserver.publisher.IJoCallable;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObject;
-import org.getobjects.appserver.publisher.IJoObjectRenderer;
-import org.getobjects.appserver.publisher.IJoObjectRendererFactory;
-import org.getobjects.appserver.publisher.JoClass;
-import org.getobjects.appserver.publisher.JoClassRegistry;
-import org.getobjects.appserver.publisher.JoDefaultRenderer;
-import org.getobjects.appserver.publisher.JoObjectRequestHandler;
-import org.getobjects.appserver.publisher.JoSecurityException;
+import org.getobjects.appserver.publisher.IGoAuthenticator;
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObject;
+import org.getobjects.appserver.publisher.IGoObjectRenderer;
+import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoClassRegistry;
+import org.getobjects.appserver.publisher.GoDefaultRenderer;
+import org.getobjects.appserver.publisher.GoObjectRequestHandler;
+import org.getobjects.appserver.publisher.GoSecurityException;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
@@ -67,7 +67,7 @@ import org.getobjects.foundation.UObject;
  * managers, handling of initial requests, etc etc)
  */
 public class WOApplication extends NSObject
-  implements IJoObject, IJoObjectRendererFactory, INSExtraVariables
+  implements IGoObject, IGoObjectRendererFactory, INSExtraVariables
 {
   // TODO: document me
   // TODO: document how it works in a Servlet environment
@@ -85,8 +85,8 @@ public class WOApplication extends NSObject
   protected Properties        properties;
   protected WOSessionStore    sessionStore;
   protected WOStatisticsStore statisticsStore;
-  protected JoClassRegistry   joClassRegistry;
-  protected JoProductManager  joProductManager;
+  protected GoClassRegistry   joClassRegistry;
+  protected GoProductManager  joProductManager;
   protected Class             contextClass;
   protected Class             sessionClass;
   protected Class             querySessionClass;
@@ -113,8 +113,8 @@ public class WOApplication extends NSObject
     this.pageCacheSize = 5;
     this.permanentPageCacheSize = 5;
 
-    this.joClassRegistry   = new JoClassRegistry(this);
-    this.joProductManager  = new JoProductManager(this);
+    this.joClassRegistry   = new GoClassRegistry(this);
+    this.joProductManager  = new GoProductManager(this);
 
     this.resourceManager = WOPackageLinker.linkApplication(this);
 
@@ -222,7 +222,7 @@ public class WOApplication extends NSObject
    * @param _ctx    - the context of the whole operation
    * @return a default method object, or null if there is none
    */
-  public IJoCallable lookupDefaultMethod(Object _object, WOContext _ctx) {
+  public IGoCallable lookupDefaultMethod(Object _object, WOContext _ctx) {
     return null;
   }
 
@@ -235,7 +235,7 @@ public class WOApplication extends NSObject
    * @return the resulting WOResponse
    */
   public WOResponse handleRequest(final WORequest _rq) {
-    return new JoObjectRequestHandler(this).handleRequest(_rq);
+    return new GoObjectRequestHandler(this).handleRequest(_rq);
   }
 
   /**
@@ -284,7 +284,7 @@ public class WOApplication extends NSObject
        * Otherwise the handleRequest() method of the respective request
        * handler is called!
        */
-      rh = new JoObjectRequestHandler(this);
+      rh = new GoObjectRequestHandler(this);
     }
     
     if (rh == null) {
@@ -349,10 +349,10 @@ public class WOApplication extends NSObject
     /* special support for authentication infrastructure */
     // TBD: this is somewhat mixed up, works in association with handleException
 
-    if (_o instanceof JoSecurityException) {
-      IJoAuthenticator authenticator =((JoSecurityException)_o).authenticator();
-      if (authenticator instanceof IJoObjectRendererFactory) {
-        Object renderer = ((IJoObjectRendererFactory)authenticator)
+    if (_o instanceof GoSecurityException) {
+      IGoAuthenticator authenticator =((GoSecurityException)_o).authenticator();
+      if (authenticator instanceof IGoObjectRendererFactory) {
+        Object renderer = ((IGoObjectRendererFactory)authenticator)
           .rendererForObjectInContext(_o, _ctx);
         if (renderer != null)
           return renderer;
@@ -363,7 +363,7 @@ public class WOApplication extends NSObject
 
     if (_ctx != null) {
       Object renderer =
-        IJoObjectRendererFactory.Utility.rendererForObjectInContext(_o, _ctx);
+        IGoObjectRendererFactory.Utility.rendererForObjectInContext(_o, _ctx);
       if (renderer != null)
         return renderer;
     }
@@ -379,8 +379,8 @@ public class WOApplication extends NSObject
 
     /* use default renderer (if he accepts ;-) */
 
-    if (JoDefaultRenderer.sharedRenderer.canRenderObjectInContext(_o, _ctx))
-      return JoDefaultRenderer.sharedRenderer;
+    if (GoDefaultRenderer.sharedRenderer.canRenderObjectInContext(_o, _ctx))
+      return GoDefaultRenderer.sharedRenderer;
 
     return null;
   }
@@ -426,8 +426,8 @@ public class WOApplication extends NSObject
     /* render */
 
     Object renderError;
-    if (renderer instanceof IJoObjectRenderer) {
-      IJoObjectRenderer typedRenderer = ((IJoObjectRenderer)renderer);
+    if (renderer instanceof IGoObjectRenderer) {
+      IGoObjectRenderer typedRenderer = ((IGoObjectRenderer)renderer);
 
       renderError = typedRenderer.renderObjectInContext(_result, _ctx);
     }
@@ -1016,9 +1016,9 @@ public class WOApplication extends NSObject
 
   public WOActionResults handleException(Throwable _e, WOContext _ctx) {
     /* support for security infrastructure */
-    if (_e instanceof JoSecurityException) {
-      IJoAuthenticator authenticator =((JoSecurityException)_e).authenticator();
-      if (authenticator instanceof IJoObjectRendererFactory)
+    if (_e instanceof GoSecurityException) {
+      IGoAuthenticator authenticator =((GoSecurityException)_e).authenticator();
+      if (authenticator instanceof IGoObjectRendererFactory)
         return this.renderObjectInContext(_e, _ctx);
 
       if (log.isDebugEnabled()) {
@@ -1314,14 +1314,14 @@ public class WOApplication extends NSObject
   
   /* JoClass */
 
-  public JoClass joClassInContext(IJoContext _ctx) {
-    return _ctx.joClassRegistry().joClassForJavaObject(this, _ctx);
+  public GoClass joClassInContext(IGoContext _ctx) {
+    return _ctx.joClassRegistry().goClassForJavaObject(this, _ctx);
   }
 
   
   /* JoObject */
 
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     if (_name == null)
       return null;
 
@@ -1338,7 +1338,7 @@ public class WOApplication extends NSObject
 
     /* check class */
 
-    JoClass joClass = this.joClassInContext(_ctx);
+    GoClass joClass = this.joClassInContext(_ctx);
     if (joClass != null) {
       Object o = joClass.lookupName(this, _name, _ctx);
       if (o != null) return o;
@@ -1348,10 +1348,10 @@ public class WOApplication extends NSObject
     return this.requestHandlerRegistry.get(_name);
   }
 
-  public JoClassRegistry joClassRegistry() {
+  public GoClassRegistry joClassRegistry() {
     return this.joClassRegistry;
   }
-  public JoProductManager joProductManager() {
+  public GoProductManager joProductManager() {
     return this.joProductManager;
   }
   

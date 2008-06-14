@@ -27,7 +27,7 @@ import java.text.ParsePosition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
-import org.getobjects.appserver.publisher.IJoLocation;
+import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.ofs.OFSBaseObject;
 
@@ -53,11 +53,11 @@ public class JMITreeLabelFormat extends Format {
     
     if (_object instanceof OFSBaseObject) {
       OFSBaseObject doc = (OFSBaseObject)_object;
-      Object container = IJoLocation.Utility.containerForObject(doc);
+      Object container = IGoLocation.Utility.containerForObject(doc);
       
       String title = null;
       title = (container != null)
-        ? IJoLocation.Utility.nameOfObjectInContainer(doc, container)
+        ? IGoLocation.Utility.nameOfObjectInContainer(doc, container)
         : "Manage!";
       
       if (title != null) _sb.append(title);

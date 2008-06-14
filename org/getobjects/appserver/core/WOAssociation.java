@@ -35,7 +35,7 @@ import org.getobjects.appserver.associations.WOOgnlAssociation;
 import org.getobjects.appserver.associations.WOQualifierAssociation;
 import org.getobjects.appserver.associations.WORegExAssociation;
 import org.getobjects.appserver.associations.WOValueAssociation;
-import org.getobjects.appserver.publisher.JoPathAssociation;
+import org.getobjects.appserver.publisher.GoPathAssociation;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSPropertyListParser;
@@ -262,7 +262,7 @@ public abstract class WOAssociation extends NSObject
         
       case 'j':
         if (_prefix.equals("jo"))
-          assoc = new JoPathAssociation(_value);
+          assoc = new GoPathAssociation(_value);
         break;
         
       case 'l':

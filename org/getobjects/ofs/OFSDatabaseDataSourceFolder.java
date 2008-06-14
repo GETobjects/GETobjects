@@ -22,7 +22,7 @@ package org.getobjects.ofs;
 
 import java.util.Map;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
@@ -41,7 +41,7 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
   implements IOFSContextObject
 {
 
-  protected IJoContext joctx;
+  protected IGoContext joctx;
   
   /* result */
   protected EODataSource ds;
@@ -52,10 +52,10 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
   public EOQualifier      qualifier;
   public EOSortOrdering[] sortOrderings;
 
-  public void _setContext(final IJoContext _ctx) {
+  public void _setContext(final IGoContext _ctx) {
     this.joctx = _ctx;
   }
-  public IJoContext context() {
+  public IGoContext context() {
     return this.joctx;
   }
   

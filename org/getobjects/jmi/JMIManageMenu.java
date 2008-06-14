@@ -28,7 +28,7 @@ import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSJavaRuntime;
-import org.getobjects.ofs.IJoFolderish;
+import org.getobjects.ofs.IGoFolderish;
 
 public class JMIManageMenu extends JMIComponent {
   
@@ -52,7 +52,7 @@ public class JMIManageMenu extends JMIComponent {
   }
   
   public Iterator itemIterator() {
-    if (!(this.item instanceof IJoFolderish))
+    if (!(this.item instanceof IGoFolderish))
       return null;
     
     /* folderish objects will have a proper folderDataSource which we are going
@@ -63,7 +63,7 @@ public class JMIManageMenu extends JMIComponent {
      */
     
     EODataSource ds =
-      ((IJoFolderish)this.item).folderDataSource(this.context());
+      ((IGoFolderish)this.item).folderDataSource(this.context());
     if (ds == null) return null;
     
     /* retrieve items */

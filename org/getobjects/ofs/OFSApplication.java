@@ -30,17 +30,17 @@ import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequestHandler;
 import org.getobjects.appserver.core.WOResourceManager;
-import org.getobjects.appserver.publisher.IJoAuthenticator;
-import org.getobjects.appserver.publisher.IJoAuthenticatorContainer;
-import org.getobjects.appserver.publisher.IJoCallable;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoLocation;
-import org.getobjects.appserver.publisher.IJoObject;
-import org.getobjects.appserver.publisher.IJoObjectRenderer;
-import org.getobjects.appserver.publisher.IJoSecuredObject;
-import org.getobjects.appserver.publisher.JoCallDirectActionRequestHandler;
-import org.getobjects.appserver.publisher.JoContainerResourceManager;
-import org.getobjects.appserver.publisher.JoHTTPAuthenticator;
+import org.getobjects.appserver.publisher.IGoAuthenticator;
+import org.getobjects.appserver.publisher.IGoAuthenticatorContainer;
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoLocation;
+import org.getobjects.appserver.publisher.IGoObject;
+import org.getobjects.appserver.publisher.IGoObjectRenderer;
+import org.getobjects.appserver.publisher.IGoSecuredObject;
+import org.getobjects.appserver.publisher.GoCallDirectActionRequestHandler;
+import org.getobjects.appserver.publisher.GoContainerResourceManager;
+import org.getobjects.appserver.publisher.GoHTTPAuthenticator;
 import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
 import org.getobjects.ofs.fs.IOFSFileInfo;
@@ -55,7 +55,7 @@ import org.getobjects.ofs.fs.OFSHostFileManager;
  * the rootObjectInContext() method to return the root of the OFS hierarchy.
  */
 public class OFSApplication extends WOApplication
-  implements IJoAuthenticatorContainer
+  implements IGoAuthenticatorContainer
 {
   protected static final Log ofslog = LogFactory.getLog("JoOFS");
   
@@ -85,7 +85,7 @@ public class OFSApplication extends WOApplication
     super.registerInitialRequestHandlers();
     
     /* redefine direct action handler */
-    WORequestHandler rh = new JoCallDirectActionRequestHandler(this);
+    WORequestHandler rh = new GoCallDirectActionRequestHandler(this);
     this.registerRequestHandler(rh, this.directActionRequestHandlerKey());
     this.registerRequestHandler(rh, "x");
     this.setDefaultRequestHandler(rh);
@@ -127,7 +127,7 @@ public class OFSApplication extends WOApplication
     if (rm == null && _ctx != null) {
       /* check whether the traversal path contains a manager */
       // TBD: should we cache that?
-      rm = JoContainerResourceManager.lookupResourceManager
+      rm = GoContainerResourceManager.lookupResourceManager
         (_ctx.joTraversalPath().resultObject(), _ctx);
       if (isPageDebugOn) pageLog.debug("  container-rm: " + rm);
     }
@@ -255,7 +255,7 @@ public class OFSApplication extends WOApplication
     
     /* Note: intentionally no secured check. 
      */
-    Object web = IJoObject.Utility.lookupName(_ofsRoot, "web", _ctx, false);
+    Object web = IGoObject.Utility.lookupName(_ofsRoot, "web", _ctx, false);
     if (web != null) {
       if (web instanceof Exception) {
         log.error("got an exception while trying to access '/web': " + _ofsRoot,
@@ -308,22 +308,22 @@ public class OFSApplication extends WOApplication
   
   /* authentication */
   
-  public IJoAuthenticator authenticatorInContext(IJoContext _ctx) {
+  public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
     /* sets up the JoHTTPAuthenticator with the default JAAS config */
-    return new JoHTTPAuthenticator();
+    return new GoHTTPAuthenticator();
   }
   
   
   /* default methods */
   
   @Override
-  public IJoCallable lookupDefaultMethod(Object _object, WOContext _ctx) {
+  public IGoCallable lookupDefaultMethod(Object _object, WOContext _ctx) {
     if (_object instanceof OFSFolder) {
-      Object folderIndex = IJoSecuredObject.Utility.lookupName
+      Object folderIndex = IGoSecuredObject.Utility.lookupName
         (_object, "index", _ctx, false /* do not acquire */);
       
-      if (folderIndex instanceof IJoCallable) {
-        IJoCallable indexMethod = (IJoCallable)folderIndex;
+      if (folderIndex instanceof IGoCallable) {
+        IGoCallable indexMethod = (IGoCallable)folderIndex;
         if (indexMethod.isCallableInContext(_ctx)) {
           // TBD: probably better to return a redirect
           return indexMethod;
@@ -381,10 +381,10 @@ public class OFSApplication extends WOApplication
     if (lookupBase instanceof WORequestHandler) // temporary hack, use root
       lookupBase = this.rootObjectInContext(_ctx, null /* path */);
     
-    Object frame = IJoLocation.Utility.lookupName(lookupBase, "Frame", _ctx);
+    Object frame = IGoLocation.Utility.lookupName(lookupBase, "Frame", _ctx);
     
-    if (frame instanceof IJoObjectRenderer) {
-      IJoObjectRenderer renderer = (IJoObjectRenderer)frame;
+    if (frame instanceof IGoObjectRenderer) {
+      IGoObjectRenderer renderer = (IGoObjectRenderer)frame;
       if (renderer.canRenderObjectInContext(_p, _ctx))
         return renderer;
     }

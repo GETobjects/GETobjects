@@ -23,10 +23,10 @@ package org.getobjects.ofs.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoUser;
-import org.getobjects.appserver.publisher.JoClassRegistry;
-import org.getobjects.appserver.publisher.JoTraversalPath;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoUser;
+import org.getobjects.appserver.publisher.GoClassRegistry;
+import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
@@ -39,17 +39,17 @@ import org.getobjects.foundation.NSObject;
  * (the former might be 'tweaked' by the configuration ...).
  */
 public class JoConfigContext extends NSObject
-  implements IJoContext, INSExtraVariables
+  implements IGoContext, INSExtraVariables
 {
   /* extra attributes (used when KVC does not resolve to a key) */
   protected Map<String,Object> extraAttributes;
   
-  protected IJoContext context;
+  protected IGoContext context;
   
-  public JoConfigContext(final IJoContext _parentContext) {
+  public JoConfigContext(final IGoContext _parentContext) {
     this.context = _parentContext;
   }
-  public JoConfigContext(final IJoContext _parentContext, Object... _args) {
+  public JoConfigContext(final IGoContext _parentContext, Object... _args) {
     this(_parentContext);
     if (_args != null) {
       for (int i = 0; i + 1 < _args.length; i += 2)
@@ -59,11 +59,11 @@ public class JoConfigContext extends NSObject
   
   /* accessors */
   
-  public IJoContext parentContext() {
+  public IGoContext parentContext() {
     return this.context;
   }
 
-  public IJoUser activeUser() {
+  public IGoUser activeUser() {
     return this.context != null ? this.context.activeUser() : null;
   }
 
@@ -71,11 +71,11 @@ public class JoConfigContext extends NSObject
     return this.context != null ? this.context.clientObject() : null;
   }
 
-  public JoClassRegistry joClassRegistry() {
+  public GoClassRegistry joClassRegistry() {
     return this.context != null ? this.context.joClassRegistry() : null;
   }
 
-  public JoTraversalPath joTraversalPath() {
+  public GoTraversalPath joTraversalPath() {
     return this.context != null ? this.context.joTraversalPath() : null;
   }
 

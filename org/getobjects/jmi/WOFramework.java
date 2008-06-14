@@ -20,7 +20,7 @@
 */
 package org.getobjects.jmi;
 
-import org.getobjects.appserver.products.JoProduct;
+import org.getobjects.appserver.products.GoProduct;
 
-public class WOFramework extends JoProduct {
+public class WOFramework extends GoProduct {
 }
