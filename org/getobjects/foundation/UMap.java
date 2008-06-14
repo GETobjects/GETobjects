@@ -91,13 +91,14 @@ public class UMap extends NSObject {
    * Adds:<pre>
    *   { firstname = "Donald"; lastname = "Duck"; }</pre>
    * 
+   * @param _map    - the Map
    * @param _values - array of values
    * @param _keys   - ordered keys, matching value indices
    * @return a Map
    */
   @SuppressWarnings("unchecked")
   public static final void fillWithArray
-    (Map map, Object[] _values, Object... _keys)
+    (final Map _map, final Object[] _values, final Object... _keys)
   {
     if (_values == null)
       return;
@@ -106,7 +107,7 @@ public class UMap extends NSObject {
     if (_values.length < count) count = _values.length;
     
     for (int i = 0; i < count; i++)
-      map.put(_keys[i], _values[i]);
+      _map.put(_keys[i], _values[i]);
   }
 
   /**

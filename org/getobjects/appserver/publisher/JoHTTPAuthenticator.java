@@ -145,25 +145,25 @@ public class JoHTTPAuthenticator extends NSObject
    * @param _creds - the credentials extracted from the HTTP request
    * @return an IJoUser object, or null if authentication failed
    */
-  public IJoUser userInContext(final IJoContext _context, final String[] creds){
+  public IJoUser userInContext(final IJoContext _ctx, final String[] _creds) {
     String lRealm = null;
-    if (creds.length > 2)
-      lRealm = creds[2];
+    if (_creds.length > 2)
+      lRealm = _creds[2];
     if (lRealm == null) {
       lRealm = this.realmForSecurityExceptionInContext(
-          null, _context instanceof WOContext ? (WOContext)_context : null);
+          null, _ctx instanceof WOContext ? (WOContext)_ctx : null);
     }
     if (lRealm == null)
       lRealm = defaultRealm;
     
-    String cacheKey = creds[0] + "\n" + creds[1] + "\n" + lRealm;
+    String cacheKey = _creds[0] + "\n" + _creds[1] + "\n" + lRealm;
 
     LoginContext lc = null;
     if ((lc = this.basicAuthContextCache.get(cacheKey)) == null) {
       /* setup context */
       
       if (this.login != null)
-        lc = this.login.loginInJaas(creds[0], creds[1], lRealm);
+        lc = this.login.loginInJaas(_creds[0], _creds[1], lRealm);
     }
     
     /* check whether login failed and return anonymous */
@@ -175,14 +175,14 @@ public class JoHTTPAuthenticator extends NSObject
        *       which has the anonymous but not the authenticated role.
        */
       if (log.isInfoEnabled())
-        log.info("did not authenticate user: " + creds[0]);
-      return this.anonymousUserInContext(_context);
+        log.info("did not authenticate user: " + _creds[0]);
+      return this.anonymousUserInContext(_ctx);
     }
 
     /* cache valid context */
     this.basicAuthContextCache.put(cacheKey, lc);
     
-    return this.userObjectForValidatedCredentials(creds[0], creds, lc,_context);
+    return this.userObjectForValidatedCredentials(_creds[0], _creds, lc,_ctx);
   }
   
   /**
@@ -206,9 +206,10 @@ public class JoHTTPAuthenticator extends NSObject
    * Override this in subclasses if you want to produce an own user object.
    * 
    * <p>
-   * @param _login
-   * @param _credentials
-   * @param _context
+   * @param _login       - the login name, eg 'donald'
+   * @param _credentials - the credentials array
+   * @param _lc          - the JAAS LoginContext object
+   * @param _context     - the Go context
    * @return an IJoUser object representing the login in the given context
    */
   public IJoUser userObjectForValidatedCredentials
@@ -385,11 +386,12 @@ public class JoHTTPAuthenticator extends NSObject
    * other authenticators (which do not inherit from JoHTTPAuthenticator).
    * 
    * @param _object - the JoAuthRequiredException object
+   * @param _realm  - the HTTP realm of the authentication request
    * @param _ctx    - the context in which the current request takes place
    * @return null if the rendering went fine, an exception otherwise
    */
   public static Exception render401InContext
-    (Object _object, String realm, WOContext _ctx)
+    (Object _object, String _realm, WOContext _ctx)
   {
     if (!(_object instanceof JoAuthRequiredException)) {
       log.error("got passed unsupported object for rendering: " + _object);
@@ -400,7 +402,7 @@ public class JoHTTPAuthenticator extends NSObject
     
     StringBuilder authenticate = new StringBuilder(128);
     authenticate.append("basic realm=\"");
-    authenticate.append(realm);
+    authenticate.append(_realm);
     authenticate.append("\"");
     
     WOResponse r = _ctx.response();

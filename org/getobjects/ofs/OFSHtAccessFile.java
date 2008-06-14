@@ -125,7 +125,6 @@ public class OFSHtAccessFile extends OFSJavaObject
    * 
    * @param _cursor    - the object the configuration was looked up in
    * @param _lookupCtx - the context the lookup is relative to
-   * @param _ctx       - the IJoContext all this is happening in
    * @return a configuration, or null if no values were added
    */
   public Map<String, ?> buildConfiguration

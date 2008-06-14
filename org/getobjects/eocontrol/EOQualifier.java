@@ -190,13 +190,12 @@ public class EOQualifier extends EOExpression {
    * Example:<pre>
    *   q = q.qualifierWithBindings("now", new Date());</pre>
    * 
-   * @param _vals        - the object containing the bindings
-   * @param _requiresAll - whether all bindings are required
+   * @param _keysAndValues - the bindings as key/value pairs
    * @return an EOQualifier with the bindings resolved
    */
   public EOQualifier qualifierWithBindings(Object... _keysAndValues) {
     return this.qualifierWithBindings(
-        new NSKeyValueHolder(_keysAndValues), true);
+        new NSKeyValueHolder(_keysAndValues), true /* requires all */);
   }
 
   public EOExpression expressionWithBindings

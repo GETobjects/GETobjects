@@ -844,7 +844,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * </pre>  
    * 
    * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
-   * @param arguments and bindings in a varargs array
+   * @param _args   - args and bindings in a varargs array
    * @return null on error, or a List containing the raw fetch results
    */
   @SuppressWarnings("unchecked")

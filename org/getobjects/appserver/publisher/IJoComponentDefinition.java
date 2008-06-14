@@ -42,7 +42,9 @@ public interface IJoComponentDefinition {
    * Returns a WOComponentDefinition which can be used to instantiate the
    * WOComponent represented by the JoObject.
    * 
-   * @param _ctx - the associated WOContext
+   * @param _name  - name of the component
+   * @param _langs - array of language codes
+   * @param _ctx   - the associated WOContext
    * @return a WOComponentDefinition
    */
   public IWOComponentDefinition definitionForComponent

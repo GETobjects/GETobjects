@@ -33,7 +33,7 @@ import org.getobjects.appserver.elements.WOString;
  * WETableData
  * <p> 
  * Sample:<pre>
- *   &lt;#WETableDate title="Mobile" var:value="item.mobile" /&gt;</pre>
+ *   &lt;wo:WETableDate title="Mobile" var:value="item.mobile" /&gt;</pre>
  * 
  * Renders in header-mode (if title is set):<pre>
  *   &lt;th class="th0 th"&gt;[title]&lt;/th&gt;</pre>

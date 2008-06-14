@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -42,7 +42,7 @@ import org.getobjects.ognl.WOFramework;
  * evaluate arbitrary Java expressions.
  * <p>
  * Example:
- * <pre><#WOConditional ognl:condition="name.startsWith('/en')"></pre>
+ * <pre>&lt;wo:if ognl:condition="name.startsWith('/en')"&gt;</pre>
  * This will call the startsWith() method on the 'name' of the current
  * component.
  * <p>
@@ -52,7 +52,7 @@ import org.getobjects.ognl.WOFramework;
  * <p>
  * This association is parsed using either the 'ognl:' namespace prefix or
  * using the '~' in .wod files, eg:
- * <pre>IsEnglish: WOConditional { condition = ~name.startsWith('/en') }
+ * <pre>IsEnglish: WOConditional { condition = ~name.startsWith('/en') }</pre>
  * <p>
  * The OGNL expressions are parsed and then cached when the association is
  * instantiated. 

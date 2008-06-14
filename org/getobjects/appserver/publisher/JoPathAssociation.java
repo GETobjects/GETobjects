@@ -32,7 +32,7 @@ import org.getobjects.foundation.NSKeyValueCoding;
  * Evaluates a path against the clientObject of the WOComponent's WOContext.
  * <p>
  * Example:<pre>
- *   &lt;#for jo:list="-manage_options"&gt;</pre>
+ *   &lt;wo:for jo:list="-manage_options"&gt;</pre>
  */
 public class JoPathAssociation extends WOAssociation {
 

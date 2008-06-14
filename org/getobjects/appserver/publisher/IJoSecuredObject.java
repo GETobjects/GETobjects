@@ -80,8 +80,10 @@ public interface IJoSecuredObject {
      * <p>
      * If the lookup fails, the method sets the lastException of the path.
      * 
-     * @param _object - base object to lookup name in
-     * @param _name   - the name to lookup in the object
+     * @param _object  - base object to lookup name in
+     * @param _name    - the name to lookup in the object
+     * @param _ctx     - the context in which the lookup runs
+     * @param _acquire - whether the object should attempt to acquire names
      * @return the object or null if it was not found
      */
     public static Object lookupName

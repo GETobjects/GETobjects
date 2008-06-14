@@ -69,7 +69,7 @@ public class EOGroupedList<E> extends ArrayList<E> {
   protected EOExpressionEvaluation[]  subexpressions;
   protected boolean needsReGroup;
   
-  public EOGroupedList(EOExpressionEvaluation[] _exprs) {
+  public EOGroupedList(final EOExpressionEvaluation[] _exprs) {
     super();
     this.groupedItems = new HashMap<Object, List<E>>(16);
     if (_exprs != null && _exprs.length > 0) {
@@ -80,17 +80,19 @@ public class EOGroupedList<E> extends ArrayList<E> {
       }
     }
   }
-  public EOGroupedList(EOExpressionEvaluation _expr) {
+  public EOGroupedList(final EOExpressionEvaluation _expr) {
     super();
     this.groupedItems = new HashMap<Object, List<E>>(16);
     this.expression   = _expr;
   }
-  public EOGroupedList(EOExpressionEvaluation _expr, int _capacity) {
+  public EOGroupedList(final EOExpressionEvaluation _expr, int _capacity) {
     super(_capacity);
     this.groupedItems = new HashMap<Object, List<E>>(16);
     this.expression   = _expr;
   }
-  public EOGroupedList(EOExpressionEvaluation _expr, Collection<? extends E> _c) {
+  public EOGroupedList
+    (EOExpressionEvaluation _expr, Collection<? extends E> _c)
+  {
     super(_c);
     this.groupedItems = new HashMap<Object, List<E>>(16);
     this.expression   = _expr;
@@ -103,10 +105,10 @@ public class EOGroupedList<E> extends ArrayList<E> {
    * Returns the List of objects grouped for the given value. Eg the _value
    * could be 'Duck' if the List was grouped by 'lastname'.
    * 
-   * @param the grouping value
+   * @param _value - the grouping value
    * @return List of objects grouped for the given value, or null
    */
-  public List<E> getGroup(Object _value) {
+  public List<E> getGroup(final Object _value) {
     if (this.needsReGroup)
       this.regroup();
     
@@ -151,7 +153,7 @@ public class EOGroupedList<E> extends ArrayList<E> {
   
   /* indices */
   
-  public E set(int index, E element) {
+  public E set(final int index, final E element) {
     this.needsReGroup = true;
     return super.set(index, element);
   }

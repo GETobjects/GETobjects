@@ -92,7 +92,8 @@ public interface IJoLocation {
      * IJoLocation, the object will be asked. Otherwise we KVC query for the
      * 'nameInContainer' key.
      * 
-     * @param _object The object which we want to know the name of.
+     * @param _object    - The object which we want to know the name of.
+     * @param _container - the containment context
      * @return The name of the object in the given container.
      */
     public static String nameOfObjectInContainer

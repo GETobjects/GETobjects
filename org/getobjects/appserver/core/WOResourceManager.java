@@ -425,8 +425,8 @@ public abstract class WOResourceManager extends NSObject
    * Opens a stream to the given resource and loads the content into a byte
    * array.
    *
-   * @param _name - name of the resource to be opened
-   * @param _ls   - array of language codes (eg [ 'de', 'en' ])
+   * @param _name  - name of the resource to be opened
+   * @param _langs - array of language codes (eg [ 'de', 'en' ])
    * @return byte array with the contents, or null if the resource is missing
    */
   public byte[] bytesForResourceNamed(String _name, String[] _langs) {

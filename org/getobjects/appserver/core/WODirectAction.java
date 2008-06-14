@@ -54,7 +54,6 @@ public class WODirectAction extends WOAction {
    * to the super implementation).
    * 
    * @param _name - the name of the action to invoke
-   * @param _ctx  - the WOContext to run the action in
    * @return the result, eg a WOComponent or WOResponse
    */
   public Object performActionNamed(String _name) {

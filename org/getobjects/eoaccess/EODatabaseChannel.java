@@ -343,8 +343,9 @@ public class EODatabaseChannel extends NSObject
    * This is different to selectObjectsWithFetchSpecification(), which has
    * additional handling for prefetched relationships.
    * 
-   * @param _fs The EOFetchSpecification which outlines how objects are being
+   * @param _fs - The EOFetchSpecification which outlines how objects are being
    *   fetched.
+   * @param _ec - the EOObjectTrackingContext for the fetch
    * @return Null if everything went fine, or an exception object representing
    *   the error.
    */
@@ -539,23 +540,24 @@ public class EODatabaseChannel extends NSObject
   /**
    * Prefetches a set of related objects.
    * 
-   * @param _entityName       entity this fetch is relative to
-   * @param prefetchRelPathes the pathes we want to prefetch
-   * @param baseObjects       the set of objects we want to prefetch for
+   * @param _entityName        - entity this fetch is relative to
+   * @param _prefetchRelPathes - the pathes we want to prefetch
+   * @param _baseObjects       - the set of objects we want to prefetch for
+   * @param _ec                - the active tracking context
    * @return an Exception if an error occurred, null on success
    */
   public Exception fetchRelationships
-    (String _entityName, String[] prefetchRelPathes,
-     List<EOEnterpriseObject> baseObjects, EOObjectTrackingContext _ec)
+    (final String _entityName, final String[] _prefetchRelPathes,
+     List<EOEnterpriseObject> _baseObjects, EOObjectTrackingContext _ec)
   {
-    if (prefetchRelPathes == null || prefetchRelPathes.length == 0)
+    if (_prefetchRelPathes == null || _prefetchRelPathes.length == 0)
       return null /* no error */;
-    if (baseObjects == null || baseObjects.size() == 0)
+    if (_baseObjects == null || _baseObjects.size() == 0)
       return null /* no error */;
 
     /* entity */
 
-    EOEntity entity = this.database.entityNamed(_entityName);
+    final EOEntity entity = this.database.entityNamed(_entityName);
     if (entity == null) { /* Note: should have failed before */
       log.error("missing entity named: " + _entityName);
       return new Exception("did not find entity for fetch!");
@@ -564,8 +566,8 @@ public class EODatabaseChannel extends NSObject
 
     /* process relationships */
 
-    Map<String, List<String>> leveledPrefetches =
-      this.levelPrefetchSpecificiation(entity, prefetchRelPathes);
+    final Map<String, List<String>> leveledPrefetches =
+      this.levelPrefetchSpecificiation(entity, _prefetchRelPathes);
 
     /*
      * Maps/caches Lists of values for a given attribute in the base result.
@@ -574,23 +576,23 @@ public class EODatabaseChannel extends NSObject
      * We cache this because its most likely reused when we have multiple
      * prefetches. The fetch will most usually go against the primary key ...
      */
-    EODatabaseChannelFetchHelper helper =
-      new EODatabaseChannelFetchHelper(baseObjects);
+    final EODatabaseChannelFetchHelper helper =
+      new EODatabaseChannelFetchHelper(_baseObjects);
 
     for (String relName: leveledPrefetches.keySet()) {
       /* The relName is never a path, its a level-1 key. the value in
        * leveledPrefetches contains 'subpathes'.
        */
       Exception error = this.fetchRelationship
-        (entity, relName, baseObjects,
+        (entity, relName, _baseObjects,
          leveledPrefetches.get(relName), helper, _ec);
       
       if (error != null) return error;
     }
 
 
-    List<String> flattenedRelationships =
-      this.flattenedRelationships(entity, prefetchRelPathes);
+    final List<String> flattenedRelationships =
+      this.flattenedRelationships(entity, _prefetchRelPathes);
     if (flattenedRelationships != null) {
       for (String rel: flattenedRelationships) {
         EORelationship flattenedRel = entity.relationshipNamed(rel);
@@ -603,6 +605,7 @@ public class EODatabaseChannel extends NSObject
     return null; /* no error */
   }
   
+  
   /**
    * Cleans the name of the relationship from parameters, eg the name contain
    * repeaters like '*' (eg parent* => repeat relationship 'parent' until no
@@ -611,7 +614,7 @@ public class EODatabaseChannel extends NSObject
    * @param _name - name of the relationship, eg 'employments' or 'parent*'
    * @return cleaned relationship name, eg 'employments' or 'parent'
    */
-  public static String relationshipNameWithoutParameters(String _name) {
+  public static String relationshipNameWithoutParameters(final String _name) {
     if (_name == null)
       return null;
     
@@ -619,24 +622,25 @@ public class EODatabaseChannel extends NSObject
     return _name.endsWith("*") ? _name.substring(0, _name.length() - 1) : _name;
   }
   
+  
   /**
    * This is the master of desaster which performs the actual fetch of the
    * relationship for a given set of 'baseObjects'.
    * 
-   * @param entity - the entity of the *base* objects
+   * @param _entity - the entity of the *base* objects
    * @param _relationNameWithParameters - the name of the relationship
-   * @param baseObjects - the objects which we want to fetch the relship for 
-   * @param prefetchPathes - subpathes we want to prefetch
+   * @param _baseObjects - the objects which we want to fetch the relship for 
+   * @param _prefetchPathes - subpathes we want to prefetch
    * @param _helper - a fetch context to track objects during the fetch
    * @param _ec - the associated editing-context, if there is one
    * @return
    */
   protected Exception fetchRelationship
-    (EOEntity entity, String _relationNameWithParameters,
-     List<EOEnterpriseObject> baseObjects,
-     List<String> prefetchPathes,
-     EODatabaseChannelFetchHelper _helper,
-     EOObjectTrackingContext _ec)
+    (final EOEntity _entity, final String _relationNameWithParameters,
+     final List<EOEnterpriseObject> _baseObjects,
+     List<String> _prefetchPathes,
+     final EODatabaseChannelFetchHelper _helper,
+     final EOObjectTrackingContext _ec)
   {
     /* Note: EODatabaseContext.batchFetchRelationship */
     
@@ -652,15 +656,15 @@ public class EODatabaseChannel extends NSObject
       relName = relationshipNameWithoutParameters(_relationNameWithParameters);
       
       /* fixup prefetch patches to include our tree-depth fetch */
-      if (!prefetchPathes.contains(_relationNameWithParameters)) {
-        prefetchPathes = new ArrayList<String>(prefetchPathes);
-        prefetchPathes.add(_relationNameWithParameters);
+      if (!_prefetchPathes.contains(_relationNameWithParameters)) {
+        _prefetchPathes = new ArrayList<String>(_prefetchPathes);
+        _prefetchPathes.add(_relationNameWithParameters);
       }
     }
     
     /* Note: we filter out non-1-join relationships in the levelXYZ() method */
-    EORelationship rel  = entity.relationshipNamed(relName); 
-    EOJoin         join = rel.joins()[0];
+    final EORelationship rel  = _entity.relationshipNamed(relName); 
+    final EOJoin         join = rel.joins()[0];
     if (join == null) {
       log.error("did not find a join in relationship: " + relName);
       return null;
@@ -668,13 +672,13 @@ public class EODatabaseChannel extends NSObject
 
     /* extract values of source object list for IN query on target */
 
-    String       srcName   = join.sourceAttribute().name();
-    List<Object> srcValues = _helper.getSourceValues(srcName);
+    final String       srcName   = join.sourceAttribute().name();
+    final List<Object> srcValues = _helper.getSourceValues(srcName);
     
     /* This is a Map which maps the join target-value to matching
      * EOs. Usually its just one.
      */
-    Map<Object, List<EOEnterpriseObject>> valueToObjects =
+    final Map<Object, List<EOEnterpriseObject>> valueToObjects =
       _helper.getValueToObjects(srcName);
     
     // TBD: srcValues could be empty?! Well, values could be NULL (for non-pkey
@@ -698,13 +702,13 @@ public class EODatabaseChannel extends NSObject
     //           refetch objects which is stupid
     //      TBD: do we really need to support arbitrary targets or can we
     //           use EOKeyGlobalID?
-    EOAttribute targetAttr = join.destinationAttribute();
+    final EOAttribute targetAttr = join.destinationAttribute();
     if (targetAttr == null) {
       log.error("did not find target-attr of relationship join: " + rel + ": " +
                 join);
       return null; // TBD: hm ... (eg if the model is b0rked)
     }
-    String targetName = targetAttr.name();
+    final String targetName = targetAttr.name();
     
     EOFetchSpecification fs = null;
     if (true) {
@@ -718,14 +722,14 @@ public class EODatabaseChannel extends NSObject
     else {
       
     }
-    if (prefetchPathes != null && prefetchPathes.size() > 0) {
+    if (_prefetchPathes != null && _prefetchPathes.size() > 0) {
       fs.setPrefetchingRelationshipKeyPaths
-        (prefetchPathes.toArray(new String[0]));
+        (_prefetchPathes.toArray(new String[0]));
     }
     
     /* run nested query */
 
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     Exception error;
     if ((error = this.selectObjectsWithFetchSpecification(fs, _ec)) != null) {
       this.cancelFetch(); /* better be sure ;-) */
@@ -780,6 +784,7 @@ public class EODatabaseChannel extends NSObject
     
     return null; /* fetch done */
   }
+  
   
   /**
    * Finishes a fetch by resetting transient fetch state in the channel. This
@@ -838,7 +843,7 @@ public class EODatabaseChannel extends NSObject
    * @param _row - database record
    * @return the EO class to instantiate for the row
    */
-  protected Class objectClassForRow(Map<String, Object> _row) {
+  protected Class objectClassForRow(final Map<String, Object> _row) {
     // TBD: implement. Add additional class information to EOEntity ...
     return EOGenericRecord.class; // non-sense
   }
@@ -849,7 +854,7 @@ public class EODatabaseChannel extends NSObject
    * @return null if there are no more objects, or the fetched object/record
    */
   public Object fetchObject() {
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     
     if (isDebugOn) log.debug("  fetch object ...");
     
@@ -869,7 +874,7 @@ public class EODatabaseChannel extends NSObject
     
     /* fetch raw row from adaptor channel */
     
-    Map<String, Object> row = this.fetchRow();
+    final Map<String, Object> row = this.fetchRow();
     if (row == null) {
       if (isDebugOn) log.debug("    return no row, finished fetching.");
       // TBD: should we cancel?
@@ -891,7 +896,7 @@ public class EODatabaseChannel extends NSObject
     
     // TODO: we might want to do uniquing here ..
     
-    EOGlobalID gid = (this.currentEntity != null)
+    final EOGlobalID gid = (this.currentEntity != null)
       ? this.currentEntity.globalIDForRow(row) : null;
     
     if (!this.refreshObjects && this.ec != null) {
@@ -905,7 +910,7 @@ public class EODatabaseChannel extends NSObject
     
     /* instantiate new object */
     
-    Object eo = NSJavaRuntime.NSAllocateObject
+    final Object eo = NSJavaRuntime.NSAllocateObject
       (clazz, EOEntity.class, this.currentEntity);
     if (eo == null) {
       log.error("failed to allocate EO: " + clazz + ": " + row);
@@ -994,7 +999,7 @@ public class EODatabaseChannel extends NSObject
     
     /* turn db ops into adaptor ops */
     
-    List<EOAdaptorOperation> aops = 
+    final List<EOAdaptorOperation> aops = 
       this.adaptorOperationsForDatabaseOperations(_ops);
     if (aops == null || aops.size() == 0)
       return null; /* nothing to do */
@@ -1036,12 +1041,12 @@ public class EODatabaseChannel extends NSObject
    * @return List of EOAdaptorOperation's
    */
   protected List<EOAdaptorOperation> adaptorOperationsForDatabaseOperations
-    (EODatabaseOperation[] _ops)
+    (final EODatabaseOperation[] _ops)
   {
     if (_ops == null || _ops.length == 0)
       return null; /* nothing to do */
     
-    List<EOAdaptorOperation> aops = new ArrayList<EOAdaptorOperation>(4);
+    final List<EOAdaptorOperation> aops = new ArrayList<EOAdaptorOperation>(4);
     
     for (int i = 0; i < _ops.length; i++) {
       EOEntity           entity = _ops[i].entity();
@@ -1249,7 +1254,7 @@ public class EODatabaseChannel extends NSObject
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.database != null)
@@ -1281,7 +1286,7 @@ public class EODatabaseChannel extends NSObject
       this.baseObjects = _baseObjects;
     }
     
-    public List<Object> getSourceValues(String srcName) {
+    public List<Object> getSourceValues(final String srcName) {
       List<Object> result = this.sourceKeyToValues.get(srcName);
       if (result == null) {
         this.fill(srcName);
@@ -1291,7 +1296,7 @@ public class EODatabaseChannel extends NSObject
     }
     
     public Map<Object, List<EOEnterpriseObject>> getValueToObjects
-      (String srcName)
+      (final String srcName)
     {
       Map<Object, List<EOEnterpriseObject>> result =
         this.sourceKeyToValueToObjects.get(srcName);
@@ -1302,7 +1307,7 @@ public class EODatabaseChannel extends NSObject
       return result;
     }
   
-    protected void fill(String srcName) {
+    protected void fill(final String srcName) {
       List<Object> srcValues;
       Map<Object, List<EOEnterpriseObject>> valueToObjects;
       

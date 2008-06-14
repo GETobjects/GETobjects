@@ -532,7 +532,7 @@ public class JoDefaultRenderer extends NSObject implements IJoObjectRenderer {
    * Renders a component within another 'Frame' component. On the page stack
    * the Frame is pushed a subcomponent of the component. It gets the template
    * of the component as the 'component content', which it then can embed using
-   * the &lt;#WOComponentContent/&gt; element.
+   * the &lt;wo:WOComponentContent/&gt; element.
    * 
    * @param _page  - the page to embed in a frame
    * @param _frame - the frame to put around the page

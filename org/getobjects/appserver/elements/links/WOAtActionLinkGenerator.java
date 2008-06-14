@@ -1,15 +1,15 @@
 /*
-  Copyright (C) 2007 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2007-2008 Helge Hess <helge.hess@opengroupware.org>
   Copyright (C) 2007 Marcus Mueller <znek@mulle-kybernetik.com>
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -38,7 +38,7 @@ import org.getobjects.appserver.core.WOSession;
  * scheme is:<pre>
  *   /AppName/ActionClass/@ActionName[?parameters[&wosid]]</pre>
  * Example:<pre>
- *   &lt;#a id="double" \@action="doDouble" string="double" /&gt;</pre>
+ *   &lt;wo:a id="double" \@action="doDouble" string="double" /&gt;</pre>
  * (Note that the \@ has a slash-prefix in JavaDoc ...).<br>
  * The example would call the 'doDouble' method in the page which currently
  * renders the template. The 'id' specifies the element-id (its also the JS DOM

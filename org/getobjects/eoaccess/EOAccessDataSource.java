@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -336,8 +336,7 @@ public abstract class EOAccessDataSource extends EODataSource
    * Example:<pre>
    *   ds.fetchObjectsForIds(pkeys);</pre>
    * 
-   * @param _idName - name of the 
-   * @param _values - values to match
+   * @param _ids - primary keys to fetch
    * @return a List of objects
    */
   public List fetchObjectsForIds(final List _ids) {
@@ -503,8 +502,8 @@ public abstract class EOAccessDataSource extends EODataSource
    * <p>
    * @see EOModel
    * 
-   * @param _fn the name of the fetch specification in the EOModel
-   * @param _firstKey the remaining parameters form the bindings
+   * @param _fn          - the name of the fetch specification in the EOModel
+   * @param _valsAndKeys - the remaining parameters form the bindings
    * @return an object which matches the named specification 
    */
   @SuppressWarnings("unchecked")

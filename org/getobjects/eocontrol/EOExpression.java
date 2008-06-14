@@ -173,13 +173,12 @@ public class EOExpression extends NSObject implements Cloneable {
    * Example:<pre>
    *   q = q.expressionWithBindings("now", new Date());</pre>
    * 
-   * @param _vals        - the object containing the bindings
-   * @param _requiresAll - whether all bindings are required
+   * @param _keysAndValues - the binding key/value pairs
    * @return an EOQualifier with the bindings resolved
    */
   public EOExpression expressionWithBindings(Object... _keysAndValues) {
     return this.expressionWithBindings(
-        new NSKeyValueHolder(_keysAndValues), true);
+        new NSKeyValueHolder(_keysAndValues), true /* requires all */);
   }
   
   

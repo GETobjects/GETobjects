@@ -42,12 +42,12 @@ import org.getobjects.eocontrol.EODataSource;
  *   <li>client overflow scrolling
  * </ul>
  * Sample:<pre>
- *   &lt;#WETableView var:displayGroup="dg" item="item"&gt;
- *     &lt;#WETableHeader title="Name"  /&gt;
- *     &lt;#WETableHeader title="EMail" /&gt;
- *     &lt;#WETableData><#WOString var:value="item.name"  /&gt;&lt;/#&gt;
- *     &lt;#WETableData><#WOString var:value="item.email" /&gt;&lt;/#&gt;
- *   &lt;/#WETableView&gt;</pre>
+ *   &lt;wo:WETableView var:displayGroup="dg" item="item"&gt;
+ *     &lt;wo:WETableHeader title="Name"  /&gt;
+ *     &lt;wo:WETableHeader title="EMail" /&gt;
+ *     &lt;wo:WETableData><#WOString var:value="item.name"  /&gt;&lt;/#&gt;
+ *     &lt;wo:WETableData><#WOString var:value="item.email" /&gt;&lt;/#&gt;
+ *   &lt;/wo:WETableView&gt;</pre>
  * 
  * Renders:<pre>
  *   &lt;table&gt;
