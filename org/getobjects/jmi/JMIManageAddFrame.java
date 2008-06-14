@@ -5,7 +5,7 @@ public class JMIManageAddFrame extends JMIComponent {
   public int index;
 
   public Object[] navigationPath() {
-    return this.context().joTraversalPath().clientObjectTraversalPath();
+    return this.context().goTraversalPath().clientObjectTraversalPath();
   }
   
   public String itemURL() {

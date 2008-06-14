@@ -12,7 +12,7 @@
   <!-- Global servlet parameters for this area -->
   <context-param>
     <param-name>WOAppName</param-name>
-    <param-value>org.getobjects.samples.HelloJo.HelloJo</param-value>
+    <param-value>org.getobjects.samples.HelloGo.HelloJo</param-value>
   </context-param>
 
   <servlet>

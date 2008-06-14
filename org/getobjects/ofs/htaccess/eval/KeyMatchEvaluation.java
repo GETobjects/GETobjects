@@ -61,7 +61,7 @@ import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
 public abstract class KeyMatchEvaluation extends NSObject
   implements IHtConfigEvaluation
 {
-  protected static final Log log = LogFactory.getLog("JoConfig");
+  protected static final Log log = LogFactory.getLog("GoConfig");
 
   protected abstract String matchKeyInConfig();
   

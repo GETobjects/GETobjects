@@ -128,7 +128,7 @@ public class OFSApplication extends WOApplication
       /* check whether the traversal path contains a manager */
       // TBD: should we cache that?
       rm = GoContainerResourceManager.lookupResourceManager
-        (_ctx.joTraversalPath().resultObject(), _ctx);
+        (_ctx.goTraversalPath().resultObject(), _ctx);
       if (isPageDebugOn) pageLog.debug("  container-rm: " + rm);
     }
     

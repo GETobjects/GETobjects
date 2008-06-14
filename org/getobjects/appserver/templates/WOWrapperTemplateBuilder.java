@@ -52,7 +52,7 @@ import org.getobjects.foundation.UString;
  * <h4>Supported binding prefixes</h4>
  * <pre>
  *   const  - WOValueAssociation
- *   jo     - JoPathAssociation
+ *   jo     - GoPathAssociation
  *   label  - WOLabelAssociation
  *   ognl   - WOOgnlAssociation
  *   plist  - parse value as plist, then create a WOValueAssociation

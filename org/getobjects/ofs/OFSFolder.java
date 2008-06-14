@@ -67,8 +67,8 @@ public class OFSFolder extends OFSBaseObject
              IGoSecuredObject, IGoAuthenticatorContainer
 {
   // TBD: document class
-  protected static final Log cfglog  = LogFactory.getLog("JoConfig");
-  protected static final Log authlog = LogFactory.getLog("JoAuthenticator");
+  protected static final Log cfglog  = LogFactory.getLog("GoConfig");
+  protected static final Log authlog = LogFactory.getLog("GoAuthenticator");
   
   /**
    * This is a cache of the child names for the specific folder object (after
@@ -197,7 +197,7 @@ public class OFSFolder extends OFSBaseObject
   }
   
   
-  /* IJoFolderish */
+  /* IGoFolderish */
   
   /**
    * The default implementation returns an OFSFolderDataSource focused on this
@@ -325,11 +325,11 @@ public class OFSFolder extends OFSBaseObject
     return linfo;
   }
   
-  /* IJoObject */
+  /* IGoObject */
   
   /**
    * Lookup the given name in this object. This works by first checking the
-   * JoClass of the object and then calling lookupStoredName() to discover an
+   * GoClass of the object and then calling lookupStoredName() to discover an
    * object on-disk.
    * <p>
    * This method maintains a cache of restored disk objects.
@@ -359,7 +359,7 @@ public class OFSFolder extends OFSBaseObject
     else if (debugOn)
       log.debug("no child cache in container.");
     
-    /* lookup using JoClass */
+    /* lookup using GoClass */
     
     final GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {
@@ -423,7 +423,7 @@ public class OFSFolder extends OFSBaseObject
   }
   
   
-  /* IJoSecuredObject */
+  /* IGoSecuredObject */
   
   /**
    * This method checks the requirements stated in the configuration associated
@@ -431,7 +431,7 @@ public class OFSFolder extends OFSBaseObject
    * <p>
    * @param _requirements - the requirements to be checked
    * @param _ctx          - the context containing the active user
-   * @return null if the user has access, a JoSecurityException otherwise
+   * @return null if the user has access, a GoSecurityException otherwise
    */
   public Exception validateRequirements
     (final Map<String, Set<String>> _requirements, IGoContext _ctx)
@@ -536,7 +536,7 @@ public class OFSFolder extends OFSBaseObject
     //       => I think we can only check LocationMatch in here?
     final OFSFileContainerChildInfo ci = this.childInfo();
     if (ci == null || !ci.hasKey(_name)) {
-      // TBD: but what about JoClass methods?! We need to be able to customize
+      // TBD: but what about GoClass methods?! We need to be able to customize
       //      the lookup of those
       final GoClass cls = this.joClassInContext(_ctx);
       if (cls != null) {
@@ -610,7 +610,7 @@ public class OFSFolder extends OFSBaseObject
   protected IGoAuthenticator cachedAuthenticator;
   
   /**
-   * Returns an IJoAuthenticator managed by the folder. The default
+   * Returns an IGoAuthenticator managed by the folder. The default
    * implementation uses the 'configurationInContext()' to build the
    * authenticator.
    */

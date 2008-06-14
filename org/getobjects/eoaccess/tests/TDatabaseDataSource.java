@@ -66,11 +66,11 @@ public class TDatabaseDataSource extends EOAccessTest {
     this.databaseWithModel =
       new EODatabase(myurl, this.model /* model */, null /* classes */);
     
-    this.database.adaptor().performUpdateSQL(createJopeTestContact);
+    this.database.adaptor().performUpdateSQL(createGopeTestContact);
     this.database.adaptor().performUpdateSQL(fillTable1_1);
     this.database.adaptor().performUpdateSQL(fillTable1_2);
     this.database.adaptor().performUpdateSQL(createTable2);
-    this.database.adaptor().performUpdateSQL(createJopeTestNotes);
+    this.database.adaptor().performUpdateSQL(createGopeTestNotes);
     this.database.adaptor().performUpdateSQL(fillTable2_1);
     
     this.dataSource =
@@ -81,7 +81,7 @@ public class TDatabaseDataSource extends EOAccessTest {
 
   @After
   public void tearDown() {
-    this.database.adaptor().performUpdateSQL(dropJopeTestNotes);
+    this.database.adaptor().performUpdateSQL(dropGopeTestNotes);
     this.database.adaptor().performUpdateSQL(dropTable2);
     this.database.adaptor().performUpdateSQL(dropTable1);
     this.database.dispose();

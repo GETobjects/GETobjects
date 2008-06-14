@@ -293,7 +293,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
     
     /* decode path */
     
-    String[] handlerPath = _ctx.joTraversalPath().pathInfo();
+    String[] handlerPath = _ctx.goTraversalPath().pathInfo();
     if (handlerPath == null) handlerPath = new String[0];
     switch (handlerPath.length) {
       case 0: {

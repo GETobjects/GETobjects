@@ -26,15 +26,15 @@ import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
 
 /**
- * WORequestJoPath
+ * WORequestGoPath
  * <p>
- * Just a collection of utility functions related to JoStyle path processing.
+ * Just a collection of utility functions related to GoStyle path processing.
  * This code was initially in WOApplication.
  * <p>
  * We could make this object a "real" one if considered necessary (if we want
  * to support other styles of WORequest=>TraversalPath mapping).
  */
-public class WORequestJoPath extends NSObject {
+public class WORequestGoPath extends NSObject {
   protected static final Log log     = LogFactory.getLog("WOApplication");
 
   private static final String[] emptyStringArray = {};
@@ -72,7 +72,7 @@ public class WORequestJoPath extends NSObject {
         uri = uri.substring(p.length());
     }
     
-    String[] path = WORequestJoPath.traversalPathForURI(uri, _ctx);
+    String[] path = WORequestGoPath.traversalPathForURI(uri, _ctx);
     
     /* Now it gets interesting, do we want to include the name of the app or
      * not? For now we consume a match.
@@ -89,7 +89,7 @@ public class WORequestJoPath extends NSObject {
     
     /* collect action parameters contained in form values */
     
-    final String[] formPath = WORequestJoPath.formMethodPathOfRequest(_rq,_ctx);
+    final String[] formPath = WORequestGoPath.formMethodPathOfRequest(_rq,_ctx);
     if (path == null || path.length == 0)
       path = formPath != null ? formPath : emptyStringArray;
     else if (formPath != null && formPath.length > 0) {
@@ -104,7 +104,7 @@ public class WORequestJoPath extends NSObject {
   }
 
   /**
-   * This is called by traversalPathForRequest() to construct the Jo traversal
+   * This is called by traversalPathForRequest() to construct the Go traversal
    * path for a given request.
    * 
    * The method splits the given URI on the '/' character and then decodes each
@@ -154,7 +154,7 @@ public class WORequestJoPath extends NSObject {
   }
 
   /**
-   * This is called by traversalPathForRequest() to construct the Jo traversal
+   * This is called by traversalPathForRequest() to construct the Go traversal
    * path for a given request. The method scans the form parameters of the
    * request for names which contain ':action', ':method', ':default_action'
    * etc.
@@ -178,7 +178,7 @@ public class WORequestJoPath extends NSObject {
    * @return a String array of names to traverse
    */
   protected static String[] formMethodPathOfRequest
-    (WORequest _rq, WOContext _ctx)
+    (final WORequest _rq, final WOContext _ctx)
   {
     // TBD: we should move this code to some UApplication static function?
     String formMethod        = null; /* 'XYZ:action' form key */

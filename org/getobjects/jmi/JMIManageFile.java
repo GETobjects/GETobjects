@@ -44,7 +44,7 @@ public class JMIManageFile extends JMIComponent {
     
     if (false) {
     System.err.println("PC: " + UString.componentsJoinedByString(
-        this.context().joTraversalPath().pathToClientObject(), "/"));
+        this.context().goTraversalPath().pathToClientObject(), "/"));
     
     System.err.println("CONTENT TYPE: " + content.getClass());
     }

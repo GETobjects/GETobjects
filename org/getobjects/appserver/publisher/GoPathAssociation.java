@@ -94,7 +94,7 @@ public class GoPathAssociation extends WOAssociation {
       return null;
     }
     
-    final GoTraversalPath tPath = _context.joTraversalPath();
+    final GoTraversalPath tPath = _context.goTraversalPath();
     if (tPath == null) {
       log.warn("attempt to traverse GoPath w/o ctxpath: " + this + 
           "\n  context: " + _context);

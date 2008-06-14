@@ -61,7 +61,7 @@ public abstract class JMIComponent extends WOComponent {
   }
   
   public String activeMethod() {
-    String[] path = this.context().joTraversalPath().path();
+    String[] path = this.context().goTraversalPath().path();
     if (path == null || path.length == 0)
       return null;
     return path[path.length - 1];
@@ -91,7 +91,7 @@ public abstract class JMIComponent extends WOComponent {
     if (this.parentObjects != null)
       return this.parentObjects;
     
-    Object[] objs = this.context().joTraversalPath().objectTraversalPath();
+    Object[] objs = this.context().goTraversalPath().objectTraversalPath();
     if (objs == null || objs.length < 2)
       return null;
     

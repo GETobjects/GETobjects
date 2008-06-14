@@ -76,7 +76,7 @@ public class GoPageInvocation extends NSObject implements IGoCallable {
      * w/o having to bind them manually!
      */
     String localActionName = this.actionName;
-    GoTraversalPath tp = ctx.joTraversalPath();
+    GoTraversalPath tp = ctx.goTraversalPath();
     if (tp != null) {
       final String[] pi = tp.pathInfo();
       if (pi != null && pi.length > 0) {

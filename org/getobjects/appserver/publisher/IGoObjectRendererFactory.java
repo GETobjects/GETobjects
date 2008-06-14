@@ -80,7 +80,7 @@ public interface IGoObjectRendererFactory {
       
       boolean isInfoOn = log.isInfoEnabled();
       
-      GoTraversalPath path = _ctx.joTraversalPath();
+      GoTraversalPath path = _ctx.goTraversalPath();
       if (path == null) {
         if (isInfoOn)
           log.info("context contained no path for renderer lookup: " + _ctx);

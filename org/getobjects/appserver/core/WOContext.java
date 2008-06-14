@@ -85,7 +85,7 @@ public class WOContext extends WOCoreContext
   protected WOErrorReport errorReport;
 
   /* GoObject support */
-  protected GoTraversalPath joTraversalPath;
+  protected GoTraversalPath goTraversalPath;
   protected IGoUser         activeUser;
   protected String          clientObjectURL;
 
@@ -847,17 +847,26 @@ public class WOContext extends WOCoreContext
    * implementation returns the registry of the application object associated
    * with this context.
    */
-  public GoClassRegistry joClassRegistry() {
+  public GoClassRegistry goClassRegistry() {
     return this.application != null
       ? this.application.joClassRegistry() : null;
   }
 
-  public void _setJoTraversalPath(GoTraversalPath _path) {
-    this.joTraversalPath = _path;
+  public void _setGoTraversalPath(final GoTraversalPath _path) {
+    this.goTraversalPath = _path;
   }
+  public GoTraversalPath goTraversalPath() {
+    return this.goTraversalPath;
+  }
+
+  /**
+   * @deprecated Use {@link #goTraversalPath()} instead
+   */
+  @Deprecated
   public GoTraversalPath joTraversalPath() {
-    return this.joTraversalPath;
+    return this.goTraversalPath();
   }
+
 
   /**
    * Returns the 'clientObject' of the GoMethod invocation. The 'clientObject'
@@ -876,8 +885,8 @@ public class WOContext extends WOCoreContext
    * @return the clientObject, or null if there was no traversal path
    */
   public Object clientObject() {
-    return this.joTraversalPath != null
-      ? this.joTraversalPath.clientObject()
+    return this.goTraversalPath != null
+      ? this.goTraversalPath.clientObject()
       : null;
   }
   
@@ -892,12 +901,12 @@ public class WOContext extends WOCoreContext
    * @return the URL path
    */
   public String clientObjectActionURL() {
-    if (this.joTraversalPath == null)
+    if (this.goTraversalPath == null)
       return null;
     if (this.clientObjectURL != null)
       return this.clientObjectURL;
     
-    String[] path = this.joTraversalPath.pathToClientObject();
+    String[] path = this.goTraversalPath.pathToClientObject();
     if (path == null)
       return null;
     
@@ -950,7 +959,7 @@ public class WOContext extends WOCoreContext
    * @return an IGoAuthenticator or null if none could be located.
    */
   protected IGoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
-    GoTraversalPath joPath = this.joTraversalPath();
+    GoTraversalPath joPath = this.goTraversalPath();
     if (joPath == null) {
       log.warn("no traversalpath is set: " + this);
       return null;
@@ -1000,7 +1009,7 @@ public class WOContext extends WOCoreContext
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     if (this.session != null) {
@@ -1018,8 +1027,8 @@ public class WOContext extends WOCoreContext
     WOComponent c = this.component();
     if (c != null && c != p) _d.append(" comp=" + c.name());
 
-    if (this.joTraversalPath != null) {
-      String[] pns = this.joTraversalPath.path();
+    if (this.goTraversalPath != null) {
+      String[] pns = this.goTraversalPath.path();
       if (pns != null && pns.length > 0) {
         _d.append(" path=");
         for (int i = 0; i < pns.length; i++) {
