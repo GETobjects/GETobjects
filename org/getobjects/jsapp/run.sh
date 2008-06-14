@@ -17,7 +17,7 @@ CLASSPATH="`ls ${JARDIR}/log4j-1.2.*.jar`:${CLASSPATH}"
 CLASSPATH="`ls ${JARDIR}/ognl-2.6.*.jar`:${CLASSPATH}"
 CLASSPATH="`ls ${JARDIR}/js*.jar`:${CLASSPATH}"
 
-# JOPE
+# Go
 CLASSPATH="${GOPATH}:${CLASSPATH}"
 
 echo "CLASSPATH: ${CLASSPATH}"

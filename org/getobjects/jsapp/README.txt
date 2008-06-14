@@ -1,15 +1,15 @@
 Go JavaScript Applications
 ==========================
 
-OK, so this kinda works now. This package lets you write JOPE applications in
+OK, so this kinda works now. This package lets you write Go applications in
 JavaScript, w/o the need to compile any Java code. To do so, it uses the Rhino
 JavaScript interpreter provided by the Mozilla project.
 
-Since Rhino can access all Java classes you can reuse all classes from JOPE,
+Since Rhino can access all Java classes you can reuse all classes from Go,
 even other Java JAR packages. But there are a few limitations, eg you cannot
 subclass Java classes in Rhino.
 
-Hence this 'jsapp' package provides the necessary hooks and JOPE subclasses to
+Hence this 'jsapp' package provides the necessary hooks and Go subclasses to
 allow scripted applications.
 
 
@@ -60,7 +60,7 @@ API
 ***
 
 The API exposed towards Application, Component, Context and Session scripts its
-mostly the same like the API of JOPE. If a script implements a relevant
+mostly the same like the API of Go. If a script implements a relevant
 function (eg awake()), jsapp will call it.
 
 To call 'super' implementations (default implementations), prefix the function

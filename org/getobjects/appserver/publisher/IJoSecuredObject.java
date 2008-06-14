@@ -1,20 +1,20 @@
 /*
   Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
 
   You should have received a copy of the GNU Lesser General Public
-  License along with JOPE; see the file COPYING.  If not, write to the
+  License along with Go; see the file COPYING.  If not, write to the
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
@@ -401,7 +401,7 @@ public interface IJoSecuredObject {
       IJoUser user = _ctx != null ? _ctx.activeUser() : null;
       if (user == null) {
         /* In SOPE we attach the authenticator, but I suppose we want to do this
-         * at rendering time in JOPE.
+         * at rendering time in Go.
          */
         if (log.isWarnEnabled())
           log.warn("got no active user, no authenticator configured?: " + _ctx);
@@ -668,11 +668,11 @@ public interface IJoSecuredObject {
       
       if (sinfo.isKeyPrivate(_name)) {
         /* What does it mean to be 'private'. Using private you can always
-         * explicitly forbid access to a JOPE name. Eg if you want that 'abc'
+         * explicitly forbid access to a Go name. Eg if you want that 'abc'
          * is *never ever* accessed using JoLookup (exposed to the web!), you
          * can declare it private.
          * 
-         * In JOPE this is the default (if no security info was found and
+         * In Go this is the default (if no security info was found and
          * no default access was defined). I think Zope2 allows access to all
          * Python slots per default (restricted by ZODB ownership of course).
          * (just like KVC)

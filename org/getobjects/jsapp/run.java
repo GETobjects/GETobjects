@@ -13,7 +13,7 @@
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with JOPE; see the file COPYING. If not, write to the Free Software
+ * along with Go; see the file COPYING. If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 package org.getobjects.jsapp;
@@ -23,7 +23,7 @@ import java.io.File;
 import org.getobjects.jetty.WOJettyRunner;
 
 /**
- * The runner class which starts Jetty for a JavaScript JOPE application. Call
+ * The runner class which starts Jetty for a JavaScript Go application. Call
  * it on a MyApp.woa directory, eg:<pre>
  *   java org.getobjects.jsapp.run MyApp.woa
  * </pre>

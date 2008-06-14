@@ -2,7 +2,7 @@ ofs.fs
 ******
 
 The packages is a small wrapper around the filesystem used as a backend for
-JOPE OFS. We can't use java.io.File, because we want to have it pluggable,
+Go OFS. We can't use java.io.File, because we want to have it pluggable,
 eg an important filemanager is one which mounts a .zip/.jar filesystem as
 a folder.
 

@@ -1,4 +1,4 @@
-JMI - JOPE Management Interface
+JMI - Go Management Interface
 ===============================
 
 NOTE: This is work in progress, a fast hack which needs a lot of cleanups. But

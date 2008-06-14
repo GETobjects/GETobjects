@@ -11,5 +11,5 @@ See LICENSE.txt for the associated Apache license.
 
 Changes:
 - use StringBuilder
-- fixed Eclipse JOPE style warnings (this. qualification, ivar overrides)
+- fixed Eclipse Go style warnings (this. qualification, ivar overrides)
 - childish formatting fixes

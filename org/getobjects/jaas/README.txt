@@ -1,7 +1,7 @@
 JAAS
 ****
 
-This package provides a few helper classes to build a JAAS module for JOPE.
+This package provides a few helper classes to build a JAAS module for Go.
 
 How to use?
 ===========
