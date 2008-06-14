@@ -1,20 +1,20 @@
 /*
   Copyright (C) 2007 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
 
   You should have received a copy of the GNU Lesser General Public
-  License along with JOPE; see the file COPYING.  If not, write to the
+  License along with Go; see the file COPYING.  If not, write to the
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
@@ -26,8 +26,8 @@ import org.getobjects.appserver.core.WOContext;
 /**
  * JoObjectRenderer
  * <p>
- * After a JOPE method associated with a request got run and returned a result,
- * JOPE will trigger a renderer to turn the result into a HTTP response.
+ * After a Go method associated with a request got run and returned a result,
+ * Go will trigger a renderer to turn the result into a HTTP response.
  * <p>
  * For regular WO like applications the result is usually a WOComponent which
  * itself does the actual rendering (the JoDefaultRenderer calls the
@@ -59,7 +59,7 @@ public interface IJoObjectRenderer {
    * context. Eg a PDF renderer could return false if the WORequest of the
    * _ctx does not contain an 'accept' handler which misses application/pdf.
    * <p>
-   * If a renderer returns 'false', JOPE will continue looking for other
+   * If a renderer returns 'false', Go will continue looking for other
    * renderers or fallback to the JoDefaultRenderer.
    * 
    * @param _object - the object to be rendered

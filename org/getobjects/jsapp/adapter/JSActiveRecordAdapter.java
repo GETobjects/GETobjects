@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Helge Hess
+ * Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
  *
  * This file is part of Go.
  *
@@ -13,7 +13,7 @@
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with JOPE; see the file COPYING. If not, write to the Free Software
+ * along with Go; see the file COPYING. If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 package org.getobjects.jsapp.adapter;

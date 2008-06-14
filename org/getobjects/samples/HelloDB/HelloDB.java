@@ -6,7 +6,7 @@ import org.getobjects.eoaccess.EODatabase;
 import org.getobjects.jetty.WOJettyRunner;
 
 /**
- * The application class is the main entry point of the JOPE application. More
+ * The application class is the main entry point of the Go application. More
  * or less like a Servlet context.
  * <br>
  * It can be used to add global state / management methods to the app. In this

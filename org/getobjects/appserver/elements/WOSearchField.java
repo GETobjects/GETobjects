@@ -20,7 +20,7 @@ import org.getobjects.appserver.core.WOResponse;
  * }</pre>
  * 
  * Renders:<pre>
- *   &lt;input type="search" name="searchfield" value="JOPE" /&gt;</pre>
+ *   &lt;input type="search" name="searchfield" value="Go" /&gt;</pre>
  * 
  * Bindings (WOInput):<pre>
  *   id       [in] - string

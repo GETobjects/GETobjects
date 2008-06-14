@@ -332,9 +332,9 @@ public class KVCWrapper extends Object {
     if (helper != null) return helper;
 
     // hh: Previously there was a synchronized registry of helpers. I removed
-    //     that because it only contained MapKVCWrapper in JOPE ..., hence it
+    //     that because it only contained MapKVCWrapper in Go ..., hence it
     //     was unnecessarily expensive.
-    //     We might want to replicate this at the JOPE level.
+    //     We might want to replicate this at the Go level.
     
     if (Map.class.isAssignableFrom(_class))
       helper = new MapKVCWrapper(_class);

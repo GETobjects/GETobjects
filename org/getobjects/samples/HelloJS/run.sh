@@ -1,7 +1,7 @@
 #!/bin/sh
 
-JARDIR="$HOME/dev/eclipse-go/JOPE/ThirdParty"
-GOPATH="$HOME/dev/eclipse-go/JOPE/bin"
+JARDIR="$HOME/dev/eclipse-go/GETobjects/ThirdParty"
+GOPATH="$HOME/dev/eclipse-go/GETobjects/bin"
 OGOPATH="$HOME/dev/eclipse-go/OGoCore/bin"
 
 RUNNER="org.getobjects.jsapp.run"
@@ -26,7 +26,7 @@ CLASSPATH="`ls ${JARDIR}/jcommon-1.0*.jar`:${CLASSPATH}"
 # iText
 CLASSPATH="`ls ${JARDIR}/iText-2.0*.jar`:${CLASSPATH}"
 
-# JOPE
+# Go
 CLASSPATH="${GOPATH}:${OGOPATH}:${CLASSPATH}"
 
 #echo "CLASSPATH: ${CLASSPATH}"

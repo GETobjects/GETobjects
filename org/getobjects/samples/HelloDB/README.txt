@@ -2,7 +2,7 @@ HelloDB
 =======
 
 This applications demonstrates how to access a relational (JDBC) database
-using JOPE.
+using Go.
 
 The demo runs against the OpenGroupware.org database schema which you can find
 over here:

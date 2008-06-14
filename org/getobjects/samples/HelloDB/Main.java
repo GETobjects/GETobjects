@@ -4,7 +4,7 @@ import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.eocontrol.EODataSource;
 
 /**
- * Main is the 'default' component of a regular JOPE application. This is what
+ * Main is the 'default' component of a regular Go application. This is what
  * you get if you enter the root /App URL.
  */
 public class Main extends WOComponent {
