@@ -12,12 +12,12 @@
   };
   
   classes = {
-    org.getobjects.samples.HelloJo.LanguageSelector = {
+    org.getobjects.samples.HelloGo.LanguageSelector = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
     };
     
-    org.getobjects.samples.HelloJo.PoJo = {
+    org.getobjects.samples.HelloGo.PoJo = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
 

@@ -48,7 +48,7 @@ import org.getobjects.ofs.IGoFolderish;
  * TODO: traverse SoClass'es and expose methods
  */
 public class JMIExposeClientObjectToJS extends WODynamicElement {
-  protected static final Log log = LogFactory.getLog("JoOFS");
+  protected static final Log log = LogFactory.getLog("GoOFS");
 
   public JMIExposeClientObjectToJS
     (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
@@ -110,7 +110,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   {
     /*
      * TODO: plenty of things, just a prototype ;-)
-     * - add ability to let the JoClass provide an own JavaScript representation
+     * - add ability to let the GoClass provide an own JavaScript representation
      * - add different invocation styles, eg updating a fragment instead of a
      *   full refresh
      */
@@ -174,7 +174,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     String className = "OFSBaseObject";
     
     if (_ctx != null) {
-      GoClass cls = _ctx.joClassRegistry().goClassForJavaObject(_object, _ctx);
+      GoClass cls = _ctx.goClassRegistry().goClassForJavaObject(_object, _ctx);
       if (cls != null)
         className = this.exposeJoClass(cls, _js, _ctx);
     }
@@ -210,7 +210,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     /* append traversal path */
     
     StringBuilder sb = new StringBuilder(512);
-    path = _ctx.joTraversalPath().pathToClientObject();
+    path = _ctx.goTraversalPath().pathToClientObject();
     if (path == null || path.length == 0) {
       _js.append("[], ");
       sb.append("/");
@@ -221,7 +221,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
         if (i != 0) _js.append(", ");
         _js.appendConstant(path[i]);
 
-        // TODO: this belongs into JoTraversalPath
+        // TODO: this belongs into GoTraversalPath
         sb.append("/");
         try {
           sb.append(URLEncoder.encode(path[i], WOMessage.defaultURLEncoding()));

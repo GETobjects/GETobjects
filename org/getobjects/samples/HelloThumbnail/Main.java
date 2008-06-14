@@ -102,7 +102,7 @@ public class Main extends WOComponent {
    * The method relies on a source-image being available in the session.
    * <p>
    * Note that the method returns a java.awt.BufferedImage. This will get
-   * rendered to a GIF image by the JoDefaultRenderer.
+   * rendered to a GIF image by the GoDefaultRenderer.
    * (this method does not return a WOResponse, but it lets the Go machinery
    * deal with the image result object).
    *

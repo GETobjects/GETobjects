@@ -57,7 +57,7 @@ import org.getobjects.ofs.htaccess.eval.UnsetEnv;
  * a given lookup context.
  */
 public class HtConfigBuilder extends NSObject {
-  protected static final Log log = LogFactory.getLog("JoConfig");
+  protected static final Log log = LogFactory.getLog("GoConfig");
   
   protected static final Map<String, IHtConfigEvaluation> defDirectiveToEval;
   static {

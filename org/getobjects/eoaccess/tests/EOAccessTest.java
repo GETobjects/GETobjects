@@ -34,16 +34,16 @@ public abstract class EOAccessTest extends NSObject {
   
   /* SQL */
   
-  static final String createJopeTestContact =
+  static final String createGopeTestContact =
     "CREATE TABLE jopetest_contact ( pkey INT PRIMARY KEY, " +
     "lastname VARCHAR(255), firstname VARCHAR(255), moddate TIMESTAMP )";
 
-  static final String dropJopeTestContact = "DROP TABLE jopetest_contact";
+  static final String dropGopeTestContact = "DROP TABLE jopetest_contact";
 
-  static final String createJopeTestNotes =
+  static final String createGopeTestNotes =
     "CREATE TABLE jopetest_notes ( id INT PRIMARY KEY, " +
     "notetext VARCHAR(255) NOT NULL, contact_id INT)";
-  static final String dropJopeTestNotes =
+  static final String dropGopeTestNotes =
     "DROP TABLE jopetest_notes";
 
   /* Note: with MySQL we can't send two in one by using ';' separation! */

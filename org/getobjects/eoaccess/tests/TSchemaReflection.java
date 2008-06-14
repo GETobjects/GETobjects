@@ -56,15 +56,15 @@ public class TSchemaReflection extends EOAccessTest {
 
     //this.channel.performUpdateSQL(dropTable1);
     this.channel.performUpdateSQL(createTable1);
-    this.channel.performUpdateSQL(createJopeTestNotes);
-    this.channel.performUpdateSQL(createJopeTestContact);
+    this.channel.performUpdateSQL(createGopeTestNotes);
+    this.channel.performUpdateSQL(createGopeTestContact);
 }
 
   @After
   public void tearDown() {
-    this.channel.performUpdateSQL(dropJopeTestContact);
+    this.channel.performUpdateSQL(dropGopeTestContact);
     this.channel.performUpdateSQL(dropTable1);
-    this.channel.performUpdateSQL(dropJopeTestNotes);
+    this.channel.performUpdateSQL(dropGopeTestNotes);
     
     this.channel.dispose();
     this.channel = null;

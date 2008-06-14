@@ -34,7 +34,7 @@ import org.getobjects.appserver.core.WOResourceManager;
  * WOElement hierarchy from that (plus component instantiation info).
  * <p>
  * The prominent subclass is <code>WOWrapperTemplateBuilder</code> which
- * handles various template setups (eg wrappers or straight .html Jo
+ * handles various template setups (eg wrappers or straight .html Go
  * templates).
  */
 public abstract class WOTemplateBuilder {

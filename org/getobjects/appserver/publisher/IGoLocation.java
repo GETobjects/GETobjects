@@ -307,7 +307,7 @@ public interface IGoLocation {
     /* GoClass */
     
     public GoClass joClassInContext(IGoContext _ctx) {
-      return _ctx.joClassRegistry().goClassForJavaObject
+      return _ctx.goClassRegistry().goClassForJavaObject
         (this.wrappedObject, _ctx);
     }
     
@@ -360,7 +360,7 @@ public interface IGoLocation {
     /* GoClass */
     
     public GoClass joClassInContext(IGoContext _ctx) {
-      return _ctx.joClassRegistry().goClassForJavaObject
+      return _ctx.goClassRegistry().goClassForJavaObject
         (this.wrappedObject, _ctx);
     }
     

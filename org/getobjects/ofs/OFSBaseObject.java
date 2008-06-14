@@ -254,7 +254,7 @@ public abstract class OFSBaseObject extends NSObject
       return null;
     }
     
-    final GoClassRegistry reg = _ctx.joClassRegistry();
+    final GoClassRegistry reg = _ctx.goClassRegistry();
     if (reg == null) {
       log.warn("context has no class registry: " + _ctx);
       return null;

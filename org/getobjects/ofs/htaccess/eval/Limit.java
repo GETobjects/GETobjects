@@ -49,7 +49,7 @@ import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
  * Note: the operation is case sensitive!
  */
 public class Limit extends NSObject implements IHtConfigEvaluation {
-  protected static final Log log = LogFactory.getLog("JoConfig");
+  protected static final Log log = LogFactory.getLog("GoConfig");
   
   public Exception evaluateDirective
     (final HtConfigBuilder _builder, HtConfigDirective _directive,

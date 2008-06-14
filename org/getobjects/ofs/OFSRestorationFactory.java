@@ -68,7 +68,7 @@ public class OFSRestorationFactory extends NSObject {
     
     /* first ask the lookup path */
     
-    GoTraversalPath tpath = _ctx != null ? _ctx.joTraversalPath() : null;
+    GoTraversalPath tpath = _ctx != null ? _ctx.goTraversalPath() : null;
     if (tpath != null) {
       Object[] objPath = tpath.objectTraversalPath();
       int len = objPath != null ? objPath.length : 0;

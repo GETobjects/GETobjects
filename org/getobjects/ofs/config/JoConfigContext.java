@@ -71,12 +71,18 @@ public class JoConfigContext extends NSObject
     return this.context != null ? this.context.clientObject() : null;
   }
 
-  public GoClassRegistry joClassRegistry() {
-    return this.context != null ? this.context.joClassRegistry() : null;
+  public GoClassRegistry goClassRegistry() {
+    return this.context != null ? this.context.goClassRegistry() : null;
   }
 
+  /**
+   * @deprecated Use {@link #goTraversalPath()} instead
+   */
   public GoTraversalPath joTraversalPath() {
-    return this.context != null ? this.context.joTraversalPath() : null;
+    return goTraversalPath();
+  }
+  public GoTraversalPath goTraversalPath() {
+    return this.context != null ? this.context.goTraversalPath() : null;
   }
 
   /* INSExtraVariables */

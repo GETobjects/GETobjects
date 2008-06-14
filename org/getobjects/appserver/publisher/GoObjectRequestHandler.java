@@ -60,7 +60,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
     GoTraversalPath tpath = null;
     if (r == null) {
       tpath = GoTraversalPath.traversalPathForContext(_ctx);
-      _ctx._setJoTraversalPath(tpath);
+      _ctx._setGoTraversalPath(tpath);
       
       // TBD: when do we want to enable acquisition? Eg we don't want it on
       //      WebDAV requests (I think?).

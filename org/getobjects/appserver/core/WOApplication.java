@@ -1315,7 +1315,7 @@ public class WOApplication extends NSObject
   /* GoClass */
 
   public GoClass joClassInContext(IGoContext _ctx) {
-    return _ctx.joClassRegistry().goClassForJavaObject(this, _ctx);
+    return _ctx.goClassRegistry().goClassForJavaObject(this, _ctx);
   }
 
   

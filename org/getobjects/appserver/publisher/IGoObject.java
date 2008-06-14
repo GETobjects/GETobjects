@@ -109,7 +109,7 @@ public interface IGoObject {
         return null;
       
       /* default behaviour is to reflect on the Java class */
-      GoClassRegistry classRegistry = _ctx.joClassRegistry();
+      GoClassRegistry classRegistry = _ctx.goClassRegistry();
       if (classRegistry != null)
         return classRegistry.goClassForJavaObject(_self, _ctx);
 

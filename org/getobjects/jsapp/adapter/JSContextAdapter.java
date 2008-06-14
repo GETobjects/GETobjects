@@ -183,7 +183,7 @@ public class JSContextAdapter extends JSExtraVarAdapter {
         break;
       case 'j':
         if (len == 15 && "joTraversalPath".equals(_name))
-          dp = ((WOContext)this.javaObject).joTraversalPath();
+          dp = ((WOContext)this.javaObject).goTraversalPath();
         break;
       case 'l':
         if (len == 3 && "log".equals(_name))

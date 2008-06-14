@@ -127,7 +127,7 @@ public class OFSComponentWrapper extends OFSFolder
     if ((actionName = wctx.request().formAction()) == null) {
       // PATH_INFO does not work well with acquisition, eg /login/login
       // returns the same object.
-      String[] handlerPath = _ctx.joTraversalPath().pathInfo();
+      String[] handlerPath = _ctx.goTraversalPath().pathInfo();
       if (handlerPath != null && handlerPath.length > 0)
         actionName = handlerPath[0];
     }

@@ -188,7 +188,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
     
     // TODO: we might want to render more
     
-    GoTraversalPath tp = _ctx.joTraversalPath();
+    GoTraversalPath tp = _ctx.goTraversalPath();
     if (tp != null) {
       r.appendContentString("Path: ");
       r.appendContentHTMLString

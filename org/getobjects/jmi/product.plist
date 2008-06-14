@@ -68,7 +68,7 @@
 				
 				"-manage_addProduct" = {
           protectedBy = "View Management Screens";
-				  valueClass = /* this instantiates the factory, its no the JoObject */
+				  valueClass = /* this instantiates the factory, its no the GoObject */
 				  	"org.getobjects.jmi.JMIManageAddProductFactory";
 				};
 				

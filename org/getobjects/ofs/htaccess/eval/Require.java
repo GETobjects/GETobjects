@@ -59,7 +59,7 @@ import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
  * a + or - to accomplish that.
  */
 public class Require extends NSObject implements IHtConfigEvaluation {
-  protected static final Log log = LogFactory.getLog("JoConfig");
+  protected static final Log log = LogFactory.getLog("GoConfig");
   
   private static final Set<String> emptySet = Collections.emptySet();
 

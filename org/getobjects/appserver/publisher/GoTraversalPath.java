@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
-import org.getobjects.appserver.core.WORequestJoPath;
+import org.getobjects.appserver.core.WORequestGoPath;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UList;
@@ -100,7 +100,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
       return null;
     
     String appName = app.name();
-    String[] rp = WORequestJoPath.traversalPathForRequest
+    String[] rp = WORequestGoPath.traversalPathForRequest
       (rq, _ctx,  appName/* cut off appname */);
     
     return new GoTraversalPath(rp, app.rootObjectInContext(_ctx, rp), _ctx);

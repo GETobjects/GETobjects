@@ -53,7 +53,7 @@ public class TActiveRecord extends EOAccessTest {
   public void setUp() {
     this.database = new EODatabase(myurl, null /* model */, null /* classes */);
 
-    this.database.adaptor().performUpdateSQL(createJopeTestContact);
+    this.database.adaptor().performUpdateSQL(createGopeTestContact);
     this.database.adaptor().performUpdateSQL(fillTable1_1);
     this.database.adaptor().performUpdateSQL(fillTable1_2);
     this.database.adaptor().performUpdateSQL(createTable2);
@@ -71,7 +71,7 @@ public class TActiveRecord extends EOAccessTest {
     this.mickey.dispose(); this.mickey = null;
     
     this.database.adaptor().performUpdateSQL(dropTable2);
-    this.database.adaptor().performUpdateSQL(dropJopeTestContact);
+    this.database.adaptor().performUpdateSQL(dropGopeTestContact);
     this.database.dispose();
     this.database = null;
   }

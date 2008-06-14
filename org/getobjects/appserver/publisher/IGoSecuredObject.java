@@ -354,7 +354,7 @@ public interface IGoSecuredObject {
                    "' on object: " + _self);
         }
         
-        GoClass cls = _ctx.joClassRegistry().goClassForJavaObject(_self, _ctx);
+        GoClass cls = _ctx.goClassRegistry().goClassForJavaObject(_self, _ctx);
         GoSecurityInfo sinfo = null;
 
         for (GoClass pcls = cls; pcls != null; pcls = pcls.joSuperClass()) {
@@ -507,7 +507,7 @@ public interface IGoSecuredObject {
     public static Exception validateObject(Object _self, IGoContext _ctx) {
       // TODO: in SOPE we also ask _self isPublicInContext:
       
-      GoClass cls = _ctx.joClassRegistry().goClassForJavaObject(_self, _ctx);
+      GoClass cls = _ctx.goClassRegistry().goClassForJavaObject(_self, _ctx);
       GoSecurityInfo sinfo = null;
       
       /* first find security info */
@@ -599,7 +599,7 @@ public interface IGoSecuredObject {
        * given key.
        */
       
-      GoClassRegistry reg = _ctx != null ? _ctx.joClassRegistry() : null;
+      GoClassRegistry reg = _ctx != null ? _ctx.goClassRegistry() : null;
       if (reg == null) {
         log.warn("did not find joClassRegistry in ctx: " + _ctx);
         return null;
