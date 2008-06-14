@@ -33,11 +33,11 @@ import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOMessage;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.elements.WOJavaScriptWriter;
-import org.getobjects.appserver.publisher.IJoCallable;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoLocation;
-import org.getobjects.appserver.publisher.JoClass;
-import org.getobjects.ofs.IJoFolderish;
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoLocation;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.ofs.IGoFolderish;
 
 /*
  * JMIExposeClientObjectToJS
@@ -79,7 +79,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     "}\n"
     ;
 
-  protected boolean shouldExposeClass(JoClass _cls) {
+  protected boolean shouldExposeClass(GoClass _cls) {
     if (_cls == null)
       return false;
     
@@ -91,7 +91,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected void exposeMethod
-    (String _methodName, WOJavaScriptWriter _js, IJoContext _ctx)
+    (String _methodName, WOJavaScriptWriter _js, IGoContext _ctx)
   {
     if (_methodName == null || _methodName.length() == 0)
       return;
@@ -106,7 +106,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected String exposeJoClass
-    (JoClass _cls, WOJavaScriptWriter _js, IJoContext _ctx)
+    (GoClass _cls, WOJavaScriptWriter _js, IGoContext _ctx)
   {
     /*
      * TODO: plenty of things, just a prototype ;-)
@@ -121,7 +121,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     
     /* check superclass */
     
-    JoClass superClass = _cls.joSuperClass();
+    GoClass superClass = _cls.joSuperClass();
     String  superName = this.shouldExposeClass(superClass)
       ? exposeJoClass(superClass, _js, _ctx)
       : null;
@@ -139,7 +139,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
         if (method == null || method instanceof Exception)
           continue;
         
-        if (method instanceof IJoCallable)
+        if (method instanceof IGoCallable)
           this.exposeMethod(slot, _js, _ctx);
       }
     }
@@ -159,7 +159,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected void exposeClientObject
-    (Object _object, WOJavaScriptWriter _js, IJoContext _ctx)
+    (Object _object, WOJavaScriptWriter _js, IGoContext _ctx)
   {
     if (_object == null) {
       _js.append("var clientObject = ");
@@ -174,7 +174,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     String className = "OFSBaseObject";
     
     if (_ctx != null) {
-      JoClass cls = _ctx.joClassRegistry().joClassForJavaObject(_object, _ctx);
+      GoClass cls = _ctx.joClassRegistry().goClassForJavaObject(_object, _ctx);
       if (cls != null)
         className = this.exposeJoClass(cls, _js, _ctx);
     }
@@ -187,14 +187,14 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     
     _js.append("initClientObject(clientObject, ");
     
-    if (_object instanceof IJoFolderish)
+    if (_object instanceof IGoFolderish)
       _js.append("true, ");
     else
       _js.append("false, ");
     
     /* append containment path */
     
-    String[] path = IJoLocation.Utility.pathToRoot(_object);
+    String[] path = IGoLocation.Utility.pathToRoot(_object);
     if (path == null || path.length == 0) {
       _js.append("[], ");
     }

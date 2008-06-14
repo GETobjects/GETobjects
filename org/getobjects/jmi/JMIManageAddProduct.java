@@ -24,12 +24,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
 import org.getobjects.appserver.core.WOContext;
-import org.getobjects.appserver.products.JoProduct;
-import org.getobjects.appserver.products.JoProductManager;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObject;
-import org.getobjects.appserver.publisher.JoInternalErrorException;
-import org.getobjects.appserver.publisher.JoNotFoundException;
+import org.getobjects.appserver.products.GoProduct;
+import org.getobjects.appserver.products.GoProductManager;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObject;
+import org.getobjects.appserver.publisher.GoInternalErrorException;
+import org.getobjects.appserver.publisher.GoNotFoundException;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -52,13 +52,13 @@ import org.getobjects.foundation.NSObject;
  */   
 // TODO: document more
 public class JMIManageAddProduct extends NSObject
-  implements IJoObject
+  implements IGoObject
 {
   protected static final Log log = LogFactory.getLog("JMI");
   protected Object     clientObject;
-  protected IJoContext context;
+  protected IGoContext context;
   
-  public JMIManageAddProduct(Object _clientObject, IJoContext _ctx) {
+  public JMIManageAddProduct(Object _clientObject, IGoContext _ctx) {
     super();
     this.clientObject = _clientObject;
     this.context      = _ctx;
@@ -77,23 +77,23 @@ public class JMIManageAddProduct extends NSObject
     return null;
   }
   
-  public JoProductManager joProductManager() {
-    return (JoProductManager)this.application().valueForKey("joProductManager");
+  public GoProductManager joProductManager() {
+    return (GoProductManager)this.application().valueForKey("joProductManager");
   }
   
   /* lookup */
 
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
-    JoProductManager pm = this.joProductManager();
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
+    GoProductManager pm = this.joProductManager();
     if (pm == null) {
       log.error("did not find product manager for AddProduct: " + this);
-      return new JoInternalErrorException("failed to lookup product manager");
+      return new GoInternalErrorException("failed to lookup product manager");
     }
     
-    JoProduct product = (JoProduct)pm.lookupName(_name, _ctx, false /*no acq*/);
+    GoProduct product = (GoProduct)pm.lookupName(_name, _ctx, false /*no acq*/);
     if (product == null) {
       log.warn("did not find product: " + _name);
-      return new JoNotFoundException("did not find product: " + _name);
+      return new GoNotFoundException("did not find product: " + _name);
     }
     
     /* factory will be looked up by name */
@@ -102,19 +102,19 @@ public class JMIManageAddProduct extends NSObject
 
   /* factory lookup */
   
-  public static class FactoryLookup extends NSObject implements IJoObject {
+  public static class FactoryLookup extends NSObject implements IGoObject {
     protected Object     clientObject;
-    protected IJoContext context;
-    protected JoProduct  product;
+    protected IGoContext context;
+    protected GoProduct  product;
     
-    public FactoryLookup(Object _clientObject, JoProduct _p, IJoContext _ctx) {
+    public FactoryLookup(Object _clientObject, GoProduct _p, IGoContext _ctx) {
       super();
       this.clientObject = _clientObject;
       this.product      = _p;
       this.context      = _ctx;
     }
 
-    public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+    public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
       log.error("lookup factory ...");
       // TBD: this is not implemented
       return null;

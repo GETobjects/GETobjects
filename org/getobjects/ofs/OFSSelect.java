@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOFilterDataSource;
@@ -39,7 +39,7 @@ import org.getobjects.foundation.NSPropertyListParser;
  * Runs a query on the folder containing this object and exposes the results
  * as a collection.
  */
-public class OFSSelect extends OFSBaseObject implements IJoFolderish {
+public class OFSSelect extends OFSBaseObject implements IGoFolderish {
 
   protected EOFetchSpecification fetchSpecification;
   
@@ -49,15 +49,15 @@ public class OFSSelect extends OFSBaseObject implements IJoFolderish {
     return true;
   }
   
-  public EODataSource folderDataSource(IJoContext _ctx) {
+  public EODataSource folderDataSource(IGoContext _ctx) {
     /* Note: the folder datasource can have its own, additional fetchspec */
     return new EOFilterDataSource(this.sourceDataSource(_ctx));
   }
   
   /* source */
   
-  public EODataSource sourceDataSource(IJoContext _ctx) {
-    EODataSource ds = ((IJoFolderish)this.container).folderDataSource(_ctx);
+  public EODataSource sourceDataSource(IGoContext _ctx) {
+    EODataSource ds = ((IGoFolderish)this.container).folderDataSource(_ctx);
     ds.setFetchSpecification(this.fetchSpecification());
     return ds;
   }
@@ -93,7 +93,7 @@ public class OFSSelect extends OFSBaseObject implements IJoFolderish {
     return this.fetchSpecification;
   }
   
-  public List fetchObjects(IJoContext _ctx) {
+  public List fetchObjects(IGoContext _ctx) {
     EODataSource ds = this.sourceDataSource(_ctx);
     return ds != null ? ds.fetchObjects() : null;
   }
@@ -101,7 +101,7 @@ public class OFSSelect extends OFSBaseObject implements IJoFolderish {
   /* JoObject */
   
   @Override
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     if (_name == null)
       return null;
     

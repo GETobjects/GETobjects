@@ -33,18 +33,18 @@ import javax.security.auth.login.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOResourceManager;
-import org.getobjects.appserver.publisher.IJoAuthenticator;
-import org.getobjects.appserver.publisher.IJoAuthenticatorContainer;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObject;
-import org.getobjects.appserver.publisher.IJoSecuredObject;
-import org.getobjects.appserver.publisher.IJoUser;
-import org.getobjects.appserver.publisher.JoAuthRequiredException;
-import org.getobjects.appserver.publisher.JoClass;
-import org.getobjects.appserver.publisher.JoContainerResourceManager;
-import org.getobjects.appserver.publisher.JoHTTPAuthenticator;
-import org.getobjects.appserver.publisher.JoRole;
-import org.getobjects.appserver.publisher.JoSessionAuthenticator;
+import org.getobjects.appserver.publisher.IGoAuthenticator;
+import org.getobjects.appserver.publisher.IGoAuthenticatorContainer;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObject;
+import org.getobjects.appserver.publisher.IGoSecuredObject;
+import org.getobjects.appserver.publisher.IGoUser;
+import org.getobjects.appserver.publisher.GoAuthRequiredException;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoContainerResourceManager;
+import org.getobjects.appserver.publisher.GoHTTPAuthenticator;
+import org.getobjects.appserver.publisher.GoRole;
+import org.getobjects.appserver.publisher.GoSessionAuthenticator;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
@@ -63,8 +63,8 @@ import org.getobjects.ofs.fs.IOFSFileManager;
  * basis.
  */
 public class OFSFolder extends OFSBaseObject
-  implements IJoFolderish, IOFSLifecycleObject,
-             IJoSecuredObject, IJoAuthenticatorContainer
+  implements IGoFolderish, IOFSLifecycleObject,
+             IGoSecuredObject, IGoAuthenticatorContainer
 {
   // TBD: document class
   protected static final Log cfglog  = LogFactory.getLog("JoConfig");
@@ -90,7 +90,7 @@ public class OFSFolder extends OFSBaseObject
    * The resource manager associated with the folder.
    */
   protected WOResourceManager resourceManager;
-  protected IJoContext context; /* required for the RM? */
+  protected IGoContext context; /* required for the RM? */
 
   /**
    * This method just grabs the <code>_ctx</code> early in the process. We need
@@ -101,7 +101,7 @@ public class OFSFolder extends OFSBaseObject
   public Object awakeFromRestoration
     (final OFSRestorationFactory _factory, final Object _container,
      final IOFSFileManager _fm, final IOFSFileInfo _file,
-     final IJoContext _ctx)
+     final IGoContext _ctx)
   {
     // TBD: check whether we can remove the context from the controller. Its
     //      currently required by the resource manager, I think during the
@@ -205,7 +205,7 @@ public class OFSFolder extends OFSBaseObject
    * 
    * @return a datasource representing the contents of this folder
    */
-  public EODataSource folderDataSource(final IJoContext _ctx) {
+  public EODataSource folderDataSource(final IGoContext _ctx) {
     return new OFSFolderDataSource(this, _ctx);
   }
   
@@ -226,7 +226,7 @@ public class OFSFolder extends OFSBaseObject
    * @param _ctx  - the context to perform the operation in
    * @return a freshly created object, or an Exception/null on error
    */
-  public Object lookupStoredName(final String _name, final IJoContext _ctx) {
+  public Object lookupStoredName(final String _name, final IGoContext _ctx) {
     // Note: do not call configurationForNameInContext() in here, might result
     //       in a cycle! (since the config is also looked up using the method)
     
@@ -266,7 +266,7 @@ public class OFSFolder extends OFSBaseObject
    * @return the IOFSFileInfo object, or null if the name could not be resolved
    */
   public IOFSFileInfo lookupInfoForName
-    (final String _name, final IJoContext _ctx)
+    (final String _name, final IGoContext _ctx)
   {
     final boolean debugOn = log.isDebugEnabled();
     
@@ -342,7 +342,7 @@ public class OFSFolder extends OFSBaseObject
   @SuppressWarnings("unchecked")
   @Override
   public Object lookupName
-    (final String _name, final IJoContext _ctx, final boolean _acquire)
+    (final String _name, final IGoContext _ctx, final boolean _acquire)
   {
     final boolean debugOn = log.isDebugEnabled();
     
@@ -361,7 +361,7 @@ public class OFSFolder extends OFSBaseObject
     
     /* lookup using JoClass */
     
-    final JoClass cls = this.joClassInContext(_ctx);
+    final GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
@@ -417,7 +417,7 @@ public class OFSFolder extends OFSBaseObject
     /* if we shall acquire, continue at parent */
     
     if (_acquire && this.container != null)
-      return ((IJoObject)this.container).lookupName(_name, _ctx, true /* aq */);
+      return ((IGoObject)this.container).lookupName(_name, _ctx, true /* aq */);
     
     return null;
   }
@@ -434,7 +434,7 @@ public class OFSFolder extends OFSBaseObject
    * @return null if the user has access, a JoSecurityException otherwise
    */
   public Exception validateRequirements
-    (final Map<String, Set<String>> _requirements, IJoContext _ctx)
+    (final Map<String, Set<String>> _requirements, IGoContext _ctx)
   {
     if (_requirements == null || _requirements.size() == 0)
       return null; /* nothing to be done */
@@ -445,7 +445,7 @@ public class OFSFolder extends OFSBaseObject
       if (requireType.equals(JoConfigKeys.Require_ValidUser)) {
         if (requiredRoles == null)
           requiredRoles = new HashSet<String>(4);
-        requiredRoles.add(JoRole.Authenticated);
+        requiredRoles.add(GoRole.Authenticated);
       }
       else if (requireType.equals(JoConfigKeys.Require_Group)) {
         if (requiredRoles == null)
@@ -469,7 +469,7 @@ public class OFSFolder extends OFSBaseObject
     
     /* check logins and roles against active user */
     
-    IJoUser user = _ctx.activeUser();
+    IGoUser user = _ctx.activeUser();
     if (user == null)
       authlog.warn("got no activeUser from ctx: " + _ctx);
     
@@ -512,14 +512,14 @@ public class OFSFolder extends OFSBaseObject
     
     /* requirements check failed, raise an exception */
     
-    return new JoAuthRequiredException(
+    return new GoAuthRequiredException(
         this.authenticatorInContext(_ctx),
         "user does not match configured requirements: " +
         user != null ? user.getName() : "<null>");
   }
   
   @SuppressWarnings("unchecked")
-  public Exception validateName(final String _name, final IJoContext _ctx) {
+  public Exception validateName(final String _name, final IGoContext _ctx) {
     /* do not rerun validation on cached objects */
     
     if (this.cacheNameToObject != null) {
@@ -538,7 +538,7 @@ public class OFSFolder extends OFSBaseObject
     if (ci == null || !ci.hasKey(_name)) {
       // TBD: but what about JoClass methods?! We need to be able to customize
       //      the lookup of those
-      final JoClass cls = this.joClassInContext(_ctx);
+      final GoClass cls = this.joClassInContext(_ctx);
       if (cls != null) {
         Object o = cls.lookupName(this, _name, _ctx);
         if (o == null) return null; /* we do not provide the given name */
@@ -568,12 +568,12 @@ public class OFSFolder extends OFSBaseObject
     
     /* also run the default implementation */
     
-    return IJoSecuredObject.DefaultImplementation
+    return IGoSecuredObject.DefaultImplementation
       .validateNameOfObject(this, _name, _ctx);
   }
 
   @SuppressWarnings("unchecked")
-  public Exception validateObject(final IJoContext _ctx) {
+  public Exception validateObject(final IGoContext _ctx) {
     if (true)
       return null; // DOES NOT WORK YET
     
@@ -600,21 +600,21 @@ public class OFSFolder extends OFSBaseObject
     
     /* also run the default implementation */
     
-    return IJoSecuredObject.DefaultImplementation.validateObject(this, _ctx);
+    return IGoSecuredObject.DefaultImplementation.validateObject(this, _ctx);
   }
-  public Exception validatePermission(String _perm, final IJoContext _ctx) {
-    return IJoSecuredObject.DefaultImplementation
+  public Exception validatePermission(String _perm, final IGoContext _ctx) {
+    return IGoSecuredObject.DefaultImplementation
       .validatePermissionOnObject(_perm, this, _ctx);
   }
   
-  protected IJoAuthenticator cachedAuthenticator;
+  protected IGoAuthenticator cachedAuthenticator;
   
   /**
    * Returns an IJoAuthenticator managed by the folder. The default
    * implementation uses the 'configurationInContext()' to build the
    * authenticator.
    */
-  public IJoAuthenticator authenticatorInContext(IJoContext _ctx) {
+  public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
     if (this.cachedAuthenticator != null)
       return this.cachedAuthenticator;
     
@@ -632,7 +632,7 @@ public class OFSFolder extends OFSBaseObject
     
     if ("Basic".equalsIgnoreCase(authType)) {
       Configuration jaasCfg = null; // TBD
-      JoHTTPAuthenticator auth = new JoHTTPAuthenticator(authName, jaasCfg);
+      GoHTTPAuthenticator auth = new GoHTTPAuthenticator(authName, jaasCfg);
       return (this.cachedAuthenticator = auth);
     }
     
@@ -644,7 +644,7 @@ public class OFSFolder extends OFSBaseObject
        * Further the session-auth renders AuthExceptions as redirects to a
        * login page.
        */
-      JoSessionAuthenticator auth = new JoSessionAuthenticator();
+      GoSessionAuthenticator auth = new GoSessionAuthenticator();
       
       String s = (String)cfg.get("authloginpage");
       if (UObject.isNotEmpty(s))
@@ -679,7 +679,7 @@ public class OFSFolder extends OFSBaseObject
    * @return the configuration dictionary, or null if there was none
    */
   @SuppressWarnings("unchecked")
-  public Map<String, Object> configurationInContext(IJoContext _ctx) {
+  public Map<String, Object> configurationInContext(IGoContext _ctx) {
     if (this.ownConfig != null)
       return this.ownConfig == CACHE_MISS ? null : (Map)this.ownConfig;
 
@@ -716,7 +716,7 @@ public class OFSFolder extends OFSBaseObject
    */
   @SuppressWarnings("unchecked")
   public Map<String, ?> configurationForNameInContext
-    (final String _name, final IJoContext _ctx)
+    (final String _name, final IGoContext _ctx)
   {
     // TBD: this only works for contained objects because the storagePath
     //      depends on lookup! (could be acquired or remapped)
@@ -765,11 +765,11 @@ public class OFSFolder extends OFSBaseObject
       return this.resourceManager;
     
     final WOResourceManager parentRM =
-      JoContainerResourceManager.lookupResourceManager
+      GoContainerResourceManager.lookupResourceManager
         (this.container(), this.context);
     
     this.resourceManager = 
-      new JoContainerResourceManager(this, parentRM, this.context);
+      new GoContainerResourceManager(this, parentRM, this.context);
     return this.resourceManager;
   }
   

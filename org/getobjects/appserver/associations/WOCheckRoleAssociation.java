@@ -22,8 +22,8 @@ package org.getobjects.appserver.associations;
 
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOComponent;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoUser;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoUser;
 import org.getobjects.foundation.UString;
 
 /**
@@ -84,9 +84,9 @@ public class WOCheckRoleAssociation extends WOAssociation {
   
   /* values */
   
-  public IJoContext locateContextInCursor(final Object _cursor) {
-    if (_cursor instanceof IJoContext)
-      return (IJoContext)_cursor;
+  public IGoContext locateContextInCursor(final Object _cursor) {
+    if (_cursor instanceof IGoContext)
+      return (IGoContext)_cursor;
     
     if (_cursor instanceof WOComponent)
       return ((WOComponent)_cursor).context();
@@ -101,7 +101,7 @@ public class WOCheckRoleAssociation extends WOAssociation {
     
     /* find context and user object */
     
-    IJoContext ctx = this.locateContextInCursor(_cursor);
+    IGoContext ctx = this.locateContextInCursor(_cursor);
     if (ctx == null) {
       if (log.isInfoEnabled()) {
         log.info("could not find a IJoContext for cursor, rejecting access: " +
@@ -110,7 +110,7 @@ public class WOCheckRoleAssociation extends WOAssociation {
       return false;
     }
     
-    IJoUser user = ctx != null ? ctx.activeUser() : null;
+    IGoUser user = ctx != null ? ctx.activeUser() : null;
     if (user == null) {
       log.info("could not find a user for cursor, rejecting access: " +_cursor);
       return false;

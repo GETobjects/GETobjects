@@ -24,8 +24,8 @@ import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
-import org.getobjects.appserver.publisher.IJoCallable;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
 import org.mozilla.javascript.Context;
@@ -332,7 +332,7 @@ public class JSComponent extends WOComponent {
   }
 
   @Override
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     Object v = this.callJSFuncWhenAvailable
       ("lookupName", new Object[] { _name, _ctx, _acquire } );
     
@@ -340,7 +340,7 @@ public class JSComponent extends WOComponent {
       ? super.lookupName(_name, _ctx, _acquire)
       : v;
   }
-  public Object super_lookupName(String _name, IJoContext _ctx, boolean _acq) {
+  public Object super_lookupName(String _name, IGoContext _ctx, boolean _acq) {
     /* check instance slots */
     
     Object jv = this.objectForKey(_name + "Action");
@@ -389,7 +389,7 @@ public class JSComponent extends WOComponent {
   
   /* Callable */
   
-  public class JSComponentAction extends NSObject implements IJoCallable {
+  public class JSComponentAction extends NSObject implements IGoCallable {
     
     protected JSComponent component;
     protected Object      function;
@@ -403,11 +403,11 @@ public class JSComponent extends WOComponent {
     
     /* callable */
 
-    public Object callInContext(Object _object, IJoContext _ctx) {
+    public Object callInContext(Object _object, IGoContext _ctx) {
       return this.component.performScriptActionNamed(this.function, this.name);
     }
 
-    public boolean isCallableInContext(IJoContext _ctx) {
+    public boolean isCallableInContext(IGoContext _ctx) {
       return true;
     }
     

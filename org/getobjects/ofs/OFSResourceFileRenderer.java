@@ -31,8 +31,8 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOMessage;
 import org.getobjects.appserver.core.WOResponse;
-import org.getobjects.appserver.publisher.IJoObjectRenderer;
-import org.getobjects.appserver.publisher.JoInternalErrorException;
+import org.getobjects.appserver.publisher.IGoObjectRenderer;
+import org.getobjects.appserver.publisher.GoInternalErrorException;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -42,7 +42,7 @@ import org.getobjects.foundation.NSObject;
  * the WOResponse.
  */
 public class OFSResourceFileRenderer extends NSObject
-  implements IJoObjectRenderer
+  implements IGoObjectRenderer
 {
   protected static final Log log = LogFactory.getLog("JoOFS");
 
@@ -59,7 +59,7 @@ public class OFSResourceFileRenderer extends NSObject
    */
   public Exception renderObjectInContext(Object _object, WOContext _ctx) {
     if (_object == null)
-      return new JoInternalErrorException("got no object to render");
+      return new GoInternalErrorException("got no object to render");
     
     /* retrieve basic info */
     
@@ -104,7 +104,7 @@ public class OFSResourceFileRenderer extends NSObject
 
     InputStream is = doc.openStream();
     if (is == null)
-      return new JoInternalErrorException("could not open resource stream");
+      return new GoInternalErrorException("could not open resource stream");
       
     r.resetLastException();
     try {
@@ -113,7 +113,7 @@ public class OFSResourceFileRenderer extends NSObject
         r.appendContentData(buffer, len);
     }
     catch (IOException e) {
-      return new JoInternalErrorException
+      return new GoInternalErrorException
         ("failed to read from resource stream");
     }
     finally {

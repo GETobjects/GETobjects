@@ -24,7 +24,7 @@ import org.getobjects.appserver.core.IWOComponentDefinition;
 import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOResourceManager;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.foundation.UString;
 import org.getobjects.ofs.OFSComponentWrapper;
 import org.getobjects.ofs.fs.IOFSFileInfo;
@@ -52,7 +52,7 @@ public class JSComponentWrapper extends OFSComponentWrapper {
 
   @Override
   public Object postProcessCallResult
-    (Object _object, Object _result, IJoContext _ctx)
+    (Object _object, Object _result, IGoContext _ctx)
   {
     /* post process results */
     // Note: this is also done in JSComponent, we do it here for @action.
@@ -99,7 +99,7 @@ public class JSComponentWrapper extends OFSComponentWrapper {
   /* IJoObject */
   
   @Override
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     if (false) {
       // TBD: complete me, not that obvious how to do it right
       ScriptCacheEntry sce = this.loadScript(null);

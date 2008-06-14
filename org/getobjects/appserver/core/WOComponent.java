@@ -27,13 +27,13 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObject;
-import org.getobjects.appserver.publisher.IJoObjectRenderer;
-import org.getobjects.appserver.publisher.IJoObjectRendererFactory;
-import org.getobjects.appserver.publisher.JoActivePageActionInvocation;
-import org.getobjects.appserver.publisher.JoClass;
-import org.getobjects.appserver.publisher.JoDefaultRenderer;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObject;
+import org.getobjects.appserver.publisher.IGoObjectRenderer;
+import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
+import org.getobjects.appserver.publisher.GoActivePageActionInvocation;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoDefaultRenderer;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.UObject;
@@ -58,8 +58,8 @@ import org.getobjects.foundation.UObject;
  * a WODynamicElement could load a stateless sub-template).
  */
 public class WOComponent extends WOElement
-  implements WOActionResults, IJoObjectRendererFactory, IJoObjectRenderer,
-             IJoObject, INSExtraVariables
+  implements WOActionResults, IGoObjectRendererFactory, IGoObjectRenderer,
+             IGoObject, INSExtraVariables
 {
   /*
    * TODO: document
@@ -973,7 +973,7 @@ public class WOComponent extends WOElement
   
   static Class[] emptyClassArray = new Class[0];
   
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     /* check whether we have an action matching the name */
     
     /* Note: this usually won't be called, since the component itself is usually
@@ -984,11 +984,11 @@ public class WOComponent extends WOElement
     Method m = NSJavaRuntime.NSMethodFromString
       (this.getClass(), _name + "Action", emptyClassArray, true /* deep */);
     if (m != null)
-      return new JoActivePageActionInvocation(_name);
+      return new GoActivePageActionInvocation(_name);
     
     /* try to find name in JoClass */
     
-    JoClass joClass = IJoObject.Utility.joClass(this, _ctx);
+    GoClass joClass = IGoObject.Utility.joClass(this, _ctx);
     if (joClass != null)
       return joClass.lookupName(this, _name, _ctx);
     
@@ -1023,7 +1023,7 @@ public class WOComponent extends WOElement
      * sense.
      */
     this.setRenderObject(_object);
-    return JoDefaultRenderer.sharedRenderer.renderComponent(this, _ctx);
+    return GoDefaultRenderer.sharedRenderer.renderComponent(this, _ctx);
   }
   
   public void setRenderObject(Object _object) {

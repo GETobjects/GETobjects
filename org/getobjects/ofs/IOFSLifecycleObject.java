@@ -20,7 +20,7 @@
 */
 package org.getobjects.ofs;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.ofs.fs.IOFSFileInfo;
 import org.getobjects.ofs.fs.IOFSFileManager;
 
@@ -40,5 +40,5 @@ public interface IOFSLifecycleObject {
    */
   public abstract Object awakeFromRestoration
     (OFSRestorationFactory _factory, Object _container,
-     IOFSFileManager _fm, IOFSFileInfo _file, IJoContext _ctx);
+     IOFSFileManager _fm, IOFSFileInfo _file, IGoContext _ctx);
 }

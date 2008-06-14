@@ -23,7 +23,7 @@ package org.getobjects.jmi;
 import java.util.List;
 import java.util.Map;
 
-import org.getobjects.appserver.publisher.IJoObject;
+import org.getobjects.appserver.publisher.IGoObject;
 
 public class JMIManageFrame extends JMIComponent {
 
@@ -46,7 +46,7 @@ public class JMIManageFrame extends JMIComponent {
   @SuppressWarnings("unchecked")
   public Map[] factories() {
     if (this.factories == null) {
-      IJoObject co = (IJoObject)this.clientObject();
+      IGoObject co = (IGoObject)this.clientObject();
       
       List t = (List)co.lookupName("-manage_addChildren", this.context(), false);
       this.factories = (Map[])t.toArray(new Map[0]); 

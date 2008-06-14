@@ -20,7 +20,7 @@
 */
 package org.getobjects.ofs;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 
 /**
  * IOFSContextObject
@@ -31,7 +31,7 @@ import org.getobjects.appserver.publisher.IJoContext;
  */
 public interface IOFSContextObject {
 
-  public void _setContext(IJoContext _ctx);
-  public IJoContext context();
+  public void _setContext(IGoContext _ctx);
+  public IGoContext context();
   
 }

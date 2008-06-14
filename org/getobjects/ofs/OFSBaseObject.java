@@ -27,11 +27,11 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoLocation;
-import org.getobjects.appserver.publisher.IJoObject;
-import org.getobjects.appserver.publisher.JoClass;
-import org.getobjects.appserver.publisher.JoClassRegistry;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoLocation;
+import org.getobjects.appserver.publisher.IGoObject;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoClassRegistry;
 import org.getobjects.eoaccess.EOValidation;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSObject;
@@ -48,7 +48,7 @@ import org.getobjects.ofs.fs.IOFSFileManager;
  * lookup location (container/oid).
  */
 public abstract class OFSBaseObject extends NSObject
-  implements IJoObject, IJoLocation, EOValidation
+  implements IGoObject, IGoLocation, EOValidation
 {
   protected static final Log log = LogFactory.getLog("JoOFS");
   
@@ -110,7 +110,7 @@ public abstract class OFSBaseObject extends NSObject
   }
   
   public String[] pathInContainer() {
-    return IJoLocation.Utility.pathToRoot(this);
+    return IGoLocation.Utility.pathToRoot(this);
   }
   public String stringPathInContainer() {
     // TODO: not recommended to use this to avoid escaping issues
@@ -126,7 +126,7 @@ public abstract class OFSBaseObject extends NSObject
    * just cuts of everything after the first dot (all extensions). This is
    * invoked by lookupStoredName().
    */
-  public String idFromName(final String _name, final IJoContext _ctx) {
+  public String idFromName(final String _name, final IGoContext _ctx) {
     if (_name == null)
       return null;
     
@@ -140,7 +140,7 @@ public abstract class OFSBaseObject extends NSObject
   /* container */
   
   public boolean isFolderish() {
-    return this instanceof IJoFolderish;
+    return this instanceof IGoFolderish;
   }
   
   
@@ -248,25 +248,25 @@ public abstract class OFSBaseObject extends NSObject
   
   /* JoClass */
   
-  public JoClass joClassInContext(final IJoContext _ctx) {
+  public GoClass joClassInContext(final IGoContext _ctx) {
     if (_ctx == null) {
       log.warn("missing context to determine JoClass: " + this);
       return null;
     }
     
-    final JoClassRegistry reg = _ctx.joClassRegistry();
+    final GoClassRegistry reg = _ctx.joClassRegistry();
     if (reg == null) {
       log.warn("context has no class registry: " + _ctx);
       return null;
     }
     
-    return reg.joClassForJavaObject(this, _ctx);
+    return reg.goClassForJavaObject(this, _ctx);
   }
   
-  public Object lookupName(String _name, IJoContext _ctx, boolean _acquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     /* lookup using JoClass */
     
-    final JoClass cls = this.joClassInContext(_ctx);
+    final GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
@@ -275,7 +275,7 @@ public abstract class OFSBaseObject extends NSObject
     /* if we shall acquire, continue at parent */
     
     if (_acquire && this.container != null)
-      return ((IJoObject)this.container).lookupName(_name, _ctx, true /* aq */);
+      return ((IGoObject)this.container).lookupName(_name, _ctx, true /* aq */);
     
     return null;
   }
@@ -462,8 +462,8 @@ public abstract class OFSBaseObject extends NSObject
     else {
       _d.append(" in=");
       _d.append(this.container.getClass().getSimpleName());
-      if (this.container instanceof IJoLocation) {
-        String cs = ((IJoLocation)this.container).nameInContainer();
+      if (this.container instanceof IGoLocation) {
+        String cs = ((IGoLocation)this.container).nameInContainer();
         if (cs != null) {
           _d.append('[');
           _d.append(cs);

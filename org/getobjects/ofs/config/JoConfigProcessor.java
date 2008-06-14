@@ -29,8 +29,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoLocation;
-import org.getobjects.appserver.publisher.IJoObject;
+import org.getobjects.appserver.publisher.IGoLocation;
+import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UMap;
 import org.getobjects.foundation.UString;
@@ -93,7 +93,7 @@ public class JoConfigProcessor extends NSObject {
     
     final List<Object> objects = new ArrayList<Object>(16);
     for (Object o = _cursor; o != null;
-         o = IJoLocation.Utility.containerForObject(o))
+         o = IGoLocation.Utility.containerForObject(o))
     {
       objects.add(o);
     }
@@ -123,7 +123,7 @@ public class JoConfigProcessor extends NSObject {
          * in some kind of root context since our configuration contains
          * security checks ...
          */
-        cfg = IJoObject.Utility.lookupName
+        cfg = IGoObject.Utility.lookupName
           (o, accessFileName, _lookupCtx, false /* do not aquire */);
         if (cfg == null) {
           if (isDebugOn) log.debug("    did not find config: "+accessFileName);

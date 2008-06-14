@@ -20,7 +20,7 @@
 */
 package org.getobjects.ofs;
 
-import org.getobjects.appserver.products.JoProduct;
+import org.getobjects.appserver.products.GoProduct;
 
 /**
  * WOFramework
@@ -28,5 +28,5 @@ import org.getobjects.appserver.products.JoProduct;
  * This is a helper class for the Go resource manager and product
  * lookup system.
  */
-public class WOFramework extends JoProduct {
+public class WOFramework extends GoProduct {
 }

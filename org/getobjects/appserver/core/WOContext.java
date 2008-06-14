@@ -31,12 +31,12 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoAuthenticator;
-import org.getobjects.appserver.publisher.IJoAuthenticatorContainer;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoUser;
-import org.getobjects.appserver.publisher.JoClassRegistry;
-import org.getobjects.appserver.publisher.JoTraversalPath;
+import org.getobjects.appserver.publisher.IGoAuthenticator;
+import org.getobjects.appserver.publisher.IGoAuthenticatorContainer;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoUser;
+import org.getobjects.appserver.publisher.GoClassRegistry;
+import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.getobjects.foundation.UMap;
 import org.getobjects.foundation.UString;
 
@@ -52,7 +52,7 @@ import org.getobjects.foundation.UString;
  *         only (the one processing the HTTP request).
  */
 public class WOContext extends WOCoreContext
-  implements IJoContext
+  implements IGoContext
 {
   // TBD: document, eg how they are autocreated and the effect on links which
   // got generated before ...
@@ -85,8 +85,8 @@ public class WOContext extends WOCoreContext
   protected WOErrorReport errorReport;
 
   /* JoObject support */
-  protected JoTraversalPath joTraversalPath;
-  protected IJoUser         activeUser;
+  protected GoTraversalPath joTraversalPath;
+  protected IGoUser         activeUser;
   protected String          clientObjectURL;
 
   /* logging */
@@ -847,15 +847,15 @@ public class WOContext extends WOCoreContext
    * implementation returns the registry of the application object associated
    * with this context.
    */
-  public JoClassRegistry joClassRegistry() {
+  public GoClassRegistry joClassRegistry() {
     return this.application != null
       ? this.application.joClassRegistry() : null;
   }
 
-  public void _setJoTraversalPath(JoTraversalPath _path) {
+  public void _setJoTraversalPath(GoTraversalPath _path) {
     this.joTraversalPath = _path;
   }
-  public JoTraversalPath joTraversalPath() {
+  public GoTraversalPath joTraversalPath() {
     return this.joTraversalPath;
   }
 
@@ -923,11 +923,11 @@ public class WOContext extends WOCoreContext
    * process. If no user is set yet, this will attempt to lookup an
    * authenticator and use that to derive the user from the request.
    */
-  public IJoUser activeUser() {
+  public IGoUser activeUser() {
     if (this.activeUser != null)
       return this.activeUser;
 
-    IJoAuthenticator authenticator =
+    IGoAuthenticator authenticator =
       this.lookupAuthenticatorByTraversingLookupPath();
     if (authenticator == null) {
       log.warn("found no authenticator to determine active user");
@@ -949,8 +949,8 @@ public class WOContext extends WOCoreContext
    *
    * @return an IJoAuthenticator or null if none could be located.
    */
-  protected IJoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
-    JoTraversalPath joPath = this.joTraversalPath();
+  protected IGoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
+    GoTraversalPath joPath = this.joTraversalPath();
     if (joPath == null) {
       log.warn("no traversalpath is set: " + this);
       return null;
@@ -963,17 +963,17 @@ public class WOContext extends WOCoreContext
     }
 
     for (int i = path.length - 1; i >= 0; i--) {
-      if (path[i] instanceof IJoAuthenticatorContainer) {
-        IJoAuthenticator authenticator =
-          ((IJoAuthenticatorContainer)path[i]).authenticatorInContext(this);
+      if (path[i] instanceof IGoAuthenticatorContainer) {
+        IGoAuthenticator authenticator =
+          ((IGoAuthenticatorContainer)path[i]).authenticatorInContext(this);
 
         if (authenticator != null) return authenticator;
       }
     }
 
-    if (this.application instanceof IJoAuthenticatorContainer) {
-      IJoAuthenticator authenticator =
-        ((IJoAuthenticatorContainer)this.application)
+    if (this.application instanceof IGoAuthenticatorContainer) {
+      IGoAuthenticator authenticator =
+        ((IGoAuthenticatorContainer)this.application)
           .authenticatorInContext(this);
 
       if (authenticator != null) return authenticator;

@@ -25,7 +25,7 @@ import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.JoInternalErrorException;
+import org.getobjects.appserver.publisher.GoInternalErrorException;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
 import org.getobjects.ofs.fs.IOFSFileInfo;
@@ -104,7 +104,7 @@ public class OFSFileContainerChildInfo extends NSObject {
     
     if (this.fileNames == null) {
       log().warn("directory returned no files: " + this);
-      return new JoInternalErrorException
+      return new GoInternalErrorException
         ("could not list directory: " + this.fileInfo.getName());
     }
     

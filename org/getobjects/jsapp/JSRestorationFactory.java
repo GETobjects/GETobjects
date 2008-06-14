@@ -20,14 +20,14 @@
 */
 package org.getobjects.jsapp;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.ofs.OFSRestorationFactory;
 
 public class JSRestorationFactory extends OFSRestorationFactory {
 
   @Override
   public Class ofsClassForDirectoryExtensionInContext
-    (String _ext, IJoContext _ctx)
+    (String _ext, IGoContext _ctx)
   {
     /* per default we do not support specific directory extensions */
     // TODO: add .wo wrappers, possibly .eomodeld

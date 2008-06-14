@@ -24,9 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
 import org.getobjects.appserver.core.WOContext;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.JoInternalErrorException;
-import org.getobjects.appserver.publisher.JoTraversalPath;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.GoInternalErrorException;
+import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
@@ -57,7 +57,7 @@ public class OFSRestorationFactory extends NSObject {
    * @param _ctx - the Context to perform the lookup in
    */
   public static OFSRestorationFactory restorationFactoryInContext
-    (IJoContext _ctx)
+    (IGoContext _ctx)
   {
     if (_ctx == null) {
       log.error("got no ctx to lookup restoration factory!");
@@ -68,7 +68,7 @@ public class OFSRestorationFactory extends NSObject {
     
     /* first ask the lookup path */
     
-    JoTraversalPath tpath = _ctx != null ? _ctx.joTraversalPath() : null;
+    GoTraversalPath tpath = _ctx != null ? _ctx.joTraversalPath() : null;
     if (tpath != null) {
       Object[] objPath = tpath.objectTraversalPath();
       int len = objPath != null ? objPath.length : 0;
@@ -115,7 +115,7 @@ public class OFSRestorationFactory extends NSObject {
    * The default implementation just checks whether the object exists.
    */
   public boolean canRestoreObjectFromFileInContext
-    (IOFSFileManager _fm, IOFSFileInfo _file, IJoContext _ctx)
+    (IOFSFileManager _fm, IOFSFileInfo _file, IGoContext _ctx)
   {
     // TBD: should this ask the IOFSFileManager whether the _file exists?
     return _file != null ? _file.exists() : false;
@@ -139,12 +139,12 @@ public class OFSRestorationFactory extends NSObject {
    */
   public Object restoreObjectFromFileInContext
     (Object _container, IOFSFileManager _fm, IOFSFileInfo _file,
-     IJoContext _ctx)
+     IGoContext _ctx)
   {
     if (_file == null || !_file.exists()) {
       log().error("got passed an invalid OFSFileInfo object: " + _file);
 
-      return new JoInternalErrorException
+      return new GoInternalErrorException
         ("could not load associated source file");
     }
     
@@ -213,7 +213,7 @@ public class OFSRestorationFactory extends NSObject {
    * @return a controller Class or null if none could be found
    */
   public Class ofsClassForFileInContext
-    (IOFSFileManager _fm, IOFSFileInfo _file, IJoContext _ctx)
+    (IOFSFileManager _fm, IOFSFileInfo _file, IGoContext _ctx)
   {
     if (_file == null)
       return null;
@@ -241,7 +241,7 @@ public class OFSRestorationFactory extends NSObject {
     return isDir ? OFSFolder.class : OFSResourceFile.class;
   }
   
-  public Class ofsClassForExtensionInContext(String _ext, IJoContext _ctx) {
+  public Class ofsClassForExtensionInContext(String _ext, IGoContext _ctx) {
     int len = _ext != null ? _ext.length() : 0;
     if (len == 0) return null;
 
@@ -308,7 +308,7 @@ public class OFSRestorationFactory extends NSObject {
    * @return a class to be used for the given extension
    */
   public Class ofsClassForDirectoryExtensionInContext
-    (String _ext, IJoContext _ctx)
+    (String _ext, IGoContext _ctx)
   {
     if (_ext == null)
       return null;
@@ -331,7 +331,7 @@ public class OFSRestorationFactory extends NSObject {
     return null;
   }
   
-  public Class ofsClassForFileNameInContext(String _fn, IJoContext _ctx) {
+  public Class ofsClassForFileNameInContext(String _fn, IGoContext _ctx) {
     return null;
   }
   

@@ -23,9 +23,9 @@ package org.getobjects.appserver.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoCallable;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObject;
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -47,7 +47,7 @@ import org.getobjects.foundation.NSObject;
  * reasons.
  */
 public abstract class WORequestHandler extends NSObject
-  implements IJoObject, IJoCallable
+  implements IGoObject, IGoCallable
 {
   protected static final Log log = LogFactory.getLog("WOApplication");
   
@@ -219,7 +219,7 @@ public abstract class WORequestHandler extends NSObject
 
   /* JoObject */
 
-  public Object lookupName(String _name, IJoContext _ctx, boolean _aquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {
     /* we support no subobjects, all remaining handling is done by us */
     return null;
   }
@@ -232,7 +232,7 @@ public abstract class WORequestHandler extends NSObject
    * @param _ctx    - the Go context used for tracking the object lookup
    * @return a result, usually, but not necessarily a WOResponse
    */
-  public Object callInContext(final Object _object, final IJoContext _ctx) {
+  public Object callInContext(final Object _object, final IGoContext _ctx) {
     if (_ctx == null)
       return null;
     
@@ -249,7 +249,7 @@ public abstract class WORequestHandler extends NSObject
    * @param _ctx - the IJoContext the call shall happen in
    * @return true if the object is callable in the given context
    */
-  public boolean isCallableInContext(final IJoContext _ctx) {
+  public boolean isCallableInContext(final IGoContext _ctx) {
     /* we are callable in WOContext's */
     return _ctx != null && _ctx instanceof WOContext;
   }

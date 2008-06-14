@@ -21,10 +21,10 @@
 package org.getobjects.jmi;
 
 import org.getobjects.appserver.core.WOComponent;
-import org.getobjects.appserver.publisher.IJoLocation;
+import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSKeyValueCoding;
-import org.getobjects.ofs.IJoFolderish;
+import org.getobjects.ofs.IGoFolderish;
 import org.getobjects.ofs.OFSBaseObject;
 
 public abstract class JMIComponent extends WOComponent {
@@ -50,11 +50,11 @@ public abstract class JMIComponent extends WOComponent {
     if (co == null) // lookup in traversal path
       return null;
     
-    if (co instanceof IJoFolderish)
+    if (co instanceof IGoFolderish)
       return co;
     
-    if (co instanceof IJoLocation)
-      return ((IJoLocation)co).container();
+    if (co instanceof IGoLocation)
+      return ((IGoLocation)co).container();
     
     // TODO: lookup in traversal path
     return null;

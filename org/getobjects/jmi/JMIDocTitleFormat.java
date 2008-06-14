@@ -27,7 +27,7 @@ import java.text.ParsePosition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
-import org.getobjects.appserver.publisher.IJoLocation;
+import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.ofs.OFSBaseObject;
 
@@ -55,7 +55,7 @@ public class JMIDocTitleFormat extends Format {
       OFSBaseObject doc = (OFSBaseObject)_object;
       
       String title = null;
-      if (IJoLocation.Utility.isContained(doc)) {
+      if (IGoLocation.Utility.isContained(doc)) {
         title = (String)doc.valueForKey("NSFileSubject");
         if (title == null || title.length() == 0)
           title = (String)doc.valueForKey("NSFileName");

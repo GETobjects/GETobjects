@@ -28,11 +28,11 @@ import org.getobjects.appserver.core.WOComponentDefinition;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODirectActionRequestHandler;
 import org.getobjects.appserver.core.WOResourceManager;
-import org.getobjects.appserver.publisher.IJoCallable;
-import org.getobjects.appserver.publisher.IJoComponentDefinition;
-import org.getobjects.appserver.publisher.IJoContext;
-import org.getobjects.appserver.publisher.IJoObjectRenderer;
-import org.getobjects.appserver.publisher.JoDefaultRenderer;
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoComponentDefinition;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoObjectRenderer;
+import org.getobjects.appserver.publisher.GoDefaultRenderer;
 import org.getobjects.appserver.templates.WOTemplate;
 import org.getobjects.appserver.templates.WOWrapperTemplateBuilder;
 import org.getobjects.foundation.NSJavaRuntime;
@@ -46,7 +46,7 @@ import org.getobjects.ofs.fs.IOFSFileInfo;
  */
 public class OFSComponentFile extends OFSJavaObject
   implements
-    IJoCallable, IJoComponentDefinition, IJoObjectRenderer,
+    IGoCallable, IGoComponentDefinition, IGoObjectRenderer,
     IWOComponentDefinition
 {
   
@@ -62,7 +62,7 @@ public class OFSComponentFile extends OFSJavaObject
 
   /* IJoCallable */
 
-  public Object callInContext(Object _object, IJoContext _ctx) {
+  public Object callInContext(Object _object, IGoContext _ctx) {
     WOContext wctx = (WOContext)_ctx;
     
     // this will just trigger the defaultAction, which returns the component
@@ -79,7 +79,7 @@ public class OFSComponentFile extends OFSJavaObject
    * @param _ctx - the context we want to call the action in
    * @return true if its a WOContext, false otherwise.
    */
-  public boolean isCallableInContext(IJoContext _ctx) {
+  public boolean isCallableInContext(IGoContext _ctx) {
     // TBVD: is this required? I guess so.
     return _ctx instanceof WOContext;
   }
@@ -97,7 +97,7 @@ public class OFSComponentFile extends OFSJavaObject
    * @return the unwrapped results
    */
   public Object postProcessCallResult
-    (Object _object, Object _result, IJoContext _ctx)
+    (Object _object, Object _result, IGoContext _ctx)
   {
     return _result;
   }
@@ -318,7 +318,7 @@ public class OFSComponentFile extends OFSJavaObject
   }
   
   public Exception renderObjectInContext(Object _object, WOContext _ctx) {
-    return JoDefaultRenderer.sharedRenderer
+    return GoDefaultRenderer.sharedRenderer
       .renderObjectWithFrame(_object, (IWOComponentDefinition)this, _ctx);
   }
   

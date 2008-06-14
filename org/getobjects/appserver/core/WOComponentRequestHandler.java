@@ -21,7 +21,7 @@
 
 package org.getobjects.appserver.core;
 
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 
 /**
  * WOComponentRequestHandler
@@ -158,7 +158,7 @@ public class WOComponentRequestHandler extends WORequestHandler {
   /* JoObject (new style) */
 
   @Override
-  public Object lookupName(String _name, IJoContext _ctx, boolean _aquire) {
+  public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {
     /* we support no subobjects, all remaining handling is done by us */
     // TBD: we should probably implement the lookup?!
     //      us => WOSession => WOComponent => WOElementID-Dispatcher!
@@ -172,7 +172,7 @@ public class WOComponentRequestHandler extends WORequestHandler {
   }
   
   @Override
-  public Object callInContext(Object _object, IJoContext _ctx) {
+  public Object callInContext(Object _object, IGoContext _ctx) {
     // this calls handleRequest()
     return super.callInContext(_object, _ctx);
   }

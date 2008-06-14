@@ -25,7 +25,7 @@ import static org.getobjects.foundation.NSJavaRuntime.NSAllocateObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.publisher.IJoContext;
+import org.getobjects.appserver.publisher.IGoContext;
 
 /**
  * WODirectActionRequestHandler
@@ -261,7 +261,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
    * @return a result, usually, but not necessarily a WOResponse
    */
   @Override
-  public Object callInContext(Object _object, IJoContext _ctx) {
+  public Object callInContext(Object _object, IGoContext _ctx) {
     boolean isDebugOn = daLog.isDebugEnabled();
     
     if (_ctx == null) {

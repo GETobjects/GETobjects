@@ -26,7 +26,7 @@ import org.getobjects.appserver.core.WODisplayGroup;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.IJoFolderish;
+import org.getobjects.ofs.IGoFolderish;
 
 public class JMIManageFolder extends JMIComponent {
   
@@ -46,7 +46,7 @@ public class JMIManageFolder extends JMIComponent {
     
     this.clientObject = this.clientObject();
     
-    EODataSource ds = ((IJoFolderish)this.clientObject).folderDataSource(_ctx);
+    EODataSource ds = ((IGoFolderish)this.clientObject).folderDataSource(_ctx);
     
     if (ds != null)
       ds.setFetchSpecification(this.fetchSpecification());

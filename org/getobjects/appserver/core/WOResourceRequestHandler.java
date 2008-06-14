@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.getobjects.appserver.publisher.JoResource;
+import org.getobjects.appserver.publisher.GoResource;
 
 /**
  * WOResourceRequestHandler
@@ -97,7 +97,7 @@ public class WOResourceRequestHandler extends WORequestHandler {
       return r;
     }
     
-    String mimeType = JoResource.mimeTypeForPath(resourceName);
+    String mimeType = GoResource.mimeTypeForPath(resourceName);
     if (mimeType == null) {
       mimeType = "application/octet-stream";
       log.warn("could not determine content-type of resource: " + resourceName);
