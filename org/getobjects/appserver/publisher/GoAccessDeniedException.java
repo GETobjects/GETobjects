@@ -23,7 +23,7 @@ package org.getobjects.appserver.publisher;
 import org.getobjects.appserver.core.WOMessage;
 
 /**
- * JoAccessDeniedException
+ * GoAccessDeniedException
  * <p>
  * Returned if an object cannot be accessed by the currently authenticated
  * user.

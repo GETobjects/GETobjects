@@ -21,7 +21,7 @@
 package org.getobjects.appserver.publisher;
 
 /**
- * JoSecurityException
+ * GoSecurityException
  */
 public class GoSecurityException extends GoException {
   private static final long serialVersionUID = 1L;

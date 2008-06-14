@@ -206,7 +206,7 @@ public abstract class EODatabaseLoginModule extends NSObject
   /**
    * This is the primary JAAS Phase 1 entry point. The default implementation
    * grabs login/username from the CallbackHandler (eg the one provided by the
-   * JoHTTPAuthenticator) and calls loginWithUsernameAndPassword() with this
+   * GoHTTPAuthenticator) and calls loginWithUsernameAndPassword() with this
    * information.
    * 
    * @return true if authentication was successful, false otherwise
@@ -238,7 +238,7 @@ public abstract class EODatabaseLoginModule extends NSObject
   
   /**
    * This is the default JAAS Phase 1 implementation, which grabs login/pwd
-   * from the CallbackHandler (eg the one provided by the JoHTTPAuthenticator)
+   * from the CallbackHandler (eg the one provided by the GoHTTPAuthenticator)
    * and calls loginWithUsernameAndPassword() with this information.
    * 
    * @return true if authentication was successful, false otherwise

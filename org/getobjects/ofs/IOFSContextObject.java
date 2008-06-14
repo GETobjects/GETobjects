@@ -26,7 +26,7 @@ import org.getobjects.appserver.publisher.IGoContext;
  * IOFSContextObject
  * <p>
  * This is a marker interface which says that the OFS controller object
- * conforming to the interface needs an IJoContext to operate. That is,
+ * conforming to the interface needs an IGoContext to operate. That is,
  * the controller is bound to a context and doesn't work without it.
  */
 public interface IOFSContextObject {

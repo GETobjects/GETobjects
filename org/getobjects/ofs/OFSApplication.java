@@ -57,7 +57,7 @@ import org.getobjects.ofs.fs.OFSHostFileManager;
 public class OFSApplication extends WOApplication
   implements IGoAuthenticatorContainer
 {
-  protected static final Log ofslog = LogFactory.getLog("JoOFS");
+  protected static final Log ofslog = LogFactory.getLog("GoOFS");
   
   protected OFSRestorationFactory defaultRestorationFactory;
   protected ConcurrentHashMap<String, IOFSFileManager> pathToFileManager;
@@ -172,7 +172,7 @@ public class OFSApplication extends WOApplication
    * 
    * @param _ctx  - the WOContext the lookup will happen in
    * @param _path - the path to be looked up
-   * @return the Object where the JoLookup process will start
+   * @return the Object where the GoLookup process will start
    */
   @Override
   public Object rootObjectInContext(WOContext _ctx, String[] _path) {
@@ -246,7 +246,7 @@ public class OFSApplication extends WOApplication
    * 'web' object.
    * 
    * @param _ofsRoot - the OFS root
-   * @param _ctx     - the context of the upcoming Jo lookup
+   * @param _ctx     - the context of the upcoming Go lookup
    * @return the document root object
    */
   public Object documentRootObjectInContext(Object _ofsRoot, WOContext _ctx) {
@@ -309,7 +309,7 @@ public class OFSApplication extends WOApplication
   /* authentication */
   
   public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
-    /* sets up the JoHTTPAuthenticator with the default JAAS config */
+    /* sets up the GoHTTPAuthenticator with the default JAAS config */
     return new GoHTTPAuthenticator();
   }
   
@@ -335,7 +335,7 @@ public class OFSApplication extends WOApplication
       }
       else if (folderIndex != null){
         log().warn("folder contained an 'index' document, but its not a " +
-            "IJoCallable: " + folderIndex);
+            "IGoCallable: " + folderIndex);
       }
       else
         log().warn("folder contained no 'index' document: " + _object);
@@ -364,7 +364,7 @@ public class OFSApplication extends WOApplication
    * 
    * @param _p   - the component to be wrapped
    * @param _ctx - the rendering context 
-   * @return an IJoObjectRenderer, or null if no suitable one was found
+   * @return an IGoObjectRenderer, or null if no suitable one was found
    */
   public Object rendererForComponentInContext(WOComponent _p, WOContext _ctx) {
     // kinda hack to let components avoid being wrapped
@@ -389,7 +389,7 @@ public class OFSApplication extends WOApplication
         return renderer;
     }
     else if (frame != null) {
-      log.info("OFS contains a Frame, but its not an IJoObjectRenderer: " +
+      log.info("OFS contains a Frame, but its not an IGoObjectRenderer: " +
           frame);
     }
     else {

@@ -30,7 +30,7 @@ import org.getobjects.appserver.core.WOResourceManager;
  * This is usually used in OFS for component objects.
  * <p>
  * The IGoComponentDefinition objects are very similiar to
- * WOComponentDefinition's, but they do exist in a certain JoLookup context
+ * WOComponentDefinition's, but they do exist in a certain GoLookup context
  * which makes them unsuitable for global caching etc.
  * <br>
  * Hence, implementations of this protocol return a WOComponentDefinition.
@@ -40,7 +40,7 @@ public interface IGoComponentDefinition {
 
   /**
    * Returns a WOComponentDefinition which can be used to instantiate the
-   * WOComponent represented by the JoObject.
+   * WOComponent represented by the GoObject.
    * 
    * @param _name  - name of the component
    * @param _langs - array of language codes

@@ -36,7 +36,7 @@ import org.getobjects.foundation.NSObject;
  */
 public class GoPageInvocation extends NSObject implements IGoCallable {
   // TODO: document
-  protected static final Log log = LogFactory.getLog("JoClass");
+  protected static final Log log = LogFactory.getLog("GoClass");
 
   protected String pageName;
   protected String actionName;
@@ -49,7 +49,7 @@ public class GoPageInvocation extends NSObject implements IGoCallable {
     this(_name, null /* action */);
   }
   
-  /* JoCallable */
+  /* GoCallable */
   
   static Class[] emptyClassArray = new Class[0];
   

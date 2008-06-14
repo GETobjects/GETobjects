@@ -229,7 +229,7 @@ public abstract class WOAssociation extends NSObject
    * Prefixes:
    * <ul>
    *   <li>const  - WOAssociation.associationWithValue
-   *   <li>jo     - JoPathAssociation
+   *   <li>jo     - GoPathAssociation
    *   <li>label  - WOLabelAssociation
    *   <li>ognl   - WOOgnlAssociation
    *   <li>plist  - WOAssociation.associationWithValue

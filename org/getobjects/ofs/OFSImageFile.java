@@ -22,6 +22,6 @@ package org.getobjects.ofs;
 
 
 public class OFSImageFile extends OFSResourceFile {
-  // this subclass is just for giving the entity a unique JoClass
+  // this subclass is just for giving the entity a unique GoClass
 
 }

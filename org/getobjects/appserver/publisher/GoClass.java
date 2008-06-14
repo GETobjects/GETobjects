@@ -39,7 +39,7 @@ import org.getobjects.foundation.UString;
  * mappings accessible to the GoObject.
  */
 public class GoClass extends NSObject implements IGoObject {
-  protected static final Log log = LogFactory.getLog("JoClass");
+  protected static final Log log = LogFactory.getLog("GoClass");
   
   protected String   name;
   protected GoClass  joSuperClass;
@@ -199,15 +199,15 @@ public class GoClass extends NSObject implements IGoObject {
     return null;
   }
   
-  /* Using a JoClass as a JoObject */
+  /* Using a GoClass as a GoObject */
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {
-    log.warn("tried to access JoClass as an JoObject: " + _name);
+    log.warn("tried to access GoClass as an GoObject: " + _name);
     return null;
   }
   
   public GoClass joClass() {
-    return null; /* the metaclass of a JoClass, not sure whether we need it */
+    return null; /* the metaclass of a GoClass, not sure whether we need it */
   }
 
 

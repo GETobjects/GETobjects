@@ -42,7 +42,7 @@ import org.mozilla.javascript.Undefined;
  * file and merges that with the component Java functionality.
  */
 public class JSComponentWrapper extends OFSComponentWrapper {
-  // TBD: maybe this is superflous and can be replaced with JoPageInvocation,
+  // TBD: maybe this is superflous and can be replaced with GoPageInvocation,
   //      at least it does not contain anything JS
   
   protected IWOComponentDefinition cdef;
@@ -96,7 +96,7 @@ public class JSComponentWrapper extends OFSComponentWrapper {
   }
 
   
-  /* IJoObject */
+  /* IGoObject */
   
   @Override
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {

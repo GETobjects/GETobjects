@@ -24,13 +24,13 @@ package org.getobjects.appserver.publisher;
 import org.getobjects.appserver.core.WOContext;
 
 /**
- * JoObjectRenderer
+ * GoObjectRenderer
  * <p>
  * After a Go method associated with a request got run and returned a result,
  * Go will trigger a renderer to turn the result into a HTTP response.
  * <p>
  * For regular WO like applications the result is usually a WOComponent which
- * itself does the actual rendering (the JoDefaultRenderer calls the
+ * itself does the actual rendering (the GoDefaultRenderer calls the
  * appendToResponse() method of WOComponent).
  * <p>
  * Note that the render directly renders into the WOResponse which is contained
@@ -60,7 +60,7 @@ public interface IGoObjectRenderer {
    * _ctx does not contain an 'accept' handler which misses application/pdf.
    * <p>
    * If a renderer returns 'false', Go will continue looking for other
-   * renderers or fallback to the JoDefaultRenderer.
+   * renderers or fallback to the GoDefaultRenderer.
    * 
    * @param _object - the object to be rendered
    * @param _ctx    - the context to render the object in

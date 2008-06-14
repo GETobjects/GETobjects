@@ -186,7 +186,7 @@ public class JSComponent extends WOComponent {
       return e;
     }
     
-    /* fixup result (Note: also done for JSJoComponent because of @action) */
+    /* fixup result (Note: also done for JSGoComponent because of @action) */
 
     if (jr == Scriptable.NOT_FOUND || jr instanceof Undefined)
       jr = null;

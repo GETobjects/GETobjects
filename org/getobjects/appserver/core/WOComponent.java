@@ -977,16 +977,16 @@ public class WOComponent extends WOElement
     /* check whether we have an action matching the name */
     
     /* Note: this usually won't be called, since the component itself is usually
-     *       *not* part of the traversal path. JoPageInvocation is!
+     *       *not* part of the traversal path. GoPageInvocation is!
      */
     
-    // TBD: would be better to fill the JoClass dynamically
+    // TBD: would be better to fill the GoClass dynamically
     Method m = NSJavaRuntime.NSMethodFromString
       (this.getClass(), _name + "Action", emptyClassArray, true /* deep */);
     if (m != null)
       return new GoActivePageActionInvocation(_name);
     
-    /* try to find name in JoClass */
+    /* try to find name in GoClass */
     
     GoClass joClass = IGoObject.Utility.joClass(this, _ctx);
     if (joClass != null)
@@ -1012,7 +1012,7 @@ public class WOComponent extends WOElement
   
   /**
    * This just takes the given object using the 'setRenderObject()' method and
-   * then lets the JoDefaultRenderer render the object as a component.
+   * then lets the GoDefaultRenderer render the object as a component.
    * 
    * @param _object - the object which shall be rendered
    * @param _ctx    - the rendering context

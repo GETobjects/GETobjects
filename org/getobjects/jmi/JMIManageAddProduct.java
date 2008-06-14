@@ -47,7 +47,7 @@ import org.getobjects.foundation.NSObject;
  *   <pre>[container] / manage_addProduct / [product name] / [factory name]</pre>
  * 
  * Container:<br>
- *   arbitrary JoObject
+ *   arbitrary GoObject
  * Contains:<br>
  */   
 // TODO: document more

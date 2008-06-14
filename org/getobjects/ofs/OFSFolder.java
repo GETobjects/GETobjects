@@ -675,7 +675,7 @@ public class OFSFolder extends OFSBaseObject
    *   <li>to determine replacement objects in lookupName()
    * </ul>
    * 
-   * @param _ctx - the active JoContext
+   * @param _ctx - the active GoContext
    * @return the configuration dictionary, or null if there was none
    */
   @SuppressWarnings("unchecked")

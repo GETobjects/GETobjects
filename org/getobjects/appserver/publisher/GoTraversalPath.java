@@ -36,7 +36,7 @@ import org.getobjects.foundation.UString;
 /**
  * GoTraversalPath
  * <p>
- * This represents a Jo path lookup. It contains the operation to perform the
+ * This represents a Go path lookup. It contains the operation to perform the
  * object traversal and it keeps the state associated with it.
  * <p>
  * Note:
@@ -51,7 +51,7 @@ import org.getobjects.foundation.UString;
  * threads and its not recommended to store the object in a persistent way.
  */
 public class GoTraversalPath extends NSObject implements NSDisposable {
-  protected static final Log log = LogFactory.getLog("JoTraversalPath");
+  protected static final Log log = LogFactory.getLog("GoTraversalPath");
 
   /* configuration */
   protected String[]   path;
@@ -88,7 +88,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
    * (based on the context's application and request).
    * 
    * @param _ctx - a WOContext
-   * @return a new JoTraversalPath or null if none could be created
+   * @return a new GoTraversalPath or null if none could be created
    */
   public static GoTraversalPath traversalPathForContext(WOContext _ctx) {
     if (_ctx == null)
@@ -128,7 +128,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
   
   /**
    * Returns the result of the path lookup. Its either the clientObject or some
-   * IJoCallable which works on the clientObject.
+   * IGoCallable which works on the clientObject.
    * 
    * @return the result of the path lookup, or null on error
    */
@@ -137,8 +137,8 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
   }
   /**
    * Returns the clientObject associated with the path lookup. The clientObject
-   * is the last object before the final IJoCallable object. (the clientObject
-   * itself can also be an IJoCallable, eg that way you can 'manage' callable
+   * is the last object before the final IGoCallable object. (the clientObject
+   * itself can also be an IGoCallable, eg that way you can 'manage' callable
    * objects).
    * 
    * @return the clientObject of the path lookup, or null on error
@@ -153,7 +153,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
   
   /**
    * The pathInfo is the part of the path which could not be looked up. This
-   * is only allowed to happen if the path object is an IJoCallable, otherwise
+   * is only allowed to happen if the path object is an IGoCallable, otherwise
    * it results in a 404 (Not Found).
    * 
    * @return the pathInfo
@@ -234,7 +234,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
   
   /**
    * Returns the objects which got looked up, ending with the clientObject (an
-   * IJoCallable might follow).
+   * IGoCallable might follow).
    * Note that this <em>includes</em> the root object as well as the
    * clientObject itself.
    * 
@@ -358,9 +358,9 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
       }
 
       if (nextObject == null) {
-        /* Check whether the current object is a JoCallable.
+        /* Check whether the current object is a GoCallable.
          * 
-         * This one is tricky. We cannot break on the first JoCallable, 
+         * This one is tricky. We cannot break on the first GoCallable, 
          * otherwise we could not call methods on methods! Which is relevant,
          * consider a management interface editing a method, eg a URL like
          * "/myscript.py/manage". In this case the clientObject being 'managed'
@@ -423,9 +423,9 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
    * The method also does the aquisition of the name when requested by the
    * path object.
    * <ol>
-   *   <li>it first invokes IJoSecuredObject.Utility.validateNameOfObject()
+   *   <li>it first invokes IGoSecuredObject.Utility.validateNameOfObject()
    *   <li>then, lookupName is invoked to find the object
-   *   <li>IJoSecuredObject.Utility.validateValueForNameOfObject() is called
+   *   <li>IGoSecuredObject.Utility.validateValueForNameOfObject() is called
    * </ol>
    * <p>
    * If the lookup fails, the method sets the lastException of the path.

@@ -50,7 +50,7 @@ import org.getobjects.ofs.fs.IOFSFileManager;
 public abstract class OFSBaseObject extends NSObject
   implements IGoObject, IGoLocation, EOValidation
 {
-  protected static final Log log = LogFactory.getLog("JoOFS");
+  protected static final Log log = LogFactory.getLog("GoOFS");
   
   protected IOFSFileManager fileManager;
   protected String[]        storagePath; /* path in filemanager */
@@ -100,7 +100,7 @@ public abstract class OFSBaseObject extends NSObject
   }
   
   
-  /* IJoLocation interface */
+  /* IGoLocation interface */
   
   public Object container() {
     return this.container;
@@ -246,7 +246,7 @@ public abstract class OFSBaseObject extends NSObject
   }
   
   
-  /* JoClass */
+  /* GoClass */
   
   public GoClass joClassInContext(final IGoContext _ctx) {
     if (_ctx == null) {
@@ -264,7 +264,7 @@ public abstract class OFSBaseObject extends NSObject
   }
   
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
-    /* lookup using JoClass */
+    /* lookup using GoClass */
     
     final GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {

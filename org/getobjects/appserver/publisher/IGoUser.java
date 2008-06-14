@@ -53,9 +53,9 @@ public interface IGoUser extends Principal {
   public String[] rolesForObjectInContext(Object _object, IGoContext _ctx);
   
   /**
-   * Returns the IJoAuthenticator which was used to authenticate this user.
+   * Returns the IGoAuthenticator which was used to authenticate this user.
    * 
-   * @return the IJoAuthenticator, or null if that information is not available
+   * @return the IGoAuthenticator, or null if that information is not available
    */
   public IGoAuthenticator authenticator();
 }

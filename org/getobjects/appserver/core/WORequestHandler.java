@@ -40,10 +40,10 @@ import org.getobjects.foundation.NSObject;
  *   <li>WODirectActionRequestHandler
  *   <li>WOComponentRequestHandler
  *   <li>WOResourceRequestHandler
- *   <li>JoObjectRequestHandler
+ *   <li>GoObjectRequestHandler
  * </ul>
  * Technically the first three are superflous in Go because of the
- * JoObjectRequestHandler. They are left in place for compatibility
+ * GoObjectRequestHandler. They are left in place for compatibility
  * reasons.
  */
 public abstract class WORequestHandler extends NSObject
@@ -83,7 +83,7 @@ public abstract class WORequestHandler extends NSObject
   }
 
   public WOResponse handleRequest(final WORequest _rq) {
-    // TODO: this is deprecated, we want to do everything with JoObject
+    // TODO: this is deprecated, we want to do everything with GoObject
     //       lookups
     WOContext  ctx;
     WOResponse r = null;
@@ -217,7 +217,7 @@ public abstract class WORequestHandler extends NSObject
     return r;
   }
 
-  /* JoObject */
+  /* GoObject */
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {
     /* we support no subobjects, all remaining handling is done by us */
@@ -225,7 +225,7 @@ public abstract class WORequestHandler extends NSObject
   }
   
   /**
-   * Act as a JoMethod. The _object will usually be the WOApplication. The
+   * Act as a GoMethod. The _object will usually be the WOApplication. The
    * default implementation just calls handleRequest().
    * 
    * @param _object - the object which the handler is attached to (WOApp)
@@ -246,7 +246,7 @@ public abstract class WORequestHandler extends NSObject
    * object is only callable in WOContext's. If the context is null or a
    * different class, this method returns false.
    * 
-   * @param _ctx - the IJoContext the call shall happen in
+   * @param _ctx - the IGoContext the call shall happen in
    * @return true if the object is callable in the given context
    */
   public boolean isCallableInContext(final IGoContext _ctx) {

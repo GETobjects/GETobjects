@@ -35,11 +35,11 @@ import org.getobjects.foundation.kvc.MissingPropertyException;
 public interface IGoObject {
 
   /**
-   * This is the primary method to resolve names against IJoObject's.
+   * This is the primary method to resolve names against IGoObject's.
    * <p>
    * This method is called <em>after</em> permissions got checked, hence you
    * should usually not call it directly. If the object handles its permissions
-   * itself, it should implement IJoSecuredObject. 
+   * itself, it should implement IGoSecuredObject. 
    * 
    * @param _name
    * @param _ctx
@@ -53,7 +53,7 @@ public interface IGoObject {
    * Utility class (use those methods in code to work on arbitrary objects)
    */
   public static class Utility {
-    protected static final Log log = LogFactory.getLog("JoObject");
+    protected static final Log log = LogFactory.getLog("GoObject");
     
     public static Object lookupName
       (Object _self, String _name, IGoContext _ctx, boolean _acquire)
@@ -97,7 +97,7 @@ public interface IGoObject {
 
   /**
    * This can be used by Object subclasses which want to implement
-   * JoObject and need a fallback.
+   * GoObject and need a fallback.
    */
   public static class DefaultImplementation {
     
@@ -125,7 +125,7 @@ public interface IGoObject {
       
       /* try to find name using KVC */
       // TODO: be sure to properly apply security checks!
-      // TODO: maybe we do not want to map KVC to Jo 'names'
+      // TODO: maybe we do not want to map KVC to Go 'names'
       
       try {
         Object v = NSKeyValueCoding.Utility.valueForKey(_self, _name);
@@ -134,7 +134,7 @@ public interface IGoObject {
       catch (MissingPropertyException e) {
       }
       
-      /* try to find name in JoClass */
+      /* try to find name in GoClass */
       
       GoClass joClass = Utility.joClass(_self, _ctx);
       if (joClass != null)

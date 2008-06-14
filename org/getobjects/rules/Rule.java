@@ -84,7 +84,7 @@ import org.getobjects.foundation.NSObject;
 public class Rule extends NSObject
   implements RuleCandidate, RuleAction
 {
-  protected static Log log = LogFactory.getLog("JoRules");
+  protected static Log log = LogFactory.getLog("GoRules");
   
   protected EOQualifier qualifier;
   protected Object      action;

@@ -25,11 +25,11 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.UString;
 
 /**
- * JoSecuredObject
+ * GoSecuredObject
  * <p>
- * This interface should be implemented by JoObject's which implement their
+ * This interface should be implemented by GoObject's which implement their
  * own security strategy, which is often not necessary.
- * In all other cases this will pass over control to the JoSecurityManager.
+ * In all other cases this will pass over control to the GoSecurityManager.
  */
 public interface IGoSecuredObject {
 
@@ -67,15 +67,15 @@ public interface IGoSecuredObject {
     private Utility() {} // do not instantiate
 
     /**
-     * This method wraps IJoObject.lookupName() and ensures that the object and
+     * This method wraps IGoObject.lookupName() and ensures that the object and
      * key are properly secured. Hence it should be the <em>primary method to
      * perform a lookup</em>!
      * The method also does the aquisition of the name when requested by the
      * path object.
      * <ol>
-     *   <li>it first invokes IJoSecuredObject.Utility.validateNameOfObject()
+     *   <li>it first invokes IGoSecuredObject.Utility.validateNameOfObject()
      *   <li>then, lookupName is invoked to find the object
-     *   <li>IJoSecuredObject.Utility.validateValueForNameOfObject() is called
+     *   <li>IGoSecuredObject.Utility.validateValueForNameOfObject() is called
      * </ol>
      * <p>
      * If the lookup fails, the method sets the lastException of the path.
@@ -151,7 +151,7 @@ public interface IGoSecuredObject {
      * Validates whether the user associated with the context is allowed to
      * access the given name in the given object.
      * <p>
-     * It first checks whether the object is an IJoSecuredObject, hence whether
+     * It first checks whether the object is an IGoSecuredObject, hence whether
      * it manages the security on its own. If not, it will ask the
      * joSecurityManager of the context.
      * 
@@ -170,7 +170,7 @@ public interface IGoSecuredObject {
         return ((IGoSecuredObject)_self).validateName(_name, _ctx);
       
       if (_ctx == null)
-        return new GoAccessDeniedException("missing JoContext");
+        return new GoAccessDeniedException("missing GoContext");
       
       return DefaultImplementation.validateNameOfObject(_self, _name, _ctx);
     }
@@ -194,7 +194,7 @@ public interface IGoSecuredObject {
         return null;
       
       if (_ctx == null)
-        return new GoAccessDeniedException("missing JoContext");
+        return new GoAccessDeniedException("missing GoContext");
       
       return DefaultImplementation
         .validateValueForNameOfObject(_self, _name, _value, _ctx);
@@ -204,7 +204,7 @@ public interface IGoSecuredObject {
      * Checks whether the given _user is the owner of the given _object in the
      * given context.
      * 
-     * @param _user - an IJoUser object
+     * @param _user - an IGoUser object
      * @param _obj  - the object to be checked for ownership
      * @param _ctx  - the context for the operation
      * @return true if the given user owns the given object, no otherwise
@@ -234,7 +234,7 @@ public interface IGoSecuredObject {
      * <code>&lt;public&gt;</code>. In those cases the method returns immediatly.
      * <p>
      * The method uses the <code>rolesForObjectInContext()</code> method of the
-     * IJoUser object in the context to locate the roles the user has.
+     * IGoUser object in the context to locate the roles the user has.
      * 
      * @param _permission - permission to check, eg 'View'
      * @param _self       - the object
@@ -254,11 +254,11 @@ public interface IGoSecuredObject {
      * Checks whether the current user is allowed to access the given object in
      * the given context.
      * <p>
-     * This works by retrieving the security info of the objects JoClass. If the
+     * This works by retrieving the security info of the objects GoClass. If the
      * object has no security info, access is rejected. That is access defaults to
      * "&lt;private&gt;".
      * <p>
-     * If an explicit permission is required to use objects of the JoClass
+     * If an explicit permission is required to use objects of the GoClass
      * validatePermissionOnObject() will get called.
      * 
      * <p>
@@ -280,14 +280,14 @@ public interface IGoSecuredObject {
   /* secured objects */
 
   public static class DefaultImplementation {
-    protected static final Log log = LogFactory.getLog("JoSecurityManager");
+    protected static final Log log = LogFactory.getLog("GoSecurityManager");
     private DefaultImplementation() {} // do not instantiate
 
     /**
      * Checks whether the given _user is the owner of the given _object in the
      * given context.
      * 
-     * @param _user - an IJoUser object
+     * @param _user - an IGoUser object
      * @param _obj  - the object to be checked for ownership
      * @param _ctx  - the context for the operation
      * @return true if the given user owns the given object, no otherwise
@@ -317,7 +317,7 @@ public interface IGoSecuredObject {
      * <code>&lt;public&gt;</code>. In those cases the method returns immediatly.
      * <p>
      * The method uses the <code>rolesForObjectInContext()</code> method of the
-     * IJoUser object in the context to locate the roles the user has.
+     * IGoUser object in the context to locate the roles the user has.
      * 
      * @param _permission - permission to check, eg 'View'
      * @param _self       - the object
@@ -490,11 +490,11 @@ public interface IGoSecuredObject {
      * Checks whether the current user is allowed to access the given object in
      * the given context.
      * <p>
-     * This works by retrieving the security info of the objects JoClass. If the
+     * This works by retrieving the security info of the objects GoClass. If the
      * object has no security info, access is rejected. That is access defaults to
      * "&lt;private&gt;".
      * <p>
-     * If an explicit permission is required to use objects of the JoClass
+     * If an explicit permission is required to use objects of the GoClass
      * validatePermissionOnObject() will get called.
      * 
      * <p>
@@ -555,7 +555,7 @@ public interface IGoSecuredObject {
   
     /**
      * The method first validates the '_self' object using validateObject(). It
-     * then retrieves the JoClass of the object and extracts the security info for
+     * then retrieves the GoClass of the object and extracts the security info for
      * the given '_name'.
      * <p>
      * If the class has no security info, the default access (allow) will get
@@ -669,7 +669,7 @@ public interface IGoSecuredObject {
       if (sinfo.isKeyPrivate(_name)) {
         /* What does it mean to be 'private'. Using private you can always
          * explicitly forbid access to a Go name. Eg if you want that 'abc'
-         * is *never ever* accessed using JoLookup (exposed to the web!), you
+         * is *never ever* accessed using GoLookup (exposed to the web!), you
          * can declare it private.
          * 
          * In Go this is the default (if no security info was found and

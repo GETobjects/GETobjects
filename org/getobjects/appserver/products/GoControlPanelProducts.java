@@ -41,7 +41,7 @@ import org.getobjects.foundation.NSObject;
  *   OFSControlPanelProduct keyed to the product name
  */
 public class GoControlPanelProducts extends NSObject implements IGoObject {
-  protected static final Log log = LogFactory.getLog("JoControlPanel");
+  protected static final Log log = LogFactory.getLog("GoControlPanel");
 
   public GoControlPanelProducts() {
   }

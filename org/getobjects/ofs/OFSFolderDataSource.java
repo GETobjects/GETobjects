@@ -21,7 +21,7 @@ import org.getobjects.foundation.UString;
  * of the folder and then calls lookupStoredObject() for each.
  */
 public class OFSFolderDataSource extends EODataSource {
-  protected static final Log log = LogFactory.getLog("JoOFS");
+  protected static final Log log = LogFactory.getLog("GoOFS");
   
   protected OFSFolder folder;
   protected IGoContext context;

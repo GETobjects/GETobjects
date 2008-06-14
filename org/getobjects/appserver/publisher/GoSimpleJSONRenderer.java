@@ -48,7 +48,7 @@ import org.getobjects.foundation.kvc.MissingPropertyException;
 public class GoSimpleJSONRenderer extends NSObject
   implements IGoObjectRenderer
 {
-  protected static final Log log = LogFactory.getLog("JoSimpleJSONRenderer");
+  protected static final Log log = LogFactory.getLog("GoSimpleJSONRenderer");
   
   /* control rendering */
   

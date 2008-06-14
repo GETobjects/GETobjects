@@ -44,7 +44,7 @@ import org.getobjects.foundation.NSObject;
 public class OFSResourceFileRenderer extends NSObject
   implements IGoObjectRenderer
 {
-  protected static final Log log = LogFactory.getLog("JoOFS");
+  protected static final Log log = LogFactory.getLog("GoOFS");
 
   /* control rendering */
   

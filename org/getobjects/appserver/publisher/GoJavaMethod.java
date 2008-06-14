@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 import org.getobjects.foundation.NSObject;
 
 /**
- * Expose a Java method as a JoCallable.
+ * Expose a Java method as a GoCallable.
  * <p>
  * NOT IMPLEMENTED YET
  */
@@ -45,7 +45,7 @@ public class GoJavaMethod extends NSObject implements IGoCallable {
     return this.method;
   }
   
-  /* JoCallable */
+  /* GoCallable */
 
   public Object callInContext(final Object _object, final IGoContext _ctx) {
     // TODO: implement me

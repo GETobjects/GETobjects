@@ -21,7 +21,7 @@
 package org.getobjects.appserver.publisher;
 
 /**
- * IJoAuthenticator
+ * IGoAuthenticator
  * <p>
  * TBD: document
  */

@@ -57,7 +57,7 @@ import org.getobjects.foundation.UString;
  * @see IGoObjectRenderer
  */
 public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
-  protected static final Log log = LogFactory.getLog("JoDefaultRenderer");
+  protected static final Log log = LogFactory.getLog("GoDefaultRenderer");
   
   public static final GoDefaultRenderer sharedRenderer =
     new GoDefaultRenderer();
@@ -71,7 +71,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
   /* control rendering */
   
   /**
-   * Checks whether the JoDefaultRenderer can render the given object. This
+   * Checks whether the GoDefaultRenderer can render the given object. This
    * renderer can render JSON stuff plus:
    * <ul>
    *   <li>WOComponent
@@ -424,7 +424,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
       rm = ((WOComponent)_object).resourceManager();
     
     if (rm == null) {
-      // TBD: this is flaky, can get confused wrt JoLookupRM ...
+      // TBD: this is flaky, can get confused wrt GoLookupRM ...
       WOComponent cursor = null;
       if (_ctx != null)
         cursor = _ctx.component();
@@ -460,7 +460,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
      * object.
      */
     if (!(_object instanceof WOComponent)) {
-      /* WOComponent itself is also an IJoRenderer :-) */
+      /* WOComponent itself is also an IGoRenderer :-) */
       // Note: do we first need to check whether the component CAN render the
       //       object?
       return frame.renderObjectInContext(_object, _ctx);
@@ -488,7 +488,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
       rm = ((WOComponent)_object).resourceManager();
     
     if (rm == null) {
-      // TBD: this is flaky, can get confused wrt JoLookupRM ...
+      // TBD: this is flaky, can get confused wrt GoLookupRM ...
       WOComponent cursor = null;
       if (_ctx != null)
         cursor = _ctx.component();
@@ -517,7 +517,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
      * object.
      */
     if (!(_object instanceof WOComponent)) {
-      /* WOComponent itself is also an IJoRenderer :-) */
+      /* WOComponent itself is also an IGoRenderer :-) */
       // Note: do we first need to check whether the component CAN render the
       //       object?
       return frame.renderObjectInContext(_object, _ctx);

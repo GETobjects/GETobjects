@@ -51,8 +51,8 @@ import org.getobjects.foundation.UString;
  * </p>
  * <p>
  * To declare security information on an Java class which you are using
- * as a JoClass:<pre>
- *    JoClassSecurityInfo sinfo; [TBD]
+ * as a GoClass:<pre>
+ *    GoClassSecurityInfo sinfo; [TBD]
  *  
  *    // to mark the object public (not restricted to a user/role)
  *    sinfo.declareObjectPublic();
@@ -61,11 +61,11 @@ import org.getobjects.foundation.UString;
  *    sinfo.setDefaultAccess("allow");
  *
  *    // to protect a specific object
- *    sinfo.declareProtected(JoPermission.View, "test.html", null);
+ *    sinfo.declareProtected(GoPermission.View, "test.html", null);
  *  }
  * </pre>
  * <p>
- * For products it's much easier to declare the products' JoClasses and
+ * For products it's much easier to declare the products' GoClasses and
  * their protections in the "product.plist" file.
  * </p>
  * 
@@ -92,7 +92,7 @@ import org.getobjects.foundation.UString;
  *         protect it.
  */
 public class GoSecurityInfo extends NSObject {
-  protected static final Log log = LogFactory.getLog("JoSecurityManager");
+  protected static final Log log = LogFactory.getLog("GoSecurityManager");
 
   /* settings affecting the keys */
   protected String   defaultAccess; /* 'allow', 'deny' */

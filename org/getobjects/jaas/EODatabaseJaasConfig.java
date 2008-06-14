@@ -32,8 +32,8 @@ import org.getobjects.eoaccess.EODatabase;
  * A simple JAAS configuration which exposes an EODatabase object to a JAAS
  * module. This can be invoked in an <code>authenticatorInContext()</code>
  * method like:<pre>
- *   public IJoAuthenticator authenticatorInContext(IJoContext _ctx) {
- *     return new JoHTTPAuthenticator("Hello World",
+ *   public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
+ *     return new GoHTTPAuthenticator("Hello World",
  *       new EODatabaseJaasConfig(this, "org.getobjects.MyAuthModule"));
  *   }</pre>
  * The module will receive the EODatabase object in the 'database' options

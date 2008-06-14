@@ -42,7 +42,7 @@ public class WOQuerySession extends NSObject {
    * - usually subclasses and handcoded? (eg display group setup)
    * - why is it a global (WOContext) object instead of component-local
    *   - should the state depend on the component and get unarchived by the comp
-   *     - or by the Jo callable object?
+   *     - or by the Go callable object?
    *     - well, *session* means those are parameters which are not component/
    *       resource specific. You can still use WOChangeQuerySession to handle
    *       component local things.
