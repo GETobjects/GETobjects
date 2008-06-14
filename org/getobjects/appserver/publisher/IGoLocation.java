@@ -68,7 +68,7 @@ public interface IGoLocation {
     
     /**
      * Retrieve the container of an object. If the object implements
-     * IJoLocation, the object will be asked. Otherwise we KVC query for the
+     * IGoLocation, the object will be asked. Otherwise we KVC query for the
      * 'container' key.
      * 
      * @param _object The object which we want to know the container of.
@@ -89,7 +89,7 @@ public interface IGoLocation {
     
     /**
      * Retrieve the name of an object. If the object implements
-     * IJoLocation, the object will be asked. Otherwise we KVC query for the
+     * IGoLocation, the object will be asked. Otherwise we KVC query for the
      * 'nameInContainer' key.
      * 
      * @param _object    - The object which we want to know the name of.
@@ -156,15 +156,15 @@ public interface IGoLocation {
     }
     
     /**
-     * This method ensures that a given object confirms to IJoLocation. If the
-     * object already is an instance of IJoLocation, this instance will be
+     * This method ensures that a given object confirms to IGoLocation. If the
+     * object already is an instance of IGoLocation, this instance will be
      * returned, if not, it will be wrapped in an object which supports
-     * IJoLocation.
+     * IGoLocation.
      * 
      * @param _container The object which contains the object to be located. 
      * @param _name The name under which the name is stored in the container.
      * @param _object The object to be located.
-     * @return The _object if it implements IJoLocation, otherwise a wrapper.
+     * @return The _object if it implements IGoLocation, otherwise a wrapper.
      */
     public static IGoLocation locate
       (Object _container, String _name, Object _object)
@@ -201,7 +201,7 @@ public interface IGoLocation {
      * <pre>
      *   public class ImapFolder {
      *     public ImapAccount account() {
-     *       return IJoLocation.Utility.locateObjectOfClass
+     *       return IGoLocation.Utility.locateObjectOfClass
      *          (this, ImapAccount.class);
      *     }
      *   }
@@ -225,7 +225,7 @@ public interface IGoLocation {
     
     /**
      * Looks up a name in the containment hierarchy. This only considers objects
-     * which conform to IJoObject.
+     * which conform to IGoObject.
      * 
      * @param _base - where to start
      * @param _name - the name to lookup
@@ -283,7 +283,7 @@ public interface IGoLocation {
   /* wrapper objects */
   
   public static class NSObjectWrapper implements IGoLocation {
-    // TODO: not sure whether we should use KVC for IJoLocation
+    // TODO: not sure whether we should use KVC for IGoLocation
     
     protected NSKeyValueCoding wrappedObject;
     
@@ -304,7 +304,7 @@ public interface IGoLocation {
       return this.wrappedObject;
     }
     
-    /* JoClass */
+    /* GoClass */
     
     public GoClass joClassInContext(IGoContext _ctx) {
       return _ctx.joClassRegistry().goClassForJavaObject
@@ -312,7 +312,7 @@ public interface IGoLocation {
     }
     
     public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
-      /* lookup using JoClass */
+      /* lookup using GoClass */
       
       GoClass cls = this.joClassInContext(_ctx);
       if (cls != null) {
@@ -357,7 +357,7 @@ public interface IGoLocation {
       return this.wrappedObject;
     }
     
-    /* JoClass */
+    /* GoClass */
     
     public GoClass joClassInContext(IGoContext _ctx) {
       return _ctx.joClassRegistry().goClassForJavaObject
@@ -365,7 +365,7 @@ public interface IGoLocation {
     }
     
     public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
-      /* lookup using JoClass */
+      /* lookup using GoClass */
       
       GoClass cls = this.joClassInContext(_ctx);
       if (cls != null) {

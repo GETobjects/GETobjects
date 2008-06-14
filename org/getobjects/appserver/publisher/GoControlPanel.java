@@ -44,7 +44,7 @@ public class GoControlPanel extends NSObject implements IGoObject {
   /* object lookup */
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
-    // TODO: should we cache the JoClass? Won't change much ...
+    // TODO: should we cache the GoClass? Won't change much ...
     return _ctx.joClassRegistry().goClassForJavaObject(this, _ctx)
       .lookupName(this, _name, _ctx);
   }

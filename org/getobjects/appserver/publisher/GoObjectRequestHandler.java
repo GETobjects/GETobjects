@@ -32,7 +32,7 @@ import org.getobjects.appserver.core.WOSession;
 /**
  * GoObjectRequestHandler
  * <p>
- * This request handler performs the actual JoStyle path processing.
+ * This request handler performs the actual GoStyle path processing.
  */
 public class GoObjectRequestHandler extends WORequestHandler {
 
@@ -41,7 +41,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
   }
 
   /**
-   * This method does the JoStyle request processing. Its called by
+   * This method does the GoStyle request processing. Its called by
    * dispatchRequest() if requesthandler-processing is turned off. Otherwise
    * the handleRequest() method of the respective request handler is called!
    *
@@ -55,7 +55,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
     WOResponse r = null;
     boolean    debugOn = log.isDebugEnabled();
     
-    /* now perform the JoObject path traversal */
+    /* now perform the GoObject path traversal */
 
     GoTraversalPath tpath = null;
     if (r == null) {
@@ -73,7 +73,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
       // component. It doesn't. The lookup of 'login' on 'login' *succeeds*
       // with acquisition, it returns itself! And the PATH_INFO will be empty.
       // => first fix component to return a Callable for 'xyzAction' methods.
-      // Actually thats the JoPageInvocation/JSActivePageActionInvocation?
+      // Actually thats the GoPageInvocation/JSActivePageActionInvocation?
       // Hm, or the OFSComponentWrapper / OFSComponentFile.
       // WOComponent itself is NOT a Callable. 
       //tpath.enableAcquisition();
@@ -86,11 +86,11 @@ public class GoObjectRequestHandler extends WORequestHandler {
     }
 
     // TODO: We might want to insert takeValuesFromRequest here, not sure.
-    //       For now we consider the request a parameter to the JoMethod, eg
-    //       a WOComponent JoMethod would do the takeValues and then issue
+    //       For now we consider the request a parameter to the GoMethod, eg
+    //       a WOComponent GoMethod would do the takeValues and then issue
     //       the performActionNamed or invokeActionForRequest.
 
-    /* call the JoObject */
+    /* call the GoObject */
 
     Object result = null;
     if (tpath != null && r == null) {
@@ -103,7 +103,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
       else if (result instanceof IGoCallable &&
                ((IGoCallable)result).isCallableInContext(_ctx))
       {
-        /* The object returned by the Jo lookup is a Callable object. So
+        /* The object returned by the Go lookup is a Callable object. So
          * lets invoke it!
          */
         IGoCallable method = ((IGoCallable)result);
@@ -148,7 +148,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
   }
   
   /**
-   * This method does the JoStyle request processing. Its called by
+   * This method does the GoStyle request processing. Its called by
    * dispatchRequest() if requesthandler-processing is turned off. Otherwise
    * the handleRequest() method of the respective request handler is called!
    *
@@ -158,9 +158,9 @@ public class GoObjectRequestHandler extends WORequestHandler {
   @Override
   public WOResponse handleRequest(final WORequest _rq) {
     /*
-     * Note: this is different to WO, we always use JoObjects to handle requests
+     * Note: this is different to WO, we always use GoObjects to handle requests
      *       and the a WORequestHandler object is just a special kind of
-     *       JoObject.
+     *       GoObject.
      */
     WOContext  ctx;
     WOResponse r       = null;

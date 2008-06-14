@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * JoProductInfo
+ * GoProductInfo
  * <p>
  * This object is used to track products in the product manager w/o actually
  * being required to activate the product (that is, w/o loading it).
@@ -64,7 +64,7 @@ public class GoProductInfo extends NSObject
    *       the class when required.
    * TODO: we also want to support a jar based way to implement products.
    */
-  protected static final Log log = LogFactory.getLog("JoProductManager");
+  protected static final Log log = LogFactory.getLog("GoProductManager");
 
   protected String       fqn;
   protected ClassLoader  classLoader;
@@ -116,7 +116,7 @@ public class GoProductInfo extends NSObject
     return null;
   }
   
-  /* common JoObject support */
+  /* common GoObject support */
   
   public String nameInContainer() {
     return this.simpleName();
@@ -273,7 +273,7 @@ public class GoProductInfo extends NSObject
     
     GoClass joClass = _reg.goClassForJavaClass(cls, null /* ctx */);
     if (joClass == null) {
-      log.error("did not find JoClass: " + cls);
+      log.error("did not find GoClass: " + cls);
       return;
     }
     

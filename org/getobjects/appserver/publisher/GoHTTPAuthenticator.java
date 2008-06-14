@@ -40,7 +40,7 @@ import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
 
 /**
- * JoHTTPAuthenticator
+ * GoHTTPAuthenticator
  * <p>
  * This authenticator works on HTTP authentication. It works on top of the
  * JAAS subsystem, hence you need to configure that properly.
@@ -48,7 +48,7 @@ import org.getobjects.foundation.UString;
 public class GoHTTPAuthenticator extends NSObject
   implements IGoAuthenticator, IGoObjectRendererFactory, IGoObjectRenderer
 {
-  protected static final Log log = LogFactory.getLog("JoAuthenticator");
+  protected static final Log log = LogFactory.getLog("GoAuthenticator");
   
   final protected String realm;
   
@@ -72,12 +72,12 @@ public class GoHTTPAuthenticator extends NSObject
   /* user database */
   
   /**
-   * This is the primary entry method of the IJoAuthenticator interface. We
+   * This is the primary entry method of the IGoAuthenticator interface. We
    * check that the context is a WOContext, then we extract the credentials
    * of the WORequest using parseCredentialsInContext().<br>
    * If there are no credentials, we return the anonymous user, otherwise we
    * call <code>userInContext(_ctx, _creds)</code> which is responsible for
-   * checking the credentials and returning a JoUser object.
+   * checking the credentials and returning a GoUser object.
    * <p>
    * Note that we do not distinguish between anonymous access (no credentials)
    * and failed logins. The framework needs 'some' user object.
@@ -139,11 +139,11 @@ public class GoHTTPAuthenticator extends NSObject
    * login, creds[1] is the password and creds[2] is the optional domain).
    * <p>
    * This method uses JAAS to authenticate the user and stores the JAAS subject
-   * in the JoUser object.
+   * in the GoUser object.
    * 
    * @param _ctx   - the context in which the current transaction takes place
    * @param _creds - the credentials extracted from the HTTP request
-   * @return an IJoUser object, or null if authentication failed
+   * @return an IGoUser object, or null if authentication failed
    */
   public IGoUser userInContext(final IGoContext _ctx, final String[] _creds) {
     String lRealm = null;
@@ -192,7 +192,7 @@ public class GoHTTPAuthenticator extends NSObject
    * The default implementation just returns null.
    * 
    * @param _sn - the WOSession which is active for the auth request
-   * @return an IJoUser, or null if none was cached in the session.
+   * @return an IGoUser, or null if none was cached in the session.
    */
   public IGoUser extractUserFromSession(final WOSession _sn) {
     return null;
@@ -210,7 +210,7 @@ public class GoHTTPAuthenticator extends NSObject
    * @param _credentials - the credentials array
    * @param _lc          - the JAAS LoginContext object
    * @param _context     - the Go context
-   * @return an IJoUser object representing the login in the given context
+   * @return an IGoUser object representing the login in the given context
    */
   public IGoUser userObjectForValidatedCredentials
     (final String _login, final String[] _credentials,
@@ -359,15 +359,15 @@ public class GoHTTPAuthenticator extends NSObject
   }
   
   
-  /* IJoObjectRendererFactory */
+  /* IGoObjectRendererFactory */
   
   /**
-   * This is a method of IJoObjectRendererFactory, it returns <code>this</code>
+   * This is a method of IGoObjectRendererFactory, it returns <code>this</code>
    * if the authenticator 'can render' in the given context.
    * <p>
    * The method is called by WOApplication.rendererForObjectInContext() if the
-   * object is a JoSecurityException and if the authenticator of the exception
-   * conforms to the IJoObjectRendererFactory interface.
+   * object is a GoSecurityException and if the authenticator of the exception
+   * conforms to the IGoObjectRendererFactory interface.
    * 
    * @param _result - the exception to be rendered
    * @param _ctx    - the context in which to render the exception
@@ -378,14 +378,14 @@ public class GoHTTPAuthenticator extends NSObject
   }
   
   
-  /* IJoObjectRenderer */
+  /* IGoObjectRenderer */
 
   /**
-   * This static function can render JoAuthRequiredException objects as HTTP 401
+   * This static function can render GoAuthRequiredException objects as HTTP 401
    * responses. This is put into a function so that it can be easily reused by
-   * other authenticators (which do not inherit from JoHTTPAuthenticator).
+   * other authenticators (which do not inherit from GoHTTPAuthenticator).
    * 
-   * @param _object - the JoAuthRequiredException object
+   * @param _object - the GoAuthRequiredException object
    * @param _realm  - the HTTP realm of the authentication request
    * @param _ctx    - the context in which the current request takes place
    * @return null if the rendering went fine, an exception otherwise
@@ -414,12 +414,12 @@ public class GoHTTPAuthenticator extends NSObject
   }
   
   /**
-   * This method can render JoAuthRequiredException objects as HTTP 401
+   * This method can render GoAuthRequiredException objects as HTTP 401
    * responses. It retrieves the realm from the authenticator object and
    * then calls the static render401InContext() function to produce the
    * actual WOResponse.
    * 
-   * @param _object - the JoAuthRequiredException object
+   * @param _object - the GoAuthRequiredException object
    * @param _ctx    - the context in which the current request takes place
    * @return null if the rendering went fine, an exception otherwise
    */
@@ -437,9 +437,9 @@ public class GoHTTPAuthenticator extends NSObject
   }
   
   /**
-   * The method returns true for JoAuthRequiredException objects.
+   * The method returns true for GoAuthRequiredException objects.
    * 
-   * @return true if the object is an JoAuthRequiredException object
+   * @return true if the object is an GoAuthRequiredException object
    */
   public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
     return _object instanceof GoAuthRequiredException;

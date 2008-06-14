@@ -81,7 +81,7 @@ import org.getobjects.foundation.NSObject;
 public class RuleContext extends NSObject
   implements EOKeyValueCoding, Cloneable
 {
-  protected static Log log = LogFactory.getLog("JoRules");
+  protected static Log log = LogFactory.getLog("GoRules");
 
   protected RuleModel           model;
   protected Map<String, Object> storedValues;

@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
 
 /**
- * JoProductLinker
+ * GoProductLinker
  * <p>
  * This object performs the loading of products.
  */

@@ -21,7 +21,7 @@
 				"-ControlPanel" = {
           protectedBy = "<public>";
 				  valueClass  =
-				    "org.getobjects.appserver.publisher.JoControlPanel";
+				    "org.getobjects.appserver.publisher.GoControlPanel";
 				};
       };
       
@@ -29,11 +29,11 @@
       };
     };
     
-    org.getobjects.appserver.products.JoProduct = {
+    org.getobjects.appserver.products.GoProduct = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
     };
-    org.getobjects.appserver.publisher.JoResource = {
+    org.getobjects.appserver.publisher.GoResource = {
       protectedBy   = "<public>";
       defaultAccess = "allow";
     };
@@ -44,13 +44,13 @@
       protectedBy   = "<public>";
       defaultAccess = "allow";
     };
-    org.getobjects.appserver.publisher.JoPageInvocation = {
+    org.getobjects.appserver.publisher.GoPageInvocation = {
       /* per default we expose all WOComponent objects to the web, including
          all names */
       protectedBy   = "<public>";
       defaultAccess = "allow";
     };
-    org.getobjects.appserver.publisher.JoDirectActionInvocation = {
+    org.getobjects.appserver.publisher.GoDirectActionInvocation = {
       /* per default we expose all DirectAction objects to the web, including
          all names */
       protectedBy   = "<public>";
@@ -72,7 +72,7 @@
     
     /* the control panel */
     
-    org.getobjects.appserver.publisher.JoControlPanel = {
+    org.getobjects.appserver.publisher.GoControlPanel = {
       /*
         Note: resources are retrieved using the control panel, so it is in
               fact public. Protect sensitive slots individually.
@@ -84,7 +84,7 @@
 				"Products" = {
           protectedBy = "<public>";
 				  valueClass  =
-				    "org.getobjects.appserver.products.JoControlPanelProducts";
+				    "org.getobjects.appserver.products.GoControlPanelProducts";
 				};
       };
       
@@ -92,7 +92,7 @@
       };
     };
     
-    org.getobjects.appserver.products.JoControlPanelProducts = {
+    org.getobjects.appserver.products.GoControlPanelProducts = {
       /*
         Note: resources are retrieved using the control panel, so it is in
               fact public. Protect sensitive slots individually.

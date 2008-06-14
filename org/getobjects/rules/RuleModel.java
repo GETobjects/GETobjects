@@ -43,7 +43,7 @@ import org.getobjects.foundation.NSObject;
  * @see Rule 
  */
 public class RuleModel extends NSObject implements Comparator {
-  protected static Log log = LogFactory.getLog("JoRules");
+  protected static Log log = LogFactory.getLog("GoRules");
   
   protected Rule[] rules;
 

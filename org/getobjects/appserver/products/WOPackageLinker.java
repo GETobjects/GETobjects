@@ -47,7 +47,7 @@ import org.getobjects.foundation.UString;
  * <p>
  * THREAD: this class is not threadsafe.
  */
-// TODO: would be nice to rewrite this somehow based on JoProducts.
+// TODO: would be nice to rewrite this somehow based on GoProducts.
 public class WOPackageLinker {
 
   protected final Log log = LogFactory.getLog("WOPackageLinker");
@@ -227,7 +227,7 @@ public class WOPackageLinker {
     else
       this.addResourceManager(rm);
 
-    /* register the product as a JoClass */
+    /* register the product as a GoClass */
 
     if (this.joProductManager != null) {
       if (!this.joProductManager.loadProduct(null, _pkg)) {

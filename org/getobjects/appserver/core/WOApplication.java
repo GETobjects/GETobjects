@@ -202,15 +202,15 @@ public class WOApplication extends NSObject
    *
    * @param _ctx  - the WOContext the lookup will happen in
    * @param _path - the path to be looked up
-   * @return the Object where the JoLookup process will start
+   * @return the Object where the GoLookup process will start
    */
   public Object rootObjectInContext(final WOContext _ctx, String[] _path) {
     return this;
   }
 
   /**
-   * If the result of the JoLookup process was not a JoCallable (something which
-   * can be Jo-invoked), this method will get called to determine a default
+   * If the result of the GoLookup process was not a GoCallable (something which
+   * can be Go-invoked), this method will get called to determine a default
    * callable.
    * For example in Zope the default 'method' is usually a page called
    * 'index_html'.
@@ -218,7 +218,7 @@ public class WOApplication extends NSObject
    * Our default implementation returns 'null', that is, no default method. This
    * will make the rendering process kick in.
    *
-   * @param _object - the result of the Jo path lookup
+   * @param _object - the result of the Go path lookup
    * @param _ctx    - the context of the whole operation
    * @return a default method object, or null if there is none
    */
@@ -227,7 +227,7 @@ public class WOApplication extends NSObject
   }
 
   /**
-   * This method does the JoStyle request processing. Its called by
+   * This method does the GoStyle request processing. Its called by
    * dispatchRequest() if requesthandler-processing is turned off. Otherwise
    * the handleRequest() method of the respective request handler is called!
    *
@@ -241,11 +241,11 @@ public class WOApplication extends NSObject
   /**
    * We currently support two styles of URL handling. Either the old WO style
    * where the WORequestHandler is responsible for all the URL decoding etc or
-   * the JoStyle, where the application object splits the URL and performs its
+   * the GoStyle, where the application object splits the URL and performs its
    * traversal process (note that handlers will still get called when they are
    * mapped!).
    * <p>
-   * The default implementation returns 'false', that is, the JoStyle is used
+   * The default implementation returns 'false', that is, the GoStyle is used
    * per default.
    *
    * @return true if the WORequestHandler should be responsible, false if not
@@ -256,7 +256,7 @@ public class WOApplication extends NSObject
 
   /**
    * The main entry method which is called by the Servlet adaptor. It invokes
-   * the appropriate request handler or does a JoStyle path lookup.
+   * the appropriate request handler or does a GoStyle path lookup.
    *
    * @param _rq - a WORequest
    * @return a WOResponse
@@ -279,7 +279,7 @@ public class WOApplication extends NSObject
       rh = this.requestHandlerForRequest(_rq);
     }
     else {
-      /* This method does the JoStyle request processing. Its called by
+      /* This method does the GoStyle request processing. Its called by
        * dispatchRequest() if requesthandler-processing is turned off.
        * Otherwise the handleRequest() method of the respective request
        * handler is called!
@@ -324,23 +324,23 @@ public class WOApplication extends NSObject
    * context.
    * <ul>
    *   <li>if the object is null, we return null
-   *   <li>if the object is a JoSecurityException, we check whether the
-   *     authenticator of the exceptions acts as a IJoObjectRendererFactory.
+   *   <li>if the object is a GoSecurityException, we check whether the
+   *     authenticator of the exceptions acts as a IGoObjectRendererFactory.
    *     If this returns a result, it is used as the renderer.
    *   <li>next, if there is a context the
-   *     IJoObjectRendererFactory.Utility.rendererForObjectInContext()
+   *     IGoObjectRendererFactory.Utility.rendererForObjectInContext()
    *     function is called in an attempt to locate a renderer by traversing
-   *     the path, looking for a IJoObjectRendererFactory which can return
+   *     the path, looking for a IGoObjectRendererFactory which can return
    *     a result.
    *   <li>then, the products are checked for appropriate renderers, by
    *     invoking the rendererForObjectInContext() of the product manager.
-   *   <li>and finally the JoDefaultRenderer will get used (if it can process
+   *   <li>and finally the GoDefaultRenderer will get used (if it can process
    *     the object)
    * </ul>
    *
    * @param _o   - the object which shall be rendered
    * @param _ctx - the context in which the rendering should happen
-   * @return a renderer object (usually an IJoRenderer)
+   * @return a renderer object (usually an IGoRenderer)
    */
   public Object rendererForObjectInContext(Object _o, WOContext _ctx) {
     if (_o == null)
@@ -387,11 +387,11 @@ public class WOApplication extends NSObject
 
   /**
    * Renders the given object in the given context. It does so by looking up
-   * a 'renderer' object (usually an IJoObjectRenderer) using
+   * a 'renderer' object (usually an IGoObjectRenderer) using
    * rendererForObjectInContext() and then calling renderObjectInContext()
    * on it.
    * <p>
-   * In the default configuration this will usually use the JoDefaultRenderer
+   * In the default configuration this will usually use the GoDefaultRenderer
    * which can deal with quite a few setups.
    *
    * @param _result - the object to be rendered
@@ -462,17 +462,17 @@ public class WOApplication extends NSObject
 
 
   /**
-   * This method is called by the JoDefaultRenderer if its asked to render a
+   * This method is called by the GoDefaultRenderer if its asked to render a
    * WOApplication object. This usually means that the root-URL of the
    * application was accessed.
    * The default implementation will return a redirect to the "wa/Main/default"
-   * JoPath.
+   * GoPath.
    *
    * @param _ctx - the WOContext the request happened in
    * @return a WOResponse to be used for the application object
    */
   public WOResponse redirectToApplicationEntry(WOContext _ctx) {
-    // TBD: Add a behaviour which makes sense for Jo based applications,
+    // TBD: Add a behaviour which makes sense for Go based applications,
     //      eg redirect to default method.
     // This is called by renderObjectInContext()
     WORequestHandler  drh = this.defaultRequestHandler();
@@ -480,7 +480,7 @@ public class WOApplication extends NSObject
     String url = null;
 
     /* Note: in both cases we use the DA request handler for entry */
-    // TBD: it would be better to perform a JoTraversal to check whether
+    // TBD: it would be better to perform a GoTraversal to check whether
     //        wa/DirectAction/default or wa/Main/default
     //      can be processed.
 
@@ -1312,14 +1312,14 @@ public class WOApplication extends NSObject
   }
 
   
-  /* JoClass */
+  /* GoClass */
 
   public GoClass joClassInContext(IGoContext _ctx) {
     return _ctx.joClassRegistry().goClassForJavaObject(this, _ctx);
   }
 
   
-  /* JoObject */
+  /* GoObject */
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     if (_name == null)
@@ -1327,7 +1327,7 @@ public class WOApplication extends NSObject
 
     /* a few hardcoded object pathes */
 
-    // TODO: why hardcode? move it to a JoClass!
+    // TODO: why hardcode? move it to a GoClass!
     if ("s".equals(_name))     return this.sessionStore();
     if ("stats".equals(_name)) return this.statisticsStore();
 

@@ -31,7 +31,7 @@ import org.getobjects.appserver.publisher.IGoContext;
  * WODirectActionRequestHandler
  * <p>
  * This handler manages 'direct action' and 'at-action' invocations. It works in
- * either traditional-request handler mode or as a JoCallable.
+ * either traditional-request handler mode or as a GoCallable.
  * <p>
  * Both variants specify a DA class or a component name in the URL. The handler
  * will instantiate that (eg using pageWithName()) and then call the action on
@@ -55,7 +55,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
   
   @Override
   public WOResponse handleRequest(WORequest _rq, WOContext _ctx, WOSession _s) {
-    // DEPRECATED, this object also acts as a JoMethod
+    // DEPRECATED, this object also acts as a GoMethod
     boolean isDebugOn = daLog.isDebugEnabled();
     WOResponse response      = null;
     String   actionClassName = null;
@@ -201,8 +201,8 @@ public class WODirectActionRequestHandler extends WORequestHandler {
    * This is called by handleRequest() to turn the result of a direct action
    * into a WOResponse.
    * <p>
-   * Note: this is not called in JoLookup mode. In JoLookup the resulting object
-   * will get rendered using the usual Jo rendering machinery.
+   * Note: this is not called in GoLookup mode. In GoLookup the resulting object
+   * will get rendered using the usual Go rendering machinery.
    * 
    * @param results - the result of the action method
    * @param _ctx    - the context the calls takes place in
@@ -251,7 +251,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
   
   
   /**
-   * Act as a JoMethod. The _object is most likely the WOApplication. This
+   * Act as a GoMethod. The _object is most likely the WOApplication. This
    * method manually processes the 'path info'.
    * Note that WORequestHandler returns true in isCallable (if the context is
    * a WOContext).
@@ -270,8 +270,8 @@ public class WODirectActionRequestHandler extends WORequestHandler {
     }
     
     // TODO: would be better if this would somehow patch the path in the context
-    //       and then setup/call a JoActionInvocation which is the same thing
-    //       used to bind actions to arbitrary JoObjects.
+    //       and then setup/call a GoActionInvocation which is the same thing
+    //       used to bind actions to arbitrary GoObjects.
 
     WOContext wctx = (WOContext)_ctx;
     String    actionClassName = null;

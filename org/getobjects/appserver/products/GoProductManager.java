@@ -39,9 +39,9 @@ import org.getobjects.foundation.UString;
 /**
  * GoProductManager
  * <p>
- * Products are the extension mechanism for the Jo subsystem of Go. Currently
+ * Products are the extension mechanism for the Go subsystem of Go. Currently
  * we also have "WOFramework"s which are loaded/linked by WOResourceManager. We
- * probably abandon those altogether and only use JoProduct's.
+ * probably abandon those altogether and only use GoProduct's.
  */
 public class GoProductManager extends NSObject
   implements IGoObject, IGoObjectRendererFactory
@@ -49,7 +49,7 @@ public class GoProductManager extends NSObject
   // TODO: document more
   // TODO: finish implementation, fix the crap
   
-  protected static final Log log = LogFactory.getLog("JoProductManager");
+  protected static final Log log = LogFactory.getLog("GoProductManager");
   
   protected WOApplication application;
   protected ConcurrentHashMap<String, GoProductInfo> nameToProduct;

@@ -46,7 +46,7 @@ public class OFSFileContainerChildInfo extends NSObject {
   // TODO: we could probably cache this based on the folder lastModified date?
   // TODO: we should probably drop this class, move ID processing to the
   //       OFSFolder and caching to a caching filemanager.
-  protected static final Log log = LogFactory.getLog("JoOFS");
+  protected static final Log log = LogFactory.getLog("GoOFS");
   
   protected IOFSFileManager fileManager;
   protected IOFSFileInfo    fileInfo;    /* a directory */

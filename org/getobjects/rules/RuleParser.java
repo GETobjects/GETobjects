@@ -38,7 +38,7 @@ import org.getobjects.foundation.UString;
 // TODO: parse assignment class? (eg "a = b; (BoolAssignment)")
 
 public class RuleParser extends NSObject {
-  protected static Log log = LogFactory.getLog("JoRuleParser");
+  protected static Log log = LogFactory.getLog("GoRuleParser");
   
   public static int RULE_PRIORITY_IMPORTANT = 1000;
   public static int RULE_PRIORITY_VERYHIGH  = 200;

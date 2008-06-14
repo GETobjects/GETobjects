@@ -63,7 +63,7 @@ public class OFSComponentWrapper extends OFSFolder
   }
   
   
-  /* IJoObject */
+  /* IGoObject */
   
   @Override
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
@@ -74,7 +74,7 @@ public class OFSComponentWrapper extends OFSFolder
     // If we don't return objects for 'submethods' (ie use PATH_INFO),
     // acquisition gets confused).
     
-    /* lookup using JoClass */
+    /* lookup using GoClass */
     
     GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {
@@ -113,7 +113,7 @@ public class OFSComponentWrapper extends OFSFolder
   }
   
   
-  /* IJoCallable */
+  /* IGoCallable */
 
   /**
    * The implementation of this call method invokes the
@@ -154,7 +154,7 @@ public class OFSComponentWrapper extends OFSFolder
   /**
    * Post process the results of callInContext(). This can be useful for
    * subclass which are some kind of bridge which requires unwrapping of the
-   * result (eg JSJoComponet).
+   * result (eg JSGoComponet).
    * <p>
    * The default implementation just returns the result as-is.
    * 
@@ -173,7 +173,7 @@ public class OFSComponentWrapper extends OFSFolder
   /* being a component definition */
   
   /**
-   * This is called by the JoContainerResourceManager to determine the
+   * This is called by the GoContainerResourceManager to determine the
    * WOComponent class of a contained component. This is only called for
    * WOComponents, not for dynamic elements.
    * 
@@ -200,9 +200,9 @@ public class OFSComponentWrapper extends OFSFolder
   
   /**
    * This method loads the WOTemplate using the WOWrapperTemplateBuilder. It
-   * maintains a cache which is hooked to the fileInfo of this wrapper JoObject.
+   * maintains a cache which is hooked to the fileInfo of this wrapper GoObject.
    * <p>
-   * Usually the <code>_name</code> will equal the JoObject, but theoretically
+   * Usually the <code>_name</code> will equal the GoObject, but theoretically
    * we could store multiple template variants with different names.
    * (TBD: not sure whether this flexibility is useful)
    * 

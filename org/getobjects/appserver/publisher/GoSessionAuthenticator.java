@@ -43,7 +43,7 @@ import org.getobjects.foundation.NSObject;
 public class GoSessionAuthenticator extends NSObject
   implements IGoAuthenticator, IGoObjectRenderer, IGoObjectRendererFactory
 {
-  protected static final Log log = LogFactory.getLog("JoAuthenticator");
+  protected static final Log log = LogFactory.getLog("GoAuthenticator");
   
   protected String sessionKey;
   
@@ -78,8 +78,8 @@ public class GoSessionAuthenticator extends NSObject
   
   
   /**
-   * This is the main IJoAuthenticator entry point. It just checks whether the
-   * context has a session, and if so, whether it contains a proper IJoUser
+   * This is the main IGoAuthenticator entry point. It just checks whether the
+   * context has a session, and if so, whether it contains a proper IGoUser
    * object.
    * 
    * @param _context - the context to perform authentication on
@@ -102,12 +102,12 @@ public class GoSessionAuthenticator extends NSObject
   }
   
   /**
-   * Extracts the IJoUser from the session. The default implementation retrieves
+   * Extracts the IGoUser from the session. The default implementation retrieves
    * the user using the <code>sessionKey</code> via KVC. If this results in an
-   * IJoUser object, its returned.
+   * IGoUser object, its returned.
    * 
    * @param _sn - the session to check
-   * @return an IJoUser or null if none could be found
+   * @return an IGoUser or null if none could be found
    */
   public IGoUser userInSession(final WOSession _sn) {
     if (_sn == null) {
@@ -121,7 +121,7 @@ public class GoSessionAuthenticator extends NSObject
     
     if (v != null) {
       log.warn("session has a " + this.sessionKey + " key, but its not an " +
-          "IJoUser!");
+          "IGoUser!");
     }
     else if (log.isInfoEnabled())
       log.info("there is a session, but it has no " + this.sessionKey + " key");
@@ -131,12 +131,12 @@ public class GoSessionAuthenticator extends NSObject
 
 
   /**
-   * This is a method of IJoObjectRendererFactory, it returns <code>this</code>
+   * This is a method of IGoObjectRendererFactory, it returns <code>this</code>
    * if the authenticator 'can render' in the given context.
    * <p>
    * The method is called by WOApplication.rendererForObjectInContext() if the
-   * object is a JoSecurityException and if the authenticator of the exception
-   * conforms to the IJoObjectRendererFactory interface.
+   * object is a GoSecurityException and if the authenticator of the exception
+   * conforms to the IGoObjectRendererFactory interface.
    * 
    * @param _result - the exception to be rendered
    * @param _ctx    - the context in which to render the exception
@@ -147,13 +147,13 @@ public class GoSessionAuthenticator extends NSObject
   }
 
   
-  /* IJoObjectRenderer */
+  /* IGoObjectRenderer */
   
   /**
-   * The method returns true for JoAuthRequiredException objects. It checks
+   * The method returns true for GoAuthRequiredException objects. It checks
    * whether a pageName or redirectURL is set.
    * 
-   * @return true if the object is an JoAuthRequiredException object
+   * @return true if the object is an GoAuthRequiredException object
    */
   public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
     return ((_object instanceof GoAuthRequiredException) &&
@@ -161,10 +161,10 @@ public class GoSessionAuthenticator extends NSObject
   }
   
   /**
-   * This method can render JoAuthRequiredException objects as a login panel or
+   * This method can render GoAuthRequiredException objects as a login panel or
    * as a redirect to a login panel.
    * 
-   * @param _object - the JoAuthRequiredException object
+   * @param _object - the GoAuthRequiredException object
    * @param _ctx    - the context in which the current request takes place
    * @return null if the rendering went fine, an exception otherwise
    */
@@ -190,7 +190,7 @@ public class GoSessionAuthenticator extends NSObject
    * variable.
    * It then fills the page with the authenticator and the exception
    * in case the appropriate keys are configured.
-   * And finally it invokes the JoDefaultRenderer to render the page. Note that
+   * And finally it invokes the GoDefaultRenderer to render the page. Note that
    * the page URL is the URL of the object which failed authentication.
    * 
    * @param _authException - the authentication exception to handle

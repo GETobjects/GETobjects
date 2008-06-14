@@ -34,18 +34,18 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
 
 /**
- * JoSimpleNamePasswordLogin
+ * GoSimpleNamePasswordLogin
  * <p>
- * Some helper class which creates a JAAS LoginContext or IJoUser for a user/pwd
+ * Some helper class which creates a JAAS LoginContext or IGoUser for a user/pwd
  * combination.
  * <p>
  * Example:<pre>
  *   Configuration jcfg = new OGoDefaultLoginConfig(_db);
- *   JoUser user = new JoSimpleNamePasswordLogin(jcfg)
+ *   GoUser user = new GoSimpleNamePasswordLogin(jcfg)
  *     .login(this.F("login"), this.F("pwd"));</pre>
  */
 public class GoSimpleNamePasswordLogin extends NSObject {
-  protected static final Log log = LogFactory.getLog("JoAuthenticator");
+  protected static final Log log = LogFactory.getLog("GoAuthenticator");
   
   protected Configuration jaasCfg;
   
@@ -60,7 +60,7 @@ public class GoSimpleNamePasswordLogin extends NSObject {
   /* login */
   
   /**
-   * Called by userInContext() of JoHTTPAuthenticator, or by the 'other' login()
+   * Called by userInContext() of GoHTTPAuthenticator, or by the 'other' login()
    * method which can be triggered by custom login panels.
    * 
    * @param _login - username
@@ -101,11 +101,11 @@ public class GoSimpleNamePasswordLogin extends NSObject {
   
   /**
    * Can be called by arbitary client objects, eg login panels, to create a
-   * JoUser with an attached JAAS LoginContext for Go authentication.
+   * GoUser with an attached JAAS LoginContext for Go authentication.
    * 
    * @param _login - username
    * @param _pwd   - password
-   * @return returns a logged-in JoUser, or null if login failed
+   * @return returns a logged-in GoUser, or null if login failed
    */
   public IGoUser login(final String _login, final String _pwd) {
     LoginContext lc = this.loginInJaas(_login, _pwd, null /* no realm */);

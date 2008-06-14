@@ -33,7 +33,7 @@ import org.getobjects.foundation.NSObject;
  * This is for calling actions bound to a page.
  * <p>
  * NOTE: this is currently rather useless since a WOComponent is usually NOT
- *       part of the traversal path (JoPageInvocation is).
+ *       part of the traversal path (GoPageInvocation is).
  * <p>
  * Eg if you bound a page to an object like:
  * <pre>
@@ -54,14 +54,14 @@ import org.getobjects.foundation.NSObject;
 public class GoActivePageActionInvocation extends NSObject
   implements IGoCallable
 {
-  protected static final Log log = LogFactory.getLog("JoClass");
+  protected static final Log log = LogFactory.getLog("GoClass");
   protected String actionName;
   
   public GoActivePageActionInvocation(final String _name) {
     this.actionName = _name;
   }
 
-  /* JoCallable */
+  /* GoCallable */
   
   public Object callInContext(final Object _object, final IGoContext _ctx) {
     if (_object == null) {

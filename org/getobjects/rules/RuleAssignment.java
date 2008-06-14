@@ -43,7 +43,7 @@ import org.getobjects.foundation.NSObject;
 public class RuleAssignment extends NSObject
   implements RuleCandidate, RuleAction
 {
-  protected static Log log = LogFactory.getLog("JoRules");
+  protected static Log log = LogFactory.getLog("GoRules");
 
   protected String keyPath;
   protected Object value;

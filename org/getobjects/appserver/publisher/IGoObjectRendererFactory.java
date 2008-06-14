@@ -35,7 +35,7 @@ import org.getobjects.appserver.core.WOContext;
  * which can contain special "master templates" (the actual root renderers).
  * <p>
  * If the WOApplication cannot find a factory in the traversal path, it will
- * first resort to the product registry and then return the JoDefaultRenderer
+ * first resort to the product registry and then return the GoDefaultRenderer
  * (which is just fine for plenty of situations).
  * <p>
  * @see IGoObjectRenderer
@@ -48,7 +48,7 @@ public interface IGoObjectRendererFactory {
    * Returns a renderer which should be used to render the given _result object
    * in the given context.
    * <p>
-   * The returned object should be an IJoObjectRenderer.
+   * The returned object should be an IGoObjectRenderer.
    * 
    * @param _result - the object which shall be rendered
    * @param _ctx    - the context in which the object lookup happened
@@ -58,15 +58,15 @@ public interface IGoObjectRendererFactory {
   
   
   public class Utility {
-    protected static final Log log = LogFactory.getLog("JoRenderer");
+    protected static final Log log = LogFactory.getLog("GoRenderer");
     
     /**
      * This methods walks the objectTraversalPath in the given context and
-     * checks each object whether its an IJoObjectRendererFactory. If so, it
+     * checks each object whether its an IGoObjectRendererFactory. If so, it
      * asks that object for a renderer. If none is returned, the method
      * continues walking the path up.
      * <p>
-     * The returned object should be an IJoObjectRenderer.
+     * The returned object should be an IGoObjectRenderer.
      * 
      * @param _o   - the object which shall be rendered
      * @param _ctx - the context in which the object lookup happened

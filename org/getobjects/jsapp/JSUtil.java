@@ -272,7 +272,7 @@ public class JSUtil {
      final NSKeyValueCoding _component, final IGoContext _ctx)
   {
     // TBD: we might want to scan the script source for additional information
-    //      like Jo protections and such (or should the script execute
+    //      like Go protections and such (or should the script execute
     //      appropriate declare() calls? Probably.)
     
     if (jslog != null && jslog.isDebugEnabled())

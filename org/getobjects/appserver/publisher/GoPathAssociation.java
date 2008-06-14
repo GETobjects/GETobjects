@@ -90,20 +90,20 @@ public class GoPathAssociation extends WOAssociation {
   
   public Object valueInContext(final IGoContext _context) {
     if (this.goPath == null || this.goPath.length == 0) {
-      log.warn("association has no JoPath assigned: " + this); 
+      log.warn("association has no GoPath assigned: " + this); 
       return null;
     }
     
     final GoTraversalPath tPath = _context.joTraversalPath();
     if (tPath == null) {
-      log.warn("attempt to traverse JoPath w/o ctxpath: " + this + 
+      log.warn("attempt to traverse GoPath w/o ctxpath: " + this + 
           "\n  context: " + _context);
       return null;
     }
     
     final Object[] otPath = tPath.objectTraversalPath();
     if (otPath == null || otPath.length == 0) {
-      log.warn("JoPath contains no objects: " + this + "\n  path: " + tPath);
+      log.warn("GoPath contains no objects: " + this + "\n  path: " + tPath);
       return null;
     }
     

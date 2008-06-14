@@ -26,7 +26,7 @@ import org.getobjects.ofs.OFSApplication;
 /**
  * GoCallDirectActionRequestHandler
  * <p>
- * A subclass of WODirectActionRequestHandler which can invoke JoCallable
+ * A subclass of WODirectActionRequestHandler which can invoke GoCallable
  * based direct actions.
  * Why do we need it? Because we still want to be able to invoke Java based
  * direct action classes, eg those coming from frameworks or products.
@@ -52,7 +52,7 @@ public class GoCallDirectActionRequestHandler
      *   Main.wo         => JSComponentMethod
      */
     
-    // TBD: We should perform a JoLookup against the application object to check
+    // TBD: We should perform a GoLookup against the application object to check
     //      for the result. Then it would be a generic OFSDAHandler
     //      Hm, better aquire the WOApp, maybe its somehow deeper in the
     //      hierarchy.

@@ -1,28 +1,28 @@
-<#Frame>
-  <h2><#WOString var:value="name"/></h2>
+<wo:Frame>
+  <h2><wo:get var:value="name"/></h2>
 
   <table border="1">
     <tr><td>Embedded Simple String:</td>
-      <td><#WOString ognl:value="name" /></td>
+      <td><wo:get ognl:value="name" /></td>
     </tr>
     <tr><td>Embedded Keypath String:</td>
-      <td><#WOString ognl:value="context.application.sessionStore" /></td>
+      <td><wo:get ognl:value="context.application.sessionStore" /></td>
     </tr>
     <tr><td>Join Strings:</td>
       <td>
-        <#WOString ognl:value="'Component ' + name + ' is hosted on ' 
+        <wo:get ognl:value="'Component ' + name + ' is hosted on ' 
             + context.application.sessionStore" /><br />
       </td>
     </tr>
 
     <tr><td>Decl Simple String:</td>
-      <td><#Simple/></td>
+      <td><wo:Simple/></td>
     </tr>
     <tr><td>Decl Keypath String:</td>
-      <td><#Keypath/></td>
+      <td><wo:Keypath/></td>
     </tr>
     <tr><td>Decl Join String:</td>
-      <td><#JoinStrings/></td>
+      <td><wo:JoinStrings/></td>
     </tr>
   </table>
   
@@ -31,11 +31,11 @@
   A repetition:
   <table border="0" cellspacing="0" cellpadding="4">
     <tr>
-      <#Repeat>
-        <#DynTD>
-          <#RepeatValue/>
-        </#DynTD>
-      </#Repeat>
+      <wo:Repeat>
+        <wo:DynTD>
+          <wo:RepeatValue/>
+        </wo:DynTD>
+      </wo:Repeat>
     </tr>
   </table>
-</#Frame>
+</wo:Frame>

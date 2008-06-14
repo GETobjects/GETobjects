@@ -134,7 +134,7 @@ public class OFSRestorationFactory extends NSObject {
    * @param _container - the parent object (used in setLocation())
    * @param _fm   - the OFS storage filemanager
    * @param _file - the object representing the OFS file
-   * @param _ctx  - the JoContext
+   * @param _ctx  - the GoContext
    * @return a freshly created object or an Exception/null on errors
    */
   public Object restoreObjectFromFileInContext
@@ -181,7 +181,7 @@ public class OFSRestorationFactory extends NSObject {
     else if (o != null)
       log().warn("restored object is not an OFS object: " + o);
     
-    /* ensure the object has the IJoContext if it depends on it */
+    /* ensure the object has the IGoContext if it depends on it */
     
     if (o instanceof IOFSContextObject)
       ((IOFSContextObject)o)._setContext(_ctx);
@@ -304,7 +304,7 @@ public class OFSRestorationFactory extends NSObject {
    * Returns the OFS handler class for 'directories' in the file system.
    * 
    * @param _ext - the extension, eg ('wo' or 'eomodeld')
-   * @param _ctx - the Jo lookup context
+   * @param _ctx - the Go lookup context
    * @return a class to be used for the given extension
    */
   public Class ofsClassForDirectoryExtensionInContext

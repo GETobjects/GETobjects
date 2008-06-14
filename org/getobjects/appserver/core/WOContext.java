@@ -84,7 +84,7 @@ public class WOContext extends WOCoreContext
   protected String        fragmentID;
   protected WOErrorReport errorReport;
 
-  /* JoObject support */
+  /* GoObject support */
   protected GoTraversalPath joTraversalPath;
   protected IGoUser         activeUser;
   protected String          clientObjectURL;
@@ -840,10 +840,10 @@ public class WOContext extends WOCoreContext
     return this.directActionURLForActionNamed(_name, qd);
   }
 
-  /* JoContext */
+  /* GoContext */
 
   /**
-   * Returns the JoClass registry associated with the context. The default
+   * Returns the GoClass registry associated with the context. The default
    * implementation returns the registry of the application object associated
    * with this context.
    */
@@ -860,9 +860,9 @@ public class WOContext extends WOCoreContext
   }
 
   /**
-   * Returns the 'clientObject' of the JoMethod invocation. The 'clientObject'
+   * Returns the 'clientObject' of the GoMethod invocation. The 'clientObject'
    * is the object in the request URL path which is located before the last
-   * Callable JoObject.
+   * Callable GoObject.
    * <p>
    * Examples:<pre>
    *   URL                          ClientObject         Method
@@ -944,10 +944,10 @@ public class WOContext extends WOCoreContext
 
   /**
    * Walks over the object traversal path in reverse order and checks each of
-   * the objects whether they implement the IJoAuthenticatorContainer interface.
+   * the objects whether they implement the IGoAuthenticatorContainer interface.
    * If so, the object is asked for an authenticator which is then returned.
    *
-   * @return an IJoAuthenticator or null if none could be located.
+   * @return an IGoAuthenticator or null if none could be located.
    */
   protected IGoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
     GoTraversalPath joPath = this.joTraversalPath();

@@ -23,7 +23,7 @@ package org.getobjects.appserver.products;
 import org.getobjects.appserver.core.WOResourceManager;
 
 /**
- * JoProductResourceManager
+ * GoProductResourceManager
  * <p>
  * 
  */

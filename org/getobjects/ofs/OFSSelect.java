@@ -98,7 +98,7 @@ public class OFSSelect extends OFSBaseObject implements IGoFolderish {
     return ds != null ? ds.fetchObjects() : null;
   }
   
-  /* JoObject */
+  /* GoObject */
   
   @Override
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {

@@ -535,7 +535,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * It sets various session specific features and then triggers the context
    * to render to the response.
    * <p>
-   * Note: this is currently not called for Jo-based lookups. Jo-lookups are
+   * Note: this is currently not called for Go-based lookups. Go-lookups are
    * handled in the WOApp.handleRequest method which also adds the session-id
    * cookie.
    * 

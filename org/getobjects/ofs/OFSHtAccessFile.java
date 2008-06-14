@@ -37,16 +37,16 @@ import org.getobjects.ofs.htaccess.IHtConfigContainer;
 /**
  * OFSHtAccessFile
  * <p>
- * Wraps an Apache style .htaccess file as a JoObject. Note that .htaccess is
+ * Wraps an Apache style .htaccess file as a GoObject. Note that .htaccess is
  * not a valid OFS name, must be 'config.htaccess' or something similiar.
  * <p>
- * This object is just the Jo controller object, the actual HtAccess
+ * This object is just the Go controller object, the actual HtAccess
  * functionality is in the 'htaccess' subpackage.
  */
 public class OFSHtAccessFile extends OFSJavaObject
   implements IJoConfigurationProvider
 {
-  protected static final Log cfglog = LogFactory.getLog("JoConfig");
+  protected static final Log cfglog = LogFactory.getLog("GoConfig");
   
   // protected IHtConfigContainer configContainer; /* 'da cache */
   // private static final String cacheKey = "OFSHtAccessFile";

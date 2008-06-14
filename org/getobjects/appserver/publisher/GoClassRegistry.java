@@ -39,7 +39,7 @@ import org.getobjects.foundation.UString;
  */
 public class GoClassRegistry extends NSObject {
   //TODO: document more
-  protected static final Log log = LogFactory.getLog("JoClassRegistry");
+  protected static final Log log = LogFactory.getLog("GoClassRegistry");
   
   protected WOApplication        application;
   protected ConcurrentHashMap<String, GoClass> nameToClass;
@@ -58,13 +58,13 @@ public class GoClassRegistry extends NSObject {
   /* exposing Java classes as So classes */
   
   /**
-   * First attempts to retrieve the JoClass by evaluating the 'joClass'
+   * First attempts to retrieve the GoClass by evaluating the 'joClass'
    * KVC key. If that doesn't return anything, we call joClassForJavaClass()
    * with the objects class.
    * 
-   * @param _object - Object to get the JoClass for
+   * @param _object - Object to get the GoClass for
    * @param _ctx    - context in which the object is active
-   * @return the JoClass, or null if none could be found
+   * @return the GoClass, or null if none could be found
    */
   public GoClass goClassForJavaObject(Object _object, final IGoContext _ctx) {
     if (_object == null)
@@ -105,7 +105,7 @@ public class GoClassRegistry extends NSObject {
     
     joClass = this.generateGoClassFromJavaClass(_cls, joSuperClass, _ctx);
     if (joClass == null) {
-      log.error("could not create JoClass from Java class: " + _cls);
+      log.error("could not create GoClass from Java class: " + _cls);
       return null;
     }
     

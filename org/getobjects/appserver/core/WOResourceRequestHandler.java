@@ -40,7 +40,7 @@ import org.getobjects.appserver.publisher.GoResource;
  */
 public class WOResourceRequestHandler extends WORequestHandler {
   // TBD: document
-  // TBD: rewrite to use JoObjects for content handling?
+  // TBD: rewrite to use GoObjects for content handling?
 
   public WOResourceRequestHandler(WOApplication _app) {
     super(_app);

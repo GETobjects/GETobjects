@@ -37,7 +37,7 @@ import org.getobjects.foundation.NSObject;
  */
 public class GoDirectActionInvocation extends NSObject implements IGoCallable {
   // TBD: document
-  protected static final Log log = LogFactory.getLog("JoClass");
+  protected static final Log log = LogFactory.getLog("GoClass");
 
   protected String className;
   protected String actionName;
@@ -51,7 +51,7 @@ public class GoDirectActionInvocation extends NSObject implements IGoCallable {
   }
   
   
-  /* JoCallable */
+  /* GoCallable */
   
   public Object callInContext(final Object _object, final IGoContext _ctx) {
     WOContext   ctx  = (WOContext)_ctx;

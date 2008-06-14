@@ -22,7 +22,7 @@ package org.getobjects.ofs;
 
 
 public class OFSPdfFile extends OFSResourceFile {
-  // this subclass is just for giving the entity a unique JoClass
+  // this subclass is just for giving the entity a unique GoClass
 
   /* accessors */
   

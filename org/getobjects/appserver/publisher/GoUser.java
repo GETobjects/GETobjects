@@ -34,9 +34,9 @@ import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
 
 /**
- * JoUser
+ * GoUser
  * <p>
- * A simple default implementation of the IJoUser interface.
+ * A simple default implementation of the IGoUser interface.
  */
 public class GoUser extends NSObject implements IGoUser {
   public static final String[] anonymousRoles = { GoRole.Anonymous };
@@ -65,7 +65,7 @@ public class GoUser extends NSObject implements IGoUser {
   
   /**
    * This one scans the Subject of the LoginContext for acl.Group objects and
-   * adds those as 'roles'. It always adds the JoRole.Authenticated.
+   * adds those as 'roles'. It always adds the GoRole.Authenticated.
    * 
    * @param _login - the username
    * @param _lc    - the authenticated JAAS LoginContext
@@ -149,7 +149,7 @@ public class GoUser extends NSObject implements IGoUser {
   
   @Override
   public int hashCode() {
-    // allow the JoUser object get used as a hashtable key
+    // allow the GoUser object get used as a hashtable key
     return this.name != null ? this.name.hashCode() : -1;
   }
   
@@ -160,10 +160,10 @@ public class GoUser extends NSObject implements IGoUser {
     if (!(_other instanceof GoUser))
       return false;
     
-    return ((GoUser)_other).isEqualToJoUser(this);
+    return ((GoUser)_other).isEqualToGoUser(this);
   }
   
-  public boolean isEqualToJoUser(final GoUser _user) {
+  public boolean isEqualToGoUser(final GoUser _user) {
     if (!(this.authenticator.equals(_user.authenticator)))
       return false; /* different scope */
     

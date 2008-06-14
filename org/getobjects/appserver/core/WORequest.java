@@ -109,7 +109,7 @@ public class WORequest extends WOMessage {
   protected void _processURL() {
     // TODO: improve path processing
     // TBD: this is more or less deprecated. Pathes should be processed using
-    //      JoLookups. The request-handler key and path are considered legacy.
+    //      GoLookups. The request-handler key and path are considered legacy.
 
     String luri = this.uri();
     if (luri == null) {
@@ -341,7 +341,7 @@ public class WORequest extends WOMessage {
    * WODirectActionRequestHandler in WOApplication).
    * <p>
    * Note: this method is considered 'almost' deprecated. Lookups are now
-   * usually done "JoStyle" (lookupName on the WOApp will be used to discover
+   * usually done "GoStyle" (lookupName on the WOApp will be used to discover
    * the WORequestHandler).
    *
    * @return the request handler key part of the URL, eg 'wo' or 'wa'
@@ -354,7 +354,7 @@ public class WORequest extends WOMessage {
    * the respective method for details.
    * <p>
    * Note: this method is considered 'almost' deprecated. Lookups should be done
-   * "JoStyle" in the WORequestHandler (that is, they should implement
+   * "GoStyle" in the WORequestHandler (that is, they should implement
    * lookupName() to let Go process the path).
    *
    * @return the request handler path part of the URL, eg 'MyPage/doIt'
@@ -367,7 +367,7 @@ public class WORequest extends WOMessage {
    * the respective method for details.
    * <p>
    * Note: this method is considered 'almost' deprecated. Lookups should be done
-   * "JoStyle" in the WORequestHandler (that is, they should implement
+   * "GoStyle" in the WORequestHandler (that is, they should implement
    * lookupName() to let Go process the path).
    *
    * @return the request handler path part of the URL, eg ['MyPage', 'doIt']

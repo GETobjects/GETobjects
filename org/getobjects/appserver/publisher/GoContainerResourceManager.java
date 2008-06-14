@@ -70,8 +70,8 @@ public class GoContainerResourceManager extends WOResourceManager {
   public static WOResourceManager lookupResourceManager
     (final Object _base, final IGoContext _ctx)
   {
-    // TBD: we could construct the RM in here. If we detect an IJoFolderish or
-    //      JSJoFolder
+    // TBD: we could construct the RM in here. If we detect an IGoFolderish or
+    //      JSGoFolder
     final WOResourceManager rm = (WOResourceManager)IGoLocation.Utility
       .locateValueForKeyPath(_base, "resourceManager");
     if (rm != null)
@@ -98,7 +98,7 @@ public class GoContainerResourceManager extends WOResourceManager {
   
   /**
    * Checks the container for an object with the given <code>_name</code>
-   * which conforms to the IJoComponentDefinition interface.
+   * which conforms to the IGoComponentDefinition interface.
    * 
    * @return an IGoComponentDefinition object
    */
@@ -131,12 +131,12 @@ public class GoContainerResourceManager extends WOResourceManager {
        * exception even if the folder does not really contain the named object!
        */
       // TBD: do we want to change that?
-      log.warn("error looking up JoObject with name '" + _name + "'\n" +
+      log.warn("error looking up GoObject with name '" + _name + "'\n" +
           "  container: " + this.container + "\n" +
           "  error:     " + o);
     }
     else if (o != null) {
-      log.warn("found a JoObject with name '" + _name + "', but its not a " +
+      log.warn("found a GoObject with name '" + _name + "', but its not a " +
           "component provider: " + o);
     }
     
@@ -207,7 +207,7 @@ public class GoContainerResourceManager extends WOResourceManager {
   @Override
   public Class lookupDirectActionClass(final String _name) {
     // TBD: JS direct actions are DIFFERENT. They have no WOComponentDefinition
-    log.info("JoDirectActions are not yet supported");
+    log.info("GoDirectActions are not yet supported");
     return this.parentRM.lookupDirectActionClass(_name);
   }
   
@@ -253,7 +253,7 @@ public class GoContainerResourceManager extends WOResourceManager {
   private static final String DefaultTableName = "LocalizableStrings";
   
   /**
-   * This method checks whether the Jo container object contains a
+   * This method checks whether the Go container object contains a
    * 'LocalizableStrings' object. If so, it attempts to resolve the
    * 'resourceBundle' key on that object.
    * 

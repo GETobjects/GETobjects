@@ -182,10 +182,10 @@ public abstract class WOSessionStore extends NSObject implements IGoObject {
   }
   
   
-  /* JoObject */
+  /* GoObject */
   
   /**
-   * Allows a WOSessionStore to be used as a JoObject. It resolves session-ids
+   * Allows a WOSessionStore to be used as a GoObject. It resolves session-ids
    * to WOSession objects.
    * <p>
    * Note: do not use this, most likely the API will change.

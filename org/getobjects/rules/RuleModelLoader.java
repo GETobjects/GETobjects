@@ -87,7 +87,7 @@ import org.xml.sax.SAXException;
  * @see RuleModel
  */
 public class RuleModelLoader extends NSObject {
-  protected static final Log log = LogFactory.getLog("JoRuleModelLoader");
+  protected static final Log log = LogFactory.getLog("GoRuleModelLoader");
 
   /* statics */
 

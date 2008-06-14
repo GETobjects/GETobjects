@@ -139,7 +139,7 @@ public class WOComponentRequestHandler extends WORequestHandler {
           log.warn("unexpected page request result: " + actionResult);
       }
       
-      // TBD: we would want to invoke a renderer in JoMode here
+      // TBD: we would want to invoke a renderer in GoMode here
       
       if (log.isInfoEnabled())
         log.info("append to response: " + actionResult);
@@ -155,7 +155,7 @@ public class WOComponentRequestHandler extends WORequestHandler {
     return null; /* we do the request thing in the main method */
   }
 
-  /* JoObject (new style) */
+  /* GoObject (new style) */
 
   @Override
   public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {

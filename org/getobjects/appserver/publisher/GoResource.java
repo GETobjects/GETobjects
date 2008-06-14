@@ -40,12 +40,12 @@ import org.getobjects.appserver.core.WOResponse;
  * GoResource
  * <p>
  * This GoObject takes a URL and delivers its contents as a resource. Eg its
- * used by JoProduct to deliver public product resources.
+ * used by GoProduct to deliver public product resources.
  * <p>
  * Note: this object supports nested queries. Eg /www/images/myimage.gif.
  */
 public class GoResource extends WOElement implements IGoObject {
-  protected static final Log log = LogFactory.getLog("JoResource");
+  protected static final Log log = LogFactory.getLog("GoResource");
   
   protected URL url;
   
