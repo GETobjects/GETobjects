@@ -35,10 +35,12 @@ import org.getobjects.appserver.core.WOAssociation;
  * never changes), which allows additional caching.
  * <p>
  * This can be used in combination with the WOConditional 'match' binding,
- * eg:<pre>
- *   &lt;#if regex:match="^/person.*" value="request.uri"&gt;</pre>
- * Which is just like:<pre> 
- *   &lt;#if match="^/person.*" value="request.uri"&gt;</pre>
+ * eg:
+ * <pre>
+ *   &lt;wo:if regex:match="^/person.*" value="request.uri"&gt;</pre>
+ * Which is just like:
+ * <pre> 
+ *   &lt;wo:if match="^/person.*" value="request.uri"&gt;</pre>
  * with the difference that the first one caches the RegEx Pattern object.
  * <br>
  * Well, actually WOConditional optimizes the case above :-) If the match

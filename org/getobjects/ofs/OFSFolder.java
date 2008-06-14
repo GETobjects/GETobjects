@@ -336,6 +336,7 @@ public class OFSFolder extends OFSBaseObject
    * 
    * @param _name - name of the object to lookup
    * @param _ctx  - the context to perform the operation in
+   * @param _acquire - whether the object should attempt to acquire names
    * @return a freshly created object, or an Exception/null on error
    */
   @SuppressWarnings("unchecked")

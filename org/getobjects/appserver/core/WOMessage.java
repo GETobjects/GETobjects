@@ -761,9 +761,10 @@ public abstract class WOMessage extends NSObject
    * This appends the given key/value attribute to the response.
    * Example:<pre>
    * response.appendAttribute("size", 12);</pre>
+   * Adding int-values is a bit faster, since they never need to be escaped.
    *
-   * @param _attrName
-   * @param _attrValue
+   * @param _attrName - the name of the attribute to add, eg "size"
+   * @param _value    - the value of the attribute to add
    * @return null if everything went fine, the exception on errors
    */
   public Exception appendAttribute(final String _attrName, final int _value) {

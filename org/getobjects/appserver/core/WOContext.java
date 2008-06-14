@@ -507,7 +507,7 @@ public class WOContext extends WOCoreContext
   }
   /**
    * Returns whether we are inside an WOForm. Remember that we do NOT track
-   * &lt;#form&gt; or &lt;form&gt; tags.
+   * &lt;wo:form&gt; or &lt;form&gt; tags.
    *
    * @return true if the template is contained in a WOForm, false if not
    */
@@ -685,7 +685,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _requestHandlerKey  - key of the given request handler, eg 'wa'
    * @param _requestHandlerPath - path to be handled by the request handler
-   * @param _qs                 - properly encoded query string
+   * @param _queryString        - properly encoded query string
    * @return a URL
    */
   public String urlWithRequestHandlerKey

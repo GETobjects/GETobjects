@@ -50,7 +50,7 @@ public class WORequestJoPath extends NSObject {
    * 
    * @param _rq  - the WORequest
    * @param _ctx - the WOContext
-   * @param _cuttOffAppName - if specified, the given name is removed
+   * @param _cutOffAppName - if specified, the given name is removed
    * @return a String array containing the traversal path
    */
   public static String[] traversalPathForRequest
@@ -115,16 +115,16 @@ public class WORequestJoPath extends NSObject {
    * @param _ctx - the context the operation happens in
    * @return a String array containing the names to traverse
    */
-  protected static String[] traversalPathForURI(String uri, WOContext _ctx) {
+  protected static String[] traversalPathForURI(String _uri, WOContext _ctx) {
     // TBD: we should move this code to some UApplication static function?
-    if (uri == null)
+    if (_uri == null)
       return null;
     
     /* clean up URI */
     
-    if (uri.startsWith("/")) uri = uri.substring(1);
-    if (uri.endsWith("/"))   uri = uri.substring(0, uri.length() - 1);
-    if (uri.length() == 0)   return emptyStringArray;
+    if (_uri.startsWith("/")) _uri = _uri.substring(1);
+    if (_uri.endsWith("/"))   _uri = _uri.substring(0, _uri.length() - 1);
+    if (_uri.length() == 0)   return emptyStringArray;
     
     /* split URL */
     
@@ -132,7 +132,7 @@ public class WORequestJoPath extends NSObject {
      * "/ab".split returns [, ab]
      * "ab/".split returns [ab]
      */
-    final String[] urlParts  = uri.split("/");
+    final String[] urlParts  = _uri.split("/");
     if (urlParts.length == 0)
       return emptyStringArray;
     if (urlParts.length == 1 && urlParts[0].equals(""))

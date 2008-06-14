@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -84,7 +84,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
     this.hints = _hints != null ? new HashMap<String, Object>(_hints) : null;
   }
   
-  public EOFetchSpecification(EOFetchSpecification _src) {
+  public EOFetchSpecification(final EOFetchSpecification _src) {
     // Note: we can't use a null _src here
     this(_src.entityName(), _src.qualifier(), _src.sortOrderings(),
          _src.usesDistinct(), _src.isDeep(), _src.hints());
@@ -111,54 +111,54 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
     return this.entityName;
   }
   
-  public void setQualifier(EOQualifier _q) {
+  public void setQualifier(final EOQualifier _q) {
     this.qualifier = _q;
   }
   public EOQualifier qualifier() {
     return this.qualifier;
   }
   
-  public void setSortOrderings(EOSortOrdering[] _sos) {
+  public void setSortOrderings(final EOSortOrdering[] _sos) {
     this.sortOrderings = _sos;
   }
   public EOSortOrdering[] sortOrderings() {
     return this.sortOrderings;
   }
   
-  public void setFetchLimit(int _limit) {
+  public void setFetchLimit(final int _limit) {
     this.fetchLimit = _limit;
   }
   public int fetchLimit() {
     return this.fetchLimit;
   }
   
-  public void setFetchOffset(int _skipCount) {
+  public void setFetchOffset(final int _skipCount) {
     this.fetchOffset = _skipCount;
   }
   public int fetchOffset() {
     return this.fetchOffset;
   }
   
-  public void setUserInfo(Map _ui) {
+  public void setUserInfo(final Map _ui) {
     this.userInfo = _ui;
   }
   public Map userInfo() {
     return this.userInfo;
   }
   
-  public void setHints(Map<String,Object> _ui) {
+  public void setHints(final Map<String,Object> _ui) {
     this.hints = _ui;
   }
   public Map<String,Object> hints() {
     /* Note: we do not return null when possible to avoid checks */
     return this.hints != null ? this.hints : new HashMap<String,Object>();
   }
-  public void setHint(String _key, Object _value) {
+  public void setHint(final String _key, final Object _value) {
     if (this.hints == null)
       this.hints = new HashMap<String, Object>(1);
     this.hints.put(_key, _value);
   }
-  public void removeHint(String _key) {
+  public void removeHint(final String _key) {
     if (this.hints != null && _key != null)
       this.hints.remove(_key);
   }
@@ -184,28 +184,28 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
     return this.deep;
   }
   
-  public void setFetchAttributeNames(String[] _attrNames) {
+  public void setFetchAttributeNames(final String[] _attrNames) {
     this.attributeNames = _attrNames;
   }
   public String[] fetchAttributeNames() {
     return this.attributeNames;
   }
   
-  public void setFetchesRawRows(boolean _flag) {
+  public void setFetchesRawRows(final boolean _flag) {
     this.fetchesRawRows = _flag;
   }
   public boolean fetchesRawRows() {
     return this.fetchesRawRows;
   }
   
-  public void setFetchesReadOnly(boolean _flag) {
+  public void setFetchesReadOnly(final boolean _flag) {
     this.fetchesReadOnly = _flag;
   }
   public boolean fetchesReadOnly() {
     return this.fetchesReadOnly;
   }
   
-  public void setRequiresAllQualifierBindingVariables(boolean _flag) {
+  public void setRequiresAllQualifierBindingVariables(final boolean _flag) {
     this.requiresAllQualifierBindingVariables = _flag;
   }
   public boolean requiresAllQualifierBindingVariables() {
@@ -214,7 +214,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
     return this.requiresAllQualifierBindingVariables;
   }
   
-  public void setPrefetchingRelationshipKeyPaths(String[] _keyPaths) {
+  public void setPrefetchingRelationshipKeyPaths(final String[] _keyPaths) {
     this.prefetchingRelationshipKeyPaths = 
       _keyPaths != null && _keyPaths.length > 0 ? _keyPaths : null;
   }
@@ -224,7 +224,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
   
   /* hint patterns */
   
-  public Map<String, Object> resolveHintBindPatterns(Object _b) {
+  public Map<String, Object> resolveHintBindPatterns(final Object _b) {
     if (this.hints == null)
       return null;
     
@@ -249,7 +249,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
   /* operations */
   
   public EOFetchSpecification fetchSpecificationWithQualifierBindings
-    (Object _b)
+    (final Object _b)
   {
     Map<String, Object> boundHints = this.resolveHintBindPatterns(_b);
     
@@ -291,7 +291,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
    */
   @SuppressWarnings("unchecked")
   public EOFetchSpecification fetchSpecificationWithQualifierBindings
-    (Object... _keyValuePairs)
+    (final Object... _keyValuePairs)
   {
     Map<String, Object> binds = UMap.createArgs(_keyValuePairs);
     if (binds == null || binds.size() == 0)
@@ -311,7 +311,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
    * 
    * @param _qualifier - qualifier to add to the EOFetchSpecification
    */
-  public void conjoinQualifier(EOQualifier _qualifier) {
+  public void conjoinQualifier(final EOQualifier _qualifier) {
     if (this.qualifier == null)
       this.setQualifier(_qualifier);
     else if (_qualifier != null) {
@@ -327,16 +327,16 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
    * 
    * @param _qualifier - qualifier to add to the EOFetchSpecification
    */
-  public void disjoinQualifier(EOQualifier _q) {
+  public void disjoinQualifier(final EOQualifier _qualifier) {
     if (this.qualifier == null)
-      this.setQualifier(_q);
-    else if (_q != null) {
+      this.setQualifier(_qualifier);
+    else if (_qualifier != null) {
       // TBD: if this.qualifier is an OR qualifier, extend it?
-      this.setQualifier(new EOOrQualifier(this.qualifier, _q));
+      this.setQualifier(new EOOrQualifier(this.qualifier, _qualifier));
     }
   }
   
-  public void setQualifier(String _fmt, Object... _args) {
+  public void setQualifier(final String _fmt, final Object... _args) {
     EOQualifierParser parser = new EOQualifierParser(_fmt.toCharArray(), _args);
     this.setQualifier(parser.parseQualifier());
   }
@@ -347,7 +347,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
    * set as the new qualifier of the fetch-spec.
    * If no qualifier is set, the given qualifier is used as-is.
    */
-  public void conjoinQualifier(String _fmt, Object... _args) {
+  public void conjoinQualifier(final String _fmt, final Object... _args) {
     EOQualifierParser parser = new EOQualifierParser(_fmt.toCharArray(), _args);
     this.conjoinQualifier(parser.parseQualifier());
   }
@@ -357,7 +357,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
    * set as the new qualifier of the fetch-spec.
    * If no qualifier is set, the given qualifier is used as-is.
    */
-  public void disjoinQualifier(String _fmt, Object... _args) {
+  public void disjoinQualifier(final String _fmt, final Object... _args) {
     EOQualifierParser parser = new EOQualifierParser(_fmt.toCharArray(), _args);
     this.disjoinQualifier(parser.parseQualifier());
   }
@@ -383,7 +383,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.entityName != null) _d.append(" entity="    + this.entityName);

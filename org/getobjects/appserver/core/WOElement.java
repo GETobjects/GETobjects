@@ -99,8 +99,8 @@ public abstract class WOElement extends NSObject {
    * to collect data before you can run a content generation phase (eg because
    * you need to know the count of the contained objects).
    * 
-   * @param _walker - the object implementing the operation of the phase
-   * @param _ctx    - the WOContext in which the phase takes place
+   * @param _walkr - the object implementing the operation of the phase
+   * @param _ctx   - the WOContext in which the phase takes place
    */
   public void walkTemplate(final WOElementWalker _walkr, final WOContext _ctx) {
   }

@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -91,7 +91,7 @@ public class RuleContext extends NSObject
   
   /* accessors */
   
-  public void setModel(RuleModel _model) {
+  public void setModel(final RuleModel _model) {
     this.model = _model;
   }
   public RuleModel model() {
@@ -101,12 +101,12 @@ public class RuleContext extends NSObject
   /* KVC */
 
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     this.takeStoredValueForKey(_value, _key);
   }
 
   @Override
-  public Object valueForKey(String _key) {
+  public Object valueForKey(final String _key) {
     if (_key == null) return null;
 
     Object v = this.storedValueForKey(_key);
@@ -115,7 +115,7 @@ public class RuleContext extends NSObject
     return this.inferredValueForKey(_key);
   }
 
-  public void takeStoredValueForKey(Object _value, String _key) {
+  public void takeStoredValueForKey(final Object _value, final String _key) {
     if (_key == null) return;
     if (_value == null) {
       if (this.storedValues != null)
@@ -128,7 +128,7 @@ public class RuleContext extends NSObject
     this.storedValues.put(_key, _value);
   }
 
-  public Object storedValueForKey(String _key) {
+  public Object storedValueForKey(final String _key) {
     if (_key == null) return null;
     return this.storedValues != null ? this.storedValues.get(_key) : null;
   }
@@ -140,7 +140,7 @@ public class RuleContext extends NSObject
 
   /* processing */
   
-  public Object inferredValueForKey(String _key) {
+  public Object inferredValueForKey(final String _key) {
     if (_key == null) {
       log.warn("got no key in inferredValueForKey.");
       return null;
@@ -150,7 +150,7 @@ public class RuleContext extends NSObject
       return null;
     }
     
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     if (isDebugOn) log.debug("infer value for key: " + _key);
     
     /* the model returns a presorted set of candidates */
@@ -184,7 +184,7 @@ public class RuleContext extends NSObject
     return null;
   }
   
-  public List<Object> allPossibleValuesForKey(String _key) {
+  public List<Object> allPossibleValuesForKey(final String _key) {
     if (_key == null) {
       log.warn("got no key in allPossibleValuesForKey.");
       return null;
@@ -194,7 +194,7 @@ public class RuleContext extends NSObject
       return null;
     }
     
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     if (isDebugOn) log.debug("infer all values for key: " + _key);
     
     List<Object> values = new ArrayList<Object>(16);
@@ -232,9 +232,9 @@ public class RuleContext extends NSObject
   }
   
   public Object[] valuesForKeyPathWhileTakingSuccessiveValuesForKeyPath
-    (String _keyPath, Object[] _values, String _valueKeyPath)
+    (final String _keyPath, final Object[] _values, final String _valueKeyPath)
   {
-    Object[] results = new Object[_values.length];
+    final Object[] results = new Object[_values.length];
     for (int i = 0; i < _values.length; i++) {
       /* take the value */
       this.takeValueForKeyPath(_values[i], _valueKeyPath);
@@ -264,7 +264,7 @@ public class RuleContext extends NSObject
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.model != null)

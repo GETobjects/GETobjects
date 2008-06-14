@@ -1259,13 +1259,13 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * <p>
    * The default implementation just returns the given value as-is.
    * 
-   * @param _meta    the metadata for the column
-   * @param _coltype the JDBC type of the column
-   * @param _value   the fetched value of column
+   * @param _colName - the name of the column
+   * @param _coltype - the JDBC type of the column
+   * @param _value   - the fetched value of column
    * @return a replacement value for the given column (or the given column)
    */
   protected Object handleColumnValue
-    (String _colName, int _coltype, Object _value)
+    (final String _colName, final int _coltype, final Object _value)
   {
     return _value;
   }
@@ -1274,15 +1274,16 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * Called by evaluateQueryExpression() AND by performSQL() to convert a
    * result set into a record.
    * 
+   * @param _record   - the record to fill
    * @param _rs       - the JDBC result set
    * @param _colNames - the JDBC column names
    * @param _colTypes - the JDBC column types
    * @param _attrs    - possibly empty array of EOAttribute's
-   * @return the new record
+   * @return true if the record got filled
    * @throws SQLException
    */
   protected boolean fillRecordMapFromResultSet
-    (Map<String,Object> record,
+    (final Map<String,Object> _record,
      ResultSet _rs, String[] _colNames, int[] _colTypes, EOAttribute[] _attrs)
     throws SQLException
   {
@@ -1370,7 +1371,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       
       if (isDebugOn) log.debug("  row[" + i + "] " + l + ": \t" + v);
       
-      record.put(l, v);
+      _record.put(l, v);
     }
     return true;
   } 

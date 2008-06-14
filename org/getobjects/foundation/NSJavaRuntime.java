@@ -161,9 +161,9 @@ public class NSJavaRuntime {
    * Attempts to retrieve a Method with the given name from the given class, or
    * from its superclasses.
    * 
-   * @param _cls       - the Class to lookup the method in
-   * @param _name      - the name of the method to lookup
-   * @param _signature - the signature of the method to lookup
+   * @param _cls  - the Class to lookup the method in
+   * @param _name - the name of the method to lookup
+   * @param _s    - the signature of the method to lookup
    * @return the Method, or null if it could not be found
    */
   public static Method NSMethodFromString(Class _cls, String _name, Class[] _s){
@@ -202,9 +202,9 @@ public class NSJavaRuntime {
    * Calls NSAllocateObject() for constructors with one parameter, with the
    * given Class as the signature.
    * 
-   * @param _cls  - the class to instantiate
-   * @param _t0   - the static type of the parameter
-   * @param _arg0 - the constructor parameter
+   * @param _cls - the class to instantiate
+   * @param _t0  - the static type of the parameter
+   * @param _a0  - the constructor parameter
    * @return the instantiated object or null if that failed
    */
   public static Object NSAllocateObject(Class _cls, Class _t0, Object _a0) {
@@ -502,7 +502,7 @@ public class NSJavaRuntime {
   /* basic values */
   
   /**
-   * @deprecated Use {@link UObject#boolValue(Object)} instead
+   * @deprecated Use {@link UObject}.boolValue(Object) instead
    */
   public static boolean boolValueForObject(Object v) {
     return UObject.boolValue(v);

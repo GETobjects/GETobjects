@@ -64,19 +64,20 @@ import org.getobjects.foundation.UString;
  *
  * <h4>Shortcuts</h4>
  * <pre>
- *   &lt;#a&gt;         - WOHyperlink
- *   &lt;#for&gt;       - WORepetition
- *   &lt;#get&gt;       - WOString
- *   &lt;#if&gt;        - WOConditional
- *   &lt;#put&gt;       - WOCopyValue
- *   &lt;#submit&gt;    - WOSubmitButton
- *   &lt;#table-for&gt; - WOTableRepetition</pre>
+ *   &lt;wo:a&gt;         - WOHyperlink
+ *   &lt;wo:for&gt;       - WORepetition
+ *   &lt;wo:get&gt;       - WOString
+ *   &lt;wo:if&gt;        - WOConditional
+ *   &lt;wo:put&gt;       - WOCopyValue
+ *   &lt;wo:submit&gt;    - WOSubmitButton
+ *   &lt;wo:table-for&gt; - WOTableRepetition</pre>
+ * .. and more. See WOShortNameAliases.plist file.
  * 
  * <h4>Element Wrapper Attributes</h4>
  * <pre>
- *   &lt#tag ... if="condition"&gt;    - WOConditional
- *   &lt#tag ... ifnot="condition"&gt; - WOConditional
- *   &lt#tag ... foreach="list"&gt;    - WORepetition
+ *   &ltwo:tag ... if="condition"&gt;    - WOConditional
+ *   &ltwo:tag ... ifnot="condition"&gt; - WOConditional
+ *   &ltwo:tag ... foreach="list"&gt;    - WORepetition
  * </pre>
  *
  * <h4>WOHTMLParser vs WOWrapperTemplateBuilder</h4>
@@ -218,9 +219,9 @@ public class WOWrapperTemplateBuilder extends WOTemplateBuilder
    * @return a WODFileEntry object representing the WOD entry
    */
   public Object makeDefinitionForComponentNamed
-    (WODParser _p, String _compname, Map _entry, String _clsname)
+    (WODParser _p, String _cname, Map _entry, String _clsname)
   {
-    return new WODFileEntry(_compname, _clsname, _entry);
+    return new WODFileEntry(_cname, _clsname, _entry);
   }
 
 
@@ -332,8 +333,8 @@ public class WOWrapperTemplateBuilder extends WOTemplateBuilder
    * This method constructs a WODynamicElement for the given name. It will first
    * check for an entry with the name in the wod mapping table and otherwise
    * attempt to lookup the name as a class. If that also fails some fallbacks
-   * kick in, that is element name aliases (<#if>) and automatic generic
-   * elements (<#li>).
+   * kick in, that is element name aliases (&lt;wo:if&gt;) and automatic generic
+   * elements (&lt;wo:li&gt;).
    * <p>
    * If the name represents a component, a WOChildComponentReference object
    * will get constructed (not the component itself, components are allocated
@@ -498,11 +499,11 @@ public class WOWrapperTemplateBuilder extends WOTemplateBuilder
   
   /**
    * Add WOConditional support to all elements, eg:<pre>
-   *   &lt;#get var:value="label" if="label.isNotEmpty" /&gt;</pre>
+   *   &lt;wo:get var:value="label" if="label.isNotEmpty" /&gt;</pre>
    * 
-   * @param _element
-   * @param _assocs
-   * @return
+   * @param _element - the element to hack
+   * @param _assocs  - the associations
+   * @return a hacked element (or the original, if no hack was necessary)
    */
   @SuppressWarnings("unchecked")
   public WOElement hackNewElement(WOElement _element, Map _assocs) {
@@ -525,6 +526,7 @@ public class WOWrapperTemplateBuilder extends WOTemplateBuilder
       
       /* foreach attribute, wraps the element in a WORepetition */
       if (_assocs.containsKey("foreach")) {
+        // TBD: better: 'repeat'?
         Map<String, WOAssociation> assocs = new HashMap(2);
         assocs.put("list", (WOAssociation)_assocs.remove("foreach"));
         assocs.put("item", WOAssociation.associationWithKeyPath("item"));

@@ -45,7 +45,9 @@ public class JoObjectRequestHandler extends WORequestHandler {
    * dispatchRequest() if requesthandler-processing is turned off. Otherwise
    * the handleRequest() method of the respective request handler is called!
    *
-   * @param _rq - the WORequest to dispatch
+   * @param _rq  - the WORequest to dispatch
+   * @param _ctx - the active WOContext
+   * @param _s   - the active WOSession (or null)
    * @return the resulting WOResponse
    */
   @Override

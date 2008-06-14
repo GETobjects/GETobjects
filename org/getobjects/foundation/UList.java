@@ -386,8 +386,8 @@ public class UList extends NSObject {
    * result could look like:
    * <pre>{ Person = [ xyz, def ]; Team = [ abc, def ]; }</pre>
    * 
-   * @param _objects objects which should be grouped by the given keypath
-   * @param _key     the criteria to group on
+   * @param _objects - objects which should be grouped by the given keypath
+   * @param _keyPath - the criteria to group on
    * @return a Map which contains the group values at the keys
    */
   public static Map<Object, List<Object>> groupByKeyPath
@@ -543,6 +543,7 @@ public class UList extends NSObject {
    * @param _keys       - array of Map keys to generate
    * @param _keyIndices - if null, _keys and _array indices must match
    * @param _keyFormats - value Format objects, when null, use value as-is
+   * @param _excludeNulls - whether null values should be added
    * @return a Map constructed according to the specification
    */
   public static Map extractRecordFromArray
@@ -613,6 +614,7 @@ public class UList extends NSObject {
    * @param _keys       - array of Map keys to generate
    * @param _keyIndices - if null, _keys and _array indices must match
    * @param _keyFormats - value Format objects, when null, use value as-is
+   * @param _excludeNulls - whether null values should be added
    * @return a List of Maps constructed according to the specification
    */
   public static List<Map> extractRecordsFromArrays

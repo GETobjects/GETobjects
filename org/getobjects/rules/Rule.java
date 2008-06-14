@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
-  This file is part of JOPE.
+  This file is part of Go.
 
-  JOPE is free software; you can redistribute it and/or modify it under
+  Go is free software; you can redistribute it and/or modify it under
   the terms of the GNU Lesser General Public License as published by the
   Free Software Foundation; either version 2, or (at your option) any
   later version.
 
-  JOPE is distributed in the hope that it will be useful, but WITHOUT ANY
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or
   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
   License for more details.
@@ -70,8 +70,8 @@ import org.getobjects.foundation.NSObject;
  * <p>
  * String representation:
  * <pre>
- * qualifer => action [; priority]
- * *true*   => action</pre>
+ * qualifer =&gt; action [; priority]
+ * *true*   =&gt; action</pre>
  * 
  * Example:<br />
  * <pre><code>"(request.isXmlRpcRequest = true) => dispatcher = XmlRpc ;0"</code></pre>

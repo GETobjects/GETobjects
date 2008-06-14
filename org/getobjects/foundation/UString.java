@@ -317,7 +317,7 @@ public class UString {
    * This method is not exact since and performs no further validation. Its
    * mostly to decide whether a prefix must be added to a generic String.
    * 
-   * @param an arbitrary string, eg mailto:info@skyrix.de
+   * @param _s - an arbitrary string, eg mailto:info@skyrix.de
    * @return the protocol if the String looks like an URL, null otherwise
    */
   public static String getURLProtocol(String _s) {
@@ -944,12 +944,12 @@ public class UString {
    * Writes the given String in UTF-8 encoding.
    * 
    * @param _data       - String to write
-   * @param _file       - File to write to
+   * @param _path       - File to write to
    * @param _atomically - whether we should write atomically
    * @return null if everything is fine, the error otherwise
    */
   public static Exception writeToFile
-    (String _data, String _path, boolean _atomically)
+    (final String _data, final String _path, final boolean _atomically)
   {
     if (_data == null)
       return new NSException("got no data to write ...");

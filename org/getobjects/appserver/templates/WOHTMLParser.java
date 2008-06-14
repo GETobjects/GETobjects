@@ -920,6 +920,9 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
   
   /**
    * Returns true for ' ', '\t', '\r' and '\n'.
+   * 
+   * @param _c - the character to check
+   * @return true if the character is a space HTML wise
    */
   public static boolean _isHTMLSpace(char _c) {
     switch (_c) {

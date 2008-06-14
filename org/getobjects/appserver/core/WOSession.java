@@ -246,7 +246,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * action is processed, we need to restore that state to properly process
    * component URLs.
    * 
-   * @param the ID of the context which resulted in the required page
+   * @param _ctxId - the ID of the context which resulted in the required page
    * @return null if the ID expired, or the stored WOComponent
    */
   public WOComponent restorePageForContextID(String _ctxId) {

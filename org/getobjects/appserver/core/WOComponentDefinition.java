@@ -138,6 +138,7 @@ public class WOComponentDefinition extends NSObject
    * This is called by instantiateComponent() to instantiate the faults of the
    * child components.
    * 
+   * @param _rm       - the resource manager used for child's resource lookups
    * @param _template - the template which contains the child infos
    * @param _ctx      - the context to instantiate the components in
    * @return a Map of WOComponentReference names and their associated component

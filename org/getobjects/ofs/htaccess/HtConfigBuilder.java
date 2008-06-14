@@ -124,9 +124,8 @@ public class HtConfigBuilder extends NSObject {
    * Walks over the configuration file and creates a Map containing the
    * configured values by evaluating the directives.
    * 
-   * @param _cursor    - the object the configuration was looked up in
    * @param _lookupCtx - the context the lookup is relative to
-   * @param _ctx       - the IJoContext all this is happening in
+   * @param _cfgfile   - the object the configuration was looked up in
    * @return a configuration, or null if no values were added
    */
   public Map<String, ?> buildConfiguration

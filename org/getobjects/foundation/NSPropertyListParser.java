@@ -38,7 +38,8 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * This class implements a parser for the old-style property list format. You
  * would not usually invoke it directly, but rather use the
- * {@link NSPropertyListSerialization} utility function class, eg:<pre>
+ * {@link NSPropertyListSerialization} utility function class, eg:
+ * <pre>
  *   Map person = NSPropertyListSerialization.dictionaryForString
  *     ("{ lastname = Duck; firstname = Donald; }");</pre>
  * </pre>

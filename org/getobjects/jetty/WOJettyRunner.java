@@ -184,9 +184,9 @@ public class WOJettyRunner extends Object {
    * directory.
    * 
    * @param _root    - the Jetty root Context
-   * @param appClass - the resource base class (where 'www' is looked up in)
+   * @param _appWww  - the URL to the public directory
    */
-  protected void addResourceHandler(Context _root, URL _appWww) {
+  protected void addResourceHandler(final Context _root, final URL _appWww) {
     Resource baseResource = null;
 
     if (UObject.isNotEmpty(this.woProjectDirectory)) {
