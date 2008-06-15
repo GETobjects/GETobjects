@@ -64,14 +64,15 @@ import org.getobjects.appserver.core.WOResponse;
  *   q/qualifier [in] - EOQualifier to be used as condition</pre>
  * 
  * WOConditional is an aliased element:
- * <pre><#if var:value="obj.isTeam">...</#></pre>
- * 
- * TODO: would be nice to have NPS style operations, like
- *         operation="isNotEmpty" condition="item.lastname"
- *       since in Java we can't add such to objects using categories.
- *       key1/value1 key2/key2 value3/value3 key4/match4 etc => parser?
+ * <pre>&lt;wo:if var:value="obj.isTeam"&gt;...&lt;/wo:if&gt;</pre>
  */
 public class WOConditional extends WODynamicElement {
+  /*
+   * TODO: would be nice to have NPS style operations, like
+   *         operation="isNotEmpty" condition="item.lastname"
+   *       since in Java we can't add such to objects using categories.
+   *       key1/value1 key2/key2 value3/value3 key4/match4 etc => parser?
+   */
   protected static Log log = LogFactory.getLog("WOConditional");
   
   protected WOAssociation condition;
@@ -92,6 +93,20 @@ public class WOConditional extends WODynamicElement {
     this.template  = _template;
     
     if (this.value == null) this.value = grabAssociation(_assocs, "v");
+
+    
+    /* <wo:if not="..."> shortcut */
+    
+    if (this.negate == null && this.condition == null) {
+      WOAssociation n = grabAssociation(_assocs, "not");
+      if (n != null) {
+        this.condition = n;
+        this.negate    = WOAssociation.associationWithValue(Boolean.TRUE);
+      }
+    }
+    
+    
+    /* qualifier association */
     
     WOAssociation q = grabAssociation(_assocs, "qualifier");
     if (q == null) q = grabAssociation(_assocs, "q");
@@ -111,6 +126,9 @@ public class WOConditional extends WODynamicElement {
       }
     }
     
+    
+    /* use 'value' as 'condition' if the latter is not set */
+    
     if (this.condition == null) {
       if (this.value != null) {
         this.condition = this.value;
@@ -122,6 +140,9 @@ public class WOConditional extends WODynamicElement {
       }
     }
     
+    
+    /* match binding */
+    
     if (this.match != null && this.match.isValueConstant()) {
       // TBD: we might want to have a 'value mode'
       if (!(this.match instanceof WORegExAssociation)) {
@@ -129,6 +150,9 @@ public class WOConditional extends WODynamicElement {
           new WORegExAssociation(this.match.stringValueInComponent(null));
       }
     }
+    
+    
+    /* validation */
     
     if (this.match != null && this.value != null)
       log().warn("both 'match' and 'value' bindings are set: " + this);
@@ -179,6 +203,7 @@ public class WOConditional extends WODynamicElement {
     }
   }
 
+  
   /* evaluate */
   
   protected boolean doShowInContext(final WOContext _ctx) {
