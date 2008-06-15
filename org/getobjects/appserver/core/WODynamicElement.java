@@ -33,6 +33,8 @@ import org.getobjects.foundation.NSKeyValueStringFormatter;
  * template. Subclasses MUST NOT store any processing state in instance
  * variables because they can be accessed concurrently by multiple threads and
  * even by one thread.
+ * 
+ * <h4>Extra Bindings</h4>
  * <p>
  * This element also tracks 'extra bindings'. Those are bindings which where
  * not explicitly grabbed (removed from the '_assocs' ctor Map) by subclasses.
@@ -41,10 +43,11 @@ import org.getobjects.foundation.NSKeyValueStringFormatter;
  * For example extra-attrs in a WOHyperlink are (usually) added to the &lt;a&gt;
  * tag.
  * <p>
- * Further 'extra bindings' can be <code>%(key)s</code> style patterns. Example:
+ * Further 'extra bindings' can be <code>%(key)s</code> style patterns IF
+ * the value starts with a % sign. Example:
  * <pre>
- *   &lt:wo:span id="employee-%(person.id)s"&gt;...&lt;wo:span&gt;
- *   &lt;a onclick="alert('clicked %(person.name)s');"&gt;</pre>
+ *   &lt;wo:span varpat:id="employee-%(person.id)s"&gt;...&lt;wo:span&gt;
+ *   &lt;wo:a varpat:onclick="alert('clicked %(person.name)s');"&gt;</pre>
  * Those patterns are resolved using the NSKeyValueStringFormatter.format()
  * function.
  */
@@ -89,7 +92,7 @@ public abstract class WODynamicElement extends WOElement {
    * 
    * @param _attrs - the bindings map (often empty)
    */
-  public void setExtraAttributes(Map<String, WOAssociation> _attrs) {
+  public void setExtraAttributes(final Map<String, WOAssociation> _attrs) {
     if (delog.isDebugEnabled())
       delog.debug("setting extra attributes: " + _attrs);
     
@@ -155,6 +158,8 @@ public abstract class WODynamicElement extends WOElement {
       if (v == null)
         continue;
       
+      // TBD: I don't think this makes a lot of sense? Either the whole value is
+      //      always a pattern or not? (better not?!)
       if (this.extraKeys[i].charAt(0) == '%') {
         v = NSKeyValueStringFormatter.format(v, _patObject);
         _r.appendAttribute(this.extraKeys[i].substring(1), v);
