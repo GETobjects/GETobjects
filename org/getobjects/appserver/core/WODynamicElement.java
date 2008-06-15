@@ -171,8 +171,12 @@ public abstract class WODynamicElement extends WOElement {
    * Utility function to add WOAssociation ivar info to a description string.
    * Example:<pre>
    *   this.appendAssocToDescription(_d, "id", this.idBinding);</pre>
+   * 
+   * @param _d    - the String to add the description to
+   * @param _name - name of the binding
+   * @param _a    - WOAssociation object used as the binding value
    */
-  public void appendAssocToDescription
+  public static void appendBindingToDescription
     (final StringBuilder _d, final String _name, final WOAssociation _a)
   {
     if (_a == null)
@@ -203,5 +207,31 @@ public abstract class WODynamicElement extends WOElement {
     }
     else
       _d.append(" null");
-  } 
+  }
+  public static void appendBindingsToDescription
+    (final StringBuilder _d, final Object ... _nameAssocPairs)
+  {
+    if (_nameAssocPairs == null)
+      return;
+    for (int i = 1; i < _nameAssocPairs.length; i += 2) {
+      appendBindingToDescription(_d,
+          (String)_nameAssocPairs[i - 1], (WOAssociation)_nameAssocPairs[i]);
+    }
+  }
+  
+  public void appendAssocToDescription
+    (final StringBuilder _d, final String _name, final WOAssociation _a)
+  {
+    appendBindingToDescription(_d, _name, _a);
+  }
+  public void appendAssocsToDescription
+    (final StringBuilder _d, final Object ... _nameAssocPairs)
+  {
+    if (_nameAssocPairs == null)
+      return;
+    for (int i = 1; i < _nameAssocPairs.length; i += 2) {
+      appendBindingToDescription(_d,
+          (String)_nameAssocPairs[i - 1], (WOAssociation)_nameAssocPairs[i]);
+    }
+  }
 }
