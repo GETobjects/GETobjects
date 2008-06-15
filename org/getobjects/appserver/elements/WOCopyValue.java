@@ -23,6 +23,7 @@ package org.getobjects.appserver.elements;
 
 import java.util.Map;
 
+import org.getobjects.appserver.associations.WONegateAssociation;
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODynamicElement;
@@ -63,6 +64,7 @@ import org.getobjects.foundation.NSKeyValueCodingAdditions;
  *   copyValues   [in] - Map
  *   finishValues [in] - Map
  *   resetValues  [in] - boolean
+ *   if/ifnot     [in] - boolean (only do the op if the condition is true)
  *   &lt;extra&gt;      [in] - used a 'prepare' values</pre>
  */
 public class WOCopyValue extends WODynamicElement {
@@ -71,6 +73,7 @@ public class WOCopyValue extends WODynamicElement {
   protected WOAssociation copyValues;
   protected WOAssociation finishValues;
   protected WOAssociation resetValues;
+  protected WOAssociation condition;
   protected WOElement     template;
 
   public WOCopyValue
@@ -81,18 +84,27 @@ public class WOCopyValue extends WODynamicElement {
     this.copyValues   = grabAssociation(_assocs, "copyValues");
     this.finishValues = grabAssociation(_assocs, "finishValues");
     this.resetValues  = grabAssociation(_assocs, "resetValues");
+    this.condition    = grabAssociation(_assocs, "condition");
     this.template     = _template;
+    
+    if (this.condition == null) {
+      WOAssociation a = grabAssociation(_assocs, "if");
+      if (a != null)
+        this.condition = a;
+      else if ((a = grabAssociation(_assocs, "ifnot")) != null)
+        this.condition = new WONegateAssociation(a);
+    }
 
     // the extra values will get processed by WODynamicElement
   }
   
-  /* copy */
+  /* basic copy method */
   
   protected void copyValues(final Object _mapThing, final WOContext _ctx) {
     if (_mapThing == null)
       return;
     
-    Map map = (Map)_mapThing; // TODO: try some coercion?
+    final Map map = (Map)_mapThing; // TODO: try some coercion?
     
     final Object getCursor = _ctx.cursor();
     final Object setCursor = getCursor;
@@ -110,7 +122,7 @@ public class WOCopyValue extends WODynamicElement {
       if (rhs instanceof WOAssociation)
         value = ((WOAssociation)rhs).valueInComponent(getCursor);
       else if (rhs instanceof String) {
-        String s = (String)rhs;
+        final String s = (String)rhs;
         
         if (s.startsWith("const:"))
           value = this.valueForConstString(s);
@@ -137,12 +149,20 @@ public class WOCopyValue extends WODynamicElement {
     }
   }
   
-  protected String valueForConstString(final String _s) {
-    return _s.substring(6); // TBD: explain
+  protected Object valueForConstString(final String _s) {
+    // TBD: we could return ints or bools?
+    return _s.substring(6); // strip off the 'const:' prefix
   }
   
+  
+  /* the main entry points */
+  
   protected void copyValuesInContext(final WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
+    if (this.condition != null) {
+      if (!this.condition.booleanValueInComponent(cursor))
+        return;
+    }
 
     /* copy constant mappings */
     if (this.extraKeys != null) {
@@ -170,6 +190,10 @@ public class WOCopyValue extends WODynamicElement {
     
     Object cursor = _ctx.cursor();
     if (cursor == null) return;
+    if (this.condition != null) {
+      if (!this.condition.booleanValueInComponent(cursor))
+        return;
+    }
     
     /* reset values to nil */
     
