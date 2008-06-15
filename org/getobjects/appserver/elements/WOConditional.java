@@ -40,6 +40,8 @@ import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOElementWalker;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.eocontrol.EOQualifierEvaluation;
+import org.getobjects.foundation.NSObject;
 
 /**
  * WOConditional
@@ -61,7 +63,8 @@ import org.getobjects.appserver.core.WOResponse;
  *   negate      [in] - boolean
  *   value/v     [in] - object
  *   match       [in] - object (Pattern or Matcher or Pattern-String)
- *   q/qualifier [in] - EOQualifier to be used as condition</pre>
+ *   q/qualifier [in] - EOQualifier to be used as condition
+ *   not         [in] - boolean (sets condition/negate=true)</pre>
  * 
  * WOConditional is an aliased element:
  * <pre>&lt;wo:if var:value="obj.isTeam"&gt;...&lt;/wo:if&gt;</pre>
@@ -75,107 +78,46 @@ public class WOConditional extends WODynamicElement {
    */
   protected static Log log = LogFactory.getLog("WOConditional");
   
-  protected WOAssociation condition;
-  protected WOAssociation negate;
-  protected WOAssociation value;
-  protected WOAssociation match;
-  protected WOElement     template;
+  protected EOQualifierEvaluation condition; /* this object has the bindings */
+  protected WOElement template;
   
   public WOConditional
     (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
-
-    this.condition = grabAssociation(_assocs, "condition");
-    this.negate    = grabAssociation(_assocs, "negate");
-    this.value     = grabAssociation(_assocs, "value");    
-    this.match     = grabAssociation(_assocs, "match");    
+    
+    WOComplexCondition c = new WOComplexCondition();
+    c.grabAssociations(_assocs);
+    
+    this.condition = c.optimize();
     this.template  = _template;
-    
-    if (this.value == null) this.value = grabAssociation(_assocs, "v");
-
-    
-    /* <wo:if not="..."> shortcut */
-    
-    if (this.negate == null && this.condition == null) {
-      WOAssociation n = grabAssociation(_assocs, "not");
-      if (n != null) {
-        this.condition = n;
-        this.negate    = WOAssociation.associationWithValue(Boolean.TRUE);
-      }
-    }
-    
-    
-    /* qualifier association */
-    
-    WOAssociation q = grabAssociation(_assocs, "qualifier");
-    if (q == null) q = grabAssociation(_assocs, "q");
-    if (q != null) {
-      if (this.condition != null) {
-        log().error
-          ("WOConditional has a 'condition' and a 'qualifier' binding!");
-      }
-      else if (!q.isValueConstant()) {
-        log().error
-          ("WOConditional does not yet support dynamic qualifier bindings: "+q);
-      }
-      else {
-        /* reassign condition to qualifier binding */
-        this.condition =
-          new WOQualifierAssociation(q.stringValueInComponent(null));
-      }
-    }
-    
-    
-    /* use 'value' as 'condition' if the latter is not set */
-    
-    if (this.condition == null) {
-      if (this.value != null) {
-        this.condition = this.value;
-        this.value = null;
-      }
-      else {
-        log().error("missing 'condition' binding in element '" + _name + "': " +
-            this + ", " + _assocs);
-      }
-    }
-    
-    
-    /* match binding */
-    
-    if (this.match != null && this.match.isValueConstant()) {
-      // TBD: we might want to have a 'value mode'
-      if (!(this.match instanceof WORegExAssociation)) {
-        this.match = 
-          new WORegExAssociation(this.match.stringValueInComponent(null));
-      }
-    }
-    
     
     /* validation */
     
-    if (this.match != null && this.value != null)
-      log().warn("both 'match' and 'value' bindings are set: " + this);
     if (this.template == null)
       log().warn("conditional has not template");
     
-    
-    /* check for multi-condition wrappings (key1/value1 & key2/value2/op2) */
+    this.processMultiStack(_assocs);
+  }
+  
+  /**
+   * Check for multi-condition wrappings (key1/value1 & key2/value2/op2)
+   */
+  public void processMultiStack(Map<String, WOAssociation> _assocs) {
     // TBD: this doesn't work if no 'condition' binding was given ...
     
     List<Map<String, WOAssociation>> multiStack = null;
     for (int idx = 1; idx < 10; idx++) {
-      WOAssociation mkey = grabAssociation(_assocs, "key" + idx);
-      if (mkey == null) mkey = grabAssociation(_assocs, "k" + idx);
-      
-      WOAssociation mvalue = grabAssociation(_assocs, "value" + idx);
-      if (mvalue == null) mvalue = grabAssociation(_assocs, "v" + idx);
-      
+      /* extract keyN/valueN/negateN bindings (or kN,vN,negN) */
+      WOAssociation mkey    = grabAssociation(_assocs, "key" + idx);
+      WOAssociation mvalue  = grabAssociation(_assocs, "value" + idx);
       WOAssociation mnegate = grabAssociation(_assocs, "negate" + idx);
+      if (mkey    == null) mkey    = grabAssociation(_assocs, "k" + idx);
+      if (mvalue  == null) mvalue  = grabAssociation(_assocs, "v" + idx);
       if (mnegate == null) mnegate = grabAssociation(_assocs, "neg" + idx);
      
       if (mkey == null && mvalue == null)
-        break;
+        break; /* stop condition, no more bindings for the N index */
       
       Map<String, WOAssociation> assocs = new HashMap<String, WOAssociation>(4);
       
@@ -208,59 +150,10 @@ public class WOConditional extends WODynamicElement {
   
   protected boolean doShowInContext(final WOContext _ctx) {
     if (this.condition == null) {
-      log.error("association has no 'condition' binding!");
+      log.error("association has no condition!");
       return false;
     }
-    
-    boolean doShow, doNegate = false;
-    Object  cursor = _ctx.cursor();
-    
-    if (this.negate != null)
-      doNegate = this.negate.booleanValueInComponent(cursor);
-    
-    if (this.match != null) {
-      Object  pato    = this.match.valueInComponent(cursor);
-      Matcher matcher = null;
-      
-      if (pato == null) {
-        if (log().isInfoEnabled())
-          log().info("'match' binding returned no Object: " + this.match);
-      }
-      else if (pato instanceof Matcher)
-        matcher = (Matcher)pato;
-      else if (pato instanceof Pattern) {
-        String s = this.condition.stringValueInComponent(cursor);
-        matcher = s != null ? ((Pattern)pato).matcher(s) : null;
-      }
-      else {
-        Pattern pat = Pattern.compile(pato.toString());
-        if (pat == null)
-          log().warn("could not compile pattern in 'match' binding: " + pato);
-        else
-          matcher = pat.matcher(this.condition.stringValueInComponent(cursor));
-      }
-      
-      doShow = matcher != null ? matcher.matches() : false;
-    }
-    else if (this.value != null) {
-      Object v = this.value.valueInComponent(cursor);
-      Object o = this.condition.valueInComponent(cursor);
-      
-      if (v == o)
-        doShow = true;
-      else if (o == null || v == null)
-        doShow = false;
-      else {
-        if (v instanceof Pattern && !(o instanceof Pattern))
-          doShow = ((Pattern)v).matcher(v.toString()).matches();
-        else
-          doShow = o.equals(v);
-      }
-    }
-    else
-      doShow = this.condition.booleanValueInComponent(cursor);
-    
-    return doNegate ? !doShow : doShow;
+    return this.condition.evaluateWithObject(_ctx);
   }
   
   
@@ -327,10 +220,228 @@ public class WOConditional extends WODynamicElement {
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
+  }
+
+  
+  /* condition classes */
+   
+  public static class WOConstCondition extends NSObject
+    implements EOQualifierEvaluation
+  {
+    protected boolean doShow;
     
-    this.appendAssocToDescription(_d, "condition", this.condition);
-    this.appendAssocToDescription(_d, "negate",    this.negate);
-    this.appendAssocToDescription(_d, "value",     this.value);
-    this.appendAssocToDescription(_d, "match",     this.match);
+    public WOConstCondition(final boolean _doShow) {
+      this.doShow = _doShow;
+    }
+    
+    public boolean evaluateWithObject(final Object _ctx) {
+      return this.doShow;
+    }
+    
+    @Override
+    public void appendAttributesToDescription(final StringBuilder _d) {
+      super.appendAttributesToDescription(_d);
+      _d.append((this.doShow) ? " show" : " hide");
+    }
+  }
+  
+  public static class WOCheckCondition extends NSObject
+    implements EOQualifierEvaluation
+  {
+    protected WOAssociation condition;
+    protected boolean doNegate;
+    
+    public WOCheckCondition(final WOAssociation _condition, boolean _negate) {
+      this.condition = _condition;
+      this.doNegate  = _negate;
+    }
+    
+    public boolean evaluateWithObject(final Object _ctx) {
+      if (this.condition == null) {
+        log.error("association has no 'condition' binding!");
+        return false;
+      }
+      Object cursor = _ctx instanceof WOContext
+        ? ((WOContext)_ctx).cursor() : _ctx;
+      boolean doShow = this.condition.booleanValueInComponent(cursor);
+      return this.doNegate ? !doShow : doShow;
+    }
+    
+    @Override
+    public void appendAttributesToDescription(final StringBuilder _d) {
+      super.appendAttributesToDescription(_d);
+      
+      WODynamicElement.appendBindingToDescription(_d, 
+          "condition", this.condition);
+      if (this.doNegate) _d.append(" negate");
+    }
+  }
+  
+  public static class WOComplexCondition extends NSObject
+    implements EOQualifierEvaluation
+  {
+    protected WOAssociation condition;
+    protected WOAssociation negate;
+    protected WOAssociation value;
+    protected WOAssociation match;
+    
+    public EOQualifierEvaluation optimize() {
+      if (this.value == null && this.match == null && this.condition != null) {
+        if (this.negate == null || this.negate.isValueConstant()) {
+          boolean doNegate = this.negate != null 
+            ? this.negate.booleanValueInComponent(null) : false;
+            
+          if (this.condition.isValueConstant()) {
+            boolean doShow = this.condition.booleanValueInComponent(null);
+            return new WOConstCondition(doNegate ? !doShow : doShow);
+          }
+          return new WOCheckCondition(this.condition, doNegate);
+        }
+      }
+      return this;
+    }
+    
+    public boolean grabAssociations(final Map<String, WOAssociation> _assocs) {
+      this.condition = grabAssociation(_assocs, "condition");
+      this.negate    = grabAssociation(_assocs, "negate");
+      this.value     = grabAssociation(_assocs, "value");    
+      this.match     = grabAssociation(_assocs, "match");    
+      
+      if (this.value == null) this.value = grabAssociation(_assocs, "v");
+
+      
+      /* <wo:if not="..."> shortcut */
+      
+      if (this.negate == null && this.condition == null) {
+        WOAssociation n = grabAssociation(_assocs, "not");
+        if (n != null) {
+          this.condition = n;
+          this.negate    = WOAssociation.associationWithValue(Boolean.TRUE);
+        }
+      }
+      
+      
+      /* qualifier association */
+      
+      WOAssociation q = grabAssociation(_assocs, "qualifier");
+      if (q == null) q = grabAssociation(_assocs, "q");
+      if (q != null) {
+        if (this.condition != null) {
+          log.error
+            ("WOConditional has a 'condition' and a 'qualifier' binding!");
+        }
+        else if (!q.isValueConstant()) {
+          log.error("WOConditional does not yet support " +
+              "dynamic qualifier bindings: "+q);
+        }
+        else {
+          /* reassign condition to qualifier binding */
+          this.condition =
+            new WOQualifierAssociation(q.stringValueInComponent(null));
+        }
+      }
+      
+      
+      /* use 'value' as 'condition' if the latter is not set */
+      
+      if (this.condition == null) {
+        if (this.value != null) {
+          this.condition = this.value;
+          this.value = null;
+        }
+        else {
+          log.error("missing 'condition' binding in element: " +
+              this + ", " + _assocs);
+        }
+      }
+      
+      
+      /* match binding */
+      
+      if (this.match != null && this.match.isValueConstant()) {
+        // TBD: we might want to have a 'value mode'
+        if (!(this.match instanceof WORegExAssociation)) {
+          this.match = 
+            new WORegExAssociation(this.match.stringValueInComponent(null));
+        }
+      }
+      
+      
+      /* validation */
+      
+      if (this.match != null && this.value != null)
+        log.warn("both 'match' and 'value' bindings are set: " + this);
+      
+      return true;
+    }
+    
+    public boolean evaluateWithObject(final Object _ctx) {
+      if (this.condition == null) {
+        log.error("association has no 'condition' binding!");
+        return false;
+      }
+      
+      final Object  cursor = (_ctx instanceof WOContext)
+        ? ((WOContext)_ctx).cursor() : _ctx;
+      boolean doShow, doNegate = false;
+      
+      if (this.negate != null)
+        doNegate = this.negate.booleanValueInComponent(cursor);
+      
+      if (this.match != null) {
+        Object  pato    = this.match.valueInComponent(cursor);
+        Matcher matcher = null;
+        
+        if (pato == null) {
+          if (log.isInfoEnabled())
+            log.info("'match' binding returned no Object: " + this.match);
+        }
+        else if (pato instanceof Matcher)
+          matcher = (Matcher)pato;
+        else if (pato instanceof Pattern) {
+          String s = this.condition.stringValueInComponent(cursor);
+          matcher = s != null ? ((Pattern)pato).matcher(s) : null;
+        }
+        else {
+          Pattern pat = Pattern.compile(pato.toString());
+          if (pat == null)
+            log.warn("could not compile pattern in 'match' binding: " + pato);
+          else
+            matcher = pat.matcher(this.condition.stringValueInComponent(cursor));
+        }
+        
+        doShow = matcher != null ? matcher.matches() : false;
+      }
+      else if (this.value != null) {
+        Object v = this.value.valueInComponent(cursor);
+        Object o = this.condition.valueInComponent(cursor);
+        
+        if (v == o)
+          doShow = true;
+        else if (o == null || v == null)
+          doShow = false;
+        else {
+          if (v instanceof Pattern && !(o instanceof Pattern))
+            doShow = ((Pattern)v).matcher(v.toString()).matches();
+          else
+            doShow = o.equals(v);
+        }
+      }
+      else
+        doShow = this.condition.booleanValueInComponent(cursor);
+      
+      return doNegate ? !doShow : doShow;
+    }
+    
+    @Override
+    public void appendAttributesToDescription(final StringBuilder _d) {
+      super.appendAttributesToDescription(_d);
+      
+      WODynamicElement.appendBindingsToDescription(_d, 
+          "condition", this.condition,
+          "negate",    this.negate,
+          "value",     this.value,
+          "match",     this.match);
+    }
   }
 }
