@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -73,8 +73,8 @@ public class WOCopyValue extends WODynamicElement {
   protected WOAssociation resetValues;
   protected WOElement     template;
 
-  public WOCopyValue(String _name, Map<String, WOAssociation> _assocs,
-                     WOElement _template)
+  public WOCopyValue
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     
@@ -88,14 +88,14 @@ public class WOCopyValue extends WODynamicElement {
   
   /* copy */
   
-  protected void copyValues(Object _mapThing, WOContext _ctx) {
+  protected void copyValues(final Object _mapThing, final WOContext _ctx) {
     if (_mapThing == null)
       return;
     
     Map map = (Map)_mapThing; // TODO: try some coercion?
     
-    Object getCursor = _ctx.cursor();
-    Object setCursor = getCursor;
+    final Object getCursor = _ctx.cursor();
+    final Object setCursor = getCursor;
     if (getCursor == null)
       return;
     
@@ -137,11 +137,11 @@ public class WOCopyValue extends WODynamicElement {
     }
   }
   
-  protected String valueForConstString(String _s) {
-    return _s.substring(6);
+  protected String valueForConstString(final String _s) {
+    return _s.substring(6); // TBD: explain
   }
   
-  protected void copyValuesInContext(WOContext _ctx) {
+  protected void copyValuesInContext(final WOContext _ctx) {
     Object cursor = _ctx.cursor();
 
     /* copy constant mappings */
@@ -164,7 +164,7 @@ public class WOCopyValue extends WODynamicElement {
       this.copyValues(this.copyValues.valueInComponent(cursor), _ctx);
   }
 
-  protected void resetValuesInContext(WOContext _ctx) {
+  protected void resetValuesInContext(final WOContext _ctx) {
     if (this.resetValues == null && this.finishValues == null)
       return;
     
@@ -186,10 +186,11 @@ public class WOCopyValue extends WODynamicElement {
       this.copyValues(this.finishValues.valueInComponent(cursor), _ctx);
   }
   
+  
   /* responder */
   
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     this.copyValuesInContext(_ctx);
     
     if (this.template != null)
@@ -199,7 +200,7 @@ public class WOCopyValue extends WODynamicElement {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     this.copyValuesInContext(_ctx);
     
     Object result = null;
@@ -211,7 +212,7 @@ public class WOCopyValue extends WODynamicElement {
   }
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     this.copyValuesInContext(_ctx);
     
     if (this.template != null)
@@ -221,7 +222,7 @@ public class WOCopyValue extends WODynamicElement {
   }
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     this.copyValuesInContext(_ctx);
     
     if (this.template != null)
