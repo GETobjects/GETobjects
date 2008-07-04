@@ -64,10 +64,10 @@ import java.util.Set;
 public class EOGroupedList<E> extends ArrayList<E> {
   private static final long serialVersionUID = 1L;
   
-  protected Map<Object, List<E>> groupedItems;
+  protected Map<Object, List<E>>      groupedItems;
   protected EOExpressionEvaluation    expression;
   protected EOExpressionEvaluation[]  subexpressions;
-  protected boolean needsReGroup;
+  protected boolean                   needsReGroup;
   
   public EOGroupedList(final EOExpressionEvaluation[] _exprs) {
     super();
