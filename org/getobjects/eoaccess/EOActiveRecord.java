@@ -410,6 +410,31 @@ public class EOActiveRecord extends EOCustomObject
     return this.values;
   }
   
+  
+  /* equality */
+  
+  public int eoHashCode() {
+    // TBD: consider and document side effects (eg what happens if an object
+    //      got inserted, hence got assigned a primary key? existing hashtables
+    //      will be b0rked)
+    if (!this.isNew) {
+      EOEntity lEntity = this.entity();
+      if (lEntity != null) {
+        String[] pkeys = lEntity.primaryKeyAttributeNames();
+        if (pkeys != null && pkeys.length > 0) {
+          int code = 0;
+          for (String pkey: pkeys) {
+            Object v = this.valueForKey(pkey);
+            if (v != null) code += v.hashCode();
+          }
+          return code;
+        }
+      }
+    }
+    
+    return super.hashCode();
+  }
+  
 
   /* description */
 
