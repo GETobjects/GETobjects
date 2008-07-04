@@ -233,16 +233,59 @@ public class UObject extends NSObject {
     return intValue(v.toString());
   }
 
-  public static String stringValue(final Object _v) {
-    if (_v == null)
+  /**
+   * Returns a String representing the object. This has special processing for
+   * arrays, which are rendered using the stringValueForArray method.
+   * 
+   * @param _value - value to convert to a String
+   * @return a String representing the object _value
+   */
+  public static String stringValue(final Object _value) {
+    if (_value == null)
       return null;
 
-    if (_v instanceof String)
-      return (String)_v;
+    if (_value instanceof String)
+      return (String)_value;
+    
+    if (_value instanceof Object[])
+      return stringValueForArray((Object[])_value);
 
-    return _v.toString();
+    return _value.toString();
   }
   
+  public static String stringValueForArray(final Object[] _array) {
+    if (_array == null)
+      return null;
+    
+    StringBuilder sb = new StringBuilder(_array.length * 16);
+    sb.append("( ");
+    boolean isFirst = true;
+    for (Object o: _array) {
+      String s = UObject.stringValue(o);
+      if (s == null) s = "[null]";
+      if (isFirst) isFirst = false;
+      else sb.append(", ");
+      sb.append(s);
+    }
+    sb.append(" )");
+    return sb.toString();
+  }
+  
+  /**
+   * Returns a java.util.Date for the given object. This method checks:
+   * <ul>
+   *   <li>for null, which is returned as null
+   *   <li>for Date, which is returned as-is
+   *   <li>for java.util.Calendar, getTime() will be called and returned
+   *   <li>for String's. Which will get parsed using the default DateFormat.
+   *   <li>for Number's, which are treated like ms since 1970
+   * </ul>
+   * All other objects are checked for a 'dateValue' method, which is then
+   * called.
+   * 
+   * @param _v - some object
+   * @return a java.util.Date or null
+   */
   public static Date dateValue(final Object _v) {
     if (_v == null)
       return null;
