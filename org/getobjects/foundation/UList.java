@@ -421,12 +421,10 @@ public class UList extends NSObject {
    * This method walks over a collection and groups the contained object based
    * on the value of some key.
    * Example:
-   * <pre>Map groupedByEntity =
-   *  UList.groupByKeyPath(myObjects, "city")</pre>
+   * <pre>  Map groupedByCity = UList.groupByKey(myObjects, "city")</pre>
    * This will iterate over the given objects and group them by the city, a
    * result could look like:
-   * <pre>{
-   *   Magdeburg = [
+   * <pre>{  Magdeburg = [
    *     { city = Madgeburg; name = "SWM"; },
    *     { city = Magdeburg; name = "Skyrix AG"; }
    *   ];
@@ -436,7 +434,7 @@ public class UList extends NSObject {
    * keypath.
    * 
    * @param _objects objects which should be grouped by the given key
-   * @param _key     the criteria to group on
+   * @param _key     the criteria to group on (eg 'city' or 'lastname')
    * @return a Map which contains the group values at the keys
    */
   public static Map<Object, List<Object>> groupByKey

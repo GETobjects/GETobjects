@@ -91,7 +91,7 @@ public class EOGroupedList<E> extends ArrayList<E> {
     this.expression   = _expr;
   }
   public EOGroupedList
-    (EOExpressionEvaluation _expr, Collection<? extends E> _c)
+    (final EOExpressionEvaluation _expr, final Collection<? extends E> _c)
   {
     super(_c);
     this.groupedItems = new HashMap<Object, List<E>>(16);
@@ -128,7 +128,15 @@ public class EOGroupedList<E> extends ArrayList<E> {
     return this.groupedItems.keySet();
   }
   
-  protected void regroup() {
+  /**
+   * Ensures that the contents of the list are grouped according to the
+   * criterias. Per default the object does the grouping only on demand
+   * to allow for reasonably fast add behaviour.
+   * <p>
+   * This method can be called to ensure that the list is grouped before
+   * 'freezing' the list for multithread usage.
+   */
+  public void regroup() {
     this.needsReGroup = false;
     
     this.groupedItems.clear();
