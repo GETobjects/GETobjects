@@ -71,11 +71,11 @@ public class EOModel extends NSObject {
   public EOModel() {    
   }
   
-  public EOModel(EOEntity[] _entities) {
+  public EOModel(final EOEntity[] _entities) {
     this(null, _entities);
   }
   
-  public EOModel(URL _url, EOEntity[] _entities) {
+  public EOModel(final URL _url, final EOEntity[] _entities) {
     this();
     this.url = _url;
     this.entities = _entities;
@@ -91,12 +91,12 @@ public class EOModel extends NSObject {
    * @return the parsed EOModel
    * @throws Exception
    */
-  public static EOModel loadModel(URL _url) throws Exception {
+  public static EOModel loadModel(final URL _url) throws Exception {
     if (_url == null)
       return null;
     
-    EOModelLoader loader = new EOModelLoader();
-    EOModel model = loader.loadModelFromURL(_url);
+    final EOModelLoader loader = new EOModelLoader();
+    final EOModel model = loader.loadModelFromURL(_url);
     if (model == null)
       throw loader.lastException();
     return model;
@@ -152,9 +152,19 @@ public class EOModel extends NSObject {
     return null;
   }
   
+  /**
+   * Returns all EOEntity objects which are part of this model.
+   * 
+   * @return an array of EOEntity objects
+   */
   public EOEntity[] entities() {
     return this.entities;
   }
+  /**
+   * Returns the names of all EOEntity objects which are part of this model.
+   * 
+   * @return an array of EOEntity objects
+   */
   public String[] entityNames() {
     if (this.entities == null) return null;
 
@@ -164,27 +174,54 @@ public class EOModel extends NSObject {
     return names;
   }
   
-  public EOEntity entityForObject(Object _object) {
+  /**
+   * Extracts the name of the object's class and then searches for an entity
+   * in the model, which matches that name. The whole array is first scanned
+   * for a fully qualified name, and then for a simple one.
+   * 
+   * @param _object - the object to return the EOEntity for
+   * @return an EOEntity object, or null if no matching one could be found
+   */
+  public EOEntity entityForObject(final Object _object) {
     if (_object == null || this.entities == null)
       return null;
     
     /* search for an entity which has the mentioned class name */
     
-    String className = _object.getClass().getName();
+    String className  = _object.getClass().getName();
     String simpleName = _object.getClass().getSimpleName();
+    int    simpleIdx  = -1;
+    
+    /* first scan the whole array for the long name */
+    
     for (int i = 0; i < this.entities.length; i++) {
       String clsname = this.entities[i].className();
       if (clsname == null) continue;
       
       if (clsname.equals(className) || clsname.equals(simpleName))
         return this.entities[i];
+      if (simpleIdx < 0 && clsname.equals(simpleName))
+        simpleIdx = i;
     }
+    
+    /* check whether the simple name was found */
+    
+    if (simpleIdx >= 0)
+      return this.entities[simpleIdx];
     
     return null;
   }
   
+  
   /* connect relationship */
   
+  /**
+   * This method is called as part of the model loading process. First all the
+   * entities are loaded into memory. After that, the model relationships need
+   * to be connected.
+   * The method just calls the connectRelationshipsInModel() method on all its
+   * entities. 
+   */
   public void connectRelationships() {
     if (this.entities == null)
       return;
@@ -193,8 +230,15 @@ public class EOModel extends NSObject {
       this.entities[i].connectRelationshipsInModel(this);
   }
   
+  
   /* pattern models */
   
+  /**
+   * Returns true if the model contains a pattern EOEntity. A pattern entity is
+   * an entity which can be used to match multiple tables.
+   * 
+   * @return true if the model has unresolved pattern entities, false if not
+   */
   public boolean isPatternModel() {
     if (this.entities == null)
       return true;
@@ -206,6 +250,11 @@ public class EOModel extends NSObject {
     return false;
   }
   
+  /**
+   * Returns true if the model contains an entity which has a pattern in its
+   * external name
+   * @return
+   */
   public boolean hasEntitiesWithExternalNamePattern() {
     if (this.entities == null) /* yes, fetch all! */
       return true;
@@ -217,9 +266,10 @@ public class EOModel extends NSObject {
     return false;
   }
   
+  
   /* prototypes */
   
-  public EOAttribute prototypeAttributeNamed(String _name) {
+  public EOAttribute prototypeAttributeNamed(final String _name) {
     if (_name == null) return null;
     
     EOEntity prototypeEntity = this.entityNamed("EOPrototype");
@@ -229,20 +279,26 @@ public class EOModel extends NSObject {
   }
   
   public String[] availablePrototypeAttributeNames() {
-    EOEntity prototypeEntity = this.entityNamed("EOPrototype");
+    final EOEntity prototypeEntity = this.entityNamed("EOPrototype");
     if (prototypeEntity == null) return null;
 
-    EOAttribute[] attributes = prototypeEntity.attributes();
+    final EOAttribute[] attributes = prototypeEntity.attributes();
     if (attributes == null) return null;
     
-    String[] names = new String[attributes.length];
+    final String[] names = new String[attributes.length];
     for (int i = 0; i < attributes.length; i++)
       names[i] = attributes[i].name();
     return names;
   }
   
+  
   /* names */
   
+  /**
+   * This method calls beautifyNames() on all entities of the model.
+   * <p>
+   * Note: we probably want to have another (customizable) mechanism for this.
+   */
   public void beautifyNames() {
     if (this.entities == null)
       return;
@@ -250,10 +306,11 @@ public class EOModel extends NSObject {
     for (int i = 0; i < this.entities.length; i++)
       this.entities[i].beautifyNames();
   }
-    
+  
+  
   /* description */
   
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     if (this.isPatternModel())
