@@ -83,7 +83,7 @@ public class EOEntity extends NSObject
   /* constructor */
   
   public static EOEntity patternEntityForExternalNameLike
-    (String _pat, EOAttribute[] _attrs)
+    (final String _pat, final EOAttribute[] _attrs)
   {
     EOEntity entity = new EOEntity();
     entity.externalName          = _pat;
@@ -122,13 +122,33 @@ public class EOEntity extends NSObject
     return this.name;
   }
   
+  /**
+   * Returns the external name of the entity. Usually the database specific
+   * table name (eg t_person for the Persons entity).
+   * 
+   * @return the table name
+   */
   public String externalName() {
     return this.externalName;
   }
+  
+  /**
+   * Returns true if the tablename is a pattern, eg "users*". This is used to
+   * use the same EOEntity definition with multiple (usually dynamic) tables
+   * (user01, user02, ...)
+   * 
+   * @return true if the external name is a pattern
+   */
   public boolean hasExternalNamePattern() {
     return this.isExternalNamePattern;
   }
   
+  /**
+   * Returns the name of the SQL92 schema the external name lives in. Eg the
+   * default schema for PostgreSQL is 'public'.
+   * 
+   * @return the name of the schema
+   */
   public String schemaName() {
     return this.schemaName;
   }
@@ -140,7 +160,7 @@ public class EOEntity extends NSObject
     return this.dataSourceClassName;
   }
   
-  public void setRestrictingQualifier(EOQualifier _q) {
+  public void setRestrictingQualifier(final EOQualifier _q) {
     // TBD: remove setter method and move parameter to constructor
     this.restrictingQualifier = _q;
   }
