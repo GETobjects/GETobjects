@@ -29,6 +29,7 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
+import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
 
 /**
@@ -98,7 +99,7 @@ public class WOString extends WOHTMLDynamicElement {
       WOHTMLElementAttributes.buildIfNecessary(_name + "_core", _assocs);
   }
   
-  public WOString(WOAssociation _value, boolean _escapeHTML) {
+  public WOString(final WOAssociation _value, final boolean _escapeHTML) {
     super(null /* name */, null /* assocs */, null /* template */);
     
     this.value      = _value;
@@ -108,26 +109,17 @@ public class WOString extends WOHTMLDynamicElement {
   
   /* some convenience accessors for from-code creation */
   
-  public WOString(Object _value) {
+  public WOString(final Object _value) {
     this(WOAssociation.associationWithValue(_value), true /* escapeHTML */);
   }
   
   
   /* generate response */
-
-  @Override
-  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
-    // method is pretty long, maybe we want to split it up
-    if (_ctx.isRenderingDisabled())
-      return;
-    
+  
+  protected String stringInContext(final WOContext _ctx) {
     final boolean isDebugOn = this.log.isDebugEnabled();
     final Object  cursor = _ctx.cursor();
     Object  v        = null;
-    boolean doEscape = true;
-    String  s;
-    
-    if (isDebugOn) this.log.debug("append, cursor: " + cursor);
     
     if (this.value != null) {
       if ((v = this.value.valueInComponent(cursor)) == null) {
@@ -145,7 +137,7 @@ public class WOString extends WOHTMLDynamicElement {
     }
     else {
       if (isDebugOn) this.log.debug("  no value binding: " + cursor);
-      return;
+      v = null; // hm
     }
     
     /* valueWhenEmpty */
@@ -163,6 +155,8 @@ public class WOString extends WOHTMLDynamicElement {
     
     /* format value */
     
+    String s;
+    
     if (this.formatter != null) {
       try {
         s = this.formatter.stringForObjectValue(v, _ctx);
@@ -175,9 +169,29 @@ public class WOString extends WOHTMLDynamicElement {
       }
     }
     else if (v != null)
-      s = v.toString();
+      s = UObject.stringValue(v);
     else
       s = null;
+    
+    return s;
+  }
+
+  @Override
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    // method is pretty long, maybe we want to split it up
+    if (_ctx.isRenderingDisabled())
+      return;
+    
+    final boolean isDebugOn = this.log.isDebugEnabled();
+    final Object  cursor = _ctx.cursor();
+    boolean doEscape = true;
+    String  s;
+    
+    if (isDebugOn) this.log.debug("append, cursor: " + cursor);
+    
+    /* determine string to render */
+    
+    s = this.stringInContext(_ctx);
 
     /* is escaping required? */
     
