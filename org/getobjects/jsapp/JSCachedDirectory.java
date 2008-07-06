@@ -5,31 +5,32 @@ import java.io.File;
 /**
  * JSCachedDirectory
  * <p>
- * This caches the contents of a directory.
+ * This caches the contents of a directory. If the timestamp or size of the
+ * directory changes, the contents are reloaded.
  */
 public class JSCachedDirectory extends JSCachedObjectFile {
 
-  public JSCachedDirectory(File _dir, String _filename) {
+  public JSCachedDirectory(final File _dir, final String _filename) {
     super(_dir, _filename);
   }
-  public JSCachedDirectory(File _file) {
+  public JSCachedDirectory(final File _file) {
     super(_file);
     
   }
 
   @Override
-  public Object loadContent(File _file) {
+  public Object loadContent(final File _file) {
     if (_file == null || !_file.isDirectory())
       return null;
     
-    /* It doesn't make sense to record timestamps etc of contained files since
+    /* It does not make sense to record timestamps etc of contained files since
      * the dir lastModified won't get updated on changes on those.
      */
     return _file.listFiles();
   }
   
   @Override
-  public Object parseObject(String _path, Object _content) {
+  public Object parseObject(final String _path, final Object _content) {
     return _content; /* File[] */
   }
 

@@ -57,8 +57,8 @@ public class JSApplication extends OFSApplication {
   public static File appRoot; // static for apprunner, need to fix this
   
   public JSKeyValueCodingScope jsSharedScope;
-  public Scriptable  jsScope;
-  public WrapFactory jsWrapFactory;
+  public Scriptable     jsScope;
+  public WrapFactory    jsWrapFactory;
   public ContextFactory jsCtxFactory;
   
   protected JSCachedKVCScriptScope applicationScript;

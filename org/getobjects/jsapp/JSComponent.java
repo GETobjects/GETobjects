@@ -26,6 +26,7 @@ import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.publisher.IGoCallable;
 import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
 import org.mozilla.javascript.Context;
@@ -81,12 +82,15 @@ public class JSComponent extends WOComponent {
   }
   
   /**
-   * Retrieves the JavaScript context from the WOContext.
+   * Retrieves the Rhino JavaScript context from the WOContext.
    * 
    * @return the current Rhino Context object
    */
   public Context jsContext() {
-    return ((JSContext)this.context()).jsContext();
+    WOContext lCtx = this.context();
+    if (lCtx instanceof JSContext)
+      return ((JSContext)this.context()).jsContext();
+    return (Context)NSKeyValueCoding.Utility.valueForKey(lCtx, "jsContext");
   }
   
   
@@ -132,7 +136,7 @@ public class JSComponent extends WOComponent {
    * @param _name - name of action, eg 'default'
    * @return result of function evaluation
    */
-  public Object performScriptActionNamed(Object jv, String _name) {
+  public Object performScriptActionNamed(final Object jv, final String _name) {
     if (jv == null)
       return null;
     
@@ -209,7 +213,7 @@ public class JSComponent extends WOComponent {
   /* override KVC */
   
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     boolean ok = JSUtil.jsTakeValueForKey(this, 
         this.extraAttributes, this.jsSharedScope(), this.jsScope(),
         _value, _key);
@@ -219,7 +223,7 @@ public class JSComponent extends WOComponent {
   }
 
   @Override
-  public Object valueForKey(String _key) {
+  public Object valueForKey(final String _key) {
     // check whether extra vars contain the key and whether its a JS callable
     if (_key != null) {
       Object v = JSUtil.jsValueForKey(this, 
@@ -236,7 +240,7 @@ public class JSComponent extends WOComponent {
   
   /* override relevant methods (subclass API towards JavaScript) */
   
-  protected Object callJSFuncWhenAvailable(String _name, Object[] _args) {
+  protected Object callJSFuncWhenAvailable(final String _name, Object[] _args) {
     return JSUtil.callJSFuncWhenAvailable
       (this.jsScope(), this.extraAttributes, true /* check prototype */,
        this.jsContext(), _name, _args);
@@ -403,11 +407,11 @@ public class JSComponent extends WOComponent {
     
     /* callable */
 
-    public Object callInContext(Object _object, IGoContext _ctx) {
+    public Object callInContext(final Object _object, final IGoContext _ctx) {
       return this.component.performScriptActionNamed(this.function, this.name);
     }
 
-    public boolean isCallableInContext(IGoContext _ctx) {
+    public boolean isCallableInContext(final IGoContext _ctx) {
       return true;
     }
     

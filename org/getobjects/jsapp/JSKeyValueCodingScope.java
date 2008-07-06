@@ -35,6 +35,7 @@ import org.mozilla.javascript.Undefined;
  * <p>
  * This is a combination of a *sealed* JavaScript scope plus a cache of KVC
  * wrappers.
+ * Eg its used in the JSCachedKVCScriptScope class.
  */
 public abstract class JSKeyValueCodingScope extends NSObject {
 
