@@ -26,6 +26,8 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
 /**
+ * JSAssociation
+ * <p>
  * An association which evaluates its value as a JavaScript within Rhino.
  */
 public class JSAssociation extends WOAssociation {
@@ -33,7 +35,7 @@ public class JSAssociation extends WOAssociation {
   protected String scriptString;
   protected Script script;
   
-  public JSAssociation(String _script) {
+  public JSAssociation(final String _script) {
     super();
     this.scriptString = _script;
     this.compile();
@@ -88,7 +90,7 @@ public class JSAssociation extends WOAssociation {
   /* value */
   
   @Override
-  public Object valueInComponent(Object _cursor) {
+  public Object valueInComponent(final Object _cursor) {
     if (this.script == null) {
       log.error("no compiled script available .."); // TODO: improve
       return null;
@@ -168,7 +170,7 @@ public class JSAssociation extends WOAssociation {
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.scriptString != null)

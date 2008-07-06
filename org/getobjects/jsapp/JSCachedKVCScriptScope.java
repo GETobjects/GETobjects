@@ -25,13 +25,17 @@ import java.io.File;
 import org.mozilla.javascript.ImporterTopLevel;
 
 /**
+ * JSCachedKVCScriptScope
+ * <p>
  * This object wraps a Scope returned by the superclass in a
  * JSKeyValueCodingScope, that is, it scans the Scope for values
  * which should be exposed via KVC and caches that information.
+ * <p>
+ * Note: the actual KVC cache is maintained by JSKeyValueCodingScope.
  */
 public class JSCachedKVCScriptScope extends JSCachedScriptScope {
 
-  public JSCachedKVCScriptScope(File _dir, String _script) {
+  public JSCachedKVCScriptScope(final File _dir, final String _script) {
     super(_dir, _script);
   }
 
@@ -44,7 +48,7 @@ public class JSCachedKVCScriptScope extends JSCachedScriptScope {
    * @return an ImporterTopLevel object with the script run against it
    */
   @Override
-  public Object parseObject(String _path, Object _content) {
+  public Object parseObject(final String _path, final Object _content) {
     ImporterTopLevel scriptScope =
       (ImporterTopLevel)super.parseObject(_path, _content);
     if (scriptScope == null) {

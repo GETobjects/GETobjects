@@ -52,7 +52,7 @@ public class JSContext extends WOContext {
   protected Scriptable jsScope;
   protected JSKeyValueCodingScope jsSharedScope;
 
-  public JSContext(WOApplication _app, WORequest _rq) {
+  public JSContext(final WOApplication _app, final WORequest _rq) {
     super(_app, _rq);
   }
 
@@ -125,7 +125,7 @@ public class JSContext extends WOContext {
   /* override KVC */
   
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     // DUP: WOSession
     // in theory we could move this to a KVC hander, no? One which is triggered
     // based on the class (JSExtraVarClass => JSExtraVarKVCHandler) or something
@@ -149,7 +149,7 @@ public class JSContext extends WOContext {
       if (v instanceof Callable) {
         Scriptable scope = this.jsScope();
         
-        Object args[] = new Object[] { Context.javaToJS(_value, scope) };
+        final Object args[] = new Object[] { Context.javaToJS(_value, scope) };
         ((Callable)v).call(this.jsContext(),
             scope /* scope */,
             scope /* this */,
@@ -238,7 +238,7 @@ public class JSContext extends WOContext {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     _d.append(this.jsContext != null ? " ctx" : " no-ctx");
   }

@@ -45,7 +45,7 @@ public class JSUtil {
   /* calling funcs */
 
   public static Object callJSFuncWhenAvailable
-    (Scriptable _wrappedObject, Map<String, Object> _slots,
+    (final Scriptable _wrappedObject, final Map<String, Object> _slots,
      boolean _checkProto, Context _jscx, String _name, Object[] _args)
   {
     if (_slots == null && !_checkProto)
@@ -132,11 +132,11 @@ public class JSUtil {
 
 
   public static boolean jsTakeValueForKey
-    (Object _self,
-     Map<String, Object>   _extraAttrs,
-     JSKeyValueCodingScope _sharedScope,
-     Scriptable            _instanceScope,
-     Object _value, String _key)
+    (final Object _self,
+     final Map<String, Object>   _extraAttrs,
+     final JSKeyValueCodingScope _sharedScope,
+     final Scriptable            _instanceScope,
+     final Object _value, final String _key)
   {
     // in theory we could move this to a KVC hander, no? One which is triggered
     // based on the class (JSExtraVarClass => JSExtraVarKVCHandler) or something
@@ -149,7 +149,7 @@ public class JSUtil {
 
       /* first check for a setter */
       
-      String n = "set" + UString.capitalizedString(_key);
+      final String n = "set" + UString.capitalizedString(_key);
       v = _extraAttrs != null ? _extraAttrs.get(n) : null;
       if (v == null || v == Scriptable.NOT_FOUND) {
         Scriptable proto = _sharedScope.scope;
@@ -208,11 +208,11 @@ public class JSUtil {
    * @return Scriptable.NOT_FOUND if the key could not be resolved, or the value 
    */
   public static Object jsValueForKey
-    (Object _self,
-     Map<String, Object>   _extraAttrs,
-     JSKeyValueCodingScope _sharedScope,
+    (final Object _self,
+     final Map<String, Object>   _extraAttrs,
+     final JSKeyValueCodingScope _sharedScope,
      Scriptable            _instanceScope, /* eg jsScope of the component */
-     String _key)
+     final String _key)
   {
     // check whether extra vars contain the key and whether its a JS callable
     if (_key != null) {

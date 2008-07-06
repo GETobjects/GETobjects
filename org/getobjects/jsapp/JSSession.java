@@ -29,10 +29,15 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 
+/**
+ * JSSession
+ * <p>
+ * Extends a WOSession with JavaScript properties.
+ */
 public class JSSession extends WOSession {
   protected static final Log jslog = LogFactory.getLog("JSBridge");
 
-  protected Scriptable jsScope;
+  protected Scriptable            jsScope;
   protected JSKeyValueCodingScope jsSharedScope;
   
   /* accessors */
@@ -48,7 +53,7 @@ public class JSSession extends WOSession {
     }
     return this.jsScope;
   }
-  public void setJsScope(Scriptable _scope) {
+  public void setJsScope(final Scriptable _scope) {
     if (this.jsScope == _scope)
       return;
     
@@ -61,7 +66,7 @@ public class JSSession extends WOSession {
   public JSKeyValueCodingScope jsSharedScope() {
     return this.jsSharedScope;
   }
-  public void setJsSharedScope(JSKeyValueCodingScope _scope) {
+  public void setJsSharedScope(final JSKeyValueCodingScope _scope) {
     if (this.jsSharedScope == _scope)
       return;
 
@@ -75,7 +80,7 @@ public class JSSession extends WOSession {
   /* override KVC */
   
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     // DUP: WOContext
     
     // check whether extra vars contain the key and whether its a JS callable
@@ -84,7 +89,7 @@ public class JSSession extends WOSession {
 
       /* first check for a setter */
       
-      String n = "set" + UString.capitalizedString(_key);
+      final String n = "set" + UString.capitalizedString(_key);
       v = this.extraAttributes != null ? this.extraAttributes.get(n) : null;
       if (v == null || v == Scriptable.NOT_FOUND) {
         // TBD: better ways to deal with this? We need to check the script scope

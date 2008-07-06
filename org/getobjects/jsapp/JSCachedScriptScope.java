@@ -48,6 +48,8 @@ import org.mozilla.javascript.Script;
  *   <li>Again: the returned scope should be considered immutable.
  *   <li>TBD: can we simply copy a scope?
  * </ul>
+ * Also remember the JSCachedKVCScriptScope class, which adds reflection on top
+ * of the loaded scope ...
  */
 public class JSCachedScriptScope extends JSCachedScriptFile {
 
