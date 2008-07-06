@@ -28,13 +28,14 @@ import org.getobjects.foundation.UData;
  * <p>
  * This object manages a file=>object cache. It checks whether the file changed
  * by testing the lastModified date and the file size. If neither changed, it
- * returns the cached object (which also can be null!).
+ * returns the cached object (which can be null!).
  * <p>
  * What exactly is cached is managed by the respective subclass, eg it could be
  * a property list or a compiled script. The important thing is that the object
  * representation should not depend on any context.
  */
 public abstract class JSCachedObjectFile extends NSObject {
+  // TBD: we might want to move this class into foundation? Nothing JS specific?
 
   public final File file; // never changes after ctor
   public long   timestamp  = -1; /* to enforce initial check */
@@ -147,7 +148,7 @@ public abstract class JSCachedObjectFile extends NSObject {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.file == null)

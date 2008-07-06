@@ -26,9 +26,32 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Script;
 
+/**
+ * JSCachedScriptScope
+ * <p>
+ * The parent class, JSCachedScriptFile, manages a compiled Rhino 'Script'
+ * object. That is, it takes the contents of the file and compiles that into
+ * a scope-independed 'Script' object.
+ * <p>
+ * This class enhances that behaviour. It creates a new ImporterTopLevel
+ * (scope) object and executes the previously compiled Script against it.
+ * In other words, it maintains a fully prepared scope with a JavaScript file
+ * applied.
+ * <p>
+ * Notes
+ * <ul>
+ *   <li>Does the ImporterTopLevel work properly as a shared scope?
+ *       We cannot seal it, because properties are added dynamically.
+ *   <li>Remember that the scope cannot be used a global object!
+ *       If some other script adds global variables, the cached script
+ *       changes for all consumers ...
+ *   <li>Again: the returned scope should be considered immutable.
+ *   <li>TBD: can we simply copy a scope?
+ * </ul>
+ */
 public class JSCachedScriptScope extends JSCachedScriptFile {
 
-  public JSCachedScriptScope(File _dir, String _script) {
+  public JSCachedScriptScope(final File _dir, final String _script) {
     super(_dir, _script);
   }
 
@@ -43,10 +66,11 @@ public class JSCachedScriptScope extends JSCachedScriptFile {
    * @return an ImporterTopLevel object with the script run against it
    */
   @Override
-  public Object parseObject(String _path, Object _content) {
-    Script script = (Script)super.parseObject(_path, _content);
+  public Object parseObject(final String _path, final Object _content) {
+    /* the superclass returns a Script */
+    final Script script = (Script)super.parseObject(_path, _content);
 
-    Context jscx = Context.getCurrentContext();
+    final Context jscx = Context.getCurrentContext();
     if (jscx == null) { // TBD: log
       jslog.error("no JavaScript Context active to exec: " + _path);
       return null;
@@ -58,7 +82,7 @@ public class JSCachedScriptScope extends JSCachedScriptFile {
      * how to use ImporterTopLevel as a shared object since its read/write.
      * Maybe we could implement the 'import' in the component?
      */
-    ImporterTopLevel scriptScope =
+    final ImporterTopLevel scriptScope =
       new ImporterTopLevel(jscx, false /* not sealed */);
     
     /* eval script if there is one */
@@ -76,7 +100,8 @@ public class JSCachedScriptScope extends JSCachedScriptFile {
     /* seal scope (its a global cache, may not be modified) */
     // hm, if we seal, the ImporterTopLevel does not work. Apparently it adds
     // stuff lazily
-    //scriptScope.sealObject();
+    // TBD: in a thread safe way?!
+    // does not work: scriptScope.sealObject();
     
     return scriptScope;
   }
