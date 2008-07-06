@@ -58,7 +58,7 @@ public class OFSComponentWrapper extends OFSFolder
   /* folderish */
 
   @Override
-  public EODataSource folderDataSource(IGoContext _ctx) {
+  public EODataSource folderDataSource(final IGoContext _ctx) {
     return null; /* we are not really a folder */
   }
   
@@ -103,11 +103,12 @@ public class OFSComponentWrapper extends OFSFolder
     return null; /* we stop here and process the path_info in da call*/
   }
   
-  public Object lookupActionNamed(String _name, IGoContext _ctx) {
-    /* This method can be overridden by subclasses which dynamically add
-     * action methods. For Java stuff, an action method would usually be
-     * attached to the joClass.
-     */
+  /**
+   * This method can be overridden by subclasses which dynamically add
+   * action methods. For Java stuff, an action method would usually be
+   * attached to the joClass.
+   */
+  public Object lookupActionNamed(final String _name, final IGoContext _ctx) {
     // TBD: add @action trampoline
     return null;
   }
@@ -120,8 +121,8 @@ public class OFSComponentWrapper extends OFSFolder
    * primaryCallComponentAction() function of WODirectActionRequestHandler
    * to trigger a component action.
    */
-  public Object callInContext(Object _object, IGoContext _ctx) {
-    WOContext wctx = (WOContext)_ctx;
+  public Object callInContext(Object _object, final IGoContext _ctx) {
+    final WOContext wctx = (WOContext)_ctx;
     String actionName = "default";
 
     if ((actionName = wctx.request().formAction()) == null) {
@@ -132,7 +133,7 @@ public class OFSComponentWrapper extends OFSFolder
         actionName = handlerPath[0];
     }
     
-    Object jr = WODirectActionRequestHandler.primaryCallComponentAction
+    final Object jr = WODirectActionRequestHandler.primaryCallComponentAction
       (this.nameInContainer, actionName, wctx);
 
     return this.postProcessCallResult(_object, jr, _ctx);
@@ -145,7 +146,7 @@ public class OFSComponentWrapper extends OFSFolder
    * @param _ctx - the context we want to call the action in
    * @return true if its a WOContext, false otherwise.
    */
-  public boolean isCallableInContext(IGoContext _ctx) {
+  public boolean isCallableInContext(final IGoContext _ctx) {
     // TBVD: is this required? I guess so.
     return _ctx instanceof WOContext;
   }
@@ -164,7 +165,7 @@ public class OFSComponentWrapper extends OFSFolder
    * @return the unwrapped results
    */
   public Object postProcessCallResult
-    (Object _object, Object _result, IGoContext _ctx)
+    (final Object _object, final Object _result, final IGoContext _ctx)
   {
     return _result;
   }
@@ -181,11 +182,11 @@ public class OFSComponentWrapper extends OFSFolder
    * @param _rm   - the resource manager which manages the instantiation
    * @return the WOComponent subclass to be used for the new component
    */
-  public Class lookupComponentClass(String _name, WOResourceManager _rm) {
+  public Class lookupComponentClass(String _name, final WOResourceManager _rm) {
     // this is a candidate for overriding
     // TBD: allow the component to contain instructions where the logic is
     // (eg def of a custom subclass to use)
-    Class cls = _rm.lookupClass(_name);
+    final Class cls = _rm.lookupClass(_name);
     if (cls == null)
       return WOComponent.class;
     
@@ -299,8 +300,8 @@ public class OFSComponentWrapper extends OFSFolder
 
     /* build template */
 
-    WOWrapperTemplateBuilder builder = new WOWrapperTemplateBuilder();
-    WOTemplate tmpl = builder.buildTemplate(
+    final WOWrapperTemplateBuilder builder = new WOWrapperTemplateBuilder();
+    final WOTemplate tmpl = builder.buildTemplate(
         htmlFile.toURL(),
         wodFile != null ? wodFile.toURL() : null,
         _rm);
@@ -329,7 +330,7 @@ public class OFSComponentWrapper extends OFSFolder
    * @return the WOComponentDefinition
    */
   public IWOComponentDefinition definitionForComponent
-    (String _name, String[] _langs, WOResourceManager _rm)
+    (final String _name, final String[] _langs, final WOResourceManager _rm)
   {
     return this;
   }
@@ -380,7 +381,7 @@ public class OFSComponentWrapper extends OFSFolder
   
   protected WOTemplate template;
   
-  public void setTemplate(WOTemplate _template) {
+  public void setTemplate(final WOTemplate _template) {
     this.template = _template;
   }
   public WOTemplate template() {
@@ -408,13 +409,13 @@ public class OFSComponentWrapper extends OFSFolder
     return this.pathExtension().equals("joframe");
   }
   
-  public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
+  public boolean canRenderObjectInContext(Object _object, final WOContext _ctx){
     // TBD: we could support rendering of arbitary objects (push to some
     //      component ivar, and then render the component)
     return this.isFrameComponent() && _object instanceof WOComponent;
   }
   
-  public Exception renderObjectInContext(Object _object, WOContext _ctx) {
+  public Exception renderObjectInContext(Object _object, final WOContext _ctx) {
     return GoDefaultRenderer.sharedRenderer
       .renderObjectWithFrame(_object, (IWOComponentDefinition)this, _ctx);
   }
