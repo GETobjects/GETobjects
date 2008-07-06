@@ -13,6 +13,11 @@ Hence this 'jsapp' package provides the necessary hooks and Go subclasses to
 allow scripted applications.
 
 
+TBD: I'm going to rewrite quite a few bits to use Rhino scopes as the
+     primary script storage. Currently we use the extended attributes
+     of WOComponent/WOContext/WOSession.
+
+
 Basic Structure
 ***************
 

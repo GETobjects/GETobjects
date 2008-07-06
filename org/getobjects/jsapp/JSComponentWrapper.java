@@ -40,6 +40,9 @@ import org.mozilla.javascript.Undefined;
  * <p>
  * This is a OFSComponentWrapper which additionally checks for a "CompName.js"
  * file and merges that with the component Java functionality.
+ * <p>
+ * The OFSComponentWrapper superclass implements various interfaces, including
+ * IWOComponentDefinition and IGoComponentDefinition.
  */
 public class JSComponentWrapper extends OFSComponentWrapper {
   // TBD: maybe this is superflous and can be replaced with GoPageInvocation,
@@ -52,7 +55,7 @@ public class JSComponentWrapper extends OFSComponentWrapper {
 
   @Override
   public Object postProcessCallResult
-    (Object _object, Object _result, IGoContext _ctx)
+    (final Object _object, Object _result, final IGoContext _ctx)
   {
     /* post process results */
     // Note: this is also done in JSComponent, we do it here for @action.
@@ -73,7 +76,7 @@ public class JSComponentWrapper extends OFSComponentWrapper {
   /* being a component definition */
 
   @Override
-  public Class lookupComponentClass(String _name, WOResourceManager _rm) {
+  public Class lookupComponentClass(final String _name, WOResourceManager _rm) {
     return JSComponent.class;
   }
 
@@ -217,14 +220,14 @@ public class JSComponentWrapper extends OFSComponentWrapper {
      * how to use ImporterTopLevel as a shared object since its read/write.
      * Maybe we could implement the 'import' in the component?
      */
-    ImporterTopLevel scriptScope =
+    ImporterTopLevel sharedScriptScope =
       new ImporterTopLevel(jscx, false /* not sealed */);
     
     /* eval script */
     
     if (sharedScript != null) {
       try {
-        sharedScript.exec(jscx, scriptScope);
+        sharedScript.exec(jscx, sharedScriptScope);
       }
       catch (Exception e) {
         // TBD: reset scriptScope/script?
@@ -238,7 +241,7 @@ public class JSComponentWrapper extends OFSComponentWrapper {
     cacheEntry.scriptFile      = scriptFile;
     cacheEntry.scriptTimestamp = currentScriptTimestamp;
     cacheEntry.script          = script;
-    cacheEntry.scriptScope     = JSKeyValueCodingScope.wrap(scriptScope);
+    cacheEntry.scriptScope     = JSKeyValueCodingScope.wrap(sharedScriptScope);
     //System.err.println("GOT SCOPE: " + cacheEntry.scriptScope);
     fileInfoToScriptEntry.put(info, cacheEntry);
     
