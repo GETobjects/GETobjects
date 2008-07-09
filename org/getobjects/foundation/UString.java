@@ -361,11 +361,26 @@ public class UString {
     return null;
   }
 
-  public static String stringByEncodingURLComponent(String _s, String _charset){
+  /**
+   * This method wraps the URLEncoder.encode() method to avoid the exception
+   * handling.
+   * 
+   * @param _s       - the string to encode
+   * @param _charset - the charset to use in the encoding
+   * @return the encoded string
+   */
+  public static String stringByEncodingURLComponent(Object _s, String _charset){
     if (_s == null) return null;
     if (_charset == null) _charset = "utf-8";
     try {
-      return URLEncoder.encode(_s, _charset);
+      if (_s instanceof String)
+        return URLEncoder.encode((String)_s, _charset);
+      if (_s instanceof Number)
+        return _s.toString();
+      if (_s instanceof Boolean)
+        return ((Boolean)_s).booleanValue() ? "1" : "0";
+      
+      return URLEncoder.encode(_s.toString(), _charset);
     }
     catch (UnsupportedEncodingException e) {
       log.warn("could not encode part of URL: " + _s);
@@ -373,10 +388,85 @@ public class UString {
     return null;
   }
   
+  /**
+   * This method wraps the URLEncoder.encode() method to avoid the exception
+   * handling. It encodes all key/value pairs of the Map as Strings.
+   * <p>
+   * The result of this method is a string like:<pre>
+   *   a=5&b=3&c=10</pre>
+   * 
+   * @param _m       - the key/value pairs to encode
+   * @param _charset - the charset to use in the encoding
+   * @return the encoded string
+   */
+  public static String stringByEncodingURLComponents(Map _m, String _charset) {
+    if (_m == null || _m.size() == 0)
+      return null;
+    
+    if (_charset == null) _charset = "utf-8";
+    StringBuilder sb = new StringBuilder(_m.size() * 32);
+    try {
+      boolean didAdd = false;
+      
+      for (Object key: _m.keySet()) {
+        Object value = _m.get(key);
+        
+        if (key == null && value == null)
+          continue;
+        
+        /* determine key string (usually the key is a string) */
+        
+        String skey;
+        if (key instanceof String)
+          skey = URLEncoder.encode((String)key, _charset);
+        else if (key instanceof Number)
+          skey = key.toString();
+        else if (key instanceof Boolean)
+          skey = ((Boolean)key).booleanValue() ? "1" : "0";
+        else if (key == null)
+          skey = "";
+        else
+          skey = URLEncoder.encode(key.toString(), _charset);
+        
+        /* add key */
+        
+        if (didAdd) sb.append("&"); /* separator */
+        else didAdd = true;
+        sb.append(skey);
+        
+        /* determine value */
+        // TBD: add support for value arrays
+        
+        if (value == null)
+          ; /* do not add a value */
+        else if (value instanceof String) {
+          sb.append("=");
+          sb.append(URLEncoder.encode((String)value, _charset));
+        }
+        else if (value instanceof Number) {
+          sb.append("=");
+          sb.append(value);
+        }
+        else if (value instanceof Boolean)
+          sb.append(((Boolean)value).booleanValue() ? "=1" : "=0");
+        else {
+          sb.append("=");
+          sb.append(URLEncoder.encode(value.toString(), _charset));
+        }
+      }
+    }
+    catch (UnsupportedEncodingException e) {
+      log.warn("could not encode part of URL: " + _m + ", part: " + sb);
+      return null;
+    }
+    
+    return sb.length() > 0 ? sb.toString() : null;
+  }
+  
 
   /* XML escaping (no Java function for that???) */
 
-  public static String stringByEscapingXMLString(String _s) {
+  public static String stringByEscapingXMLString(final String _s) {
     if (_s == null)
       return null;
 
@@ -437,7 +527,7 @@ public class UString {
 
   /* HTML escaping */
 
-  public static String stringByEscapingHTMLString(String _s) {
+  public static String stringByEscapingHTMLString(final String _s) {
     if (_s == null)
       return null;
 
@@ -524,7 +614,7 @@ public class UString {
   }
 
   public static void appendEscapedHTMLAttributeValue
-    (StringBuilder _sb, String _s)
+    (final StringBuilder _sb, final String _s)
   {
     if (_sb == null || _s == null)
       return;
@@ -581,7 +671,7 @@ public class UString {
     }
   }
 
-  public static String stringByEscapingHTMLAttributeValue(String _s) {
+  public static String stringByEscapingHTMLAttributeValue(final String _s) {
     if (_s == null)
       return null;
 
@@ -686,7 +776,7 @@ public class UString {
 
   /* lower/upper */
 
-  public static String capitalizedString(String _s) {
+  public static String capitalizedString(final String _s) {
     if (_s == null) return null;
 
     char[] chars = _s.toCharArray();
@@ -719,7 +809,7 @@ public class UString {
    * @param _p - the String which a hash shall be calculated for
    * @return the hash as a String
    */
-  public static String md5HashForString(String _p) {
+  public static String md5HashForString(final String _p) {
     if (_p == null) return null;
 
     String pwdhash = null;
@@ -757,7 +847,7 @@ public class UString {
    * @param _p - a byte array
    * @return a String representing the data, or null on error
    */
-  public static String hexStringFromData(byte[] _data) {
+  public static String hexStringFromData(final byte[] _data) {
     if (_data == null)
       return null;
     
@@ -792,8 +882,8 @@ public class UString {
    * @param _src     - the String to decode as BASE64
    * @return the String decoded from the BASE64
    */
-  public static String stringByDecodingBase64(String _src) {
-    return stringByDecodingBase64(_src, null);
+  public static String stringByDecodingBase64(final String _src) {
+    return stringByDecodingBase64(_src, null /* use default charset */);
   }
   
   /**
@@ -802,7 +892,7 @@ public class UString {
    * @param _data - the data to encode as BASE64
    * @return BASE64 representing of the _data
    */
-  public static String stringByEncodingBase64(byte[] _data) {
+  public static String stringByEncodingBase64(final byte[] _data) {
     if (_data == null)
       return null;
     
@@ -831,7 +921,7 @@ public class UString {
    * @param _charset - the charset, use null for UTF-8
    * @return the bytes representing the String in the given charset, or null
    */
-  public static byte[] getBytes(String _s, String _charset) {
+  public static byte[] getBytes(final String _s, final String _charset) {
     if (_s == null)
       return null;
     
@@ -853,7 +943,7 @@ public class UString {
    * @param _charset - the charset, use null for UTF-8
    * @return the bytes representing the String in the given charset, or null
    */
-  public static String newFromBytes(byte[] _data, String _charset) {
+  public static String newFromBytes(final byte[] _data, final String _charset) {
     if (_data == null)
       return null;
     try {
@@ -877,7 +967,7 @@ public class UString {
    * @param _encoding - the charset to use (eg utf8)
    * @return the contents of the file as a String, or null on error
    */
-  public static String loadFromFile(Object _file, String _encoding) {
+  public static String loadFromFile(final Object _file, String _encoding) {
     if (_file == null)
       return null;
     if (_encoding == null)
@@ -907,7 +997,7 @@ public class UString {
    * @param _file     - some kind of object which specifies a file (eg File)
    * @return the contents of the file as a String, or null on error
    */
-  public static String loadFromFile(Object _file) {
+  public static String loadFromFile(final Object _file) {
     return loadFromFile(_file, null /* encoding, defaults to utf-8 */);
   }
 
@@ -922,7 +1012,7 @@ public class UString {
    * @return null if everything is fine, the error otherwise
    */
   public static Exception writeToFile
-    (String _data, String _encoding, File _file, boolean _atomically)
+    (final String _data, String _encoding, File _file, boolean _atomically)
   {
     if (_data == null) // use "" for empty strings!
       return new NSException("got no data to write ...");
@@ -969,7 +1059,7 @@ public class UString {
    * @param _file - the File to read the lines from
    * @return an array of Strings, or null if the file could not be opened
    */
-  public static String[] loadLinesFromFile(File _file) {
+  public static String[] loadLinesFromFile(final File _file) {
     if (_file == null)
       return null;
     
@@ -1065,7 +1155,7 @@ public class UString {
    * @param _b - a set of characters
    * @return a String containing the chars of a and b
    */
-  public static String unionCharacterSets(String _a, String _b) {
+  public static String unionCharacterSets(final String _a, final String _b) {
     // TBD: improve algorithm, this *****
     if (_a == _b) return _a;
     int al = _a != null ? _a.length() : 0;
@@ -1102,7 +1192,7 @@ public class UString {
    * @param _b - set of chars
    * @return a set of chars containing the chars which are in _a and _b
    */
-  public static String intersectCharacterSets(String _a, String _b) {
+  public static String intersectCharacterSets(final String _a, final String _b){
     // TBD: improve algorithm, this *****
     // TBD: we might want to have a char[] variant
     if (_a == _b) return _a;
@@ -1170,7 +1260,7 @@ public class UString {
    * @param _b - a set of characters
    * @return a char array containing the chars of a and b
    */
-  public static char[] unionCharacterSets(char[] _a, char[] _b) {
+  public static char[] unionCharacterSets(final char[] _a, final char[] _b) {
     // TBD: improve algorithm, this *****
     int al = _a != null ? _a.length : 0;
     int bl = _b != null ? _b.length : 0;
@@ -1214,7 +1304,7 @@ public class UString {
    */
   @SuppressWarnings("unchecked")
   public static Map<String, Object> mapForQueryString
-    (String _qs, String _charset)
+    (final String _qs, String _charset)
   {
     if (_qs == null || _qs.length() == 0)
       return null;
@@ -1270,7 +1360,7 @@ public class UString {
   }
 
 
-  public static String readFromStream(InputStream in, String _enc) {
+  public static String readFromStream(final InputStream in, String _enc) {
     if (_enc == null) _enc = "UTF-8";
     BufferedReader reader = null;
     InputStreamReader fr = null;
@@ -1315,16 +1405,22 @@ public class UString {
 
 
   /**
-   * Reading legacy files.
+   * Reading legacy files in ISO-Latin-1 (ISO-8859-1).
    *
    * @param in - InputStream
    * @return a String if something could be read, null on error
    */
-  public static String readLatin1FromStream(InputStream in) {
+  public static String readLatin1FromStream(final InputStream in) {
     return UString.readFromStream(in, "ISO-8859-1");
   }
 
-  public static String readLatin1FromFile(File _file) {
+  /**
+   * Reading legacy files in ISO-Latin-1 (ISO-8859-1).
+   *
+   * @param _file - File object
+   * @return a String if something could be read, null on error
+   */
+  public static String readLatin1FromFile(final File _file) {
     FileInputStream fs = null;
     try {
       fs = new FileInputStream(_file);
@@ -1344,8 +1440,17 @@ public class UString {
   }
   
   
-  /* HTML */
+  /* char buffer matching */
   
+  /**
+   * Returns true if the given char buffer starts with the characters of the
+   * given string.
+   * 
+   * @param _buf - the buffer to check
+   * @param _idx - start to compare at _buf[_idx]
+   * @param _s   - the String which must match
+   * @return true if the all chars of the String match the buffer at _idx
+   */
   public static boolean startsWith(final char[] _buf, int _idx, String _s) {
     if (_s == null)
       return false;
@@ -1364,6 +1469,9 @@ public class UString {
     }
     return true;
   }
+  
+  
+  /* HTML */
 
   /**
    * Removes HTML comments from the given String. HTML comments are:<pre>
@@ -1500,6 +1608,22 @@ public class UString {
   }
 
 
+  /**
+   * Increases the size of the given String[] array by one and puts the given
+   * String at the last position.
+   * <p>
+   * Example:<pre>
+   *   path is [ '/', 'tmp' ]
+   *   str  is 'test.log'
+   *   result: [ '/', 'tmp', 'test.log' ]</pre>
+   * Obviously this isn't a very fast way to build multi component pathes, but
+   * its convenient for quick hacks.
+   * <p>
+   * 
+   * @param _path - the existing String array (can be null)
+   * @param _str  - the String to add to the array (can be null)
+   * @return a new array containing a copy of the old path plus the String
+   */
   public static final String[] addStringToStringArray
     (final String[] _path, final String _str)
   {

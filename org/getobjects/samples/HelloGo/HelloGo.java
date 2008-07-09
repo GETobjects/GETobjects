@@ -8,7 +8,7 @@ import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.jetty.WOJettyRunner;
 
-public class HelloJo extends WOApplication {
+public class HelloGo extends WOApplication {
 
   @Override
   public WOResponse redirectToApplicationEntry(WOContext _ctx) {
@@ -34,7 +34,7 @@ public class HelloJo extends WOApplication {
    * need it, we could also deploy the application to a container.
    */
   public static void main(String[] args) {
-    new WOJettyRunner(HelloJo.class, args).run();
+    new WOJettyRunner(HelloGo.class, args).run();
   }
 
 }
