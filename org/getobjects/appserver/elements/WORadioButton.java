@@ -180,10 +180,20 @@ public class WORadioButton extends WOInput {
     else if (this.selection != null) {
       /* compare selection with value */
       final Object s = this.selection.valueInComponent(cursor);
-      if (v == s)
-        _r.appendAttribute("checked", "checked");
-      else if (v != null && v.equals(s))
-        _r.appendAttribute("checked", "checked");
+      if (v == s) {
+        _r.appendAttribute("checked",
+            _ctx.generateEmptyAttributes() ? null : "checked");
+      }
+      else if (v != null && v.equals(s)) { // s can be null!
+        _r.appendAttribute("checked",
+            _ctx.generateEmptyAttributes() ? null : "checked");
+      }
+      else if (false) {
+        System.err.println("VALUES DO NOT MATCH: " + formName + "\n" +
+            "  value: " + v + " | " + (v != null?v.getClass():"NULL") + "\n" +
+            "  sel:   " + s + " | " + (s != null?s.getClass():"NULL") + "\n" +
+            "  bind:  " + this.selection);
+      }
     }
     else {
       /* if the button isn't handled by the page but by some DirectAction or
