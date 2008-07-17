@@ -100,7 +100,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _flag - true to store IDs in URLs, false to avoid it
    */
-  public void setStoresIDsInURLs(boolean _flag) {
+  public void setStoresIDsInURLs(final boolean _flag) {
     this.storesIDsInURLs = _flag;
   }
   /**
@@ -119,7 +119,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _flag
    */
-  public void setStoresIDsInCookies(boolean _flag) {
+  public void setStoresIDsInCookies(final boolean _flag) {
     this.storesIDsInCookies = _flag;
   }
   /**
@@ -133,7 +133,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
     return this.storesIDsInCookies;
   }
   
-  public void setTimeOut(double _value) {
+  public void setTimeOut(final double _value) {
     this.timeOut = _value;
   }
   public double timeOut() {
@@ -149,7 +149,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _languages - a List of language codes
    */
-  public void setLanguages(List<String> _languages) {
+  public void setLanguages(final List<String> _languages) {
     this.languages = _languages;
   }
   /**
@@ -189,7 +189,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _ctx - the WOContext the session is active in
    */
-  public void _awakeWithContext(WOContext _ctx) {
+  public void _awakeWithContext(final WOContext _ctx) {
     // in SOPE we also setup context/application
     if (!this.isAwake) {
       this.awake();
@@ -203,7 +203,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _ctx - the WOContext representing the current transaction
    */
-  public void _sleepWithContext(WOContext _ctx) {
+  public void _sleepWithContext(final WOContext _ctx) {
     if (this.isAwake) {
       this.sleep();
       this.isAwake = false;
@@ -249,7 +249,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * @param _ctxId - the ID of the context which resulted in the required page
    * @return null if the ID expired, or the stored WOComponent
    */
-  public WOComponent restorePageForContextID(String _ctxId) {
+  public WOComponent restorePageForContextID(final String _ctxId) {
     if (_ctxId == null)
       return null;
     
@@ -272,7 +272,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * @param _page - the page to retrieve the context id for
    * @return a context-id or null if no context was associated with the page
    */
-  protected String contextIDForPage(WOComponent _page) {
+  protected String contextIDForPage(final WOComponent _page) {
     if (_page == null)
       return null;
     
@@ -298,7 +298,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _page - the page which shall be preserved
    */
-  public void savePage(WOComponent _page) {
+  public void savePage(final WOComponent _page) {
     String ctxId = this.contextIDForPage(_page);
     if (ctxId == null) return;
     
@@ -333,7 +333,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @param _page - the save to be stored in the permanent cache
    */
-  public void savePageInPermanentCache(WOComponent _page) {
+  public void savePageInPermanentCache(final WOComponent _page) {
     String ctxId = this.contextIDForPage(_page);
     if (ctxId == null) return;
     
@@ -358,12 +358,12 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * This method is called by WOApp.takeValuesFromRequest() if a session is
    * active in the context.
    */
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
-    String senderID = _ctx != null ? _ctx.senderID() : null;
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
+    final String senderID = _ctx != null ? _ctx.senderID() : null;
     
     if (senderID == null || senderID.length() == 0) {
       /* no element URL is available */
-      WOComponent page = _ctx.page();
+      final WOComponent page = _ctx.page();
       
       if (page != null) {
         /* But we do have a page set in the context. This usually means that the
@@ -371,8 +371,12 @@ public class WOSession extends NSObject implements INSExtraVariables {
          * combination with a WOComponent being the DirectAction object.
          */
         _ctx.enterComponent(page, null /* component-content */);
-        page.takeValuesFromRequest(_rq, _ctx);
-        _ctx.leaveComponent(page);
+        try {
+          page.takeValuesFromRequest(_rq, _ctx);
+        }
+        finally {
+          _ctx.leaveComponent(page);
+        }
       }
       else if (log.isInfoEnabled())
         log.info("got no page in context to push values to?");
@@ -392,12 +396,16 @@ public class WOSession extends NSObject implements INSExtraVariables {
     }
     
     // TODO: SOPE: if reqCtxId = ctx.currentElementID() == null
-    WOComponent page = _ctx.page();
+    final WOComponent page = _ctx.page();
       
     if (page != null) {
       _ctx.enterComponent(page, null /* component-content */);
-      page.takeValuesFromRequest(_rq, _ctx);
-      _ctx.leaveComponent(page);
+      try {
+        page.takeValuesFromRequest(_rq, _ctx);
+      }
+      finally {
+        _ctx.leaveComponent(page);
+      }
     }
     else if (log.isInfoEnabled())
       log.info("got no page in context to push values to?");
@@ -411,18 +419,22 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * This is called by WOApp.invokeAction() if a session is active in the
    * context.
    */
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     Object result = null;
     
     // TODO: SOPE: if reqCtxId = ctx.currentElementID() == null return null;
     // in Go the context is not part of the EID, but part of the previously
     // resolved URL (sessionid/contextid/elementid)
     
-    WOComponent page = _ctx.page();
+    final WOComponent page = _ctx.page();
     if (page != null) {
       _ctx.enterComponent(page, null /* component-content */);
-      result = page.invokeAction(_rq, _ctx);
-      _ctx.leaveComponent(page);
+      try {
+        result = page.invokeAction(_rq, _ctx);
+      }
+      finally {
+        _ctx.leaveComponent(page);
+      }
     }
     else if (log.isInfoEnabled())
       log.info("got no page in context to invoke the action on?");
@@ -438,7 +450,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * 
    * @return the path the session-id cookie is valid for
    */
-  public String domainForIDCookies(WORequest _rq, WOContext _ctx) {
+  public String domainForIDCookies(final WORequest _rq, final WOContext _ctx) {
     if (_ctx == null) {
       log.warn("got no context to generate session cookie path!");
       return null;
@@ -457,7 +469,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * active.
    */
   public static void expireSessionCookieInResponse
-    (WORequest _rq, WOResponse r, WOContext _ctx)
+    (final WORequest _rq, final WOResponse r, final WOContext _ctx)
   {
     /* check whether there is a cookie set */
     if (_rq != null && _rq.cookieValueForKey(WORequest.SessionIDKey) == null)
@@ -476,7 +488,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
           null /* query path */);
     }
     
-    WOCookie cookie = new WOCookie(
+    final WOCookie cookie = new WOCookie(
         WORequest.SessionIDKey, /* name  */
         null,                   /* new value */
         path,                   /* path  */
@@ -499,7 +511,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
     // TBD: also add expiration date? (we already set max-age)
     // TBD: we might not always want to set max-age? but "close" the session
     //      when the browser is closed.
-    WOCookie snCookie = new WOCookie(
+    final WOCookie snCookie = new WOCookie(
         WORequest.SessionIDKey, /* name  */
         this.sessionID(),       /* value */
         "/",                    /* path  */
@@ -515,7 +527,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
       snCookie.setTimeOut(0); // 0 Max-Age says: "remove cookie"
     }
     else {
-      int to = (int)this.timeOut(); /* in seconds */
+      final int to = (int)this.timeOut(); /* in seconds */
       if (to > 0) {
         /* Should we add or subtract a bit of the timeout? Not sure. */
         snCookie.setTimeOut(to);
@@ -542,7 +554,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
    * @param _r   - the WOResponse object to generate to
    * @param _ctx - the WOContext the generation takes place in
    */
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(WOResponse _r, final WOContext _ctx) {
     if (_r == null) _r = _ctx.response();
     
     /* HTTP/1.1 caching directive, prevents browser from caching dyn pages */
@@ -558,12 +570,16 @@ public class WOSession extends NSObject implements INSExtraVariables {
     
     _ctx.deleteAllElementIDComponents();
     {
-      WOComponent page = _ctx.page();
+      final WOComponent page = _ctx.page();
       
       if (page != null) {
         _ctx.enterComponent(page, null /* component-content */);
-        page.appendToResponse(_r, _ctx);
-        _ctx.leaveComponent(page);
+        try {
+          page.appendToResponse(_r, _ctx);
+        }
+        finally {
+          _ctx.leaveComponent(page);
+        }
       }
     }
     
@@ -574,7 +590,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
     
     /* record statistics */
     
-    WOStatisticsStore stats = _ctx.application().statisticsStore();
+    final WOStatisticsStore stats = _ctx.application().statisticsStore();
     if (stats != null)
       stats.recordStatisticsForResponse(_r, _ctx);
   }
@@ -585,7 +601,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
   // TODO: threading? (hm, no, sessions are single threaded (checked out))
   protected Map<String,Object> extraAttributes = null;
   
-  public void setObjectForKey(Object _value, String _key) {
+  public void setObjectForKey(final Object _value, final String _key) {
     if (_value == null) {
       this.removeObjectForKey(_key);
       return;
@@ -597,14 +613,14 @@ public class WOSession extends NSObject implements INSExtraVariables {
     this.extraAttributes.put(_key, _value);
   }
   
-  public void removeObjectForKey(String _key) {
+  public void removeObjectForKey(final String _key) {
     if (this.extraAttributes == null)
       return;
     
     this.extraAttributes.remove(_key);
   }
   
-  public Object objectForKey(String _key) {
+  public Object objectForKey(final String _key) {
     if (_key == null || this.extraAttributes == null)
       return null;
     
@@ -619,7 +635,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
   /* KVC */
   
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     if (this.extraAttributes != null) {
       // for perf, triggered anyways?
       if (this.extraAttributes.containsKey(_key)) {
@@ -631,7 +647,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
     super.takeValueForKey(_value, _key);
   }
   @Override
-  public Object valueForKey(String _key) {
+  public Object valueForKey(final String _key) {
     Object v;
     
     if ((v = this.objectForKey(_key)) != null)
@@ -642,11 +658,11 @@ public class WOSession extends NSObject implements INSExtraVariables {
   }
 
   @Override
-  public Object handleQueryWithUnboundKey(String _key) {
+  public Object handleQueryWithUnboundKey(final String _key) {
     return this.objectForKey(_key);
   }
   @Override
-  public void handleTakeValueForUnboundKey(Object _value, String _key) {
+  public void handleTakeValueForUnboundKey(Object _value, final String _key) {
     this.setObjectForKey(_value, _key);
   }
   
@@ -654,7 +670,7 @@ public class WOSession extends NSObject implements INSExtraVariables {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.sessionID != null)

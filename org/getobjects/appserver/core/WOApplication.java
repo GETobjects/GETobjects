@@ -1096,8 +1096,12 @@ public class WOApplication extends NSObject
 
       if (page != null) {
         _ctx.enterComponent(page, null /* component content */);
-        page.takeValuesFromRequest(_rq, _ctx);
-        _ctx.leaveComponent(page);
+        try {
+          page.takeValuesFromRequest(_rq, _ctx);
+        }
+        finally {
+          _ctx.leaveComponent(page);
+        }
       }
     }
   }
@@ -1122,8 +1126,12 @@ public class WOApplication extends NSObject
 
       if (page != null) {
         _ctx.enterComponent(page, null /* component content */);
-        result = page.invokeAction(_rq, _ctx);
-        _ctx.leaveComponent(page);
+        try {
+          result = page.invokeAction(_rq, _ctx);
+        }
+        finally {
+          _ctx.leaveComponent(page);
+        }
       }
       else
         result = null;
@@ -1147,8 +1155,12 @@ public class WOApplication extends NSObject
 
       if (page != null) {
         _ctx.enterComponent(page, null /* component content */);
-        page.appendToResponse(_response, _ctx);
-        _ctx.leaveComponent(page);
+        try {
+          page.appendToResponse(_response, _ctx);
+        }
+        finally {
+          _ctx.leaveComponent(page);
+        }
       }
       else if (log.isInfoEnabled())
         log.info("called WOApp.appendToResponse w/o a page");
