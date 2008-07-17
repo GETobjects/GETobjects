@@ -148,7 +148,7 @@ public class NSObject extends Object
     if (_keys == null)
       return null;
     
-    Map<String, Object> vals = new HashMap<String, Object>(_keys.length);
+    final Map<String, Object> vals = new HashMap<String, Object>(_keys.length);
     if (_keys.length == 0) return vals;
     
     for (int i = 0; i < _keys.length; i++) {
@@ -161,7 +161,7 @@ public class NSObject extends Object
   
   /* NSValidation */
 
-  public Object validateValueForKey(Object _value, String _key)
+  public Object validateValueForKey(final Object _value, final String _key)
     throws ValidationException
   {
     return NSValidation.DefaultImplementation
@@ -182,6 +182,35 @@ public class NSObject extends Object
   }
   public boolean isNotEmpty() {
     return !this.isEmpty();
+  }
+  
+  
+  /* trampolines which are useful for KVC */
+  
+  /**
+   * Returns a trampoline which negates the value of a given KVC key.
+   * <p>
+   * Example:<pre>
+   *   myAccount.not.isActive</pre>
+   *   
+   * @return a NSKeyValueCoding object which resolves keys against this object 
+   */
+  public NSKeyValueCoding not() {
+    return new NSNotObjectTrampoline(this);
+  }
+  
+  public static class NSNotObjectTrampoline extends NSObject {
+    public NSKeyValueCoding object;
+    
+    public NSNotObjectTrampoline(final NSKeyValueCoding _base) {
+      this.object = _base;
+    }
+    
+    public Object valueForKey(final String _key) {
+      boolean originalValue = this.object != null
+        ? UObject.boolValue(this.object.valueForKey(_key)) : false;
+      return originalValue ? Boolean.FALSE : Boolean.TRUE;
+    }
   }
   
   
