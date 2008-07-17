@@ -69,8 +69,12 @@ public class WOChildComponentReference extends WODynamicElement {
     }
     
     _ctx.enterComponent(child, this.template);
-    child.takeValuesFromRequest(_rq, _ctx);
-    _ctx.leaveComponent(child);
+    try {
+      child.takeValuesFromRequest(_rq, _ctx);
+    }
+    finally {
+      _ctx.leaveComponent(child);
+    }
   }
   
   @Override
@@ -88,9 +92,14 @@ public class WOChildComponentReference extends WODynamicElement {
       return null;
     }
     
+    Object result;
     _ctx.enterComponent(child, this.template);
-    Object result = child.invokeAction(_rq, _ctx);
-    _ctx.leaveComponent(child);
+    try {
+      result = child.invokeAction(_rq, _ctx);
+    }
+    finally {
+      _ctx.leaveComponent(child);
+    }
     
     return result;
   }
@@ -121,8 +130,12 @@ public class WOChildComponentReference extends WODynamicElement {
     }
     
     _ctx.enterComponent(child, this.template);
-    child.appendToResponse(_r, _ctx);
-    _ctx.leaveComponent(child);
+    try {
+      child.appendToResponse(_r, _ctx);
+    }
+    finally {
+      _ctx.leaveComponent(child);
+    }
   }
   
   /* description */

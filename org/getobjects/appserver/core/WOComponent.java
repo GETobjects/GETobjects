@@ -763,11 +763,13 @@ public class WOComponent extends WOElement
     ctx.setPage(this);
     this.ensureAwakeInContext(ctx);
     ctx.enterComponent(this, null);
-    {
+    try {
       r = new WOResponse(rq);
       this.appendToResponse(r, ctx);
     }
-    ctx.leaveComponent(this);
+    finally {
+      ctx.leaveComponent(this);
+    }
     return r;
   }
   
