@@ -16,6 +16,29 @@ allow scripted applications.
 TBD: I'm going to rewrite quite a few bits to use Rhino scopes as the
      primary script storage. Currently we use the extended attributes
      of WOComponent/WOContext/WOSession.
+     
+Common Issues
+*************
+
+- Rhino Number objects are floating point! If you have code which expects
+  Integers, they might not compare.
+  
+  Example:
+    
+    public boolean thisIsCalledFromRhino(Number _value) {
+      Integer someInt = new Integer(5);
+      return someInt.equals(_value);
+    }
+  Rhino:
+    javaObject.thisIsCalledFromRhino(5);
+    
+  This won't return true! If you look at it in Java, the 5 becomes
+  a java.lang.Double(5.0)
+  
+- Rhino Strings vs Java Strings. They are different.
+  And in the current JSApp bridge they are buggy. Somehow the Rhino
+  Strings loose most of their properties.
+  We'll fix this if we move to TopLevelImporter as the primary storage.
 
 
 Basic Structure
