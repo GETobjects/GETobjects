@@ -105,15 +105,15 @@ public class WOJettyRunner extends Object {
       this.log.warn("did not find application class: " + _appName);
       appClass = WOApplication.class;
     }
-    
+
     String shortAppName = appClass.getSimpleName();
-    
+
     /* Map 'www' directory inside the application package */
     URL www = appClass.getResource("www");
-    
+
     this.initWithClassAndNameAndPort(appClass, shortAppName, www, _port);
   }
-  
+
   public void initWithClassAndNameAndPort
     (Class _appClass, String _shortAppName, URL _rsrcBase, int _port)
   {
@@ -142,6 +142,9 @@ public class WOJettyRunner extends Object {
     servletHolder.setName(_shortAppName);
     servletHolder.setInitParameter("WOAppName",  _shortAppName);
     servletHolder.setInitParameter("WOAppClass", _appClass.getName());
+    if (UObject.isNotEmpty(this.woProjectDirectory))
+    	servletHolder.setInitParameter("WOProjectDirectory", this.woProjectDirectory);
+
     this.prepareServletHolder(root, servletHolder, _shortAppName);
 
     /* This makes the Servlet being initialize on startup (instead of first
@@ -156,7 +159,7 @@ public class WOJettyRunner extends Object {
 
 
     /* add resource handler (directly expose 'www' directory to Jetty) */
-    
+
     this.addResourceHandler(root, _rsrcBase);
 
     /* done */
@@ -165,11 +168,11 @@ public class WOJettyRunner extends Object {
     this.applicationURL = "http://localhost:" + _port + "/" + _shortAppName;
     this.log.info("Application URL is " + this.applicationURL);
   }
-  
+
   /**
    * This can be overridden by subclasses to add additional init parameters to
    * the ServletHolder.
-   * 
+   *
    * @param _root    - the Jetty root Context
    * @param _holder  - the ServletHolder of the application
    * @param _appName - the short application name
@@ -182,7 +185,7 @@ public class WOJettyRunner extends Object {
   /**
    * This adds the 'www' directory of the application package as a resource
    * directory.
-   * 
+   *
    * @param _root    - the Jetty root Context
    * @param _appWww  - the URL to the public directory
    */
@@ -254,7 +257,7 @@ public class WOJettyRunner extends Object {
     }
   }
 
-  
+
   /* runner */
 
   public void run() {

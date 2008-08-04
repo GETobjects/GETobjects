@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletConfig;
@@ -55,15 +56,15 @@ public class WOServletAdaptor extends HttpServlet {
   // TODO: this must be a cross-servlet/context hash
   //       possibly this must be a weak reference so that
   //       the app goes away if all servlets went away.
-  protected static Map<String,WOApplication> appRegistry = 
+  protected static Map<String,WOApplication> appRegistry =
     new ConcurrentHashMap<String, WOApplication>(4);
-  
+
   /* Note: remember that the ivars are thread-shared (= do not modify!) */
   private WOApplication WOApp;
 
-  
+
   /* application registry */
-  
+
   /**
    * Called by the Servlet init() method. This first checks the cache for an
    * application object of the given name. If its missing, it allocates a
@@ -71,18 +72,18 @@ public class WOServletAdaptor extends HttpServlet {
    * its init() method).
    */
   public void initApplicationWithName
-    (String _appName, String _appClassName)
+    (String _appName, String _appClassName, Properties _properties)
   {
     synchronized(this) {
       if (this.WOApp != null) // TODO: is this valid in THREADs?
         return;
     }
-    
+
     if (_appName == null) {
       log.fatal("got no application name!");
       return;
     }
-    
+
     WOApplication app = appRegistry.get(_appName);
     if (app != null) {
       /* already cached, eg setup by a different Servlet instance */
@@ -91,7 +92,7 @@ public class WOServletAdaptor extends HttpServlet {
       }
       return;
     }
-    
+
     /* find class of application */
 
     Class cl = null;
@@ -102,12 +103,14 @@ public class WOServletAdaptor extends HttpServlet {
       log.fatal("did not find WOApp class: " + _appClassName);
       return;
     }
-    
+
     /* instantiate application class */
-    
+
     try {
       app = (WOApplication)cl.newInstance();
       app._setName(_appName);
+      if (_properties != null)
+        app._setVolatileProperties(_properties);
     }
     catch (InstantiationException e) {
       log.fatal("could not instantiate WOApplication class: " + cl, e);
@@ -119,19 +122,19 @@ public class WOServletAdaptor extends HttpServlet {
       log.fatal("did not find WOApp class: " + _appClassName);
       return;
     }
-    
+
     try {
       app.init();
     }
     catch (Exception e) {
       log.fatal("error initializing WOApplication: " + cl, e);
     }
-    
+
     /* register new object */
-    
+
     appRegistry.put(_appName, app);
     app = null;
-    
+
     /*
      * Note: we use the registry because another thread might have been faster
      *       with registration. (how? its synchronized!)
@@ -142,32 +145,32 @@ public class WOServletAdaptor extends HttpServlet {
     }
   }
 
-  
+
   /* deliver WOResponse to ServletResponse */
-  
+
   public static boolean prepareResponseHeader
     (WOResponse _wr, HttpServletResponse _sr)
   {
     boolean didSetLength = false;
-    
+
     /* set response status */
     _sr.setStatus(_wr.status());
-    
+
     /* setup content type */
-    
-    String s = _wr.headerForKey("content-type"); 
+
+    String s = _wr.headerForKey("content-type");
     if (s != null) {
       if (s.startsWith("text/html") && !s.contains("charset")) {
         /* Explicitly add charset to content type, let me know if there are any
          * reasons not to do this.
-         * 
+         *
          * Note: this implies that you MUST properly set the contentEncoding
          *       in WOResponse in case you manually patch the contents of it.
          *       (eg if you serve a static HTML file)
          */
         s += "; charset=" + _wr.contentEncoding();
       }
-      
+
       _sr.setContentType(s);
     }
     else {
@@ -181,9 +184,9 @@ public class WOServletAdaptor extends HttpServlet {
           _sr.setContentType("application/octet-stream");
       }
     }
-    
+
     /* setup content length */
-    
+
     int contentLen = -1;
     if ((s = _wr.headerForKey("content-length")) != null) {
       try {
@@ -196,14 +199,14 @@ public class WOServletAdaptor extends HttpServlet {
     }
 //    if (contentLen == -1 && content != null)
 //      contentLen = content.length;
-    
+
     if (contentLen != -1) {
       _sr.setContentLength(contentLen);
       didSetLength = true;
     }
-    
+
     /* deliver headers */
-    
+
     Map<String,List<String>> headers = _wr.headers();
     if (headers != null) {
       for (String k: headers.keySet()) {
@@ -213,29 +216,29 @@ public class WOServletAdaptor extends HttpServlet {
           continue;
         if (k.equals("cookie") || k.equals("set-cookie"))
           continue;
-        
+
         List<String> v = headers.get(k);
         if (v == null) continue;
         if (v.size() == 0) continue;
-        
+
         s = UString.componentsJoinedByString(v, ", ");
         _sr.addHeader(k, s);
       }
     }
-    
+
     /* deliver cookies */
-    
+
     for (WOCookie k: _wr.cookies())
       _sr.addHeader("set-cookie", k.headerString());
-    
+
     return didSetLength;
   }
-  
-  
+
+
   /**
    * This is called by woService() if streaming is disabled to deliver the
    * content.
-   * 
+   *
    * @param _woResponse      - the WOResponse which should be delivered
    * @param _servletResponse - the ServletResponse to deliver to
    * @throws IOException
@@ -245,43 +248,43 @@ public class WOServletAdaptor extends HttpServlet {
     throws IOException
   {
     log.debug("sending WOResponse to Servlet ...");
-    
+
     boolean didSetLength = prepareResponseHeader(_woResponse, _servletResponse);
-    
+
     /* deliver content */
-    
+
     byte[] content = _woResponse.content();
     if (!didSetLength && content != null)
       _servletResponse.setContentLength(content.length);
-    
+
     OutputStream os = _servletResponse.getOutputStream();
     if (content != null)
       os.write(content);
     os.flush();
   }
-  
-  
+
+
   protected void woService(HttpServletRequest _rq, HttpServletResponse _r) {
     log.debug("woService ...");
-    
+
     if (this.WOApp == null) {
       log.error("Cannot run service, missing application object!");
       return;
     }
-    
+
     WORequest  rq;
     WOResponse r;
-    
+
     rq = new WOServletRequest(_rq, _r);
 
     try {
       log.debug("  dispatch ...");
       r = this.WOApp.dispatchRequest(rq);
-      
+
       if (r != null) {
         log.debug("  flush ...");
         r.flush();
-      
+
         if (!r.isStreaming())
           this.sendWOResponseToServletResponse(r, _r);
       }
@@ -291,21 +294,21 @@ public class WOServletAdaptor extends HttpServlet {
     catch (Exception e) {
       e.printStackTrace();
     }
-    
+
     if (rq != null) {
       rq.dispose(); /* this will delete temporary files, eg of file uploads */
       rq = null;
     }
-    
+
     log.debug("done woService.");
   }
 
-  
+
   protected String valueFromServletConfig(ServletConfig _cfg, String _key) {
     String an = _cfg.getInitParameter(_key);
     if (an != null)
       return an;
-    
+
     ServletContext sctx = _cfg.getServletContext();
     if (sctx == null)
       return null;
@@ -321,18 +324,18 @@ public class WOServletAdaptor extends HttpServlet {
       return an;
     if ((an = (String)sctx.getAttribute(_key)) != null)
       return an;
-    
+
     return an;
   }
-  
+
 
   /* servlet methods */
-  
+
   @Override
   public void init(ServletConfig _cfg) throws ServletException {
     // Jetty: org.mortbay.jetty.servlet.ServletHolder$Config@114024
     super.init(_cfg);
-    
+
     String an = this.valueFromServletConfig(_cfg, "WOAppName");
     String ac = this.valueFromServletConfig(_cfg, "WOAppClass");
     if (ac == null) ac = an;
@@ -341,12 +344,25 @@ public class WOServletAdaptor extends HttpServlet {
       int dotidx = ac.lastIndexOf('.');
       an = dotidx < 1 ? ac : ac.substring(dotidx + 1);
     }
-    
+
     if (an == null) {
       log.warn("no WOAppName specified in servlet context: " + _cfg);
       an = WOApplication.class.getName();
     }
-    this.initApplicationWithName(an, ac);
+
+    // TODO: this is pretty barebones right now... we could decide to
+    //       generalize this pattern and put all command line arguments
+    //       into these properties later on (once we have a decent argument
+    //       parser)
+    Properties properties         = null;
+    String     woProjectDirectory = this.valueFromServletConfig(_cfg,
+        "WOProjectDirectory");
+
+    if (woProjectDirectory != null) {
+      properties = new Properties();
+      properties.put("WOProjectDirectory", woProjectDirectory);
+    }
+    this.initApplicationWithName(an, ac, properties);
   }
 
   @Override
@@ -355,7 +371,7 @@ public class WOServletAdaptor extends HttpServlet {
   {
     this.woService(_rq, _r);
   }
-  
+
   @Override
   protected void doPost(HttpServletRequest _rq, HttpServletResponse _r)
     throws ServletException, IOException
@@ -366,9 +382,9 @@ public class WOServletAdaptor extends HttpServlet {
      */
     this.woService(_rq, _r);
   }
-  
+
   protected static String[] stdMethods = { "GET", "POST", "PUT", "DELETE" };
-  
+
   /**
    * This invokes the Servlet service() for GET/POST/PUT/DELETE to trigger
    * default Servlet behaviour (eg form handling). For non-standard methods it
