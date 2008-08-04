@@ -23,6 +23,7 @@ package org.getobjects.servlets;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -350,18 +351,13 @@ public class WOServletAdaptor extends HttpServlet {
       an = WOApplication.class.getName();
     }
 
-    // TODO: this is pretty barebones right now... we could decide to
-    //       generalize this pattern and put all command line arguments
-    //       into these properties later on (once we have a decent argument
-    //       parser)
-    Properties properties         = null;
-    String     woProjectDirectory = this.valueFromServletConfig(_cfg,
-        "WOProjectDirectory");
-
-    if (woProjectDirectory != null) {
-      properties = new Properties();
-      properties.put("WOProjectDirectory", woProjectDirectory);
+    Properties  properties         = new Properties();
+    Enumeration parameterNamesEnum = _cfg.getInitParameterNames();
+    while (parameterNamesEnum.hasMoreElements()) {
+      String name = (String)parameterNamesEnum.nextElement();
+      properties.put(name, _cfg.getInitParameter(name));
     }
+
     this.initApplicationWithName(an, ac, properties);
   }
 

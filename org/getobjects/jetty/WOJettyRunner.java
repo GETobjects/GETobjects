@@ -45,10 +45,10 @@ import org.mortbay.resource.Resource;
 public class WOJettyRunner extends Object {
 
   protected final Log log = LogFactory.getLog("WOJettyRunner");
-  protected Server  server;
-  protected String  applicationURL;
-  protected boolean autoOpenInBrowser;
-  protected String  woProjectDirectory;
+  protected Server     server;
+  protected String     applicationURL;
+  protected Properties properties;
+  protected boolean    autoOpenInBrowser;
 
   /* initialization */
 
@@ -69,24 +69,29 @@ public class WOJettyRunner extends Object {
   }
 
   public WOJettyRunner(Class _appCls, String[] _args) {
-    String appName      = null;
-    int    port         = 8181;
-    String autoOpenFlag = "false";
+    String appName;
+    int    port;
 
+    this.properties = new Properties();
     for (String arg: _args) {
-      if (arg.startsWith("-DWOPort="))
-        port = Integer.parseInt(arg.substring(9));
-      else if (arg.startsWith("-DWOAppName="))
-        appName = arg.substring(12);
-      else if (arg.startsWith("-DWOAutoOpenInBrowser="))
-        autoOpenFlag = arg.substring(22);
-      else if(arg.startsWith("-DWOProjectDirectory="))
-        this.woProjectDirectory = arg.substring(21);
+      if (arg.startsWith("-D") && arg.length() > 2) {
+        arg = arg.substring(2);
+        int idx = arg.indexOf("=");
+        if (idx != -1) {
+          String value = arg.substring(idx + 1);
+          arg = arg.substring(0, idx);
+          this.properties.put(arg, value);
+        }
+        else {
+          this.properties.put(arg, Boolean.TRUE);
+        }
+      }
     }
+    port    = Integer.parseInt(this.properties.getProperty("WOPort", "8181"));
+    appName = this.properties.getProperty("WOAppName", _appCls.getName());
 
-    if (appName == null)
-      appName = _appCls.getName();
-    this.autoOpenInBrowser = UObject.boolValue(autoOpenFlag);
+    this.autoOpenInBrowser = UObject.boolValue(this.properties.getProperty(
+        "WOAutoOpenInBrowser", "true"));
 
     this.initWithNameAndPort(appName, port);
   }
@@ -142,8 +147,13 @@ public class WOJettyRunner extends Object {
     servletHolder.setName(_shortAppName);
     servletHolder.setInitParameter("WOAppName",  _shortAppName);
     servletHolder.setInitParameter("WOAppClass", _appClass.getName());
-    if (UObject.isNotEmpty(this.woProjectDirectory))
-    	servletHolder.setInitParameter("WOProjectDirectory", this.woProjectDirectory);
+
+    if (this.properties != null) {
+      for (Object pName : this.properties.keySet()) {
+        String value = this.properties.getProperty((String)pName);
+        servletHolder.setInitParameter((String)pName, value);
+      }
+    }
 
     this.prepareServletHolder(root, servletHolder, _shortAppName);
 
@@ -192,14 +202,17 @@ public class WOJettyRunner extends Object {
   protected void addResourceHandler(final Context _root, final URL _appWww) {
     Resource baseResource = null;
 
-    if (UObject.isNotEmpty(this.woProjectDirectory)) {
-      File projectDir = new File(this.woProjectDirectory, "www");
-      if (projectDir.exists()) {
-        try {
-          baseResource = Resource.newResource(projectDir.getAbsolutePath());
-          this.log.info("mapped public www to: " + projectDir);
+    if (this.properties != null) {
+      String projDir = this.properties.getProperty("WOProjectDirectory");
+      if (UObject.isNotEmpty(projDir)) {
+        File projectDir = new File(projDir, "www");
+        if (projectDir.exists()) {
+          try {
+            baseResource = Resource.newResource(projectDir.getAbsolutePath());
+            this.log.info("mapped public www to: " + projectDir);
+          }
+          catch (Exception e) {}
         }
-        catch (Exception e) {}
       }
     }
 
