@@ -82,6 +82,7 @@ public class WOApplication extends NSObject
   protected WORequestHandler  defaultRequestHandler;
   protected Map<String,WORequestHandler> requestHandlerRegistry;
 
+  protected Properties        volatileProperties;
   protected Properties        properties;
   protected WOSessionStore    sessionStore;
   protected WOStatisticsStore statisticsStore;
@@ -98,7 +99,7 @@ public class WOApplication extends NSObject
 
   /* extra attributes (used when KVC does not resolve to a key) */
   protected ConcurrentHashMap<String,Object> extraAttributes = null;
-  
+
   /**
    * The constructor is triggered by WOServletAdaptor.
    */
@@ -270,7 +271,7 @@ public class WOApplication extends NSObject
       this.logRequestStart(_rq, rqId);
 
     final WORequestHandler rh;
-    
+
     if (this.useHandlerRequestDispatch()) {
       /*
        * This is the regular WO approach, derive a request handler from
@@ -286,7 +287,7 @@ public class WOApplication extends NSObject
        */
       rh = new GoObjectRequestHandler(this);
     }
-    
+
     if (rh == null) {
       log.error("got no request handler for request: " + _rq);
       r = null;
@@ -300,7 +301,7 @@ public class WOApplication extends NSObject
         r = null;
       }
     }
-    
+
     if (!isCachingEnabled()) { /* help with debugging weak references */
       log.info("running full garbage collection (WOCachingEnabled is off)");
       System.gc();
@@ -518,7 +519,7 @@ public class WOApplication extends NSObject
 
   /**
    * This method is called when 'info' is enabled in the profile logger.
-   * 
+   *
    * @param _rq   - the WORequest
    * @param _rqId - the numeric ID of the request (counter)
    */
@@ -538,13 +539,13 @@ public class WOApplication extends NSObject
         for (String qk: qks) {
           sb.append(" ");
           sb.append(qk);
-          
+
           // do not log passwords
           if (qk.startsWith("pass") || qk.startsWith("pwd")) {
             sb.append("=HIDE");
             continue;
           }
-          
+
           Object[] vs = _rq.formValuesForKey(qk);
           if (vs != null && vs.length > 0) {
             sb.append('=');
@@ -552,12 +553,12 @@ public class WOApplication extends NSObject
             for (Object v: vs) {
               if (isFirst) isFirst = false;
               else sb.append(",");
-              
+
               if (v == null) {
                 sb.append(",[null]");
                 continue;
               }
-              
+
               String s = v.toString();
               if (s.length() > 0) {
                 if (s.length() > 16) s = s.substring(0, 14) + "..";
@@ -568,7 +569,7 @@ public class WOApplication extends NSObject
         }
         sb.append(" ]");
       }
-      
+
       Collection<WOCookie> cookies = _rq.cookies();
       if (cookies != null && cookies.size() > 0) {
         sb.append(" C[");
@@ -581,10 +582,10 @@ public class WOApplication extends NSObject
 
     profile.info(sb.toString());
   }
-  
+
   /**
    * This method is called when 'info' is enabled in the profile logger.
-   * 
+   *
    * @param _rq   - the WORequest
    * @param _rqId - the numeric ID of the request (counter)
    * @param _r    - the generated WOResponse
@@ -598,7 +599,7 @@ public class WOApplication extends NSObject
       String s;
       final int status = _r.status();
       sb.append(status);
-      
+
       if ((s = _r.headerForKey("content-length")) != null) {
         sb.append(" ");
         sb.append(s);
@@ -608,19 +609,19 @@ public class WOApplication extends NSObject
         sb.append(" len=");
         sb.append(len);
       }
-      
+
       if ((s = _r.headerForKey("content-type")) != null) {
         sb.append(' ');
         sb.append(s);
       }
-      
+
       Collection<WOCookie> cookies = _r.cookies();
       if (cookies != null && cookies.size() > 0) {
         sb.append(" C[");
         WOCookie.addCookieInfo(cookies, sb);
         sb.append("]");
       }
-      
+
       if (status == 302 && (s = _r.headerForKey("location")) != null) {
         sb.append(" 302[");
         sb.append(s);
@@ -652,7 +653,7 @@ public class WOApplication extends NSObject
    * or if the key maps to nothing the <code>defaultRequestHandler()</code> is
    * used.
    * Otherwise the WORequestHandler stored for the key will be returned.
-   * 
+   *
    * @param _rq - the WORequest to be handled
    * @return a WORequestHandler object responsible for processing the request
    */
@@ -679,10 +680,10 @@ public class WOApplication extends NSObject
                    " / " + _rq.uri());
     return this.defaultRequestHandler();
   }
-  
+
   /**
    * Maps the given request handler to the given request handler key.
-   * 
+   *
    * @param _rh  - the request handler object to be mapped
    * @param _key - the request handler key which will trigger the handler
    */
@@ -715,7 +716,7 @@ public class WOApplication extends NSObject
   /**
    * This method explicitly sets the name of the application. If no name is set,
    * we will usually use the short name of the application class.
-   * 
+   *
    * @param _name - the application name to be used
    */
   public void _setName(String _name) {
@@ -730,6 +731,15 @@ public class WOApplication extends NSObject
    */
   public String name() {
     return this.name != null ? this.name : this.getClass().getSimpleName();
+  }
+
+  /**
+   * Sets volatile properties, i.e. properties provided via the command
+   * line or debugger.
+   * @param _properties - non-permanent properties used during this run
+   */
+  public void _setVolatileProperties(Properties _properties) {
+    this.volatileProperties = _properties;
   }
 
   /**
@@ -1200,7 +1210,7 @@ public class WOApplication extends NSObject
     if (!this.loadProperties(in))
       log.error("failed to load Defaults.properties of application");
 
-    /* Finally load configuration from the current directory. We might want
+    /* Load configuration from the current directory. We might want
      * to change the lookup strategy ...
      */
     File f = this.userDomainPropertiesFile();
@@ -1225,6 +1235,15 @@ public class WOApplication extends NSObject
         continue;
       if (Character.isUpperCase(((String)key).charAt(0)))
         this.properties.put(key, sysProps.get(key));
+    }
+
+    /* Finally, add volatile properties set by the adapter */
+    if (this.volatileProperties != null) {
+      for (Object key: this.volatileProperties.keySet()) {
+        if (!(key instanceof String))
+          continue;
+        this.properties.put(key, this.volatileProperties.get(key));
+      }
     }
   }
 
@@ -1323,14 +1342,14 @@ public class WOApplication extends NSObject
     this.setObjectForKey(_value, _key);
   }
 
-  
+
   /* GoClass */
 
   public GoClass joClassInContext(IGoContext _ctx) {
     return _ctx.goClassRegistry().goClassForJavaObject(this, _ctx);
   }
 
-  
+
   /* GoObject */
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
@@ -1366,10 +1385,10 @@ public class WOApplication extends NSObject
   public GoProductManager joProductManager() {
     return this.joProductManager;
   }
-  
-  
+
+
   /* extra attributes */
-  
+
   public void setObjectForKey(Object _value, String _key) {
     if (_value == null) {
       this.removeObjectForKey(_key);
@@ -1378,28 +1397,28 @@ public class WOApplication extends NSObject
 
     this.extraAttributes.put(_key, _value);
   }
-  
+
   public void removeObjectForKey(String _key) {
     if (this.extraAttributes == null)
       return;
-    
+
     this.extraAttributes.remove(_key);
   }
-  
+
   public Object objectForKey(String _key) {
     if (_key == null || this.extraAttributes == null)
       return null;
-    
+
     return this.extraAttributes.get(_key);
   }
-  
+
   public Map<String,Object> variableDictionary() {
     return this.extraAttributes;
   }
 
 
   /* description */
-  
+
   public Log log() {
     return log;
   }
@@ -1421,19 +1440,19 @@ public class WOApplication extends NSObject
     if (this.extraAttributes != null)
       this.appendExtraAttributesToDescription(_d);
   }
-  
+
   public void appendExtraAttributesToDescription(StringBuilder _d) {
     if (this.extraAttributes == null || this.extraAttributes.size() == 0)
       return;
-    
+
     _d.append(" vars=");
     boolean isFirst = true;
     for (String ekey: this.extraAttributes.keySet()) {
       if (isFirst) isFirst = false;
       else _d.append(",");
-      
+
       _d.append(ekey);
-      
+
       Object v = this.extraAttributes.get(ekey);
       if (v == null)
         _d.append("=null");
