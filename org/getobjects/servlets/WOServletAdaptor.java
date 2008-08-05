@@ -68,7 +68,7 @@ public class WOServletAdaptor extends HttpServlet {
 
   /**
    * Called by the Servlet init() method. This first checks the cache for an
-   * application object of the given name. If its missing, it allocates a
+   * application object of the given name. If it's missing, it allocates a
    * new instance of the WOApplication (and the constructor of the WOApp calls
    * its init() method).
    */
@@ -351,11 +351,33 @@ public class WOServletAdaptor extends HttpServlet {
       an = WOApplication.class.getName();
     }
     
-    Properties  properties         = new Properties();
+    /* Construct properties for the volatile "domain" from servlet init
+     * parameters and context init parameters and attributes.
+     * It's probably best to have a real UserDefaults concept, but for the
+     * time being this is better than nothing.
+     */
+    Properties  properties = new Properties();
     Enumeration parameterNamesEnum = _cfg.getInitParameterNames();
     while (parameterNamesEnum.hasMoreElements()) {
       String name = (String)parameterNamesEnum.nextElement();
       properties.put(name, _cfg.getInitParameter(name));
+    }
+
+    /* The ServletContext may override the previous init parameters.
+     * ServletContext init parameters will be overridden by attributes.
+     */
+    ServletContext sctx = _cfg.getServletContext();
+    if (sctx != null) {
+      parameterNamesEnum = sctx.getInitParameterNames();
+      while (parameterNamesEnum.hasMoreElements()) {
+        String name = (String)parameterNamesEnum.nextElement();
+        properties.put(name, sctx.getInitParameter(name));
+      }
+      Enumeration attributeNamesEnum = sctx.getAttributeNames();
+      while (attributeNamesEnum.hasMoreElements()) {
+        String name = (String)attributeNamesEnum.nextElement();
+        properties.put(name, sctx.getAttribute(name));
+      }
     }
 
     this.initApplicationWithName(an, ac, properties);
@@ -369,7 +391,7 @@ public class WOServletAdaptor extends HttpServlet {
   }
 
   @Override
-  protected void doPost(HttpServletRequest _rq, HttpServletResponse _r)
+  protected void doPost(final HttpServletRequest _rq, HttpServletResponse _r)
     throws ServletException, IOException
   {
     /* Note: apparently the Servlet service() method performs additional
