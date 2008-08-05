@@ -333,7 +333,7 @@ public class WOServletAdaptor extends HttpServlet {
   /* servlet methods */
 
   @Override
-  public void init(ServletConfig _cfg) throws ServletException {
+  public void init(final ServletConfig _cfg) throws ServletException {
     // Jetty: org.mortbay.jetty.servlet.ServletHolder$Config@114024
     super.init(_cfg);
 
@@ -350,7 +350,7 @@ public class WOServletAdaptor extends HttpServlet {
       log.warn("no WOAppName specified in servlet context: " + _cfg);
       an = WOApplication.class.getName();
     }
-
+    
     Properties  properties         = new Properties();
     Enumeration parameterNamesEnum = _cfg.getInitParameterNames();
     while (parameterNamesEnum.hasMoreElements()) {
@@ -362,7 +362,7 @@ public class WOServletAdaptor extends HttpServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest _rq, HttpServletResponse _r)
+  protected void doGet(final HttpServletRequest _rq, HttpServletResponse _r)
     throws ServletException, IOException
   {
     this.woService(_rq, _r);

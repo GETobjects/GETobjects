@@ -1195,7 +1195,7 @@ public class WOApplication extends NSObject
   protected void loadProperties() {
     InputStream in;
 
-    Properties sysProps = System.getProperties();
+    final Properties sysProps = System.getProperties();
     this.properties = new Properties();
 
     /* First load the internal properties of WOApplication */
