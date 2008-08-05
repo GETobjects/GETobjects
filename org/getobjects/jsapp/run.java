@@ -19,7 +19,9 @@
 package org.getobjects.jsapp;
 
 import java.io.File;
+import java.util.Properties;
 
+import org.getobjects.foundation.UObject;
 import org.getobjects.jetty.WOJettyRunner;
 
 /**
@@ -30,35 +32,19 @@ import org.getobjects.jetty.WOJettyRunner;
  */
 public class run extends WOJettyRunner {
 
-  public static void main(String[] _args) {
-    WOJettyRunner runner;
-    
-    if (true)
-      runner = new WOJettyRunner();
-    else
-      runner = new WOJettyRunner(JSApplication.class, _args);
-    
-    String  appName      = null;
-    String  path         = null;
-    Integer port         = null;
-    
-    for (String arg: _args) {
-      if (arg == null || arg.length() == 0)
-        continue;
+  public run(String[] _args) {
+    super(JSApplication.class, _args);
+  }
 
-      if (arg.startsWith("-DWOPort="))
-        port = Integer.parseInt(arg.substring(9));
-      else if (arg.startsWith("-DWOAppName="))
-        appName = arg.substring(12);
-      else if (arg.startsWith("JSAppPath="))
-        path = arg.substring(10);
-      
-      if (path == null && !arg.startsWith("-"))
-        path = arg;
-    }
-    if (path == null || path.length() == 0 || path.equals("."))
+  @Override
+  public void initWithProperties(Properties _properties) {
+    /* determine JSAppPath */
+
+    String path = _properties.getProperty("JSAppPath");
+
+    if (UObject.isEmpty(path) || path.equals("."))
       path = System.getProperty("user.dir");
-    
+
     File root = new File(path);
     root = root != null ? root.getAbsoluteFile() : null;
     if (root == null || !root.isDirectory()) {
@@ -66,31 +52,25 @@ public class run extends WOJettyRunner {
       System.exit(1);
       return;
     }
-    
     JSApplication.appRoot = root;
-    
-    if (port == null || port.intValue() < 80)
-      port = 8080;
-    
-    if (true) {
-    String shortAppName;
-    
-    if (appName == null) {
+
+    /* determine WOAppName */
+
+    String shortAppName = _properties.getProperty("WOAppName");
+    if (shortAppName == null) {
       shortAppName = root.getName();
       int extidx = shortAppName.indexOf('.');
       if (extidx > 0)
         shortAppName = shortAppName.substring(0, extidx);
+      // set this, so super deals with it properly
+      _properties.setProperty("WOAppName", shortAppName);
     }
-    else
-      shortAppName = appName;
 
     System.out.println("jsapp[" + shortAppName + "]: " + root);
-    
-    runner.initWithClassAndNameAndPort
-      (JSApplication.class, shortAppName, null /* Jetty www */, port);
-    }
-    
-    runner.run();
+    super.initWithProperties(_properties);
   }
 
+  public static void main(String[] _args) {
+    new run(_args).run();
+  }
 }
