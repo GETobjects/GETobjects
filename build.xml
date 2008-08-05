@@ -173,6 +173,9 @@
     <!--
     <include name="org/getobjects/jsapp/www/product.plist" />
   -->
+  	<!-- Do not include _any_ documentation here -->
+  	<exclude name="doc/**"      />
+    <exclude name="doxygen/**" />
   </patternset>
 
   <patternset id="samples.resources">
