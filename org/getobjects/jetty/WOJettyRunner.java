@@ -55,32 +55,13 @@ public class WOJettyRunner extends Object {
   }
 
   public WOJettyRunner(final Class _appCls, final String[] _args) {
-    this(_appCls.getName(), _args);
+    Properties properties = this.getPropertiesFromArguments(_args);
+    properties.put("WOAppClass", _appCls.getName());
+    this.initWithProperties(properties);
   }
   public WOJettyRunner(final String _shortAppName, final String[] _args) {
-    Properties properties = new Properties();
-
-    /* provide some defaults */
-
-    properties.put("WOPort",    "8181");
+    Properties properties = this.getPropertiesFromArguments(_args);
     properties.put("WOAppName", _shortAppName);
-
-    /* parse all command line arguments as properties */
-
-    for (String arg: _args) {
-      if (arg.startsWith("-D") && arg.length() > 2)
-        arg = arg.substring(2);
-      int idx = arg.indexOf("=");
-      if (idx != -1) {
-        String value = arg.substring(idx + 1);
-        arg = arg.substring(0, idx);
-        properties.put(arg, value);
-      }
-      else {
-        properties.put(arg, Boolean.TRUE);
-      }
-    }
-
     this.initWithProperties(properties);
   }
 
@@ -103,14 +84,21 @@ public class WOJettyRunner extends Object {
   }
 
   public void initWithProperties(Properties _properties) {
-    String appName  = _properties.getProperty("WOAppName");
-    Class  appClass = NSJavaRuntime.NSClassFromString(appName);
+    String appClassName = _properties.getProperty("WOAppClass");
+    String appName      = _properties.getProperty("WOAppName");
+
+    if (appClassName == null)
+      appClassName = appName;
+
+    Class appClass = NSJavaRuntime.NSClassFromString(appClassName);
     if (appClass == null) {
-      this.log.warn("did not find application class: " + appName);
+      this.log.warn("did not find application class: " + appClassName);
       appClass = WOApplication.class;
     }
 
-    String shortAppName = appClass.getSimpleName();
+    String shortAppName = appName;
+    if (shortAppName == null)
+      shortAppName = appClass.getSimpleName();
 
     /* Map 'www' directory inside the application package */
     URL rsrcBase = appClass.getResource("www");
@@ -241,6 +229,32 @@ public class WOJettyRunner extends Object {
       this.log.debug("did not find a static base resource.");
   }
 
+  /* Helpers */
+
+  protected Properties getPropertiesFromArguments(String[] _args) {
+    Properties properties = new Properties();
+
+    /* provide some defaults */
+
+    properties.put("WOPort", "8181");
+
+    /* parse all command line arguments as properties */
+
+    for (String arg: _args) {
+      if (arg.startsWith("-D") && arg.length() > 2)
+        arg = arg.substring(2);
+      int idx = arg.indexOf("=");
+      if (idx != -1) {
+        String value = arg.substring(idx + 1);
+        arg = arg.substring(0, idx);
+        properties.put(arg, value);
+      }
+      else {
+        properties.put(arg, Boolean.TRUE);
+      }
+    }
+    return properties;
+  }
 
   public void logSystemProperties() {
     Properties props = System.getProperties();
