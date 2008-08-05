@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="GETobjects" default="makejars" basedir=".">
 
+	<tstamp />
+
+	<!-- include the version file FIRST -->
+  <property file="version.properties" />
+
   <!-- give user a chance to override any of the following settings
          NOTE: any properties defined in one of these files will prevent
                the defaults provided below from being set - this means
@@ -16,9 +21,6 @@
   <property name="bin.core"  value="${bin}/core" />
   <property name="bin.jetty" value="${bin}/jetty" />
   <property name="jardir"    value="${bin}/lib" />
-
-  <!-- include the version file NOW -->
-  <property file="version.properties" />
 
   <!-- NOTE: This is the default version name for each release build.
              If you need to override it, i.e. if you want to refer to a
