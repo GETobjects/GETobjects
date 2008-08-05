@@ -169,7 +169,7 @@ public class WOJettyRunner extends Object {
     this.log.info("Application URL is " + this.applicationURL);
 
     this.autoOpenInBrowser = UObject.boolValue(_properties.getProperty(
-        "WOAutoOpenInBrowser", "true"));
+        "WOAutoOpenInBrowser", "false"));
   }
 
   /**
