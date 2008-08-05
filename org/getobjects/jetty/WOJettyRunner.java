@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2007 Helge Hess
+ * Copyright (C) 2006-2008 Helge Hess
  *
  * This file is part of SOPE/J.
  *
@@ -55,20 +55,7 @@ public class WOJettyRunner extends Object {
   public WOJettyRunner() {
   }
 
-  public WOJettyRunner(Class _appCls) {
-    //this.logSystemProperties();
-
-    // TODO: for unknown reasons this does not return arguments set with
-    //       -DWOPort=1234
-    //       => reason is: Jetty clears the System properties?
-    String ps = System.getProperty("WOPort");
-    if (ps == null || ps.length() == 0)
-      ps = "8181";
-
-    this.initWithNameAndPort(_appCls.getName(), Integer.parseInt(ps));
-  }
-
-  public WOJettyRunner(Class _appCls, String[] _args) {
+  public WOJettyRunner(final Class _appCls, final String[] _args) {
     String appName;
     int    port;
 
