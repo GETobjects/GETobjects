@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -44,17 +44,18 @@ import org.getobjects.appserver.core.WOResponse;
  * to ensure a proper component state setup. If you wish, you can further
  * reduce processing overhead using WOConditionals in appropriate places (if
  * you know that those sections do not matter for processing)
+ * 
  * <p>
  * Fragments can be nested. WOFragment sections _never_ disable rendering or
  * change template control flow, they only enable rendering when fragment ids
  * match. This way it is ensured that "sub fragments" will get properly
  * accessed.
  * This can be overridden by setting the "onlyOnMatch" binding. If this is set
- * the content will only get accessed in case the fragment matches OR not
- * fragment id is set. 
+ * the content will only get accessed in case the fragment matches OR no
+ * fragment id is set (in the request).
  * <p>
  * Sample:
- *   <pre>&lt;#WOFragment name="tableview" /&gt;</pre>
+ *   <pre>&lt;wo:fragment name="tableview" /&gt;</pre>
  * <p>
  * Renders:
  *   This element can render a container tag if the elementName is specified.
@@ -94,15 +95,15 @@ public class WOFragment extends WODynamicElement {
   
   /* support */
   
-  protected boolean isFragmentActiveInContext(WOContext _ctx) {
-    boolean debugOn = log.isDebugEnabled();
-    String rqFragID = _ctx.fragmentID();
+  protected boolean isFragmentActiveInContext(final WOContext _ctx) {
+    final boolean debugOn = log.isDebugEnabled();
+    final String rqFragID = _ctx.fragmentID();
     if (rqFragID == null) { /* yes, active, no fragment is set */
       if (debugOn) log.debug("no fragmentID set in context, we are active.");
       return true;
     }
     
-    String fragName = (this.name == null) 
+    final String fragName = (this.name == null) 
       ? _ctx.elementID()
       : this.name.stringValueInComponent(_ctx.cursor());
     if (fragName == null) { /* we have no fragid in the current state */
@@ -124,7 +125,7 @@ public class WOFragment extends WODynamicElement {
   /* request handling */
   
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (this.template == null)
       return;
 
@@ -137,11 +138,11 @@ public class WOFragment extends WODynamicElement {
   }
 
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     if (this.template == null)
       return null;
 
-    String rqFragID = _ctx.fragmentID();
+    final String rqFragID = _ctx.fragmentID();
     
     if (this.onlyOnMatch == null || rqFragID == null)
       return this.template.invokeAction(_rq, _ctx);
@@ -159,12 +160,12 @@ public class WOFragment extends WODynamicElement {
   /* rendering */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    boolean debugOn      = log.isDebugEnabled();
-    Object  cursor       = _ctx.cursor();
-    boolean wasDisabled  = _ctx.isRenderingDisabled();
-    boolean isFragActive = this.isFragmentActiveInContext(_ctx);
-    boolean doRender     = true;     
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    final boolean debugOn      = log.isDebugEnabled();
+    final Object  cursor       = _ctx.cursor();
+    final boolean wasDisabled  = _ctx.isRenderingDisabled();
+    final boolean isFragActive = this.isFragmentActiveInContext(_ctx);
+    boolean doRender = true;     
     
     if (!isFragActive) {
       /* we are not active (no match) */
