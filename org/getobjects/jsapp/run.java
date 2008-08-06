@@ -37,7 +37,7 @@ public class run extends WOJettyRunner {
   }
 
   @Override
-  public void initWithProperties(Properties _properties) {
+  public void initWithProperties(final Properties _properties) {
     /* determine JSAppPath */
 
     String path = _properties.getProperty("JSAppPath");
@@ -70,7 +70,7 @@ public class run extends WOJettyRunner {
     super.initWithProperties(_properties);
   }
 
-  public static void main(String[] _args) {
+  public static void main(final String[] _args) {
     new run(_args).run();
   }
 }
