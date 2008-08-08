@@ -505,33 +505,43 @@ public class WOWrapperTemplateBuilder extends WOTemplateBuilder
    * @param _assocs  - the associations
    * @return a hacked element (or the original, if no hack was necessary)
    */
-  @SuppressWarnings("unchecked")
-  public WOElement hackNewElement(WOElement _element, Map _assocs) {
+  public WOElement hackNewElement
+    (WOElement _element, final Map<String, WOAssociation> _assocs)
+  {
     if (_element instanceof WOHTMLDynamicElement) {
+      WOHTMLDynamicElement original = (WOHTMLDynamicElement)_element;
+      WOAssociation v;
       
       /* if attribute, wraps the element in a WOConditional */
-      if (_assocs.containsKey("if")) {
-        Map<String, WOAssociation> assocs = new HashMap(1);
-        assocs.put("condition", (WOAssociation)_assocs.remove("if"));
+      if ((v = _assocs.remove("if")) != null) {
+        Map<String, WOAssociation> assocs = 
+          new HashMap<String, WOAssociation>(1);
+        assocs.put("condition", v);
         _element = new WOConditional("if-attr", assocs, _element);
       }
       
       /* ifnot attribute, wraps the element in a WOConditional */
-      if (_assocs.containsKey("ifnot")) {
-        Map<String, WOAssociation> assocs = new HashMap(2);
-        assocs.put("condition", (WOAssociation)_assocs.remove("ifnot"));
+      if ((v = _assocs.remove("ifnot")) != null) {
+        Map<String, WOAssociation> assocs =
+          new HashMap<String, WOAssociation>(2);
+        assocs.put("condition", v);
         assocs.put("negate", WOAssociation.associationWithValue(Boolean.TRUE));
         _element = new WOConditional("ifnot-attr", assocs, _element);
       }
       
       /* foreach attribute, wraps the element in a WORepetition */
-      if (_assocs.containsKey("foreach")) {
+      if ((v = _assocs.remove("foreach")) != null) {
         // TBD: better: 'repeat'?
-        Map<String, WOAssociation> assocs = new HashMap(2);
-        assocs.put("list", (WOAssociation)_assocs.remove("foreach"));
+        Map<String, WOAssociation> assocs = 
+          new HashMap<String, WOAssociation>(2);
+        assocs.put("list", v);
         assocs.put("item", WOAssociation.associationWithKeyPath("item"));
         _element = new WORepetition("foreach-attr", assocs, _element);
       }
+      
+      /* properly apply extra attrs on wrapped element */
+      if (original != _element && _assocs != null && !_assocs.isEmpty())
+        original.setExtraAttributes(_assocs);
     }
     return _element;
   }
