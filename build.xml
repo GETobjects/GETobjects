@@ -433,10 +433,10 @@
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Jetty -->
-      <zipfileset src="${libs}/jetty-6.1.7.jar">
+      <zipfileset src="${libs}/jetty-6.1.11.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/jetty-util-6.1.7.jar">
+      <zipfileset src="${libs}/jetty-util-6.1.11.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Database adaptors
