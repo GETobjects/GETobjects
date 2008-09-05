@@ -21,25 +21,29 @@
 
 package org.getobjects.samples.HelloWorld;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.getobjects.appserver.core.WOActionResults;
 import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOResponse;
 
 public class PrototypeTestPage extends WOComponent {
-  
+
   public String title;
   public String searchText;
-  
+  public List<String> completions;
+  public String item;
+
   /* accessors */
-  
+
   public Date now() {
     return new Date();
   }
 
   /* actions */
-  
+
   public WOActionResults sayWhenAction() {
     WOResponse r = this.context().response();
     r.appendContentString
@@ -66,5 +70,14 @@ public class PrototypeTestPage extends WOComponent {
       r.appendContentString("</li>");
     }
     return r;
+  }
+
+  public WOActionResults liveCompletionAction() {
+    this.completions = new ArrayList<String>(3);
+    this.completions.add("Foo");
+    this.completions.add("Bar");
+    this.completions.add("Baz");
+
+    return this;
   }
 }
