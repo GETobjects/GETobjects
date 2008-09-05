@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import org.getobjects.appserver.core.WOComponent;
 
-public class HelloJoPage extends WOComponent {
+public class HelloGoPage extends WOComponent {
 
   public Locale locale() {
     return this.context().locale();
