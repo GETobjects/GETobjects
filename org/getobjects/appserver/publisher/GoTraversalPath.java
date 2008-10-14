@@ -90,7 +90,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
    * @param _ctx - a WOContext
    * @return a new GoTraversalPath or null if none could be created
    */
-  public static GoTraversalPath traversalPathForContext(WOContext _ctx) {
+  public static GoTraversalPath traversalPathForContext(final WOContext _ctx) {
     if (_ctx == null)
       return null;
     
@@ -291,7 +291,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
    * @return null if everything went fine, or the Exception
    */
   public Exception traverse() {
-    boolean debugOn = log.isDebugEnabled();
+    final boolean debugOn = log.isDebugEnabled();
     
     this.reset();
     
@@ -305,6 +305,11 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
     this.objects[0] = this.rootObject;
     
     /* iterate over the path */
+    
+    if (debugOn) {
+      log.debug("traverse path: " +
+          UString.componentsJoinedByString(this.path, "/"));
+    }
     
     for (this.traversalIndex = 0;
          this.traversalIndex < this.path.length;
@@ -324,14 +329,14 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
          */
         this.pathInfo = new String[] { this.lookupName };
         if (debugOn)
-          log.debug("ignoring last path part in lookup: " + this.pathInfo);
+          log.debug("  ignoring last path part in lookup: " + this.pathInfo);
         break; /* we are done */
       }
       
       /* perform name lookup */ 
       
       if (debugOn) { 
-        log.debug("will lookup[" + this.traversalIndex + "]: " + 
+        log.debug("  will lookup[" + this.traversalIndex + "]: " + 
                   this.lookupName);
       }
       
@@ -339,7 +344,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
       this.objects[this.traversalIndex + 1] = nextObject;
       
       if (debugOn)
-        log.debug("  did lookup: " + nextObject);
+        log.debug("    did lookup: " + nextObject);
       
       /* process lookup results */
       
@@ -350,7 +355,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
            */
           this.pathInfo = new String[] { this.lookupName };
           if (debugOn) {
-            log.debug("ignoring last path part in failed lookup: " +
+            log.debug("  ignoring last path part in failed lookup: " +
                       this.pathInfo);
           }
           break; /* we are done */
@@ -377,13 +382,13 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
                            this.pathInfo, 0,
                            this.path.length - this.traversalIndex);
           if (debugOn) {
-            log.debug("  found callable, pathinfo: " + 
+            log.debug("    found callable, pathinfo: " + 
                       Arrays.asList(this.pathInfo));
           }
         }
         else {
           if (debugOn) {
-            log.debug("got no result and current object is not callable: " +
+            log.debug("  got no result and current object is not callable: " +
                       this.contextObject);
           }
           this.contextObject = null;
@@ -437,7 +442,7 @@ public class GoTraversalPath extends NSObject implements NSDisposable {
   public Object traverseKey(Object _object, String _name) {
     boolean debugOn = log.isDebugEnabled();
     
-    if (debugOn) log.debug("traverse key '" + _name + "' on: " + _object);
+    if (debugOn) log.debug("    traverse key '" + _name + "' on: " + _object);
     
     /* lookup object for name */
     

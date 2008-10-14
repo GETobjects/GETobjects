@@ -111,5 +111,26 @@ public class JoConfigKeys {
       
       return null;
     }
+    
+    /* description */
+
+    @Override
+    public void appendAttributesToDescription(final StringBuilder _d) {
+      super.appendAttributesToDescription(_d);
+      
+      if (this.pattern != null) {
+        _d.append(" pat=");
+        _d.append(this.pattern);
+      }
+      else
+        _d.append(" no-pattern?");
+      
+      if (this.replacement != null) {
+        _d.append(" replace=");
+        _d.append(this.replacement);
+      }
+      else
+        _d.append(" no-replacement?");
+    }
   }
 }

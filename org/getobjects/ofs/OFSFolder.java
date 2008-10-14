@@ -357,7 +357,7 @@ public class OFSFolder extends OFSBaseObject
       if (debugOn) log.debug("cache miss[" + _name + "].");
     }
     else if (debugOn)
-      log.debug("no child cache in container.");
+      log.debug("no child cache in container: " + this);
     
     /* lookup using GoClass */
     
@@ -374,9 +374,17 @@ public class OFSFolder extends OFSBaseObject
     List<KeyMatchEntry> aliases = (List<KeyMatchEntry>)(cfg != null
       ? cfg.get(JoConfigKeys.AliasMatchName) : null);
     if (aliases != null) { // TBD: bad, we grab AliasMatchEntry from htaccess
+      if (debugOn) {
+        log.debug("lookup '" + _name + "' process AliasMatchName: " +
+            UString.componentsJoinedByString(aliases, ","));
+        log.debug("  in: " + this);
+      }
+      
       for (KeyMatchEntry entry: aliases) {
         final String newName = entry.match(_name);
         if (newName != null && !newName.equals(_name)) {
+          if (debugOn)
+            log.debug("  match, rewrite '" + _name + "' to '" + newName + "'");
           Object o = this.lookupName(newName, _ctx, _acquire);
           
           if (o instanceof OFSBaseObject) {
@@ -409,7 +417,7 @@ public class OFSFolder extends OFSBaseObject
     }
     else if (log.isDebugEnabled()) {
       if (ci != null)
-        log.debug("container misses key " + _name + " in: " + ci);
+        log.debug("container misses key '" + _name + "' in: " + ci);
       else
         log.debug("container has no child info: " + this);
     }

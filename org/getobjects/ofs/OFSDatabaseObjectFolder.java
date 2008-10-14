@@ -38,18 +38,18 @@ public class OFSDatabaseObjectFolder extends OFSFolder
   implements IOFSContextObject
 {
 
-  protected IGoContext joctx;
+  protected IGoContext goctx;
 
   protected EOQualifier qualifier;
-  protected Object      object;
+  protected Object      object; // TBD: who assigns this?
   
   /* accessors */
   
   public void _setContext(final IGoContext _ctx) {
-    this.joctx = _ctx;
+    this.goctx = _ctx;
   }
   public IGoContext context() {
-    return this.joctx;
+    return this.goctx;
   }
 
   public Object object() {
@@ -68,9 +68,15 @@ public class OFSDatabaseObjectFolder extends OFSFolder
     return new NSKeyValueHolder(
         "configObject", this,
         "config",       this.config(),
-        "context",      this.joctx);
+        "context",      this.goctx);
   }
   
+  /**
+   * Returns the eoaccess/eocontrol database entity name which is configured
+   * for this object (eg 'Customer').
+   * 
+   * @return the name of the EOEntity to be used with this object.
+   */
   public String entityName() {
     Object o = this.config().get(JoConfigKeys.EOEntity);
     if (o instanceof String)
@@ -80,6 +86,18 @@ public class OFSDatabaseObjectFolder extends OFSFolder
     return null;
   }
   
+  /**
+   * Returns the EOQualifier object which is configured for the Go lookup
+   * path.
+   * If the qualifier contains bindings, its evaluated against the
+   * 'evaluationContext' object returned by the method with the same name.
+   * That object contains this Go object, the htaccess configuration and the
+   * active GoContext.
+   * <p>
+   * Note: the qualifier is cached in an ivar.
+   * 
+   * @return an EOQualifier, or null
+   */
   public EOQualifier qualifier() {
     if (this.qualifier == null) {
       Object o = this.config().get(JoConfigKeys.EOQualifier);

@@ -470,10 +470,10 @@ public abstract class OFSBaseObject extends NSObject
           _d.append(']');
         }
         else
-          _d.append('-');
+          _d.append('-'); // no name in container (eg root aka WOApp?)
       }
       else
-        _d.append('x');
+        _d.append('x'); // not an IGoLocation object
       
       if (this.nameInContainer != null) {
         _d.append(" as='");
