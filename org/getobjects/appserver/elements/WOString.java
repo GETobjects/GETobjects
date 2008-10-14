@@ -56,8 +56,9 @@ import org.getobjects.foundation.UString;
  *   insertBR       [in] - boolean (replace newlines with &lt;br/&gt; tags)
  *   %value         [in] - string (pattern in %(keypath)s syntax)</pre>
  * Bindings (WOFormatter):<pre>
- *   calformat      [in] - a dateformat (returns Calendar)
- *   dateformat     [in] - a dateformat (returns Data)
+ *   calformat      [in] - a dateformat   (returns java.util.Calendar)
+ *   dateformat     [in] - a dateformat   (returns java.util.Date)
+ *   lenient        [in] - bool, only in combination with cal/dateformat!
  *   numberformat   [in] - a numberformat (NumberFormat.getInstance())
  *   currencyformat [in] - a numberformat (NumberFormat.getCurrencyInstance())
  *   percentformat  [in] - a numberformat (NumberFormat.getPercentInstance())

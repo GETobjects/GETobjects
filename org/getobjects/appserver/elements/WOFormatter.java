@@ -67,10 +67,18 @@ public abstract class WOFormatter extends NSObject {
     /* specific formatters */
     
     fmt = WODynamicElement.grabAssociation(_assocs,"dateformat");
-    if (fmt != null) return new WODateFormatter(fmt, false /* return Date */);
+    if (fmt != null) {
+      return new WODateFormatter(fmt,
+          WODynamicElement.grabAssociation(_assocs,"lenient"),
+          java.util.Date.class);
+    }
 
     fmt = WODynamicElement.grabAssociation(_assocs,"calformat");
-    if (fmt != null) return new WODateFormatter(fmt, true /* Calendar */);
+    if (fmt != null) {
+      return new WODateFormatter(fmt,
+          WODynamicElement.grabAssociation(_assocs,"lenient"),
+          java.util.Calendar.class);
+    }
     
     fmt = WODynamicElement.grabAssociation(_assocs,"numberformat");
     if (fmt != null) return new WONumberFormatter(fmt, 0);
@@ -105,7 +113,7 @@ public abstract class WOFormatter extends NSObject {
   
   /* methods */
   
-  public abstract Format formatInContext(WOContext _ctx);
+  public abstract Format formatInContext(final WOContext _ctx);
   
   
   /* NSFormatter like wrappers */
@@ -134,8 +142,12 @@ public abstract class WOFormatter extends NSObject {
       return _s;
     
     Object v = fmt.parseObject(_s);
+    
+    /* Downcast large values, eg if a Long fits into an Integer,
+     * we return an Integer.
+     * A bit hackish, but better for various reasons (eg JS bridge)
+     */
     if (v instanceof Long) {
-      /* downsize, better for various reasons (eg JS bridge) */
       long l = ((Long)v).longValue();
       if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE)
         v = new Integer((int)l);
@@ -157,7 +169,7 @@ public abstract class WOFormatter extends NSObject {
     if (_o == null)
       return null;
     
-    Format fmt = this.formatInContext(_ctx);
+    final Format fmt = this.formatInContext(_ctx);
     if (fmt == null)
       return (_o != null ? _o.toString() : null);
     

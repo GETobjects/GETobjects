@@ -33,7 +33,16 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 
 /**
- * Format:
+ * WODateFormatter
+ * <p>
+ * This formatter takes a String and returns a java.util.Date or
+ * java.util.Calendar object.
+ * The transformation can either use a predefined key, like 'SHORT' or
+ * 'DATETIME.SHORT', or a custom format (eg 'dd-MMM-yy') as implemented by
+ * the java.text.SimpleDateFormat parser.
+ * 
+ * <p>
+ * Custom Formats (of java.text.SimpleDateFormat):
  * <pre>
  * G       Era designator          Text    AD
  * y       Year                    Year    1996; 96
@@ -57,20 +66,33 @@ import org.getobjects.appserver.core.WOContext;
  *                                   Pacific Standard Time; PST; GMT-08:00</pre>
  */
 class WODateFormatter extends WOFormatter {
+  
   protected WOAssociation format;
+  protected WOAssociation isLenient;
   
   /* optimization for constant formats */
   protected String        fmtString;
+  protected Boolean       isLenientConst;
   protected boolean       isCustomFormat;
   protected boolean       returnCalendar;
   
-  public WODateFormatter(final WOAssociation _fmt, boolean _returnCal) {
-    this.format = _fmt;
-    this.returnCalendar = _returnCal;
+  public WODateFormatter
+    (WOAssociation _fmt, WOAssociation _isLenient, final Class _resultClass)
+  {
+    this.format    = _fmt;
+    this.isLenient = _isLenient;
+    this.returnCalendar = _resultClass == java.util.Calendar.class;
+    
+    this.isLenientConst = null;
     if (_fmt != null) {
-      if (_fmt.isValueConstant()) {
+      if (_fmt.isValueConstant() &&
+          (_isLenient == null || _isLenient.isValueConstant()))
+      {
         this.fmtString      = _fmt.stringValueInComponent(null /* cursor */);
         this.isCustomFormat = isCustomDateFormat(this.fmtString);
+        
+        if (_isLenient != null)
+          this.isLenientConst = _isLenient.booleanValueInComponent(null);
       }
     }
   }
@@ -85,6 +107,22 @@ class WODateFormatter extends WOFormatter {
     "DATETIME.SHORT", "DATETIME.MEDIUM", "DATETIME.LONG", "DATETIME.FULL"
   };
   
+  /**
+   * Returns true if the the given date format string contains a custom date
+   * format, that is, not a keyword value like:
+   * <ul>
+   *   <li>SHORT
+   *   <li>LONG
+   *   <li>DATE.SHORT
+   *   <li>DATETIME.MEDIUM
+   *   <li>...
+   * </ul>
+   * Example:<pre>
+   *   dd.MM.yyyy</pre>
+   * 
+   * @param _fmt
+   * @return
+   */
   protected static boolean isCustomDateFormat(final String _fmt) {
     /* this is kinda slow, maybe we should do something else or detect
      * constant dateformats so that we can do it once
@@ -104,40 +142,48 @@ class WODateFormatter extends WOFormatter {
   
   /**
    * Returns a java.text.Format object suitable for the bindings in the given
-   * context.
+   * context (more exactly, this returns a java.text.DateFormat object).
    * 
    * @param _ctx - the WOContext
    * @return a java.text.Format, or null if none could be built
    */
   @Override
   public Format formatInContext(final WOContext _ctx) {
-    // TODO: we should probably cache some formatter objects?
+    // TODO: we should probably cache some formatter objects? (per thread!)
     // TODO: find out how to do date patterns
     //
     // eg: DateFormat expiresFormat1
     //     = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US)
-    String  fmt;
-    boolean isCustom;
+    final String  fmt;
+    final boolean isCustom;
+    final Boolean lIsLenient;
     
-    if (this.fmtString != null) {
-      fmt      = this.fmtString;
-      isCustom = this.isCustomFormat;
+    if (this.fmtString != null) { /* we had constant bindings, faster */
+      fmt        = this.fmtString;
+      isCustom   = this.isCustomFormat;
+      lIsLenient = this.isLenientConst;
     }
-    else {
-      fmt = this.format.stringValueInComponent
-        (_ctx != null ? _ctx.cursor() : null);
-
+    else { /* format bindings were dynamic, we need to eval to get the format */
+      final Object cursor = _ctx != null ? _ctx.cursor() : null;
+      fmt = this.format.stringValueInComponent(cursor);
       if (fmt == null)
         return null;
       
       isCustom = isCustomDateFormat(fmt);
+      
+      lIsLenient = this.isLenient != null
+        ? this.isLenient.booleanValueInComponent(cursor)
+        : null;
     }
+    
+    /* create the java.text.Format object for the given format string */
     
     DateFormat lFormat;
     
     final Locale locale = _ctx != null ? _ctx.locale() : null;
 
     if (isCustom) {
+      /* a custom format String, eg: "E, dd-MMM-yyyy k:m:s 'GMT'" */
       try {
         lFormat = locale != null
           ? new SimpleDateFormat(fmt, locale)
@@ -150,6 +196,7 @@ class WODateFormatter extends WOFormatter {
       }
     }
     else {
+      /* keyword format, use getDateTimeInstance() and companions */
       int mode = DateFormat.SHORT;
       if (fmt.endsWith("SHORT"))       mode = DateFormat.SHORT;
       else if (fmt.endsWith("MEDIUM")) mode = DateFormat.MEDIUM;
@@ -172,12 +219,19 @@ class WODateFormatter extends WOFormatter {
           : DateFormat.getDateInstance(mode);
       }
     }
+
+    /* final customizations */
     
-    /* apply timezone */
+    if (lFormat != null) {
+      /* apply timezone stored in WOContext */
+      final TimeZone tz = _ctx != null ? _ctx.timezone() : null;
+      if (tz != null) lFormat.setTimeZone(tz);
+      
+      /* apply lenient configuration */
     
-    final TimeZone tz = _ctx != null ? _ctx.timezone() : null;
-    if (tz != null && lFormat != null)
-      lFormat.setTimeZone(tz);
+      if (lIsLenient != null && lFormat instanceof SimpleDateFormat)
+        ((SimpleDateFormat)lFormat).setLenient(lIsLenient.booleanValue());
+    }
     
     return lFormat;
   }
@@ -198,15 +252,21 @@ class WODateFormatter extends WOFormatter {
         _s = null;
     }
     
+    /* Invoke the WOFormatter method, which calls formatInContext() and then
+     * use the returned Format to convert the String into an object.
+     */
     Object v = super.objectValueForString(_s, _ctx);
     
+    
     if (this.returnCalendar) {
+      /* a 'calformat' binding was used (instead of 'dateformat') */
       if (v instanceof Date) {
         Calendar cal = Calendar.getInstance(_ctx.locale());
         cal.setTime((Date)v);
         v = cal;
       }
       else if (v instanceof Number) {
+        // TBD: document how/when this can happen
         Calendar cal = Calendar.getInstance(_ctx.locale());
         cal.setTimeInMillis(((Number)v).longValue());
         v = cal;
