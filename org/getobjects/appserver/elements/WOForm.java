@@ -114,9 +114,19 @@ public class WOForm extends WOHTMLDynamicElement {
   
   /**
    * Returns a new or existing WOErrorReport object for the given WOContext.
+   * This checks the 'errorReport' associations, which can have those values:
+   * <ul>
+   *   <li>null! - if the binding is set, but returns null, a NEW error report
+   *       will be created and pushed to the binding
+   *   <li>WOErrorReport - a specific object is given
+   *   <li>Boolean true/false - if true, a new report will be created
+   *   <li>String evaluated as a Boolean (eg "true"/"false"), same like above
+   * </ul>
    * <p>
    * Note: This does NOT touch the WOContext's active errorReport. Its only
    *       used to setup new reports using the 'errorReport' binding.
+   * 
+   * @param the active WOContext
    */
   protected WOErrorReport prepareErrorReportObject(final WOContext _ctx) {
     if (this.errorReport == null) /* no error report requested */
@@ -168,6 +178,7 @@ public class WOForm extends WOHTMLDynamicElement {
       lid = v.toString();
     }
     
+    /* push an WOErrorReport object to the WOContext */
     WOErrorReport er = this.prepareErrorReportObject(_ctx);
     if (er != null && _ctx != null) _ctx.pushErrorReport(er);
 

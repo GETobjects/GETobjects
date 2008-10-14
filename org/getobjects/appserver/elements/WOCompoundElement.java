@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -34,13 +34,13 @@ public class WOCompoundElement extends WODynamicElement {
 
   protected WOElement[] children;
   
-  public WOCompoundElement(List<WOElement> _children) {
+  public WOCompoundElement(final List<WOElement> _children) {
     super(null /* name */, null /* assocs */, null /* template */);
     
     this.children = _children != null
       ? _children.toArray(new WOElement[0]) : null;
   }
-  public WOCompoundElement(WOElement... _children) {
+  public WOCompoundElement(final WOElement... _children) {
     super(null /* name */, null /* assocs */, null /* template */);
     this.children = _children;
   }
@@ -48,7 +48,7 @@ public class WOCompoundElement extends WODynamicElement {
   /* responder */
   
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     _ctx.appendZeroElementIDComponent();
     
     for (WOElement element: this.children) {
@@ -60,7 +60,7 @@ public class WOCompoundElement extends WODynamicElement {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     // TODO: implement me, required for WOComponentAction's
     // - we need to check the senderID for the element we are dealing with
 
@@ -84,7 +84,7 @@ public class WOCompoundElement extends WODynamicElement {
   }
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     _ctx.appendZeroElementIDComponent();
     
     for (WOElement element: this.children) {
@@ -96,7 +96,7 @@ public class WOCompoundElement extends WODynamicElement {
   }
 
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, WOContext _ctx) {
     _ctx.appendZeroElementIDComponent();
     
     for (WOElement element: this.children) {

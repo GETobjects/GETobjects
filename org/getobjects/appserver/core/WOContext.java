@@ -289,12 +289,35 @@ public class WOContext extends WOCoreContext
   
   /* error handling */
   
+  /**
+   * Returns the currently active WOErrorReport. This method is called by
+   * dynamic elements (eg WOInput) which want to attach errors.
+   * The value can be null (in this case the elements usually throw an
+   * exception).
+   * <p>
+   * Error reports are pushed to the WOContext using the pushErrorReport()
+   * method. For example this is called by WOForm if the errorReport binding
+   * is set.
+   * 
+   * @return the active WOErrorReport object
+   */
   public WOErrorReport errorReport() {
     return this.errorReport;
   }
   public boolean hasErrorReport() {
     return this.errorReport() != null;
   }
+  
+  /**
+   * This method is used to push a new WOErrorReport object to the stack of
+   * error reports. New error reports will be attached to their parent report,
+   * so that a hierarchy of reports can be built.
+   * Eg its called by WOForm if the 'errorReport' binding is set.
+   * <p>
+   * Careful: if the '_report' is null, the parent might get lost! (during pop)
+   * 
+   * @param _report - the new WOErrorReport object
+   */
   public void pushErrorReport(final WOErrorReport _report) {
     if (this.errorReport != null)
       _report.setParentReport(this.errorReport);
