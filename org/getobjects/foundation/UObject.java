@@ -304,7 +304,7 @@ public class UObject extends NSObject {
    * @param _objs - some values, usually a List<Number>
    * @return null, or a List of Integer or Long objects
    */
-  public static List<Number> listOfIntsOrLongs(final Collection<Object> _objs) {
+  public static List<Number> listOfIntsOrLongs(final Collection _objs) {
     if (_objs == null)
       return null;
     
