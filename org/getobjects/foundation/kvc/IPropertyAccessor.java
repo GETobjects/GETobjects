@@ -55,12 +55,13 @@ public interface IPropertyAccessor {
 
   /**
    *  Returns the current value of the property in the instance.
+   * @param key TODO
    *
    **/
 
-  public Object get(Object instance);
+  public Object get(Object instance, String key);
 
   public Class getWriteType();
 
-  public void set(Object instance, Object value);
+  public void set(Object instance, String key, Object value);
 }

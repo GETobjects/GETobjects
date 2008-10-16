@@ -72,7 +72,7 @@ public class MapKVCWrapper extends KVCWrapper {
       this.name = _name;
     }
 
-    public Object get(final Object instance) {
+    public Object get(final Object instance, String key) {
       return ((Map)instance).get(this.name);
     }
 
@@ -95,7 +95,7 @@ public class MapKVCWrapper extends KVCWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public void set(final Object _target, final Object _value) {
+    public void set(final Object _target, String key, final Object _value) {
       ((Map<String,Object>) _target).put(this.name, _value);
     }
 

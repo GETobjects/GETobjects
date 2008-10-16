@@ -95,8 +95,8 @@ public class PropertyAccessor implements IPropertyAccessor {
       return this.fa.getWriteType();
     }
 
-    public void set(Object _target, Object _value) {
-      this.fa.set(_target, _value);
+    public void set(Object _target, final String _key, final Object _value) {
+      this.fa.set(_target, _key, _value);
     }
   }
 
@@ -118,8 +118,8 @@ public class PropertyAccessor implements IPropertyAccessor {
       return this.fa.getReadType();
     }
 
-    public Object get(Object _target) {
-      return this.fa.get(_target);
+    public Object get(final Object _target, final String key) {
+      return this.fa.get(_target, key);
     }
   }
   
@@ -152,7 +152,7 @@ public class PropertyAccessor implements IPropertyAccessor {
    *           if the class does not define an accessor method for the property.
    *
    */
-  public Object get(final Object _target) {
+  public Object get(final Object _target, String key) {
     if (logger.isDebugEnabled())
       logger.debug("Getting property " + this.getName() + " from " + _target);
 
@@ -221,7 +221,7 @@ public class PropertyAccessor implements IPropertyAccessor {
    *           if the class does not define a mutator method for the property.
    *
    */
-  public void set(final Object _target, final Object _value) {
+  public void set(final Object _target, String key, final Object _value) {
     if (this.setter == null) {
       final String propertyName = this.getName();
 

@@ -98,7 +98,7 @@ public interface NSKeyValueCoding {
           _value = UObject.boolValue(_value) ? Boolean.TRUE : Boolean.FALSE;
         }
         
-        accessor.set(_o, _value);
+        accessor.set(_o, _key, _value);
       }
       catch (MissingPropertyException e) {
         if (_o instanceof NSKeyValueCoding) {
@@ -119,7 +119,7 @@ public interface NSKeyValueCoding {
       }
     }
     
-    public static Object valueForKey(Object _o, String _key) {
+    public static Object valueForKey(final Object _o, final String _key) {
       // IMPORTANT: keep consistent with NSObject.valueForKey()!!
       if (_o == null)
         return null;
@@ -135,7 +135,7 @@ public interface NSKeyValueCoding {
           throw new MissingPropertyException(_o, _key);
         }
 
-        return accessor.get(_o);
+        return accessor.get(_o, _key);
       }
       catch (MissingPropertyException e) {
         if (_o instanceof NSKeyValueCoding)

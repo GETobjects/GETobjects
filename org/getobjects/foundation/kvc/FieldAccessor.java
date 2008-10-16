@@ -58,7 +58,7 @@ class FieldAccessor implements IPropertyAccessor {
 
   // TBD: always building the exception reasons is still costly
  
-  public void set(Object instance, Object value) {
+  public void set(Object instance, String key, Object value) {
     try {
       this.field.set(instance, value);
     }
@@ -84,7 +84,7 @@ class FieldAccessor implements IPropertyAccessor {
     return this.field.getType();
   }
 
-  public Object get(Object instance) {
+  public Object get(Object instance, String key) {
     try {
       return this.field.get(instance);
     }

@@ -76,7 +76,7 @@ public class NSObject extends Object
         _value = UObject.boolValue(_value) ? Boolean.TRUE : Boolean.FALSE;
       }
       
-      accessor.set(this, _value);
+      accessor.set(this, _key, _value);
     }
     catch (MissingPropertyException e) {
       this.handleTakeValueForUnboundKey(_value, _key);
@@ -102,7 +102,7 @@ public class NSObject extends Object
       if (accessor == null) // never fails on Maps
         return this.handleQueryWithUnboundKey(_key);
 
-      return accessor.get(this);
+      return accessor.get(this, _key);
     }
     catch (MissingPropertyException e) {
       return this.handleQueryWithUnboundKey(_key);
