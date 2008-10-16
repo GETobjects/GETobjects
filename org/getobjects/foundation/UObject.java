@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -293,6 +294,31 @@ public class UObject extends NSObject {
     }
     
     return intOrLongValue(v.toString());
+  }
+  
+  /**
+   * Returns an 'Integer' object if the value in v is small enough to fit,
+   * otherwise a 'Long' object.
+   * Note: this downsizes Long objects!
+   * 
+   * @param _objs - some values, usually a List<Number>
+   * @return null, or a List of Integer or Long objects
+   */
+  public static List<Number> listOfIntsOrLongs(final Collection<Object> _objs) {
+    if (_objs == null)
+      return null;
+    
+    ArrayList<Number> nums = new ArrayList<Number>(_objs.size());
+    
+    for (Object o: _objs) {
+      Number n = intOrLongValue(o);
+      
+      if (n != o && n == null) // could not convert
+        return null;
+      
+      nums.add(n);
+    }
+    return nums;
   }
   
   /**
