@@ -52,7 +52,7 @@ import org.getobjects.foundation.NSObject;
  *   <li>=&gt; / &gt;=
  *   <li>&lt;&gt; / &gt;&lt; 
  *   <li>LIKE
- *   <li>IN
+ *   <li>IN (ComparisonOperation.CONTAINS) [TBD: a NOT IN array]
  *   <li>IS NULL / IS NOT NULL
  *   <li>custom identifiers, eg: 'hasPrefix:'
  *   <li>Note: you can use formats, eg: ("lastname %@ 'Duck'", "LIKE")
@@ -264,7 +264,7 @@ public class EOQualifierParser extends NSObject {
     
     /* OK, now we check for operations */
     
-    String operation = this.parseOperation();
+    String operation = this.parseOperation(); // can be 'IN' or '<' or 'has:'..
     if (operation == null) {
       /* ok, it was just the ID and some spaces, no operation. We treat this as
        * a boolean kvqualifier, eg: "isArchived  "
@@ -298,6 +298,8 @@ public class EOQualifierParser extends NSObject {
       /* did not match, restore pointer */
       this.idx = saveIdx;
     }
+    
+    // TBD: special support for "NOT IN" (do a regular IN, then wrap in NotQual)
     
     /* and finally the right hand side (either id or value) */
 
@@ -666,8 +668,10 @@ public class EOQualifierParser extends NSObject {
       return ">";
     }
     
+    // TBD: support IN and => NOT IN
+    
     // TODO: better an own parser? hm, yes.
-    // the following stuff parses things like hasPrefix:
+    // the following stuff parses things like hasPrefix:, but also IN!
     
     return this.parseIdentifier(true /* break only on space */);
   }
