@@ -91,10 +91,15 @@ public class NSObject extends Object
   public Object valueForKey(final String _key) {
     // IMPORTANT: keep consistent with DefaultImp.valueForKey()!!
     try { // TODO: avoid this exception handler
+      // Note: this has *two* indirections:
+      // - first we lookup the KVCWrapper for the given Java Class
+      //   eg: MapKVCWrapper for java.util.Map's
+      // - and THEN we lookup the IPropertyAccessor using that
+      //   eg: MapAccessor, which just stores the _key
       final IPropertyAccessor accessor =
         KVCWrapper.forClass(this.getClass()).getAccessor(this, _key);
       
-      if (accessor == null)
+      if (accessor == null) // never fails on Maps
         return this.handleQueryWithUnboundKey(_key);
 
       return accessor.get(this);

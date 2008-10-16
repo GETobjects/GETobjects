@@ -57,16 +57,23 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class MapKVCWrapper extends KVCWrapper {
+  // Methods of this object are at the bottom. The IPropertyAccessor class
+  // follows.
   
   public static class MapAccessor implements IPropertyAccessor {
+    // hh:  this just stores the key which is being accessed
+    // TBD: do we create a new MapAccessor just for KVC? sounds expensive.
+    //      well, there is a ConcurrentHashMap below, but still!
+    //      - I think the rational is that we might want to access Map
+    //        methods as well
     private String name;
 
-    private MapAccessor(String _name) {
+    private MapAccessor(final String _name) {
       this.name = _name;
     }
 
-    public Object get(Object instance) {
-      return ((Map) instance).get(this.name);
+    public Object get(final Object instance) {
+      return ((Map)instance).get(this.name);
     }
 
     public String getName() {
@@ -88,7 +95,7 @@ public class MapKVCWrapper extends KVCWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public void set(Object _target, Object _value) {
+    public void set(final Object _target, final Object _value) {
       ((Map<String,Object>) _target).put(this.name, _value);
     }
 
@@ -101,21 +108,23 @@ public class MapKVCWrapper extends KVCWrapper {
    * Map of MapAccessor, keyed on property name.
    * 
    */
-
   private static final Map<String,IPropertyAccessor> accessorMap = 
     new ConcurrentHashMap<String,IPropertyAccessor>();
 
-  public MapKVCWrapper(Class _class) {
+  public MapKVCWrapper(final Class _class) {
     super(_class);
   }
 
   @SuppressWarnings("synthetic-access")
-  public IPropertyAccessor getAccessor(Object _target, String _name) {
+  public IPropertyAccessor getAccessor(Object _target, final String _name) {
+    // this is invoked by valueForKey/takeValueForKey of NSObject and
+    // NSKeyValueCoding.DefaultImplementation
     IPropertyAccessor result;
 
     result = super.getAccessor(_target, _name);
 
     if (result == null) {
+      // cached names
       result = accessorMap.get(_name);
 
       if (result == null) {
