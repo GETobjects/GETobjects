@@ -34,7 +34,6 @@
 package org.getobjects.foundation.kvc;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A subclass of {@link PropertyHelper} that allows values of a
@@ -61,23 +60,13 @@ public class MapKVCWrapper extends KVCWrapper {
   // follows.
   
   public static class MapAccessor implements IPropertyAccessor {
-    // hh:  this just stores the key which is being accessed
-    // TBD: do we create a new MapAccessor just for KVC? sounds expensive.
-    //      well, there is a ConcurrentHashMap below, but still!
-    //      - I think the rational is that we might want to access Map
-    //        methods as well
-    private String name;
+    // a threadsafe singleton. just wraps Map get/put operations
 
-    private MapAccessor(final String _name) {
-      this.name = _name;
+    public MapAccessor() {
     }
 
-    public Object get(final Object instance, String key) {
-      return ((Map)instance).get(this.name);
-    }
-
-    public String getName() {
-      return this.name;
+    public Object get(final Object _instance, final String _key) {
+      return ((Map)_instance).get(_key);
     }
 
     /**
@@ -95,21 +84,16 @@ public class MapKVCWrapper extends KVCWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public void set(final Object _target, String key, final Object _value) {
-      ((Map<String,Object>) _target).put(this.name, _value);
+    public void set(final Object _target, String _key, final Object _value) {
+      ((Map<String,Object>) _target).put(_key, _value);
     }
 
     public String toString() {
-      return "MapKVCWrapper.MapAccessor[" + this.name + "]";
+      return "MapKVCWrapper.MapAccessor";
     }
   }
 
-  /**
-   * Map of MapAccessor, keyed on property name.
-   * 
-   */
-  private static final Map<String,IPropertyAccessor> accessorMap = 
-    new ConcurrentHashMap<String,IPropertyAccessor>();
+  private static final IPropertyAccessor commonMapAccessor = new MapAccessor();
 
   public MapKVCWrapper(final Class _class) {
     super(_class);
@@ -123,15 +107,8 @@ public class MapKVCWrapper extends KVCWrapper {
 
     result = super.getAccessor(_target, _name);
 
-    if (result == null) {
-      // cached names
-      result = accessorMap.get(_name);
-
-      if (result == null) {
-        result = new MapAccessor(_name);
-        accessorMap.put(_name, result);
-      }
-    }
+    if (result == null)
+      result = commonMapAccessor;
 
     return result;
   }
