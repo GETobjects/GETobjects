@@ -42,26 +42,16 @@ package org.getobjects.foundation.kvc;
  **/
 
 public interface IPropertyAccessor {
-  /**
-   *  Returns the name of the property.
-   *
-   *  @since 1.0.6
-   *
-   **/
-
-  public String getName();
 
   public Class getReadType();
+  public Class getWriteType();
 
   /**
    *  Returns the current value of the property in the instance.
    * @param key TODO
    *
    **/
+  public Object get(final Object instance, final String key);
 
-  public Object get(Object instance, String key);
-
-  public Class getWriteType();
-
-  public void set(Object instance, String key, Object value);
+  public void set(final Object instance, final String key, final Object value);
 }
