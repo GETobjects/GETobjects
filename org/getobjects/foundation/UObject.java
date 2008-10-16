@@ -21,6 +21,7 @@ package org.getobjects.foundation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -232,6 +233,91 @@ public class UObject extends NSObject {
 
     return intValue(v.toString());
   }
+  public static long longValue(final Object v) {
+    if (v == null)
+      return 0;
+
+    if (v instanceof Number)
+      return ((Number)v).longValue();
+
+    if (v instanceof String) {
+      /* Note: we return 0 for empty strings */
+      String s = (String)v;
+      if (s.length() == 0)
+        return 0;
+
+      try {
+        if (s.indexOf('.') >= 0)
+          return new BigDecimal(s).longValue();
+        
+        return Long.parseLong(s);
+      }
+      catch (NumberFormatException e) {
+        return 0;
+      }
+    }
+
+    return longValue(v.toString());
+  }
+  
+  /**
+   * Returns an 'Integer' object if the value in v is small enough to fit,
+   * otherwise a 'Long' object.
+   * Note: this downsizes Long objects!
+   * 
+   * @param v - some value, usually a Number
+   * @return null, an Integer or a Long object
+   */
+  public static Number intOrLongValue(final Object v) {
+    if (v == null)
+      return null;
+    
+    if (v instanceof Integer)
+      return (Number)v;
+    
+    if (v instanceof Number) {
+      long lv = ((Number)v).longValue();
+      return (lv >= Integer.MIN_VALUE && lv <= Integer.MAX_VALUE)
+        ? new Integer((int)lv)
+        : new Long(lv);
+    }
+    
+    if (v instanceof String) {
+      String s = ((String)v).trim();
+      if (s.length() == 0) return null;
+      
+      long lv = longValue(s);
+      return (lv >= Integer.MIN_VALUE && lv <= Integer.MAX_VALUE)
+        ? new Integer((int)lv)
+        : new Long(lv);
+    }
+    
+    return intOrLongValue(v.toString());
+  }
+  
+  /**
+   * Returns true if the given object represents a discrete number, that is,
+   * a number w/o digits after the decimal point. (TBD: is discrete the
+   * correct word? I don't remember ;-))
+   * 
+   * @param v - some object, usually a Number
+   * @return true if the object is a discrete number, eg Integer or Long
+   */
+  public static boolean isDiscreteNumber(final Object v) {
+    if (!(v instanceof Number))
+      return false;
+    
+    if (v instanceof Integer    ||
+        v instanceof Long       ||
+        v instanceof BigInteger ||
+        v instanceof Short      ||
+        v instanceof Byte)
+      return true;
+    
+    // TBD: support BigDecimal
+    return false;
+  }
+
 
   /**
    * Returns a String representing the object. This has special processing for
