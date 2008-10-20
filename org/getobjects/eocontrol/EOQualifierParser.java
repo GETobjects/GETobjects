@@ -774,6 +774,10 @@ public class EOQualifierParser extends NSObject {
       return null; // hm, can't distinguish between this and null => match..
     
     if (castClass != null) {
+      // TBD: another option might be to support property lists, eg:
+      //        code IN ( 'a', 'b', 'c' )
+      //      maybe distinguish by checking for an ID?
+      
       // TODO: handle casts, eg (Date)'2006-06-10'
       log.error("not handling cast to '" + castClass + "', value: "  + v);
     }
