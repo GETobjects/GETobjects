@@ -39,7 +39,8 @@ import org.getobjects.foundation.NSException;
  * database channels to fetch objects.
  */
 public class EODatabaseContext extends EOObjectStore {
-  protected static final Log log = LogFactory.getLog("EODatabaseContext");
+  protected static final Log log     = LogFactory.getLog("EODatabaseContext");
+  protected static final Log perflog = LogFactory.getLog("EOPerformance");
   
   protected EODatabase db;
   
@@ -67,6 +68,7 @@ public class EODatabaseContext extends EOObjectStore {
   public List objectsWithFetchSpecification
     (EOFetchSpecification _fs, EOObjectTrackingContext _ec)
   {
+    boolean perfOn  = perflog.isDebugEnabled();
     boolean debugOn = log().isDebugEnabled();
     this.resetLastException();
     
@@ -95,6 +97,8 @@ public class EODatabaseContext extends EOObjectStore {
       return null;
     }
     
+    if (perfOn) perflog.error("selectObjectsWithFetchSpecification()");
+    
     Exception error = ch.selectObjectsWithFetchSpecification(_fs, _ec);
     if (error != null) {
       this.lastException = error;
@@ -103,6 +107,9 @@ public class EODatabaseContext extends EOObjectStore {
     }
     
     int resCount = ch.recordCount(); 
+    if (perfOn)
+      perflog.error("selectObjectsWithFetchSpecification(): " + resCount);
+    
     if (debugOn)
       log().debug("iterate over channel: " + ch + " , #rec=" + resCount);
     
@@ -122,6 +129,10 @@ public class EODatabaseContext extends EOObjectStore {
       if (ch != null) ch.dispose();
     }
     
+    if (perfOn) {
+      perflog.error("objectsWithFetchSpecification(): got: " +
+          (results != null ? results.size() : "null"));
+    }
     return results;
   }
   

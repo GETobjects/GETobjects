@@ -56,7 +56,8 @@ import org.getobjects.foundation.UString;
 public class EODatabaseChannel extends NSObject
   implements NSDisposable, Iterator
 {
-  protected static final Log log = LogFactory.getLog("EODatabaseChannel");
+  protected static final Log log     = LogFactory.getLog("EODatabaseChannel");
+  protected static final Log perflog = LogFactory.getLog("EOPerformance");
   
   protected EODatabase       database;
   protected EOAdaptorChannel adChannel;
@@ -353,8 +354,10 @@ public class EODatabaseChannel extends NSObject
     (final EOFetchSpecification _fs, final EOObjectTrackingContext _ec)
   {
     final boolean isDebugOn = log.isDebugEnabled();
+    final boolean perfOn    = perflog.isDebugEnabled();
     
     if (isDebugOn) log.debug("primary select: " + _fs);
+    if (perfOn) perflog.debug("primarySelectObjectsWithFetchSpecification ..");
     
     /* tear down */
     this.cancelFetch();
@@ -409,9 +412,11 @@ public class EODatabaseChannel extends NSObject
       List<Map<String, Object>> results;
       
       /* Note: custom queries are detected by the adaptor */
+      if (perfOn) perflog.debug("  selectAttributes ..");
       results = this.adChannel.selectAttributes
         (null, // selectList, /* was null to let the channel do the work, why? */
          _fs, this.isLocking, this.currentEntity);
+      if (perfOn) perflog.debug("  did selectAttributes.");
       
       if (results == null) {
         log.error("could not perform adaptor query: ",
@@ -431,6 +436,7 @@ public class EODatabaseChannel extends NSObject
       if (didOpenChannel) this.releaseChannel();
     }
     
+    if (perfOn) perflog.debug("primarySelectObjectsWithFetchSpecification.");
     return error;
   }
   

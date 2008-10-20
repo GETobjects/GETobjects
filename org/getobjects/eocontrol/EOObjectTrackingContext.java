@@ -38,7 +38,8 @@ import org.getobjects.foundation.UMap;
  * This is a simple object uniquer, it does not track changes.
  */
 public abstract class EOObjectTrackingContext extends EOObjectStore {
-  protected static final Log log = LogFactory.getLog("EOEditingContext");
+  protected static final Log log     = LogFactory.getLog("EOEditingContext");
+  protected static final Log perflog = LogFactory.getLog("EOPerformance");
   
   /* this is the main object registry */
   protected Map<EOGlobalID, Object> gidToObject;
@@ -110,8 +111,19 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
       }
     }
     
+    final boolean debugPerf = perflog.isDebugEnabled();
+    
     EOObjectStore os = this.rootObjectStore();
+    
+    if (debugPerf) perflog.debug("TC: objectsWithFetchSpecification() ...");
+    
     List r = os.objectsWithFetchSpecification(_fs, _ec);
+    
+    if (debugPerf) {
+      perflog.debug("TC: objectsWithFetchSpecification(): " +
+          (r != null ? r.size() : "-"));
+    }
+    
     if (r == null)
       this.lastException = os.consumeLastException();
     
