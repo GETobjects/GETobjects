@@ -546,6 +546,15 @@ public class NSTimeRange extends NSObject
     cal.setTime(_date);
     return getDayRange(cal);
   }
+  public static NSTimeRange getDayRange
+    (final int _year, final int _month, final int _day, final TimeZone _tz)
+  {
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.set(Calendar.YEAR,         _year);
+    cal.set(Calendar.MONTH,        _month);
+    cal.set(Calendar.DAY_OF_MONTH, _day);
+    return getDayRange(cal);
+  }
   
   /**
    * Returns an NSTimeRange which covers a full, 7 day week. The week is
@@ -633,6 +642,14 @@ public class NSTimeRange extends NSObject
     cal.setTime(_date);
     return getMonthRange(cal);
   }
+  public static NSTimeRange getMonthRange
+    (final int _year, final int _month, final TimeZone _tz)
+  {
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.set(Calendar.YEAR,  _year);
+    cal.set(Calendar.MONTH, _month);
+    return getMonthRange(cal);
+  }
   
   /**
    * Returns an NSTimeRange which covers a full year. The year is
@@ -675,6 +692,11 @@ public class NSTimeRange extends NSObject
     if (_date == null) return null;
     Calendar cal = Calendar.getInstance(_tz);
     cal.setTime(_date);
+    return getYearRange(cal);
+  }
+  public static NSTimeRange getYearRange(final int _year, final TimeZone _tz) {
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.set(Calendar.YEAR, _year);
     return getYearRange(cal);
   }
 
