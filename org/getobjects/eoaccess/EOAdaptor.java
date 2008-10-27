@@ -824,25 +824,35 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   
 
   /**
-   * Creates a pattern EOFetchSpecification and evaluates it using a channel.
+   * Creates a pattern EOFetchSpecification (EOCustomQueryExpressionHintKey)
+   * and evaluates it using a channel.
    * <p>
    * Possible arguments:
    * <ul>
-   *   <li>q / qualifier
-   *   <li>sort
-   *   <li>distinct
+   *   <li>q / qualifier (EOQualifier or String, eg "name LIKE 'H*'")
+   *   <li>sort (EOSortOrdering[]/EOSortOrdering/String, eg "name,-date")
+   *   <li>distinct (bool)
+   *   <li>offset
+   *   <li>limit
    * </ul>
    * All remaining keys are evaluated as qualifier bindings.
    * <p>
    * Examples:<pre>
-   *   ad.performSQL("SELECT * FROM accounts WHERE %(where)s",
+   *   ad.performSQL("SELECT * FROM accounts %(where)s",
    *     "q", "name LIKE $query", "query", F("q"));
+   *   
    *   this.results = this.application.db.adaptor().performSQL(
    *     "SELECT DISTINCT function FROM employment" +
    *     " %(where)s ORDER BY function ASC %(limit)s",
    *     "limit", limit, "q", "function LIKE '" + this.F("q").trim() + "*'");
-   * </pre>  
+   * </pre>
+   * For a discussion of the available %(xyz)s patterns, check the
+   * EOSQLExpression class.
+   * <p>
+   * Note: be careful wrt SQL injection! (parameters are good, building query
+   * strings using + is bad!)
    * 
+   * <p>
    * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
    * @param _args   - args and bindings in a varargs array
    * @return null on error, or a List containing the raw fetch results
@@ -861,7 +871,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     final Map<String, Object> args = UMap.createArgs(_args);
     
     if ((o = args.remove("qualifier")) == null)
-      o = args.remove("q");
+      o = args.remove("q"); /// allow 'q' and 'qualifier'
     if (o instanceof String)
       q = EOQualifier.parse((String)o);
     else if (o instanceof EOQualifier)
@@ -869,9 +879,11 @@ public class EOAdaptor extends NSObject implements NSDisposable {
 
     if ((o = args.remove("sort")) != null) {
       if (o instanceof String)
-        sos = EOSortOrdering.parse((String)o);
+        sos = EOSortOrdering.parse((String)o); // eg: name,-date
       else if (o instanceof EOSortOrdering[])
         sos = (EOSortOrdering[])o;
+      else if (o instanceof EOSortOrdering)
+        sos = new EOSortOrdering[] { (EOSortOrdering)o };
     }
 
     if ((o = args.remove("distinct")) != null)
