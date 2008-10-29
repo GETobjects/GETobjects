@@ -678,13 +678,13 @@ public class NSTimeRange extends NSObject
      final TimeZone _tz)
   {
     Calendar cal = Calendar.getInstance(_tz);
+    cal.set(Calendar.YEAR,  _fromYear);
+    cal.set(Calendar.MONTH, _fromMonth);
+    cal.set(Calendar.DAY_OF_MONTH, 1);
     cal.set(Calendar.HOUR_OF_DAY,  0);
     cal.set(Calendar.MINUTE,       0);
     cal.set(Calendar.SECOND,       0);
     cal.set(Calendar.MILLISECOND,  0);
-    
-    cal.set(Calendar.YEAR,  _fromYear);
-    cal.set(Calendar.MONTH, _fromMonth);
     long fromMS = cal.getTimeInMillis();
     
     if (_fromYear != _toYear) cal.set(Calendar.YEAR,  _toYear);
