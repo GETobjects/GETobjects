@@ -69,6 +69,7 @@ class WODateFormatter extends WOFormatter {
   
   protected WOAssociation format;
   protected WOAssociation isLenient;
+  protected WOAssociation locale;
   
   /* optimization for constant formats */
   protected String        fmtString;
@@ -77,18 +78,29 @@ class WODateFormatter extends WOFormatter {
   protected boolean       returnCalendar;
   
   public WODateFormatter
-    (WOAssociation _fmt, WOAssociation _isLenient, final Class _resultClass)
+    (WOAssociation _fmt, WOAssociation _isLenient, WOAssociation _locale, 
+     final Class _resultClass)
   {
     this.format    = _fmt;
     this.isLenient = _isLenient;
+    this.locale    = _locale;
     this.returnCalendar = _resultClass == java.util.Calendar.class;
     
     this.isLenientConst = null;
-    if (_fmt != null) {
+    if (_fmt != null && this.locale == null) {
       if (_fmt.isValueConstant() &&
           (_isLenient == null || _isLenient.isValueConstant()))
       {
-        this.fmtString      = _fmt.stringValueInComponent(null /* cursor */);
+        Object v = _fmt.valueInComponent(null /* cursor */);
+        if (v instanceof SimpleDateFormat)
+          this.fmtString = ((SimpleDateFormat)v).toPattern();
+        else if (v instanceof String)
+          this.fmtString      = (String)v;
+        else if (v != null) {
+          log.warn("using non-string value as date format: " + v);
+          this.fmtString      = v.toString();
+        }
+        
         this.isCustomFormat = isCustomDateFormat(this.fmtString);
         
         if (_isLenient != null)
@@ -176,17 +188,30 @@ class WODateFormatter extends WOFormatter {
         : null;
     }
     
+    /* determine locale */
+    
+    Locale lLocale = null;
+    if (this.locale != null) {
+      Object v = this.locale.valueInComponent(_ctx != null?_ctx.cursor() :null);
+      if (v instanceof Locale)
+        lLocale = (Locale)v;
+      else if (v instanceof String)
+        lLocale = new Locale((String)v);
+      else if (v != null)
+        log.error("unexpected 'locale' object: " + v);
+    }
+    if (lLocale == null)
+      lLocale = _ctx != null ? _ctx.locale() : null;
+
     /* create the java.text.Format object for the given format string */
     
     DateFormat lFormat;
     
-    final Locale locale = _ctx != null ? _ctx.locale() : null;
-
     if (isCustom) {
       /* a custom format String, eg: "E, dd-MMM-yyyy k:m:s 'GMT'" */
       try {
-        lFormat = locale != null
-          ? new SimpleDateFormat(fmt, locale)
+        lFormat = lLocale != null
+          ? new SimpleDateFormat(fmt, lLocale)
           : new SimpleDateFormat(fmt);
       }
       catch (IllegalArgumentException e) {
@@ -205,17 +230,17 @@ class WODateFormatter extends WOFormatter {
       
       if (fmt.startsWith("DATETIME")) {
         lFormat = _ctx != null
-          ? DateFormat.getDateTimeInstance(mode, mode, locale)
+          ? DateFormat.getDateTimeInstance(mode, mode, lLocale)
           : DateFormat.getDateTimeInstance(mode, mode);
       }
       else if (fmt.startsWith("TIME")) {
         lFormat = _ctx != null
-          ? DateFormat.getTimeInstance(mode, locale)
+          ? DateFormat.getTimeInstance(mode, lLocale)
           : DateFormat.getTimeInstance(mode);
       }
       else {
         lFormat = _ctx != null
-          ? DateFormat.getDateInstance(mode, locale)
+          ? DateFormat.getDateInstance(mode, lLocale)
           : DateFormat.getDateInstance(mode);
       }
     }
