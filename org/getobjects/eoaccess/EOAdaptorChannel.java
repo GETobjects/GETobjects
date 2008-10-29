@@ -125,28 +125,33 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * Creates a PreparedStatement from the statement and the bindings of the
    * EOSQLExpression.
    * <p>
-   * @param _s - the EOSQLExpression to execute
+   * @param _sqlexpr - the EOSQLExpression to execute
    * @return the fetch results as a List of Maps
    */
-  public List<Map<String, Object>> evaluateQueryExpression(EOSQLExpression _s) {
+  public List<Map<String, Object>> evaluateQueryExpression
+    (final EOSQLExpression _sqlexpr)
+  {
     this.lastException = null;
     
     // System.err.println("\nEXEC: " + _s.statement());
 
-    if (_s == null) {
-      log.error("performSQL caller gave us no SQL ...");
+    if (_sqlexpr == null) {
+      log.error("evaluateQueryExpression() caller gave us no SQL ...");
       return null;      
     }
     
-    List<Map<String, Object>> binds = _s.bindVariableDictionaries();
+    final List<Map<String, Object>> binds = _sqlexpr.bindVariableDictionaries();
     
     if (binds == null || binds.size() == 0)
-      return this.performSQL(_s.statement());
+      /* expression has no binds, perform a plain SQL query */
+      return this.performSQL(_sqlexpr.statement());
     
-    PreparedStatement stmt = 
-      this._prepareStatementWithBinds(_s.statement(), binds);
+    /* otherwise, create a PreparedStatement */
+    
+    final PreparedStatement stmt = 
+      this._prepareStatementWithBinds(_sqlexpr.statement(), binds);
     if (stmt == null) {
-      log.error("could not create prepared statement for expression: " + _s);
+      log.error("could not create prepared statement for expr: " + _sqlexpr);
       return null;
     }
     
@@ -156,7 +161,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     List<Map<String, Object>> records = null;
     ResultSet rs = null;
     try {
-      if (sqllog.isInfoEnabled()) sqllog.info(_s.statement());
+      if (sqllog.isInfoEnabled()) sqllog.info(_sqlexpr.statement());
       
       rs = stmt.executeQuery();
       
@@ -169,9 +174,6 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       /* Collect meta data, calling meta inside fetches is rather expensive,
        * even though the PG JDBC adaptor also has some cache.
        */
-      // TBD: we should setup a EOFixedResultMap using that information. The
-      //      map would share hashes and attrname arrays.
-      //      TBD: find out how to do the mapping
       final ResultSetMetaData meta = rs.getMetaData();
       final int      columnCount = meta.getColumnCount();
       final String[] colNames  = new String[columnCount];
@@ -186,8 +188,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       /* loop over results and convert them to records */
       records = new ArrayList<Map<String, Object>>(128);
       while (rs.next()) {
-        // TBD: setup an EOFixedResultMap (which is then just filled)
-        EORecordMap record = new EORecordMap(colNames, colHashes);
+        final EORecordMap record = new EORecordMap(colNames, colHashes);
         
         // TODO: somehow add model information
         boolean ok = this.fillRecordMapFromResultSet
@@ -201,6 +202,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
        *   08S01 MySQL network-connect issues during the processing of a query
        *   42601 PG    syntax error
        *   42703 PG    column "number" does not exist
+       *   22023 PG    No value specified for parameter 3 (eg multiple %andQual)
        */
       this.lastException = e;
       
@@ -208,14 +210,14 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         records = null;
         if (log.isInfoEnabled()) {
           log.info("could not execute SQL expression " + e.getSQLState() +
-                   ":\n  " + _s.statement(), e);
+                   ":\n  " + _sqlexpr.statement(), e);
         }
         
         // System.err.println("STATE: " + e.getSQLState());
       }
       else {
         log.warn("could not execute SQL expression " + e.getSQLState() +
-                 ":\n  " + _s.statement(), e);
+                 ":\n  " + _sqlexpr.statement(), e);
       }
     }
     finally {
@@ -236,7 +238,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * @param _s - the formatted SQL expression
    * @return the number of affected records, or -1 if something failed
    */
-  public int evaluateUpdateExpression(EOSQLExpression _s) {
+  public int evaluateUpdateExpression(final EOSQLExpression _s) {
     if (_s == null) {
       log.error("evaluateUpdateExpression caller gave us no expr ...");
       return -1;      
@@ -244,7 +246,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
 
     this.lastException = null;
     
-    String sql = _s.statement();
+    final String sql = _s.statement();
     if (sql == null) {
       log.error("evaluateUpdateExpression param is invalid expr: " + _s);
       return -1;
@@ -252,7 +254,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     /* we always prepare for updates to improve escaping behaviour */
     
-    List<Map<String, Object>> binds = _s.bindVariableDictionaries();
+    final List<Map<String, Object>> binds = _s.bindVariableDictionaries();
 
     if (sqllog.isInfoEnabled()) {
       sqllog.info(sql);
@@ -325,12 +327,12 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   }
   
   protected PreparedStatement _prepareStatementWithBinds
-    (String _sql, List<Map<String, Object>> _binds)
+    (final String _sql, final List<Map<String, Object>> _binds)
   {
     boolean isDebugOn = log.isDebugEnabled();
     if (_sql == null || _sql.length() == 0) return null;
-
-    PreparedStatement stmt = this._createPreparedStatement(_sql);
+    
+    final PreparedStatement stmt = this._createPreparedStatement(_sql);
     if (stmt == null)
       return null;
     if (_binds == null) {
@@ -345,14 +347,18 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       log.debug("prepare binds: " + _binds);
     
     try {
-      /* fill statement with values */
+      /* Fill statement with bindg values */
       for (int i = 0; i < _binds.size(); i++) {
-        Map<String, Object> bind = _binds.get(i);
+        /* a dictionary with such keys:
+         *   BindVariableAttributeKey - the EOAttribute of the value
+         *   BindVariableValueKey     - the actual value
+         */
+        final Map<String, Object> bind = _binds.get(i);
         
-        EOAttribute attribute = 
+        final EOAttribute attribute = 
           (EOAttribute)bind.get(EOSQLExpression.BindVariableAttributeKey);
         
-        Object value = bind.get(EOSQLExpression.BindVariableValueKey);
+        final Object value = bind.get(EOSQLExpression.BindVariableValueKey);
         
         int sqlType = this.sqlTypeForValue(value, attribute);
         
@@ -431,7 +437,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     return stmt;
   }
   
-  protected int sqlTypeForValue(Object _o, EOAttribute _attr) {
+  protected int sqlTypeForValue(final Object _o, final EOAttribute _attr) {
     if (_attr != null) {
       int type = _attr.sqlType();
       if (type != java.sql.Types.NULL)
@@ -481,12 +487,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * 
    * @return null on error (check lastException), or the fetch results
    */
-  public List<Map<String, Object>> performSQL(String _sql) {
-    // TODO: return some kind of indexed SQL (EOGenericRecord??) record which does
-    //       KVC and stores the columns as an array (instead of create a HashMap
-    //       which sounds rather expensive).
-    //       Since all results are uniform, the array-wrapper could reuse all
-    //       the key management information.
+  public List<Map<String, Object>> performSQL(final String _sql) {
     if (_sql == null || _sql.length() == 0) {
       log.error("performSQL caller gave us no SQL ...");
       this.lastException = new Exception("got no SQL to perform!");
@@ -496,7 +497,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     /* acquire DB resources */
     
-    Statement  stmt = this._createStatement();
+    final Statement stmt = this._createStatement();
     if (stmt == null) return null;
     
     /* perform query */

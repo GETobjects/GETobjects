@@ -276,7 +276,7 @@ public abstract class EOAccessDataSource extends EODataSource
    * @return
    */
   @SuppressWarnings("unchecked")
-  public List fetchObjects(String _fetchSpec, Object... _valsAndKeys) {
+  public List fetchObjects(final String _fetchSpec, Object... _valsAndKeys) {
     EOEntity findEntity = this.entity();
     if (findEntity == null) {
       // TBD: improve exception

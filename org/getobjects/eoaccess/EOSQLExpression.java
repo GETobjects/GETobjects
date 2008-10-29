@@ -100,6 +100,12 @@ import org.getobjects.foundation.UList;
  *   andQualifier eg AND lastname LIKE 'Duck%'   (nothing w/o qualifier) 
  *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier)</pre>
  * 
+ * Note: parts which involve bind variables (eg andQualifier) can only be used
+ *       ONCE! This is because the bindings are generated only once, but the
+ *       '?' in the SQL are generated multiple times. Hence the
+ *       PreparedStatement will report that not all '?' bindings are set!
+ *       (TBD: fix me, make generation dynamic)
+ * 
  * 
  * <h4>How it works</h4>
  * <p>
@@ -1514,6 +1520,17 @@ public class EOSQLExpression extends NSObject {
     this.bindVariableDictionaries.add(_dict);
   }
   
+  /**
+   * Returns the list of bindings which got created during SQL construction. A
+   * bind dictionary contains such keys:
+   * <ul>
+   *   <li>BindVariableAttributeKey   - the EOAttribute object
+   *   <li>BindVariablePlaceHolderKey - the placeholder used in the SQL (eg '?')
+   *   <li>BindVariableNameKey        - the name which is bound
+   * </ul>
+   * 
+   * @return a List of bind records.
+   */
   public List<Map<String, Object>> bindVariableDictionaries() {
     return this.bindVariableDictionaries;
   }
