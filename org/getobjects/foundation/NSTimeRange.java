@@ -642,15 +642,59 @@ public class NSTimeRange extends NSObject
     cal.setTime(_date);
     return getMonthRange(cal);
   }
+  
+  /**
+   * Get a range representing a month for the given year in the given timezone.
+   * 
+   * @param _year  - eg 1999
+   * @param _month - the month, 0=Jan ... 11=Dec
+   * @param _tz    - the timezone
+   * @return an NSTimeRange representing the given year/month
+   */
   public static NSTimeRange getMonthRange
     (final int _year, final int _month, final TimeZone _tz)
   {
     Calendar cal = Calendar.getInstance(_tz);
+    cal.setLenient(true);
     cal.set(Calendar.YEAR,  _year);
     cal.set(Calendar.MONTH, _month);
     return getMonthRange(cal);
   }
   
+  
+  /**
+   * Get a month range. Note that the 'to' values are *inclusive*.
+   * 
+   * @param _fromYear  - start year, eg 1999
+   * @param _fromMonth - start month, 0=Jan .. 11=Dec
+   * @param _toYear    - end year, INCLUSIVE (eg 2000)
+   * @param _toMonth   - end month, 0=Jan .. 11=Dec
+   * @param _tz        - timezone
+   * @return an NSTimeRange representing the given year/month range
+   */
+  public static NSTimeRange getMonthRange
+    (final int _fromYear, final int _fromMonth,
+     final int _toYear,   final int _toMonth,
+     final TimeZone _tz)
+  {
+    Calendar cal = Calendar.getInstance(_tz);
+    cal.set(Calendar.HOUR_OF_DAY,  0);
+    cal.set(Calendar.MINUTE,       0);
+    cal.set(Calendar.SECOND,       0);
+    cal.set(Calendar.MILLISECOND,  0);
+    
+    cal.set(Calendar.YEAR,  _fromYear);
+    cal.set(Calendar.MONTH, _fromMonth);
+    long fromMS = cal.getTimeInMillis();
+    
+    if (_fromYear != _toYear) cal.set(Calendar.YEAR,  _toYear);
+    cal.setLenient(true);
+    cal.set(Calendar.MONTH, (_toMonth + 1)); // inclusive
+    long toMS = cal.getTimeInMillis();
+    
+    return new NSTimeRange(fromMS, toMS);
+  }
+
   /**
    * Returns an NSTimeRange which covers a full year. The year is
    * selected by providing an arbitary instant using the _date parameter.
