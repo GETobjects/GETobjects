@@ -30,6 +30,7 @@ import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.foundation.NSHtmlEntityTextCoder;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
+import org.getobjects.foundation.NSTextCoder;
 import org.getobjects.foundation.UObject;
 
 /**
@@ -231,19 +232,20 @@ public class WOString extends WOHTMLDynamicElement {
    * Rewrites \n characters to &lt;br /&gt; tags. Note: the result must not be
    * escaped in subsequent processing.
    * 
-   * @param s        - String to rewrite
-   * @param doEscape - whether the parts need to be escaped
+   * @param _s        - String to rewrite
+   * @param _doEscape - whether the parts need to be escaped
    * @return the rewritten string
    */
-  public String handleInsertBR(String s, boolean doEscape) {
-    if (s == null)
+  public String handleInsertBR(String _s, boolean _doEscape) {
+    if (_s == null)
       return null;
     
     /* Note: we can't use replace() because we need to escape the individual
      *       parts.
      */
-    String[] lines = s.split("[\\n]");
-    StringBuilder sb = new StringBuilder(lines.length * 80 + 16);
+    final NSTextCoder coder = _doEscape?NSHtmlEntityTextCoder.sharedCoder:null;
+    final String[] lines = _s.split("[\\n]");
+    final StringBuilder sb = new StringBuilder(lines.length * 80 + 16);
     boolean isFirst = true;
 
     for (String line: lines) {
@@ -251,11 +253,12 @@ public class WOString extends WOHTMLDynamicElement {
         isFirst = false;
       else
         sb.append("<br />");
-      if (doEscape)
-        line = NSHtmlEntityTextCoder.stringByEscapingHTMLString(line);
-      sb.append(line);
+      if (_doEscape)
+        coder.encodeString(sb, line);
+      else
+        sb.append(line);
     }
-    doEscape = false;
+    _doEscape = false;
     return sb.toString();
   }
   
