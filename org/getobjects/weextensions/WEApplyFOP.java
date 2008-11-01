@@ -32,6 +32,7 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODynamicElement;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.foundation.NSXmlEntityTextCoder;
 import org.getobjects.foundation.UObject;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -334,6 +335,8 @@ public class WEApplyFOP extends WODynamicElement {
     WOResponse foResponse = new WOResponse(_ctx != null ? _ctx.request() :null);
     foResponse.setContentEncoding("utf-8");
     foResponse.setHeaderForKey("text/xml", "Content-Type");
+    foResponse.setTextCoder
+      (NSXmlEntityTextCoder.sharedCoder, NSXmlEntityTextCoder.sharedCoder);
 
     foResponse.appendContentString(
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
