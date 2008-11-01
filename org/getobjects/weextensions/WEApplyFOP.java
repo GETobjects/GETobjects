@@ -122,11 +122,12 @@ public class WEApplyFOP extends WODynamicElement {
   {
     super(_name, _assocs, _template);
     
-    this.data        = grabAssociation(_assocs, "data");
-    this.response    = grabAssociation(_assocs, "response");
-    this.mimeType    = grabAssociation(_assocs, "mimeType");
-    this.disposition = grabAssociation(_assocs, "disposition");
-    this.filename    = grabAssociation(_assocs, "filename");
+    this.data             = grabAssociation(_assocs, "data");
+    this.response         = grabAssociation(_assocs, "response");
+    this.mimeType         = grabAssociation(_assocs, "mimeType");
+    this.disposition      = grabAssociation(_assocs, "disposition");
+    this.filename         = grabAssociation(_assocs, "filename");
+    this.response         = grabAssociation(_assocs, "response");
 
     this.baseURL          = grabAssociation(_assocs, "baseURL");
     this.producer         = grabAssociation(_assocs, "producer");
