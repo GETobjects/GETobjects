@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -31,17 +31,17 @@ import org.getobjects.appserver.core.WOElementWalker;
 import org.getobjects.appserver.core.WOQuerySession;
 import org.getobjects.appserver.core.WORequest;
 
-/*
+/**
  * WEDisplayGroupLink
- * 
+ * <p>
  * Abstract superclass for links which manipulate a display group, eg change
  * the sort ordering or modify the batches.
- * 
- * Bindings:
+ * <p>
+ * Bindings:<pre>
  *   displayGroup    [in] - WODisplayGroup
  *   queryDictionary [in] - Map
  *   icons           [in] - ?
- *   string          [in] - String
+ *   string          [in] - String</pre>
  */
 public abstract class WEDisplayGroupLink extends WEDynamicElement {
 
@@ -67,7 +67,7 @@ public abstract class WEDisplayGroupLink extends WEDynamicElement {
   /* work on the query dictionary */
   
   protected Map<String, Object> queryDictInContext
-    (WODisplayGroup dg, WOContext _ctx)
+    (final WODisplayGroup dg, final WOContext _ctx)
   {
     // TODO: check whether we consolidate this in WOLinkGenerator?!
     WOQuerySession      qs     = _ctx != null ? _ctx.querySession() : null;
@@ -110,7 +110,7 @@ public abstract class WEDisplayGroupLink extends WEDynamicElement {
   /* template walker */
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (this.template != null)
       _walker.processTemplate(this, this.template, _ctx);
   }
@@ -118,7 +118,7 @@ public abstract class WEDisplayGroupLink extends WEDynamicElement {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "dg",  this.displayGroup);

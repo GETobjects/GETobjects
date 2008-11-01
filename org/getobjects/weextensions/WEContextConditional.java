@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -29,6 +29,21 @@ import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 
+/**
+ * WEContextConditional
+ * <p>
+ * Checks whether the current WOContext returns a value for the given
+ * 'objectForKey' key.
+ * <p>
+ * TBD: document
+ * 
+ * <p>
+ * Bindings:
+ * <pre>
+ *   contextKey [in]  - String
+ *   negate     [in]  - boolean
+ *   didMatch   [out] - boolean</pre>
+ */
 public class WEContextConditional extends WEDynamicElement {
   
   protected WOAssociation negate     = null;
@@ -36,8 +51,8 @@ public class WEContextConditional extends WEDynamicElement {
   protected WOAssociation didMatch   = null;
   protected WOElement     template   = null;
 
-  public WEContextConditional(String _name, Map<String, WOAssociation> _assocs,
-                              WOElement _template)
+  public WEContextConditional
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     
@@ -58,7 +73,7 @@ public class WEContextConditional extends WEDynamicElement {
     return null;
   }
   
-  protected boolean doShowInContext(WOContext _ctx) {
+  protected boolean doShowInContext(final WOContext _ctx) {
     boolean doShow = false;
     
     if (this._contextKey() != null)
@@ -84,10 +99,12 @@ public class WEContextConditional extends WEDynamicElement {
     }
     return doShow;
   }
+
   
   /* responder */
 
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  @Override
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (!this.doShowInContext(_ctx) || this.template == null)
       return;
     
@@ -96,14 +113,16 @@ public class WEContextConditional extends WEDynamicElement {
     _ctx.deleteLastElementIDComponent();
   }
   
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  @Override
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     // TODO: implement me for WOComponentActions
     System.err.println
       ("WEContextConditional not implemented for component actions ...");
     return null;
   }
   
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  @Override
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (!this.doShowInContext(_ctx) || this.template == null)
       return;
     
@@ -114,7 +133,8 @@ public class WEContextConditional extends WEDynamicElement {
   
   /* description */
   
-  public void appendAttributesToDescription(StringBuilder _d) {
+  @Override
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "negate",     this.negate);

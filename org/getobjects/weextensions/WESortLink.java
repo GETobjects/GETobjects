@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2006-2008 Helge Hess
+
+  This file is part of Go.
+
+  Go is free software; you can redistribute it and/or modify it under
+  the terms of the GNU Lesser General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with Go; see the file COPYING.  If not, write to the
+  Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 package org.getobjects.weextensions;
 
 import java.util.HashMap;
@@ -13,19 +33,19 @@ import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 
-/*
+/**
  * WESortLink
- * 
+ * <p>
  * TODO: document
+ * <p>
+ * Sample:<pre>
+ *   &lt;wo:WESortLink key="name" displayGroup="displayGroup"/&gt;</pre>
  * 
- * Sample:
- *   <#WESortLink key="name" displayGroup="displayGroup"/>
- * 
- * Renders:
+ * Renders:<pre>
  *   TODO
- *   <a ...><img .../>[content/string]</a>
- * 
- * Bindings:
+ *   &lt;a ...&gt;&lt;img .../&gt;[content/string]&lt;/a&gt;</pre>
+ * <p>
+ * Bindings:<pre>
  *   key             [in]  - String (can start with +/- for default sort dir)
  *   displayGroup    [in]  - WODisplayGroup (will retrieve SOs from that)
  *   sortOrderings   [i/o] - Array of EOSortOrdering's or a List or a single SO
@@ -33,7 +53,7 @@ import org.getobjects.foundation.NSKeyValueStringFormatter;
  *   icons           [in]  - String (prefix [eg sort-]) or Boolean
  *   string          [in]  - String
  *   queryDictionary [in]  - Map
- *   defaultSelector [in]  - String (ASC, DESC) or a EOSortOrdering selector
+ *   defaultSelector [in]  - String (ASC, DESC) or a EOSortOrdering sel</pre>
  */
 public class WESortLink extends WEDisplayGroupLink {
   
@@ -58,14 +78,14 @@ public class WESortLink extends WEDisplayGroupLink {
   
   @SuppressWarnings("unchecked")
   protected Object sortSelectorInContext
-    (WODisplayGroup _dg, String _key, WOContext _ctx)
+    (final WODisplayGroup _dg, final String _key, final WOContext _ctx)
   {
     if (_key == null) {
       this.log().warn("no/empty 'key' binding set in WESortLink?!");
       return null;
     }
     
-    Object cursor = _ctx != null ? _ctx.cursor() : null;
+    final Object cursor = _ctx != null ? _ctx.cursor() : null;
     
     /* first extract active sort orderings */
     
@@ -109,7 +129,7 @@ public class WESortLink extends WEDisplayGroupLink {
   /* response generation */
   
   protected void appendIcon
-    (String _prefix, Object _sel, WOResponse _r, WOContext _ctx)
+    (String _prefix, Object _sel, final WOResponse _r, final WOContext _ctx)
   {
     if (_prefix == null)
       _prefix = "sort-";
@@ -167,7 +187,7 @@ public class WESortLink extends WEDisplayGroupLink {
   }
   
   protected Object nextSortSelector
-    (Object _selector, char _defdir, WOContext _ctx)
+    (final Object _selector, final char _defdir, final WOContext _ctx)
   {
     if (_selector == null) {
       /* not yet sorted */
@@ -249,8 +269,8 @@ public class WESortLink extends WEDisplayGroupLink {
   }
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    Object         cursor  = _ctx != null ? _ctx.cursor() : null;
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    final Object   cursor  = _ctx != null ? _ctx.cursor() : null;
     WODisplayGroup dg      = null;
     String         sortKey = null;
     char           sortDir = '+';
@@ -318,7 +338,7 @@ public class WESortLink extends WEDisplayGroupLink {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "key", this.key);

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -26,8 +26,9 @@ import java.net.URL;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.GoResource;
 
-/* WOFramework
- * 
+/**
+ * WOFramework
+ * <p>
  * This is just used as a reference point by WOPackageLinker.
  */
 public class WOFramework {

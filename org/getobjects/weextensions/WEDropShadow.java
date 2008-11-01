@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2006-2008 Helge Hess
+
+  This file is part of Go.
+
+  Go is free software; you can redistribute it and/or modify it under
+  the terms of the GNU Lesser General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with Go; see the file COPYING.  If not, write to the
+  Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 package org.getobjects.weextensions;
 
 import java.util.HashMap;
@@ -11,19 +31,19 @@ import org.getobjects.appserver.core.WOResourceManager;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 
-/*
+/**
  * WEDropShadow
- * 
- * Icons:
+ * <p>
+ * Icons:<pre>
  *   corner_bl
  *   corner_tr
- *   shadow
- *   
- * Predefined Styles:
+ *   shadow</pre>
+ * <p>
+ * Predefined Styles:<pre>
  *   light
  *   regular
- *   strong
- * 
+ *   strong</pre>
+ * <p>
  * TODO: document
  */
 public class WEDropShadow extends WEDynamicElement {
@@ -44,9 +64,11 @@ public class WEDropShadow extends WEDynamicElement {
     this.position = grabAssociation(_assocs, "position");
     this.template = _template;
   }
+  
+  /* generate response */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     StringBuilder sb = new StringBuilder(512);
     
     /* find resource manager */
@@ -157,17 +179,9 @@ public class WEDropShadow extends WEDynamicElement {
   }
 
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (this.template != null)
       _walker.processTemplate(this, this.template, _ctx);
-  }
-  
-  /* description */
-
-  @Override
-  public void appendAssocToDescription(StringBuilder _d, String _name, WOAssociation _a) {
-    // TODO Auto-generated method stub
-    super.appendAssocToDescription(_d, _name, _a);
   }
 
 }

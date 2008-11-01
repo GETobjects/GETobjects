@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -29,9 +29,9 @@ import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOFetchSpecification;
 
-/*
+/**
  * DisplayGroup
- * 
+ * <p>
  * Small controller object which manages database fetches, especially
  * display ranges.
  */
@@ -39,7 +39,7 @@ public class WEDatabaseDisplayGroup extends WODisplayGroup {
   
   /* construction */
   
-  public WEDatabaseDisplayGroup(EODataSource _ds) {
+  public WEDatabaseDisplayGroup(final EODataSource _ds) {
     super();
     this.dataSource = _ds;
   }

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -30,24 +30,25 @@ import org.getobjects.appserver.core.WOElementWalker;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 
-/*
+/**
  * WEContextKey
- * 
+ * <p>
  * This elements set a a value in the context for the duration of its
  * subtemplate. If values were set previously, they are properly restored
  * at the end.
+ * <p>
+ * Sample:<pre>
+ *   &lt;wo:WEContextKey key="tab" value="first"&gt;
+ *     &lt;wo:str value="$context.tab" /&gt;
+ *   &lt;/wo:WEContextKey&gt;</pre>
  * 
- * Sample:
- *   <#WEContextKey key="tab" value="first">
- *     <#WOString var:value="context.tab" />
- *   </#WEContextKey>
- * 
+ * <p>
  * Renders:
  *   This element doesn't render anything.
- * 
- * Bindings:
+ * <p>
+ * Bindings:<pre>
  *   key   [in] - String
- *   value [in] - Object
+ *   value [in] - Object</pre>
  */
 public class WEContextKey extends WEDynamicElement {
   
@@ -72,7 +73,7 @@ public class WEContextKey extends WEDynamicElement {
   // TODO: oh well, so many code DUPs ;-)
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (this.template == null)
       return;
     
@@ -94,13 +95,13 @@ public class WEContextKey extends WEDynamicElement {
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     if (this.template == null)
       return null;
     
-    String k = (this.key != null) 
+    final String k = (this.key != null) 
       ? this.key.stringValueInComponent(_ctx.cursor()) : null;
-    Object v = (this.value != null)
+    final Object v = (this.value != null)
       ? this.value.valueInComponent(_ctx.cursor()) : null;
     Object t = null;
     
@@ -109,7 +110,7 @@ public class WEContextKey extends WEDynamicElement {
       _ctx.setObjectForKey(v, k);
     }
     
-    Object result = this.template.invokeAction(_rq, _ctx);
+    final Object result = this.template.invokeAction(_rq, _ctx);
 
     if (k != null && v != null) _ctx.removeObjectForKey(k);
     if (k != null && t != null) _ctx.setObjectForKey(t, k); /* restore old */
@@ -118,13 +119,13 @@ public class WEContextKey extends WEDynamicElement {
   }
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (this.template == null)
       return;
     
-    String k = (this.key != null) 
+    final String k = (this.key != null) 
       ? this.key.stringValueInComponent(_ctx.cursor()) : null;
-    Object v = (this.value != null)
+    final  Object v = (this.value != null)
       ? this.value.valueInComponent(_ctx.cursor()) : null;
     Object t = null;
     
@@ -140,13 +141,13 @@ public class WEContextKey extends WEDynamicElement {
   }
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (this.template == null)
       return;
     
-    String k = (this.key != null) 
+    final String k = (this.key != null) 
       ? this.key.stringValueInComponent(_ctx.cursor()) : null;
-    Object v = (this.value != null)
+    final Object v = (this.value != null)
       ? this.value.valueInComponent(_ctx.cursor()) : null;
     Object t = null;
     
@@ -165,7 +166,7 @@ public class WEContextKey extends WEDynamicElement {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     this.appendAssocToDescription(_d, "key",   this.key);

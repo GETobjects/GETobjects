@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -26,9 +26,9 @@ import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WODisplayGroup;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 
-/*
+/**
  * WEBatchPager
- * 
+ * <p>
  * TODO: document
  */
 public class WEBatchPager extends WOComponent {
@@ -77,7 +77,7 @@ public class WEBatchPager extends WOComponent {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
   }
 }

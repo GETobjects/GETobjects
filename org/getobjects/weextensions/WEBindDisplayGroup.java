@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -37,33 +37,33 @@ import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 
-/*
+/**
  * WEBindDisplayGroup
- * 
+ * <p>
  * Generates a JavaScript proxy for a display group.
- * 
- * Note: you need to load the WEDisplayGroup.js resource, eg using:
- *   <#WOJavaScript filename="WEBindDisplayGroup.js" />
- * 
- * Sample (.wod):
+ * <p>
+ * Note: you need to load the WEDisplayGroup.js resource, eg using:<pre>
+ *   &lt;wo:WOJavaScript filename="WEBindDisplayGroup.js" /&gt;</pre>
+ * <p>
+ * Sample (.wod):<pre>
  *   DG: WEBindDisplayGroup {
  *     displayGroup = dg;
  *     dataSource   = ds;
  *     jsProxy      = "dg";
  *     numberOfObjectsPerBatch = 3;
- *   }
- * 
+ *   }</pre>
+ * <p>
  * Renders:
- * 
- * Bindings:
+ * <p>
+ * Bindings:<pre>
  *   displayGroup    [i/o] - WODisplayGroup (default kp: 'displayGroup')
  *   dataSource      [in]  - EODataSource
  *   queryDictionary [in]  - Map
  *   fetchesOnLoad   [in]  - bool (default: true)
  *   jsProxy         [in]  - 
  *   update
- *   numberOfObjectsPerBatch [in] - int 
- * 
+ *   numberOfObjectsPerBatch [in] - int</pre> 
+ * <p>
  * TODO: document
  */
 public class WEBindDisplayGroup extends WEDynamicElement {
@@ -259,7 +259,7 @@ public class WEBindDisplayGroup extends WEDynamicElement {
   }
 
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     return null;
   }
 
@@ -338,7 +338,7 @@ public class WEBindDisplayGroup extends WEDynamicElement {
   
   @SuppressWarnings("unchecked")
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     Object         cursor = _ctx.cursor();
     WODisplayGroup dg     = (WODisplayGroup)
       this.displayGroup.valueInComponent(cursor);

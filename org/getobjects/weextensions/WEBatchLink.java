@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -31,27 +31,27 @@ import org.getobjects.appserver.core.WOResourceManager;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 
-/*
+/**
  * WEBatchLink
- * 
+ * <p>
  * This link objects navigates in the batches of a WODisplayGroup. You can
  * either use a batch-index as the target or one of the first/prev/next/last
  * keys.
- * 
+ * <p>
  * TODO: document
- * 
- * Sample:
- *   <#WEBatchLink var:displayGroup="dg" page="next">
+ * <p>
+ * Sample:<pre>
+ *   &lt;wo:WEBatchLink displayGroup="$dg" page="next"&gt;
  *     [content]
- *   </#WEBatchLink>
- * 
+ *   &lt;/wo:WEBatchLink&gt;</pre>
+ * <p>
  * Renders:
  *   TODO
- * 
- * Bindings:
+ * <p>
+ * Bindings:<pre>
  *   displayGroup [in] - WODisplayGroup
  *   page         [in] - String [first/prev/next/last] or int with batch-idx
- *   TODO
+ *   TODO</pre>
  */
 public class WEBatchLink extends WEDisplayGroupLink {
   
