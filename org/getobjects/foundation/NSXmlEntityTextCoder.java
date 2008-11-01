@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2008 Helge Hess
+
+  This file is part of Go.
+
+  Go is free software; you can redistribute it and/or modify it under
+  the terms of the GNU Lesser General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with Go; see the file COPYING.  If not, write to the
+  Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 package org.getobjects.foundation;
 
 public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
@@ -17,8 +37,8 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
   public Exception encodeString(StringBuilder _out, final String _s) {
     if (_out == null || _s == null) return null;
 
-    char[] chars = _s.toCharArray();
-    int    len   = chars.length;
+    final char[] chars = _s.toCharArray();
+    final int    len   = chars.length;
     if (len == 0)
       return null;
   
@@ -41,7 +61,7 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
     }
   
     // TBD: is this buffer actually more efficient?
-    char[] echars = new char[len + escapeCount];
+    final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -103,8 +123,8 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
     if (_s == null)
       return null;
   
-    char[] chars = _s.toCharArray();
-    int    len   = chars.length;
+    final char[] chars = _s.toCharArray();
+    final int    len   = chars.length;
     if (len == 0)
       return "";
   
@@ -123,7 +143,7 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
     if (escapeCount == 0)
       return _s;
   
-    char[] echars = new char[len + escapeCount];
+    final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {

@@ -483,19 +483,19 @@ public class UString {
   }
 
   /**
-   * @deprecated Use {@link NSHtmlEntityTextCoder#appendEscapedHTMLAttributeValue(StringBuilder,String)} instead
+   * @deprecated Use {@link NSHtmlAttributeEntityTextCoder#appendEscapedHTMLAttributeValue(StringBuilder,String)} instead
    */
   public static void appendEscapedHTMLAttributeValue
     (final StringBuilder _sb, final String _s)
   {
-    NSHtmlEntityTextCoder.appendEscapedHTMLAttributeValue(_sb, _s);
+    NSHtmlAttributeEntityTextCoder.appendEscapedHTMLAttributeValue(_sb, _s);
   }
 
   /**
-   * @deprecated Use {@link NSHtmlEntityTextCoder#stringByEscapingHTMLAttributeValue(String)} instead
+   * @deprecated Use {@link NSHtmlAttributeEntityTextCoder#stringByEscapingHTMLAttributeValue(String)} instead
    */
   public static String stringByEscapingHTMLAttributeValue(final String _s) {
-    return NSHtmlEntityTextCoder.stringByEscapingHTMLAttributeValue(_s);
+    return NSHtmlAttributeEntityTextCoder.stringByEscapingHTMLAttributeValue(_s);
   }
 
   /* lower/upper */
