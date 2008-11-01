@@ -45,8 +45,8 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSException;
+import org.getobjects.foundation.NSHtmlEntityTextCoder;
 import org.getobjects.foundation.NSObject;
-import org.getobjects.foundation.UString;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -74,15 +74,15 @@ public abstract class WOMessage extends NSObject
 
   protected Map<String,List<String>> headers;
   protected Collection<WOCookie>     cookies;
-  protected String httpVersion;
-  protected byte[] contents;
-  protected Map    userInfo;
+  protected String        httpVersion;
+  protected byte[]        contents;
+  protected Map           userInfo;
   protected StringBuilder stringBuffer;
 
-  protected String contentEncoding;
+  protected String        contentEncoding;
 
-  protected OutputStream outputStream;
-  protected Exception    lastException;
+  protected OutputStream  outputStream;
+  protected Exception     lastException;
 
   public WOMessage() {
   }
@@ -557,7 +557,7 @@ public abstract class WOMessage extends NSObject
   public Exception appendContentHTMLString(final String s) {
     if (s == null) return null;
     // TBD: directly pass StringBuffer to stringByEscaping ...
-    return this.appendContentString(UString.stringByEscapingHTMLString(s));
+    return this.appendContentString(NSHtmlEntityTextCoder.stringByEscapingHTMLString(s));
   }
 
   /**
@@ -573,7 +573,7 @@ public abstract class WOMessage extends NSObject
     if (s == null) return null;
     // TBD: directly pass StringBuffer to stringByEscaping ...
     //      (appendEscapedHTMLAttributeValue())
-    s = UString.stringByEscapingHTMLAttributeValue(s);
+    s = NSHtmlEntityTextCoder.stringByEscapingHTMLAttributeValue(s);
     return this.appendContentString(s);
   }
 
@@ -652,7 +652,7 @@ public abstract class WOMessage extends NSObject
         if (v != null) {
           sb.append("=\"");
           // TBD: make escaper append to buffer directly
-          UString.appendEscapedHTMLAttributeValue(sb, v.toString());
+          NSHtmlEntityTextCoder.appendEscapedHTMLAttributeValue(sb, v.toString());
           sb.append('"');
         }
         /* should we add a value if its missing? eg selected="selected"
@@ -787,7 +787,7 @@ public abstract class WOMessage extends NSObject
    * @return the escaped String
    */
   public static String stringByEscapingHTMLString(final String _v) {
-    return UString.stringByEscapingHTMLString(_v);
+    return NSHtmlEntityTextCoder.stringByEscapingHTMLString(_v);
   }
   /**
    * This method escapes the given string for use in HTML tag attribute value.
@@ -797,7 +797,7 @@ public abstract class WOMessage extends NSObject
    * @return the escaped String
    */
   public static String stringByEscapingHTMLAttributeValue(final String _v) {
-    return UString.stringByEscapingHTMLAttributeValue(_v);
+    return NSHtmlEntityTextCoder.stringByEscapingHTMLAttributeValue(_v);
   }
 
   

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.getobjects.foundation.NSKeyValueStringFormatter;
+import org.getobjects.foundation.NSXmlEntityTextCoder;
 import org.getobjects.foundation.UString;
 import org.junit.After;
 import org.junit.Before;
@@ -68,11 +69,11 @@ public class TUString {
   public void testXMLEscaping() {
     assertEquals("text mismatch",
                  "hello &lt;tag&gt;",
-                 UString.stringByEscapingXMLString("hello <tag>"));
+                 NSXmlEntityTextCoder.stringByEscapingXMLString("hello <tag>"));
 
     assertEquals("text mismatch",
                  "a &amp; b",
-                 UString.stringByEscapingXMLString("a & b"));
+                 NSXmlEntityTextCoder.stringByEscapingXMLString("a & b"));
   }
 
   @Test

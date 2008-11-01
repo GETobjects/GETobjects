@@ -28,9 +28,9 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.foundation.NSHtmlEntityTextCoder;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.UObject;
-import org.getobjects.foundation.UString;
 
 /**
  * WOString
@@ -252,7 +252,7 @@ public class WOString extends WOHTMLDynamicElement {
       else
         sb.append("<br />");
       if (doEscape)
-        line = UString.stringByEscapingHTMLString(line);
+        line = NSHtmlEntityTextCoder.stringByEscapingHTMLString(line);
       sb.append(line);
     }
     doEscape = false;
