@@ -45,8 +45,10 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSException;
+import org.getobjects.foundation.NSHtmlAttributeEntityTextCoder;
 import org.getobjects.foundation.NSHtmlEntityTextCoder;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.NSTextCoder;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -80,6 +82,8 @@ public abstract class WOMessage extends NSObject
   protected StringBuilder stringBuffer;
 
   protected String        contentEncoding;
+  protected NSTextCoder   contentCoder;
+  protected NSTextCoder   attributeCoder;
 
   protected OutputStream  outputStream;
   protected Exception     lastException;
@@ -95,11 +99,13 @@ public abstract class WOMessage extends NSObject
   public void init(String _httpVersion, Map<String,List<String>> _headers,
                    byte[] _contents, Map _userInfo)
   {
-    this.httpVersion = _httpVersion;
-    this.headers     = _headers;
-    this.contents    = _contents;
-    this.userInfo    = _userInfo;
+    this.httpVersion     = _httpVersion;
+    this.headers         = _headers;
+    this.contents        = _contents;
+    this.userInfo        = _userInfo;
     this.contentEncoding = WOMessage.defaultEncoding();
+    this.contentCoder    = NSHtmlEntityTextCoder.sharedCoder;
+    this.attributeCoder  = NSHtmlAttributeEntityTextCoder.sharedCoder;
   }
 
   /* destructor */
@@ -134,6 +140,17 @@ public abstract class WOMessage extends NSObject
   }
   public Map userInfo() {
     return this.userInfo;
+  }
+  
+  public NSTextCoder contentCoder() {
+    return this.contentCoder;
+  }
+  public NSTextCoder attributeValueCoder() {
+    return this.attributeCoder;
+  }
+  public void setTextCoder(NSTextCoder _contentCoder, NSTextCoder _valCoder) {
+    this.contentCoder   = _contentCoder;
+    this.attributeCoder = _valCoder;
   }
 
   
@@ -554,10 +571,13 @@ public abstract class WOMessage extends NSObject
    * @param s - the string to be appended
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendContentHTMLString(final String s) {
-    if (s == null) return null;
-    // TBD: directly pass StringBuffer to stringByEscaping ...
-    return this.appendContentString(NSHtmlEntityTextCoder.stringByEscapingHTMLString(s));
+  public Exception appendContentHTMLString(final String _s) {
+    if (_s == null || _s.length() == 0)
+      return null;
+    
+    // TBD: flush at a certain size?
+    if (this.stringBuffer == null) this._ensureStringBuffer();
+    return this.contentCoder.encodeString(this.stringBuffer, _s);
   }
 
   /**
@@ -569,12 +589,13 @@ public abstract class WOMessage extends NSObject
    * @param s - the string to be appended
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendContentHTMLAttributeValue(String s) {
-    if (s == null) return null;
-    // TBD: directly pass StringBuffer to stringByEscaping ...
-    //      (appendEscapedHTMLAttributeValue())
-    s = NSHtmlEntityTextCoder.stringByEscapingHTMLAttributeValue(s);
-    return this.appendContentString(s);
+  public Exception appendContentHTMLAttributeValue(final String _s) {
+    if (_s == null || _s.length() == 0)
+      return null;
+    
+    // TBD: flush at a certain size?
+    if (this.stringBuffer == null) this._ensureStringBuffer();
+    return this.attributeCoder.encodeString(this.stringBuffer, _s);
   }
 
   /**
@@ -652,7 +673,7 @@ public abstract class WOMessage extends NSObject
         if (v != null) {
           sb.append("=\"");
           // TBD: make escaper append to buffer directly
-          NSHtmlEntityTextCoder.appendEscapedHTMLAttributeValue(sb, v.toString());
+          NSHtmlAttributeEntityTextCoder.appendEscapedHTMLAttributeValue(sb, v.toString());
           sb.append('"');
         }
         /* should we add a value if its missing? eg selected="selected"
@@ -773,7 +794,8 @@ public abstract class WOMessage extends NSObject
     return this.appendAttribute(_attrName, String.valueOf(_value));
   }
 
-  /* Escaping */
+  
+  /* Escaping (old static methods, do not use!) */
 
   /**
    * This method escapes the given string for use in HTML content. The method
@@ -797,7 +819,7 @@ public abstract class WOMessage extends NSObject
    * @return the escaped String
    */
   public static String stringByEscapingHTMLAttributeValue(final String _v) {
-    return NSHtmlEntityTextCoder.stringByEscapingHTMLAttributeValue(_v);
+    return NSHtmlAttributeEntityTextCoder.stringByEscapingHTMLAttributeValue(_v);
   }
 
   
