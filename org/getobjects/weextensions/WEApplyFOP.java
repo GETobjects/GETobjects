@@ -22,8 +22,10 @@ package org.getobjects.weextensions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
+import java.util.Date;
 import java.util.Map;
 
+import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.FopFactory;
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
@@ -102,6 +104,17 @@ public class WEApplyFOP extends WODynamicElement {
   protected WOAssociation disposition;
   protected WOAssociation filename;
   protected WOAssociation error;
+
+  /* FOUserAgent info */
+  protected WOAssociation baseURL;
+  protected WOAssociation producer;
+  protected WOAssociation creator;
+  protected WOAssociation author;
+  protected WOAssociation creationDate;
+  protected WOAssociation title;
+  protected WOAssociation keywords;
+  protected WOAssociation targetResolution;
+  
   protected WOElement     template;
 
   public WEApplyFOP
@@ -115,6 +128,15 @@ public class WEApplyFOP extends WODynamicElement {
     this.disposition = grabAssociation(_assocs, "disposition");
     this.filename    = grabAssociation(_assocs, "filename");
 
+    this.baseURL          = grabAssociation(_assocs, "baseURL");
+    this.producer         = grabAssociation(_assocs, "producer");
+    this.creator          = grabAssociation(_assocs, "creator");
+    this.author           = grabAssociation(_assocs, "author");
+    this.creationDate     = grabAssociation(_assocs, "creationDate");
+    this.title            = grabAssociation(_assocs, "title");
+    this.keywords         = grabAssociation(_assocs, "keywords");
+    this.targetResolution = grabAssociation(_assocs, "targetResolution");
+    
     this.template = _template;
   }
   
@@ -142,23 +164,72 @@ public class WEApplyFOP extends WODynamicElement {
     fo = null; /* release memory early, can be quite large! */
     
     
+    /* The iText book says browsers do not deal well with missing
+     * content-lengths, so we can't stream the PDF directly.
+     * Technically it would probably be best to stream to a file and then
+     * deliver that on the socket using sendfile().
+     */
+    ByteArrayOutputStream bas =
+      new ByteArrayOutputStream(defaultOutputCapacity);
+
+
     /* generate PDF */
     
     Exception lError  = null;
     byte[]    result = null;
     
     synchronized (fopFactory) { /* FOP is not thread safe?! */
-      /* The iText book says browsers do not deal well with missing
-       * content-lengths, so we can't stream the PDF directly.
-       * Technically it would probably be best to stream to a file and then
-       * deliver that on the socket using sendfile().
-       */
-      ByteArrayOutputStream bas =
-        new ByteArrayOutputStream(defaultOutputCapacity);
+      
+      /* configure user agent */
+
+      FOUserAgent ua = fopFactory.newFOUserAgent();
+      String v;
+      
+      // TBD: kinda crappy
+      if (this.baseURL != null) {
+        if ((v = this.baseURL.stringValueInComponent(cursor)) != null)
+          ua.setBaseURL(v);
+      }
+      if (this.producer != null) {
+        if ((v = this.producer.stringValueInComponent(cursor)) != null)
+          ua.setProducer(v);
+      }
+      if (this.creator != null) {
+        if ((v = this.creator.stringValueInComponent(cursor)) != null)
+          ua.setCreator(v);
+      }
+      if (this.author != null) {
+        if ((v = this.author.stringValueInComponent(cursor)) != null)
+          ua.setAuthor(v);
+      }
+      if (this.creationDate != null) {
+        Date d = (Date)this.creationDate.valueInComponent(cursor);
+        if (d != null) ua.setCreationDate(d);
+      }
+      if (this.title != null) {
+        if ((v = this.title.stringValueInComponent(cursor)) != null)
+          ua.setTitle(v);
+      }
+      if (this.keywords != null) {
+        if ((v = this.keywords.stringValueInComponent(cursor)) != null)
+          ua.setKeywords(v);
+      }
+      if (this.targetResolution != null) {
+        Object o = this.targetResolution.stringValueInComponent(cursor);
+        if (o instanceof String)
+          o = new Double(Double.parseDouble((String)o));
+        if (o instanceof Number)
+          ua.setTargetResolution(((Number)o).floatValue());
+        else if (o != null)
+          delog.error("unexpected targetResolution value: " + o);
+      }
+
+
+      /* process content using FOP */
       
       try {
         ContentHandler fop =
-          fopFactory.newFop(format, bas).getDefaultHandler();
+          fopFactory.newFop(format, ua, bas).getDefaultHandler();
 
         XMLReader reader = XMLReaderFactory.createXMLReader();
         reader.setContentHandler(fop);
@@ -172,15 +243,15 @@ public class WEApplyFOP extends WODynamicElement {
         if (this.error == null)
           delog.error("FOP exception during rendering: " + this, e);
       }
-      
-      /* extract result array */
-      
-      if (lError == null)
-        result = bas.toByteArray();
-      
-      /* release memory early, can be quite large! */
-      bas = null;
     }
+
+    /* extract result array */
+    
+    if (lError == null)
+      result = bas.toByteArray();
+    
+    /* release memory early, can be quite large! */
+    bas = null;
     
     
     /* handle result */
