@@ -251,12 +251,12 @@ public class KVCWrapper extends Object {
      * by properties, yet. Imagine this as a "last resort".
      */
 
-    Map<String,FieldAccessor> propertyFieldAccessorMap = 
+    final Map<String,FieldAccessor> propertyFieldAccessorMap = 
       new HashMap<String,FieldAccessor>();
-    Field fields[] = this.clazz.getFields();
+    final Field fields[] = this.clazz.getFields();
 
     for (Field field : fields) {
-      int mods = field.getModifiers();
+      final int mods = field.getModifiers();
 
       // Skip static variables and non-public instance variables.
       if ((Modifier.isPublic(mods) == false) || (Modifier.isStatic(mods)))
@@ -278,6 +278,8 @@ public class KVCWrapper extends Object {
       throw new DynamicInvocationException(e);
     }
 
+    // TBD: instead build the table locally, and then apply to an
+    //      atomic reference?!
     this.accessors = new ConcurrentHashMap<String,IPropertyAccessor>(16);
 
     if (logger.isDebugEnabled())
@@ -285,17 +287,17 @@ public class KVCWrapper extends Object {
           + "\"");
 
     for (PropertyDescriptor pd : props) {
-      String name = pd.getName();
+      final String name = pd.getName();
 
       if (logger.isDebugEnabled())
         logger.debug("Recording property \"" + name + "\"");
       
-      Method getter      = pd.getReadMethod();
-      Method setter      = pd.getWriteMethod();
-      FieldAccessor fa   = propertyFieldAccessorMap.get(name);
-      Class         type = pd.getPropertyType();
+      final Method getter      = pd.getReadMethod();
+      final Method setter      = pd.getWriteMethod();
+      final FieldAccessor fa   = propertyFieldAccessorMap.get(name);
+      final Class         type = pd.getPropertyType();
  
-      PropertyAccessor pa =
+      final PropertyAccessor pa =
         PropertyAccessor.getPropertyAccessor(name, type, getter, setter, fa);
       this.accessors.put(name, pa);
     }
