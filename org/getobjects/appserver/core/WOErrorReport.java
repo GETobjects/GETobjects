@@ -85,6 +85,16 @@ public class WOErrorReport extends NSObject {
     }
     return errs;
   }
+  
+  /**
+   * Returns the WOErrorItems which match the given name. Note that
+   * there can be multiple items per name. If you just want the first, use
+   * errorForName().
+   * Eg the 'name' is the name used in markField(). 
+   * 
+   * @param _name - the name of the item (eg 'lastname')
+   * @return the WOErrorItems for the form element with the name, or null
+   */
   public List<WOErrorItem> errorsForName(final String _name) {
     if (this.errors == null || _name == null)
       return null;
@@ -100,6 +110,7 @@ public class WOErrorReport extends NSObject {
     }
     return errs;
   }
+  
   public WOErrorItem errorForElementID(final String _eid) {
     if (this.errors == null || _eid == null)
       return null;
@@ -110,6 +121,16 @@ public class WOErrorReport extends NSObject {
     }
     return null;
   }
+  
+  /**
+   * Returns the first WOErrorItem which matches the given name. Note that
+   * there can be multiple items per name, to retrieve all, you can use
+   * errorsForName().
+   * Eg the 'name' is the name used in markField(). 
+   * 
+   * @param _name - the name of the item (eg 'lastname')
+   * @return the first WOErrorItem for the form element with the name, or null
+   */
   public WOErrorItem errorForName(final String _name) {
     if (this.errors == null || _name == null)
       return null;
@@ -121,6 +142,11 @@ public class WOErrorReport extends NSObject {
     return null;
   }
   
+  /**
+   * Adds the given WOErrorItem to the list of errors.
+   * 
+   * @param _item - the WOErrorItem describing the error
+   */
   public void addErrorItem(final WOErrorItem _item) {
     if (_item == null)
       return;
@@ -131,7 +157,8 @@ public class WOErrorReport extends NSObject {
   }
   
   public void addError
-    (String _eid, String _name, Object _value, Exception _error)
+    (final String _eid,   final String    _name,
+     final Object _value, final Exception _error)
   {
     WOErrorItem item = new WOErrorItem();
     item.elementID = _eid;
@@ -229,6 +256,7 @@ public class WOErrorReport extends NSObject {
       return this.value;
     }
     
+    
     /* description */
     
     @Override
@@ -270,7 +298,7 @@ public class WOErrorReport extends NSObject {
     }
     
     @Override
-    public void takeValueForKey(Object _value, String _key) {
+    public void takeValueForKey(final Object _value, final String _key) {
       // do nothing
     }
     
