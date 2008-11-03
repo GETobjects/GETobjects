@@ -73,7 +73,7 @@ public class EODatabaseChannel extends NSObject
   protected Iterator<Map<String, Object>> records;
   protected Iterator<EOEnterpriseObject> objects;
   
-  public EODatabaseChannel(EODatabase _db) {
+  public EODatabaseChannel(final EODatabase _db) {
     this.database = _db;
   }
   
@@ -1057,7 +1057,20 @@ public class EODatabaseChannel extends NSObject
     for (int i = 0; i < _ops.length; i++) {
       EOEntity           entity = _ops[i].entity();
       EOAdaptorOperation aop = new EOAdaptorOperation(entity);
-      aop.setAdaptorOperator(_ops[i].databaseOperator());
+      
+      int dbop = _ops[i].databaseOperator();
+      if (dbop == 0) {
+        if (_ops[i].object() instanceof EOActiveRecord) {
+          EOActiveRecord eo = (EOActiveRecord)_ops[i].object();
+          if (eo.isNew())
+            dbop = EOAdaptorOperation.AdaptorInsertOperator;
+          else if (eo.hasChanges())
+            dbop = EOAdaptorOperation.AdaptorUpdateOperator;
+        }
+      }
+      if (dbop == 0)
+        log.warn("got no operator in DBOp: " + _ops[i]);
+      aop.setAdaptorOperator(dbop);
       
       if (entity == null) {
         log.warn("entity is missing in database operation: " + _ops[i]);
@@ -1068,7 +1081,7 @@ public class EODatabaseChannel extends NSObject
       switch (_ops[i].databaseOperator()) {
         case EOAdaptorOperation.AdaptorDeleteOperator: {
           // TODO: do we also want to add attrs used for locking?
-          Map<String, Object> snapshot = _ops[i].dbSnapshot();
+          final Map<String, Object> snapshot = _ops[i].dbSnapshot();
           EOQualifier pq = null;
           
           if (entity == null)
@@ -1088,10 +1101,10 @@ public class EODatabaseChannel extends NSObject
         }
         
         case EOAdaptorOperation.AdaptorInsertOperator: {
-          Map<String, Object> values =
+          final Map<String, Object> values =
             NSKeyValueCodingAdditions.Utility.valuesForKeys
               (_ops[i].object(), entity.classPropertyNames());
-          aop.setChangedValues(values);
+          aop.setChangedValues(values); // Note: does not copy the Map!
           
           _ops[i].setNewRow(values);
           

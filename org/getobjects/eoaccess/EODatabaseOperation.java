@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -35,6 +37,7 @@ import org.getobjects.foundation.NSObject;
  * DELETE, INSERT on an EOEnterpriseObject.
  */
 public class EODatabaseOperation extends NSObject {
+  protected static final Log log = LogFactory.getLog("EODatabaseChannel");
   
   protected EOEntity            entity;
   protected Object              eo;
@@ -44,9 +47,14 @@ public class EODatabaseOperation extends NSObject {
   
   protected List<EOAdaptorOperation> adaptorOperations;
 
-  public EODatabaseOperation(Object _eo, EOEntity _entity) {
+  public EODatabaseOperation(final Object _eo, final EOEntity _entity) {
     this.entity = _entity;
     this.eo     = _eo;
+    
+    if (_entity == null && (_eo instanceof EOActiveRecord))
+      this.entity = ((EOActiveRecord)_eo).entity();
+    if (this.entity == null)
+      log.warn("EODatabaseOperation got no entity: " + _eo);
   }
   
   /* accessors */
@@ -59,21 +67,27 @@ public class EODatabaseOperation extends NSObject {
     return this.eo;
   }
 
-  public void setDatabaseOperator(int _op) {
+  /**
+   * Sets the actual type of the operation (INSERT/UPDATE/DELETE). Same like
+   * EOAdaptorOperation.
+   * 
+   * @param _op
+   */
+  public void setDatabaseOperator(final int _op) {
     this.operator = _op;
   }
   public int databaseOperator() {
     return this.operator;
   }
   
-  public void setDBSnapshot(Map<String, Object> _snap) {
+  public void setDBSnapshot(final Map<String, Object> _snap) {
     this.dbSnapshot = _snap;
   }
   public Map<String, Object> dbSnapshot() {
     return this.dbSnapshot;
   }
   
-  public void setNewRow(Map<String, Object> _values) {
+  public void setNewRow(final Map<String, Object> _values) {
     this.newRow = _values;
   }
   public Map<String, Object> newRow() {
@@ -82,7 +96,7 @@ public class EODatabaseOperation extends NSObject {
   
   /* mapped operations */
   
-  public void addAdaptorOperation(EOAdaptorOperation _op) {
+  public void addAdaptorOperation(final EOAdaptorOperation _op) {
     if (_op == null) return;
     
     if (this.adaptorOperations == null)
@@ -97,10 +111,11 @@ public class EODatabaseOperation extends NSObject {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
-    _d.append(" op=" + this.operator);
+    _d.append(" op=");
+    _d.append(this.operator);
     
     if (this.entity != null)
       _d.append(" entity=" + this.entity.name());

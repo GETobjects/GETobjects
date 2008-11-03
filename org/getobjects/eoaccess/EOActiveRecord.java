@@ -52,19 +52,19 @@ public class EOActiveRecord extends EOCustomObject
 
   /* construction */
 
-  public EOActiveRecord(EODatabase _database, EOEntity _entity) {
+  public EOActiveRecord(final EODatabase _database, final EOEntity _entity) {
     this.database = _database;
     this.entity   = _entity;
     this.isNew    = true;
   }
 
-  public EOActiveRecord(EODatabase _database, String _entityName) {
+  public EOActiveRecord(final EODatabase _database, final String _entityName) {
     this(_database,
          _database != null ? _database.entityNamed(_entityName) : null);
   }
 
   public EOActiveRecord(final EOEntity _entity) {
-    this(null, _entity);
+    this(null /* database */, _entity);
   }
 
   public EOActiveRecord(final EODatabase _database) {
@@ -75,7 +75,7 @@ public class EOActiveRecord extends EOCustomObject
     /* This is allowed for custom subclasses which can be found using the
      * model. The use should be restricted to object creation.
      */
-    this(null, (EOEntity)null);
+    this(null /* database */, (EOEntity)null);
   }
 
   /* initialization */
@@ -185,7 +185,7 @@ public class EOActiveRecord extends EOCustomObject
 
     return super.validateForSave();
   }
-
+  
   public Exception save() {
     /* Note: we have no reference to the datasource which is why we can't
      *       just call the matching methods in there. But the datasource knows
@@ -209,6 +209,8 @@ public class EOActiveRecord extends EOCustomObject
 
       op = new EODatabaseOperation(this, this.entity());
       op.setDatabaseOperator(EOAdaptorOperation.AdaptorInsertOperator);
+      // TBD: shouldn't we do?:
+      //        op.setNewRow(this.changesFromSnapshot(this.snapshot));
     }
     else {
       if ((e = this.validateForUpdate()) != null)

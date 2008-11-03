@@ -141,11 +141,11 @@ public class EODatabaseContext extends EOObjectStore {
   /**
    * NOT IMPLEMENTED!
    */
-  public Exception saveChangesInEditingContext(EOEditingContext _ec) {
+  public Exception saveChangesInEditingContext(final EOEditingContext _ec) {
     if (_ec == null || !_ec.hasChanges())
       return null; /* nothing to be done */
     
-    boolean debugOn = log().isDebugEnabled();
+    final boolean debugOn = log().isDebugEnabled();
     this.resetLastException();
     
     if (debugOn) log().debug("save changes in EC: " + _ec);
@@ -156,7 +156,7 @@ public class EODatabaseContext extends EOObjectStore {
     
     /* setup channel to perform changes */
     
-    EODatabaseChannel ch = new EODatabaseChannel(this.db);
+    final EODatabaseChannel ch = new EODatabaseChannel(this.db);
     if (ch == null) { // can never happen anyways ...
       this.lastException = new NSException("could not create db channel");
       log.error("could not create database channel!");

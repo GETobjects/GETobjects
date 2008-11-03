@@ -22,6 +22,7 @@
 package org.getobjects.eoaccess;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -310,6 +311,40 @@ public class EODatabase extends NSObject
     try {
       error = channel.performDatabaseOperations
         (new EODatabaseOperation[] { _op } );
+    }
+    finally {
+      if (channel != null) channel.dispose();
+    }
+    return error;
+  }
+
+  /**
+   * Performs the set of database operations in a single database transaction.
+   * 
+   * @param _ops - a collection of EODatabaseOperation objects
+   * @return an exception if the operations failed, null if all is OK
+   */
+  public Exception performDatabaseOperations
+    (final Collection<EODatabaseOperation> _ops)
+  {
+    if (_ops == null || _ops.size() == 0)
+      return null; /* nothing to do */
+    
+    final EODatabaseChannel channel = new EODatabaseChannel(this);
+    Exception error = null;
+    try {
+      error = channel.begin();
+      
+      if (error == null) {
+        error = channel.performDatabaseOperations(
+            _ops.toArray(new EODatabaseOperation[0]));
+        
+        if (error == null)
+          error = channel.commit();
+        
+        if (error != null) // this also happens if the commit fails
+          channel.rollback(); // yes, ignore follow-up errors
+      }
     }
     finally {
       if (channel != null) channel.dispose();
