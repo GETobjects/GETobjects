@@ -280,6 +280,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
        * PG: 0A000 = "cannot insert into a view" (INSERT on view)
        * PG: 42804 = "column XYZ is of type numeric but expression is of type
        *              character varying"
+       * PG: 23502 = "null value in column "x" violates not-null constraint"
        */
       this.lastException = e;
       
