@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -27,10 +27,20 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WODynamicElement;
 import org.getobjects.appserver.core.WOElement;
 
+/**
+ * WOHTMLDynamicElement
+ * <p>
+ * Superclass for WODynamicElement's which render actual HTML tags. For example
+ * WOTextField is a WOHTMLDynamicElement, but WOConditional is not (its just
+ * flow control which renders nothing).
+ * <p>
+ * Currently this has no additional behaviour, it just annotates the rendering
+ * contract.
+ */
 public abstract class WOHTMLDynamicElement extends WODynamicElement {
 
-  public WOHTMLDynamicElement(String _name, Map<String, WOAssociation> _assocs, 
-                              WOElement _template)
+  public WOHTMLDynamicElement
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
   }

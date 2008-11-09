@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -49,6 +49,11 @@ import org.w3c.dom.NodeList;
  * WOListWalker
  * <p>
  * This is a helper object used by WORepetition to walk over a list.
+ * 
+ * <p>
+ * A special feature is that the 'list' binding can contain DOM nodes, NodeList
+ * and EODataSource's (fetchObjects will get called).
+ * 
  * <p>
  * Bindings:
  * <pre>
@@ -233,6 +238,8 @@ public abstract class WOListWalker extends NSObject {
   /**
    * The primary worker method. It keeps all the bindings in sync prior invoking
    * the operation.
+   * <p>
+   * This method must be overridden by actual worker subclasses.
    * 
    * @param _list - the list to walk
    * @param _op   - the operation to perform on each item
@@ -244,8 +251,26 @@ public abstract class WOListWalker extends NSObject {
   
   /* utility methods for dynamic elements which work on lists */
   
+  /**
+   * This utility method converts the given object into a List.
+   * <p>
+   * This is the sequence:
+   * <ul>
+   *   <li>if the _value is a List, its returned as-is
+   *   <li>if the _value is a Collection, its converted into an ArrayList
+   *   <li>on EODataSource's we call fetchObjects, and return the result
+   *   <li>String[], Object[] and other arrays are converted using Array.asList
+   *   <li>DOM NodeList objects are converted into ArrayLists
+   *   <li>from DOM Node objects we retrieve the child nodes and return those
+   *   <li>Iterator's and Enumeration's are converted to ArrayList's
+   *   <li>all other values are wrapped into a single-value List 
+   * </ul>
+   * 
+   * @param _value - the object, eg an array, a list, a datasource, etc
+   * @return the List
+   */
   @SuppressWarnings("unchecked")
-  public static List listForValue(Object _value) {
+  public static List listForValue(final Object _value) {
     // TODO: maybe we want to move this to Foundation for general use?
     // => is the DOM NodeList an issue or always available?
     if (_value == null)
@@ -301,8 +326,8 @@ public abstract class WOListWalker extends NSObject {
     /* Iterators */
     
     if (_value instanceof Iterator) {
-      List a     = new ArrayList();
-      Iterator i = (Iterator)_value;
+      final List a     = new ArrayList();
+      final Iterator i = (Iterator)_value;
 
       while(i.hasNext())
         a.add(i.next());
@@ -310,8 +335,8 @@ public abstract class WOListWalker extends NSObject {
     }
 
     if (_value instanceof Enumeration) {
-      List a        = new ArrayList();
-      Enumeration e = (Enumeration)_value;
+      final List a        = new ArrayList();
+      final Enumeration e = (Enumeration)_value;
 
       while(e.hasMoreElements())
         a.add(e.nextElement());
@@ -320,9 +345,9 @@ public abstract class WOListWalker extends NSObject {
 
     /* fallback */
     
-    System.err.println
+    log.warn
       ("WODynamicElement: treating a list as a single object: " + _value);
-    List a = new ArrayList(1);
+    final List a = new ArrayList(1);
     a.add(_value);
     return a;
   }

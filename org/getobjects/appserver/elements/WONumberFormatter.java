@@ -37,12 +37,14 @@ import org.getobjects.appserver.core.WOContext;
  * DecimalFormat documentation for the possible patterns. 
  * 
  * <p>
- * Example:
+ * Examples:
  * <pre>
  * Text: WOString {
  *   value        = product.price;
  *   numberformat = "#,##0.00;(#,##0.00)";
- * }</pre>
+ * }
+ * 
+ * &lt;wo:str value="$product.price" numberformat="#,##0.00"/&gt;</pre>
  */
 class WONumberFormatter extends WOFormatter {
   

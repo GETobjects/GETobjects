@@ -51,11 +51,11 @@ import org.getobjects.foundation.UString;
  * bindings starting with a dot (.).
  * <p>
  * Example:<pre>
- * &lt;#div !display='none' style="color: red;"&gt;</pre>
+ * &lt;wo:div !display='none' style="color: red;"&gt;</pre>
  * produces<pre>
  * &lt;div style="color: red; display: none;"&gt;</pre>
  * A very common usecase is dynamically adding classes, eg:<pre>
- * &lt;#li var:.selected="isSelectedPage"&gt;Customers&lt;/#li&gt;</pre>
+ * &lt;wo:li .selected="$isSelectedPage"&gt;Customers&lt;/wo:li&gt;</pre>
  */
 public class WOHTMLElementAttributes extends WODynamicElement {
   protected static final Log log = LogFactory.getLog("WOHTMLElementAttributes");

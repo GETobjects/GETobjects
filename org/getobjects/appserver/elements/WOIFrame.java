@@ -29,7 +29,7 @@ import org.getobjects.appserver.core.WOElement;
 /**
  * WOIFrame
  * <p>
- * Can be used to generate a <frame> tag with a dynamic content URL.
+ * Can be used to generate a &lt;iframe&gt; tag with a dynamic content URL.
  * <p>
  * Sample:<pre>
  *   Frame: WOIFrame {
@@ -38,7 +38,9 @@ import org.getobjects.appserver.core.WOElement;
  *   }</pre>
  * 
  * Renders:<pre>
- *   &lt;iframe src="/App/x/LeftMenu/default"&gt;[sub-template]&lt;/iframe&gt;</pre>
+ *   &lt;iframe src="/App/x/LeftMenu/default"&gt;
+ *     [sub-template]
+ *   &lt;/iframe&gt;</pre>
  *   
  * Bindings:<pre>
  *   name             [in] - string
@@ -57,7 +59,7 @@ public class WOIFrame extends WOFrame {
   }
 
   @Override
-  protected String tagInContext(WOContext _ctx) {
+  protected String tagInContext(final WOContext _ctx) {
     return "iframe";
   }
 }

@@ -77,8 +77,8 @@ public class WOImageButton extends WOInput {
   protected WOLinkGenerator link;
   // TODO: add support for disabledFilename? (SOPE)
   
-  public WOImageButton(String _name, Map<String, WOAssociation> _assocs,
-                       WOElement _template)
+  public WOImageButton
+    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
   {
     super(_name, _assocs, _template);
     

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -23,17 +23,17 @@ package org.getobjects.appserver.elements;
 
 import org.getobjects.appserver.core.WOContext;
 
-/*
+/**
  * WOListWalkerOperation
- * 
+ * <p>
  * This is the operation triggered by the list walker for a given item. When
  * the method is called all the relevant bindings like index are set. This
  * _includes_ 'item'.
- * 
+ * <p>
  * Usually an implementor will just trigger an operation on its template.
  */
 public interface WOListWalkerOperation {
 
-  public void processItem(int _idx, Object _item, WOContext _ctx);
+  public void processItem(int _idx, final Object _item, final WOContext _ctx);
   
 }

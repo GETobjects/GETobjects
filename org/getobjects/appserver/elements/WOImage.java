@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2008 Helge Hess
 
   This file is part of Go.
 
@@ -88,10 +88,11 @@ public class WOImage extends WOHTMLDynamicElement {
       .rsrcLinkGeneratorForAssociations("src", _assocs);
   }
   
+  
   /* generate response */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
@@ -132,7 +133,7 @@ public class WOImage extends WOHTMLDynamicElement {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.link != null) {

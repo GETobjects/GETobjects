@@ -19,7 +19,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.appserver.elements;
 
 import java.text.Format;
@@ -45,14 +44,14 @@ class WOObjectFormatter extends WOFormatter {
   
   protected WOAssociation formatter = null;
   
-  public WOObjectFormatter(WOAssociation _fmt) {
+  public WOObjectFormatter(final WOAssociation _fmt) {
     this.formatter = _fmt;
   }
 
   /* creating Format */
   
   @Override
-  public Format formatInContext(WOContext _ctx) {
+  public Format formatInContext(final WOContext _ctx) {
     if (this.formatter == null)
       return null;
     
@@ -81,7 +80,7 @@ class WOObjectFormatter extends WOFormatter {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.formatter != null)
