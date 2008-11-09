@@ -92,7 +92,7 @@ public class WORepetition extends WODynamicElement {
     /* check whether we should wrap the repetitive content in a container */
     
     if (_assocs.containsKey("elementName")) {
-      WOGenericContainer c = 
+      final WOGenericContainer c = 
         new WOGenericContainer(_name + "_wrap", _assocs, _template);
       c.setExtraAttributes(_assocs);
       _assocs.clear();
@@ -105,11 +105,12 @@ public class WORepetition extends WODynamicElement {
     if (_assocs.size() > 0)
       log.warn("found extra bindings on repetition: " + _assocs);
   }
+
   
-  /* responder */
+  /* handling requests */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (this.template == null || this.walker == null) {
       /* no point in iterating the list if there is no taker ... */
       return;
@@ -119,10 +120,8 @@ public class WORepetition extends WODynamicElement {
         new WOTakeValuesListWalkerOperation(this.template, _rq), _ctx);
   }
   
-  /* handle component actions */
-  
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     // TODO: implement me for WOComponentActions
     log.error("WORepetition not implemented for component actions ...");
     return null;
@@ -132,8 +131,8 @@ public class WORepetition extends WODynamicElement {
   /* generate response */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    WOListWalkerOperation op;
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    final WOListWalkerOperation op;
     
     if (this.separator == null || _ctx.isRenderingDisabled())
       op = new WOAppendListWalkerOperation(this.template, _r);
@@ -149,11 +148,11 @@ public class WORepetition extends WODynamicElement {
   /* walker */
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
     if (this.template == null) /* nothing to walk over */
       return;
     
-    WOListWalkerOperation op =
+    final WOListWalkerOperation op =
       new WOGenericListWalkerOperation(this, this.template, _walker);
     
     this.walker.walkList(op, _ctx);
