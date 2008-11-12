@@ -54,6 +54,7 @@ import org.getobjects.appserver.core.WOResponse;
  *   count      [in]  - int
  *   item       [out] - object
  *   index      [out] - int
+ *   index1     [out] - int (like index, but starts at 1, not 0)
  *   startIndex [in]  - int
  *   identifier [in]  - string (TODO: currently unescaped)
  *   sublist    [in]  - java.util.List | Collection | Java array | DOM Node

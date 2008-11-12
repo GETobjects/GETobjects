@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2006-2008 Helge Hess
+
+  This file is part of Go.
+
+  Go is free software; you can redistribute it and/or modify it under
+  the terms of the GNU Lesser General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with Go; see the file COPYING.  If not, write to the
+  Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 package org.getobjects.appserver.elements;
 
 import java.util.List;
@@ -8,6 +28,32 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODynamicElement;
 import org.getobjects.foundation.UList;
 
+/**
+ * WOComplexListWalker
+ * <p>
+ * Concrete subclass of WOListWalker, which can process all possible bindings.
+ * <p>
+ * Do not instantiate directly, use the WOListWalker.newListWalker() factory
+ * function.
+ * 
+ * <p>
+ * Bindings:
+ * <pre>
+ *   list       [in]  - java.util.List | Collection | Java array | DOM Node
+ *   count      [in]  - int
+ *   item       [out] - object
+ *   index      [out] - int
+ *   index1     [out] - int (like index, but starts at 1, not 0)
+ *   startIndex [in]  - int
+ *   identifier [in]  - string (TODO: currently unescaped)
+ *   sublist    [in]  - java.util.List | Collection | Java array | DOM Node
+ *   isEven     [out] - boolean
+ *   isFirst    [out] - boolean
+ *   isLast     [out] - boolean
+ *   filter     [in]  - EOQualifier/String
+ *   sort       [in]  - EOSortOrdering/EOSortOrdering[]/Comparator/String/bool
+ * </pre>
+ */
 public class WOComplexListWalker extends WOListWalker {
 
   protected WOAssociation list;
@@ -17,13 +63,14 @@ public class WOComplexListWalker extends WOListWalker {
   protected WOAssociation filter;
   protected WOAssociation sort;
   protected WOAssociation index;
+  protected WOAssociation index1;
   protected WOAssociation startIndex;
   protected WOAssociation identifier;
   protected WOAssociation isEven;
   protected WOAssociation isFirst;
   protected WOAssociation isLast;
 
-  protected WOComplexListWalker(Map<String, WOAssociation> _assocs) {
+  protected WOComplexListWalker(final Map<String, WOAssociation> _assocs) {
     super(_assocs);
     
     this.list = WODynamicElement.grabAssociation(_assocs, "list");
@@ -33,6 +80,7 @@ public class WOComplexListWalker extends WOListWalker {
     this.filter     = WODynamicElement.grabAssociation(_assocs, "filter");
     this.sort       = WODynamicElement.grabAssociation(_assocs, "sort");
     this.index      = WODynamicElement.grabAssociation(_assocs, "index");
+    this.index1     = WODynamicElement.grabAssociation(_assocs, "index1");
     this.startIndex = WODynamicElement.grabAssociation(_assocs, "startIndex");
     this.identifier = WODynamicElement.grabAssociation(_assocs, "identifier");
     this.sublist    = WODynamicElement.grabAssociation(_assocs, "sublist");
@@ -56,7 +104,7 @@ public class WOComplexListWalker extends WOListWalker {
    * @param _ctx - the WOContext to perform the operation in
    */
   @Override
-  public void walkList(WOListWalkerOperation _op, WOContext _ctx) {
+  public void walkList(final WOListWalkerOperation _op, final WOContext _ctx) {
     /* determine list */
     
     Object oList = null;
@@ -154,6 +202,8 @@ public class WOComplexListWalker extends WOListWalker {
       
       if (this.index != null)
         this.index.setIntValue(cnt, cursor);
+      if (this.index1 != null)
+        this.index1.setIntValue(cnt + 1, cursor);
       
       lItem = _list != null ? _list.get(cnt) : null;
       
@@ -226,7 +276,8 @@ public class WOComplexListWalker extends WOListWalker {
     // if (this.item == null && this.index == null)
     //  _ctx.popCursor();
 
-    //if (this.index != null) this.index.setUnsignedIntValue(0);
-    //if (this.item  != null) this.item.setValue(null);
+    //if (this.index  != null) this.index.setUnsignedIntValue(0);
+    //if (this.index1 != null) this.index1.setUnsignedIntValue(0);
+    //if (this.item   != null) this.item.setValue(null);
   }
 }

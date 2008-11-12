@@ -18,7 +18,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.appserver.elements;
 
 import java.util.ArrayList;
@@ -61,6 +60,7 @@ import org.w3c.dom.NodeList;
  *   count      [in]  - int
  *   item       [out] - object
  *   index      [out] - int
+ *   index1     [out] - int (like index, but starts at 1, not 0)
  *   startIndex [in]  - int
  *   identifier [in]  - string (TODO: currently unescaped)
  *   sublist    [in]  - java.util.List | Collection | Java array | DOM Node
@@ -75,13 +75,23 @@ public abstract class WOListWalker extends NSObject {
   // TBD: make more powerful in combination with datasources/fetchspecs
   protected static Log log = LogFactory.getLog("WORepetition");
   
+  /**
+   * Creates a new WOListWalker instance for the given associations.
+   * WOListWalker itself is an abstract class, this method returns the
+   * appropriate (optimized) subclass.
+   * 
+   * @param _assocs - the dynamic element bindings
+   * @return a WOListWalker instance
+   */
   public static WOListWalker newListWalker(Map<String, WOAssociation> _assocs) {
     // TBD: improve detection
-    int count = _assocs != null ? _assocs.size() : 0;
+    // TBD: add special subclass for constant lists! (eg plist:list="(1,2,3)")
+    final int count = _assocs != null ? _assocs.size() : 0;
     
     if (count == 0)
       return new WOSimpleListWalker(_assocs);
     
+    // Note: those do not consume the values from the _assocs Map
     WOAssociation list = _assocs.get("list");
     WOAssociation item = _assocs.get("item");
     
@@ -124,9 +134,10 @@ public abstract class WOListWalker extends NSObject {
     /* continue factory */
     
     if (list != null) {
-      if (count == 1)
+      // TBD: check whether the list is constant and use a special subclass
+      if (count == 1) // just the 'list' binding
         return new WOSimpleListWalker(_assocs);
-      if (count == 2 && item != null)
+      if (count == 2 && item != null) // just the 'list' and 'item' binding
         return new WOSimpleListWalker(_assocs);
     }
     else {
@@ -137,7 +148,7 @@ public abstract class WOListWalker extends NSObject {
     return new WOComplexListWalker(_assocs);
   }
   
-  protected WOListWalker(Map<String, WOAssociation> _assocs) {
+  protected WOListWalker(final Map<String, WOAssociation> _assocs) {
     super();
   }
   
@@ -154,15 +165,38 @@ public abstract class WOListWalker extends NSObject {
   public abstract void walkList(WOListWalkerOperation _op, WOContext _ctx);
 
   
+  /**
+   * Filters the given lList depending on the value of the 'filter' binding.
+   * Those values are accepted:
+   * <ul>
+   *   <li>null - return lList as-is
+   *   <li>EOQualifier - use that qualifier to filter the List
+   *   <li>String - parse String using EOQualifier.parse, then filter with
+   *                the result
+   *   <li>List - assumes that the items are EOQualifier's, combines them into
+   *              an EOAndQualifier
+   *   <li>EOQualifier[] - combine the EOQualifier's in an EOAndQualifier
+   * </ul>
+   * Note: the qualifier can contain bindings which refer to the current
+   * component! The qualifier bindings are evaluated against the component
+   * before the qualifier is evaluated.
+   * 
+   * @param _filter - the 'filter' WOAssociation
+   * @param oList   - the original value
+   * @param lList   - the List we work on (can be the same like oList!)
+   * @param _ctx    - the WOContext all this is happening in
+   * @return a possibly filtered List representation
+   */
   @SuppressWarnings("unchecked")
   public List filterInContext
-    (WOAssociation _filter, Object oList, List lList, WOContext _ctx)
+    (WOAssociation _filter, Object oList, List lList, final WOContext _ctx)
   {
-    Object o = _filter.valueInComponent(_ctx.cursor());
+    final Object o = _filter.valueInComponent(_ctx.cursor());
     
     if (o == null)
       return lList;
     
+    /* copy oList, no sideeffects on the original List */
     if (lList == oList) lList = new ArrayList(lList);
     
     EOQualifier q = null;
@@ -200,23 +234,44 @@ public abstract class WOListWalker extends NSObject {
   }
   
   
+  /**
+   * Sorts the given lList depending on the value of the 'sort' binding.
+   * Those values are accepted:
+   * <ul>
+   *   <li>null    - List is returned as is
+   *   <li>Boolean - if True, the List is sorting using the generic
+   *                 Collections.sort() method
+   *   <li>EOSortOrdering   - sort using EOSortOrdering.sort()
+   *   <li>EOSortOrdering[] - sort using EOSortOrdering.sort()
+   *   <li>Comparator - sort the List using that Comparator object
+   *   <li>String - parse String using EOSortOrdering.parse(), then sort
+   * </ul>
+   * 
+   * @param _sort - the 'sort' WOAssociation
+   * @param oList - the original value
+   * @param lList - the List we work on (can be the same like oList!)
+   * @param _ctx  - the WOContext all this is happening in
+   * @return a possibly sorted List representation
+   */
   @SuppressWarnings("unchecked")
   public List sortInContext
-    (WOAssociation _sort, Object oList, List lList, WOContext _ctx)
+    (WOAssociation _sort, final Object oList, List lList, final WOContext _ctx)
   {
-    Object o = _sort.valueInComponent(_ctx.cursor());
+    /* retrieve the 'sort' object (object bound to the sort assoc) */
+    final Object o = _sort.valueInComponent(_ctx.cursor());
     
     if (o == null)
       return lList;
 
     if (o instanceof Boolean) {
       if (((Boolean)o).booleanValue()) {
-        if (lList == oList) lList = new ArrayList(lList);
+        if (lList == oList) lList = new ArrayList(lList); // copy
         Collections.sort(lList, (Comparator)o);
       }
       return lList;
     }
     
+    /* copy oList, no sideeffects on the original List */
     if (lList == oList) lList = new ArrayList(lList);
 
     if (o instanceof EOSortOrdering)
@@ -246,7 +301,7 @@ public abstract class WOListWalker extends NSObject {
    * @param _ctx  - the WOContext to perform the operation in
    */
   public abstract void walkList
-    (List _list, WOListWalkerOperation _op, WOContext _ctx);
+    (List _list, final WOListWalkerOperation _op, final WOContext _ctx);
 
   
   /* utility methods for dynamic elements which work on lists */

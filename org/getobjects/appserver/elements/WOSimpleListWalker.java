@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2006-2008 Helge Hess
+
+  This file is part of Go.
+
+  Go is free software; you can redistribute it and/or modify it under
+  the terms of the GNU Lesser General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  Go is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+  License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with Go; see the file COPYING.  If not, write to the
+  Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+*/
 package org.getobjects.appserver.elements;
 
 import java.util.List;
@@ -7,12 +27,28 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODynamicElement;
 
+/**
+ * WOSimpleListWalker
+ * <p>
+ * Concrete subclass of WOListWalker, which can process just 'list' and 'item'
+ * bindings.
+ * <p>
+ * Do not instantiate directly, use the WOListWalker.newListWalker() factory
+ * function.
+ * 
+ * <p>
+ * Bindings:
+ * <pre>
+ *   list       [in]  - java.util.List | Collection | Java array | DOM Node
+ *   item       [out] - object
+ * </pre>
+ */
 public class WOSimpleListWalker extends WOListWalker {
 
   protected WOAssociation list;
   protected WOAssociation item;
 
-  protected WOSimpleListWalker(Map<String, WOAssociation> _assocs) {
+  protected WOSimpleListWalker(final Map<String, WOAssociation> _assocs) {
     super(_assocs);
     
     this.list = WODynamicElement.grabAssociation(_assocs, "list");
@@ -20,7 +56,7 @@ public class WOSimpleListWalker extends WOListWalker {
   }
 
   @Override
-  public void walkList(WOListWalkerOperation _op, WOContext _ctx) {
+  public void walkList(final WOListWalkerOperation _op, final WOContext _ctx) {
     /* determine list */
     
     Object oList = null;
@@ -59,9 +95,9 @@ public class WOSimpleListWalker extends WOListWalker {
     if (_list == null) /* nothing to render */
       return;
     
-    int aCount = _list.size();
+    final int aCount = _list.size();
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
     
     /* limits */
     
