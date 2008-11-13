@@ -45,6 +45,7 @@ import org.getobjects.eocontrol.EORecordMap;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.UMap;
 
 /**
  * EOAdaptorChannel
@@ -624,14 +625,39 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   }
   
   
-  public boolean insertRow(String _table, Map<String, Object> _record) {
+  /**
+   * Inserts a row in a table.
+   * <p>
+   * Example:<pre>
+   *   ch.insertRow("person", "lastname", "Duck", "firstname", "Donald");</pre>
+   * 
+   * @param _table  - table name, eg 'person'
+   * @param _values - key/value pairs used to form a record
+   * @return true if a record got inserted
+   */
+  @SuppressWarnings("unchecked")
+  public boolean insertRow(String _table, Object... _values) {
+    return this.insertRow(_table, UMap.createArgs(_values));
+  }
+  
+  /**
+   * Inserts a row in a table.
+   * <p>
+   * Example:<pre>
+   *   ch.insertRow("person", record);</pre>
+   * 
+   * @param _table  - table name, eg 'person'
+   * @param _record - values to insert
+   * @return true if a record got inserted
+   */
+  public boolean insertRow(String _table, final Map<String, Object> _record) {
     // Note: this does not support insertion of NULLs
     if (_table == null || _record == null)
       return false;
     
-    String columns[] = _record.keySet().toArray(new String[0]);
-    Object values[]  = new Object[columns.length];
-    int    types[]   = new int[columns.length];
+    final String columns[] = _record.keySet().toArray(new String[0]);
+    final Object values[]  = new Object[columns.length];
+    final int    types[]   = new int[columns.length];
     
     for (int i = 0; i < columns.length; i++) {
       values[i] = _record.get(columns[i]);
@@ -641,7 +667,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   }
   
   public boolean insertRow
-    (String _table, String _cols[], int _types[], Object _vals[])
+    (final String _table, String _cols[], int _types[], Object _vals[])
   {
     if (_table == null || _cols == null)
       return false;
@@ -649,7 +675,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     /* generate SQL */
     
     EOSQLExpression e = this.adaptor.expressionFactory().createExpression(null);
-    StringBuilder sql = new StringBuilder(255);
+    final StringBuilder sql = new StringBuilder(255);
     
     sql.append("INSERT INTO ");
     sql.append(e.sqlStringForSchemaObjectName(_table));
@@ -700,36 +726,80 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     return insertCount == 1;
   }
   
-  
+  /**
+   * Updates one or more rows in a table.
+   * <p>
+   * Example:<pre>
+   *   ch.updateRow("person", "person_id", 10000,
+   *     "lastname", "Duck", "firstname", "Donald");</pre>
+   * 
+   * @param _table    - table name, eg 'person'
+   * @param _colname  - some column name, eg 'person_id'
+   * @param _colvalue - primary key value, eg 10000
+   * @param _values   - key/value pairs used to form a record
+   * @return true if at least one record was updated
+   */
+  @SuppressWarnings("unchecked")
   public boolean updateRow
-    (String _table, String _pkey, Object _value, Map<String, Object> _record)
+    (String _table, String _colname, Object _colvalue, Object... _values)
+  {
+    final Map<String, Object> record = UMap.createArgs(_values);
+    return this.updateRow(_table, _colname, _colvalue, record);
+  }
+  
+  /**
+   * Updates one or more rows in a table.
+   * <p>
+   * Example:<pre>
+   *   ch.updateRow("person", "person_id", 10000, record);</pre>
+   * 
+   * @param _table    - table name, eg 'person'
+   * @param _colname  - some column name, eg 'person_id'
+   * @param _colvalue - primary key value, eg 10000
+   * @param _record   - values to update
+   * @return true if at least one record was updated
+   */
+  public boolean updateRow
+    (final String _table, final String _colname, final Object _colvalue,
+        final Map<String, Object> _record)
   {
     // Note: this does not support insertion of NULLs
     if (_table == null || _record == null)
       return false;
     
-    String columns[] = _record.keySet().toArray(new String[0]);
-    Object values[]  = new Object[columns.length];
-    int    types[]   = new int[columns.length];
+    final String columns[] = _record.keySet().toArray(new String[0]);
+    final Object values[]  = new Object[columns.length];
+    final int    types[]   = new int[columns.length];
     
     for (int i = 0; i < columns.length; i++) {
       values[i] = _record.get(columns[i]);
       types[i]  = this.sqlTypeForValue(values[i], null /* attribute */);
     }
-    return this.updateRow(_table, _pkey, _value, columns, types, values);
+    return this.updateRow(_table, _colname, _colvalue, columns, types, values);
   }
   
+  /**
+   * Updates one or more rows in a table.
+   * 
+   * @param _table - table name, eg 'person'
+   * @param _colname  - some column name, eg 'person_id'
+   * @param _colvalue - primary key value, eg 10000
+   * @param _cols  - columns to update
+   * @param _types - types of the columns
+   * @param _vals  - values of the columns
+   * @return true if at least one record was updated
+   */
   public boolean updateRow
-    (String _table, String _pkey, Object _value, 
-     String _cols[], int _types[], Object _vals[])
+    (final String _table, final String _colname, final Object _colvalue, 
+     final String _cols[], final int _types[], final Object _vals[])
   {
-    if (_table == null || _cols == null || _pkey == null || _value == null)
+    if (_table == null || _cols == null || _colname == null || _colvalue ==null)
       return false;
     
     /* generate SQL */
     
     EOSQLExpression e = this.adaptor.expressionFactory().createExpression(null);
-    StringBuilder sql = new StringBuilder(255);
+    final StringBuilder sql = new StringBuilder(255);
     sql.append("UPDATE ");
     sql.append(e.sqlStringForSchemaObjectName(_table));
     sql.append(" SET ");
@@ -745,7 +815,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     /* where */
     
     sql.append(" WHERE ");
-    sql.append(e.sqlStringForSchemaObjectName(_pkey));
+    sql.append(e.sqlStringForSchemaObjectName(_colname));
     sql.append(" = ?");
     
     /* acquire DB resources */
@@ -763,13 +833,14 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       
       /* WHERE statement parameter */
       this._setStatementParameter(stmt, _vals.length + 1, 
-                                  this.sqlTypeForValue(_value, null), _value);
+                                  this.sqlTypeForValue(_colvalue, null),
+                                  _colvalue);
       
       /* execute */
       updateCount = stmt.executeUpdate();
       if (updateCount > 1) {
         log.warn("update affected more than one record " +
-                      _table + " (" + _pkey + " = " + _value + ")");
+                      _table + " (" + _colname + " = " + _colvalue + ")");
       }
     }
     catch (SQLException ex) {
@@ -1639,6 +1710,99 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       return null;
     
     return values.toArray(new String[values.size()]);
+  }
+  
+  /**
+   * Translates the EOFetchSpecification into a SQL query and evaluates it.
+   * 
+   * @param _fs - the EOFetchSpecification to perform
+   * @return null on error, or a List containing the raw fetch results
+   */
+  public List<Map<String, Object>> performSQL(final EOFetchSpecification _fs) {
+    if (_fs == null)
+      return null;
+    
+    final EOSQLExpression e =
+      this.adaptor.expressionFactory().createExpression(null);
+    e.prepareSelectExpressionWithAttributes(null, _fs.locksObjects(), _fs);
+    
+    return this.evaluateQueryExpression(e);
+  }
+  /**
+   * Creates a pattern EOFetchSpecification (EOCustomQueryExpressionHintKey)
+   * and evaluates it using a channel.
+   * <p>
+   * Possible arguments:
+   * <ul>
+   *   <li>q / qualifier (EOQualifier or String, eg "name LIKE 'H*'")
+   *   <li>sort (EOSortOrdering[]/EOSortOrdering/String, eg "name,-date")
+   *   <li>distinct (bool)
+   *   <li>offset
+   *   <li>limit
+   * </ul>
+   * All remaining keys are evaluated as qualifier bindings.
+   * <p>
+   * Examples:<pre>
+   *   ad.performSQL("SELECT * FROM accounts %(where)s",
+   *     "q", "name LIKE $query", "query", F("q"));
+   *   
+   *   this.results = this.application.db.adaptor().performSQL(
+   *     "SELECT DISTINCT function FROM employment" +
+   *     " %(where)s ORDER BY function ASC %(limit)s",
+   *     "limit", limit, "q", "function LIKE '" + this.F("q").trim() + "*'");
+   * </pre>
+   * For a discussion of the available %(xyz)s patterns, check the
+   * EOSQLExpression class.
+   * <p>
+   * Note: be careful wrt SQL injection! (parameters are good, building query
+   * strings using + is bad!)
+   * 
+   * <p>
+   * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
+   * @param _args   - args and bindings in a varargs array
+   * @return null on error, or a List containing the raw fetch results
+   */
+  public List<Map<String, Object>> performSQL
+    (final String _sqlpat, final Object... _args)
+  {
+    return performSQL(EOAdaptor.buildVarArgsFetchSpec(_sqlpat, _args));
+  }
+  
+  /**
+   * Convenience method which fetches exactly one record. Example:<pre>
+   *   Map record = channel.fetchRecord("persons", "company_id", 10000);</pre>
+   * 
+   * @param _table - name of table, eg 'persons'
+   * @param _field - column to check, usually the primary key (eg 'id')
+   * @param _value - value of the column
+   * @return the record as a Map, or null if the record was not found
+   */
+  public Map<String, Object> fetchRecord
+    (final String _table, final String _field, final Object _value)
+  {
+    /* generate SQL */
+
+    final String sql = 
+      this.adaptor.generateSQLToFetchRecord(_table, _field, _value);
+    if (sql == null) return null;
+
+    /* run query */
+
+    final List<Map<String, Object>> records = this.performSQL(sql);
+    if (records == null)
+      return null;
+
+    if (records.size() == 0) {
+      log.debug("found no matching record in table " + _table + ": " +
+                     _field + " = " + _value);
+      return null;
+    }
+    if (records.size() > 1) {
+      log.warn("found multiple matches for fetchRecord, table " +
+                     _table + ": " + _field + " = " + _value);
+    }
+
+    return records.get(0);
   }
   
   

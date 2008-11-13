@@ -857,9 +857,39 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * @param _args   - args and bindings in a varargs array
    * @return null on error, or a List containing the raw fetch results
    */
-  @SuppressWarnings("unchecked")
   public List<Map<String, Object>> performSQL
     (final String _sqlpat, final Object... _args)
+  {
+    return performSQL(buildVarArgsFetchSpec(_sqlpat, _args));
+  }
+  
+  /**
+   * Creates a pattern EOFetchSpecification (EOCustomQueryExpressionHintKey).
+   * <p>
+   * Possible arguments:
+   * <ul>
+   *   <li>q / qualifier (EOQualifier or String, eg "name LIKE 'H*'")
+   *   <li>sort (EOSortOrdering[]/EOSortOrdering/String, eg "name,-date")
+   *   <li>distinct (bool)
+   *   <li>offset
+   *   <li>limit
+   * </ul>
+   * All remaining keys are evaluated as qualifier bindings.
+   * </pre>
+   * For a discussion of the available %(xyz)s patterns, check the
+   * EOSQLExpression class.
+   * <p>
+   * Note: be careful wrt SQL injection! (parameters are good, building query
+   * strings using + is bad!)
+   * 
+   * <p>
+   * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
+   * @param _args   - args and bindings in a varargs array
+   * @return the new EOFetchSpecification
+   */
+  @SuppressWarnings("unchecked")
+  public static EOFetchSpecification buildVarArgsFetchSpec
+    (final String _sqlpat, final Object[] _args)
   {
     EOQualifier      q   = null;
     EOSortOrdering[] sos = null;
@@ -907,8 +937,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     if (limit  != null) fs.setFetchLimit(limit.intValue());
     if (_sqlpat != null)
       fs.setHint(EOSQLExpression.EOCustomQueryExpressionHintKey, _sqlpat);
-    
-    return performSQL(fs);
+    return fs;
   }
   
   /**
@@ -958,6 +987,41 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   public Map<String, Object> fetchRecord
     (final String _table, final String _field, final Object _value)
   {
+    /* generate SQL */
+
+    final String sql = this.generateSQLToFetchRecord(_table, _field, _value);
+    if (sql == null) return null;
+
+    /* run query */
+
+    final List<Map<String, Object>> records = this.performSQL(sql);
+    if (records == null)
+      return null;
+
+    if (records.size() == 0) {
+      log.debug("found no matching record in table " + _table + ": " +
+                     _field + " = " + _value);
+      return null;
+    }
+    if (records.size() > 1) {
+      log.warn("found multiple matches for fetchRecord, table " +
+                     _table + ": " + _field + " = " + _value);
+    }
+
+    return records.get(0);
+  }
+  /**
+   * Generates SQL to fetch a single record, example:<pre>
+   *   SELECT * FROM persons WHERE id = 10</pre>
+   * 
+   * @param _table - name of table, eg 'persons'
+   * @param _field - column to check, usually the primary key (eg 'id')
+   * @param _value - value of the column
+   * @return the record as a Map, or null if the record was not found
+   */
+  public String generateSQLToFetchRecord
+    (final String _table, final String _field, final Object _value)
+  {
     if (_table.length() < 1 || _field.length() < 1)
       return null;
     if (_value == null)
@@ -975,24 +1039,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     sql.append(" = ");
     sql.append(e.formatValueForAttribute(_value, null /* attribute */));
     sql.append(" LIMIT 2"); /* 2 so that we can detect multiple records */
-
-    /* run query */
-
-    final List<Map<String, Object>> records = this.performSQL(sql.toString());
-    if (records == null)
-      return null;
-
-    if (records.size() == 0) {
-      log.debug("found no matching record in table " + _table + ": " +
-                     _field + " = " + _value);
-      return null;
-    }
-    if (records.size() > 1) {
-      log.warn("found multiple matches for fetchRecord, table " +
-                     _table + ": " + _field + " = " + _value);
-    }
-
-    return records.get(0);
+    return sql.toString();
   }
 
   public boolean insertRow(final String _table, Map<String, Object> _record) {
