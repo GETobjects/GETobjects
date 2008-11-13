@@ -160,7 +160,7 @@ public class WOErrorReport extends NSObject {
     (final String _eid,   final String    _name,
      final Object _value, final Exception _error)
   {
-    WOErrorItem item = new WOErrorItem();
+    final WOErrorItem item = new WOErrorItem();
     item.elementID = _eid;
     item.name      = _name;
     item.value     = _value;
@@ -169,11 +169,11 @@ public class WOErrorReport extends NSObject {
   }
 
   public void addError(final String _name, final Object _value) {
-    this.addError(null, _name, _value, null);
+    this.addError(null /* eid */, _name, _value, null /* exception */);
   }
   
   public void addError(final String _name, final Object _value, String _error) {
-    this.addError(null, _name, _value, new NSException(_error));
+    this.addError(null /* eid */, _name, _value, new NSException(_error));
   }
   
   /**
