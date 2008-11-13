@@ -586,7 +586,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * during the operation.
    * 
    * @param _sql - the SQL, usually and UPDATE, INSERT or DELETE
-   * @return number of affected rows
+   * @return number of affected rows, or a negative number on errors
    */
   public int performUpdateSQL(String _sql) {
     if (_sql == null || _sql.length() == 0) {
@@ -598,7 +598,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     /* acquire DB resources */
     
-    Statement  stmt = this._createStatement();
+    final Statement stmt = this._createStatement();
     if (stmt == null) return -1;
     
     /* perform query */
