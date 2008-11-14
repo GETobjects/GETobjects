@@ -712,8 +712,13 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         this._setStatementParameter(stmt, i + 1, _types[i], _vals[i]);
       
       /* execute */
-      // TODO: support autoincrement columns
+      
+      if (sqllog.isInfoEnabled()) sqllog.info(sql.toString());
       insertCount = stmt.executeUpdate();
+
+      // TODO: support autoincrement columns? Eg we could add a method to
+      //       fetch the last generated value in some EOAdaptor independend
+      //       way
     }
     catch (SQLException ex) {
       log.error("could not perform INSERT: " + sql.toString(), ex);
@@ -837,6 +842,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
                                   _colvalue);
       
       /* execute */
+      if (sqllog.isInfoEnabled()) sqllog.info(sql.toString());
       updateCount = stmt.executeUpdate();
       if (updateCount > 1) {
         log.warn("update affected more than one record " +
@@ -855,7 +861,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   }
 
   
-  public Integer nextNumberInSequence(String _sequence) {
+  public Integer nextNumberInSequence(final String _sequence) {
     log.warn("this EOAdaptor does not implement sequence fetches ...");
     return null;
   }
@@ -898,7 +904,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * because it returns the count of affected objects (eg how many rows got
    * deleted or updated).
    */
-  public int performAdaptorOperationN(EOAdaptorOperation _op) {
+  public int performAdaptorOperationN(final EOAdaptorOperation _op) {
     // TBD: we might want to move evaluation to this method and make
     // updateValuesInRows..() etc create EOAdaptorOperation's. This might
     // easen the creation of non-SQL adaptors.
@@ -952,11 +958,11 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * @param _op - the operation object
    * @return an Exception object on error, otherwise null
    */
-  public Exception performAdaptorOperation(EOAdaptorOperation _op) {
+  public Exception performAdaptorOperation(final EOAdaptorOperation _op) {
     if (_op == null) /* got nothing, should we raise? */
       return null;
     
-    int affectedRows = this.performAdaptorOperationN(_op);
+    final int affectedRows = this.performAdaptorOperationN(_op);
     if (affectedRows == 1)
       return null; /* everything OK */
 
@@ -977,7 +983,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * @param _ops - the array of EOAdaptorOperation's to be performed
    * @return an Exception of the first operation which failed, null otherwise
    */
-  public Exception performAdaptorOperations(EOAdaptorOperation[] _ops) {
+  public Exception performAdaptorOperations(final EOAdaptorOperation[] _ops) {
     if (_ops == null) /* got nothing, should we raise? */
       return null;
     
@@ -995,7 +1001,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     //      OR)
     
     for (EOAdaptorOperation op: _ops) {
-      Exception e = this.performAdaptorOperation(op);
+      final Exception e = this.performAdaptorOperation(op);
       if (e != null) return e;
     }
     
@@ -1045,13 +1051,13 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       return -1;
     }
     
-    EOSQLExpression expr = this.adaptor.expressionFactory()
+    final EOSQLExpression expr = this.adaptor.expressionFactory()
       .updateStatementForRow(_values, _qualifier, _entity);
     return this.evaluateUpdateExpression(expr);
   }
   
   public int deleteRowsDescribedByQualifier(EOQualifier _q, EOEntity _entity) {
-    EOSQLExpression expr = this.adaptor.expressionFactory()
+    final EOSQLExpression expr = this.adaptor.expressionFactory()
       .deleteStatementWithQualifier(_q, _entity);
     return this.evaluateUpdateExpression(expr);
   }
@@ -1128,13 +1134,13 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     /* build SQL */
     
-    EOSQLExpression expr = this.adaptor.expressionFactory()
+    final EOSQLExpression expr = this.adaptor.expressionFactory()
       .selectExpressionForAttributes(_attrs, _lock, _fs, _e);
     
     
     /* perform fetch */
     
-    List<Map<String, Object>> rows = this.evaluateQueryExpression(expr);
+    final List<Map<String, Object>> rows = this.evaluateQueryExpression(expr);
     
     if (_fs != null && _fs.fetchesRawRows()) // TBD: no mapping for raw rows?!
       return rows;
@@ -1149,7 +1155,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     //System.err.println("ATTRS: " + Arrays.asList(_attrs));
     
-    EOAttribute[] attributesToMap =
+    final EOAttribute[] attributesToMap =
       this.attributesWhichRequireRowNameMapping(_attrs);
     
     if (attributesToMap != null) {
@@ -1157,7 +1163,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
        * between all the resulting records.
        * Kinda hackish, but hey! ;-)
        */
-      EORecordMap row = (EORecordMap)rows.get(0);
+      final EORecordMap row = (EORecordMap)rows.get(0);
       
       for (EOAttribute a: attributesToMap)
         row.switchKey(a.columnName(), a.name());
@@ -1190,12 +1196,12 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         : new EOAndQualifier(new EOQualifier[] { _qualifier, q });
     }
     
-    EOFetchSpecification fspec =
+    final EOFetchSpecification fspec =
       new EOFetchSpecification(_entity != null ? _entity.name() : null,
                                q,
                                null /* sort orderings */);
     
-    List<Map<String, Object>> results =
+    final List<Map<String, Object>> results =
       this.selectAttributes(_attrs, fspec, true /* do lock */, _entity);
     
     if (results == null) /* SQL error */
@@ -1226,10 +1232,10 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         continue;
       }
       
-      String attrname = _s[i].name();
+      final String attrname = _s[i].name();
       if (attrname == null) continue; /* attrs w/o a name don't need mapping */
       
-      String colname  = _s[i].columnName();
+      final String colname  = _s[i].columnName();
       if (colname == attrname || colname == null) continue; /* fast check */
       if (colname.equals(attrname)) continue;
       
@@ -1256,7 +1262,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       return null;
     
     try {
-      Statement stmt = this.connection.createStatement();
+      final Statement stmt = this.connection.createStatement();
       return stmt;
     }
     catch (SQLException e) {
@@ -1278,7 +1284,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       return null;
     
     try {
-      PreparedStatement stmt = this.connection.prepareStatement(_sql);
+      final PreparedStatement stmt = this.connection.prepareStatement(_sql);
       return stmt;
     }
     catch (SQLException e) {
