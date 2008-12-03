@@ -98,7 +98,9 @@ import org.getobjects.foundation.UList;
  * <pre>
  *   where        eg WHERE lastname LIKE 'Duck%'
  *   andQualifier eg AND lastname LIKE 'Duck%'   (nothing w/o qualifier) 
- *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier)</pre>
+ *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier)
+ *   orderby      eg ORDER BY mod_date DESC (nothing w/o orderings)
+ *   andOrderBy   eg , mod_date DESC (nothing w/o orderings)</pre>
  * 
  * Note: parts which involve bind variables (eg andQualifier) can only be used
  *       ONCE! This is because the bindings are generated only once, but the
@@ -596,6 +598,27 @@ public class EOSQLExpression extends NSObject {
     _map.put(_key, _value == null ? "" : _value);
   }
 
+  /**
+   * Example:<pre>
+   *   SELECT COUNT(*) FROM %(tables)s WHERE %(where)s %(limit)s</pre>
+   *   
+   * Keys:<pre>
+   *   select       eg SELECT or SELECT DISTINCT
+   *   columns      eg BASE.lastname, BASE.firstname
+   *   tables       eg BASE.customer
+   *   basetable    eg customer
+   *   qualifier    eg lastname LIKE 'Duck%'
+   *   orderings    eg lastname ASC, firstname DESC
+   *   limit        eg OFFSET 0 LIMIT 1
+   *   lock         eg FOR UPDATE
+   *   joins</pre>
+   * Compound:<pre>
+   *   where        eg WHERE lastname LIKE 'Duck%'
+   *   andQualifier eg AND lastname LIKE 'Duck%'   (nothing w/o qualifier) 
+   *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier)
+   *   orderby      eg ORDER BY mod_date DESC (nothing w/o orderings)
+   *   andOrderBy   eg , mod_date DESC (nothing w/o orderings)</pre>
+   */
   public String assembleCustomSelectStatementWithAttributes
     (final EOAttribute[] _attrs, boolean _lock, final EOQualifier _qualifier,
      final EOSortOrdering[] _fetchOrder,
@@ -605,26 +628,6 @@ public class EOSQLExpression extends NSObject {
      String _limit,
      String _lockClause)
   {
-    /*
-     * Example:
-     *   SELECT COUNT(*) FROM %(tables)s WHERE %(where)s %(limit)s
-     *   
-     * Keys:
-     *   select       eg SELECT or SELECT DISTINCT
-     *   columns      eg BASE.lastname, BASE.firstname
-     *   tables       eg BASE.customer
-     *   basetable    eg customer
-     *   qualifier    eg lastname LIKE 'Duck%'
-     *   orderings    eg lastname ASC, firstname DESC
-     *   limit        eg OFFSET 0 LIMIT 1
-     *   lock         eg FOR UPDATE
-     *   joins
-     * Compound:
-     *   where        eg WHERE lastname LIKE 'Duck%'
-     *   andQualifier eg AND lastname LIKE 'Duck%'   (nothing w/o qualifier) 
-     *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier)
-     *   orderby      eg ORDER BY mod_date DESC (nothing w/o orderings) 
-     */
     if (_sqlPattern == null || _sqlPattern.length() == 0)
       return null;
     
@@ -683,10 +686,14 @@ public class EOSQLExpression extends NSObject {
       bindings.put("orQualifier",  "");
     }
     
-    if (_orderBy != null)
+    if (_orderBy != null) {
       bindings.put("orderby",   " ORDER BY " + _orderBy);
-    else
+      bindings.put("andOrderBy", ", " + _orderBy);
+    }
+    else {
       bindings.put("orderby", "");
+      bindings.put("andOrderBy", "");
+    }
     
     /* some base entity information */
     
