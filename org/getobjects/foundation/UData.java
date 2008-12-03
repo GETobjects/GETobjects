@@ -58,12 +58,12 @@ public class UData extends NSObject {
    * @param _in - an InputStream to read the content from
    * @return a byte[] array containing the stream contents or null on error
    */
-  public static byte[] loadContentFromStream(InputStream _in) {
+  public static byte[] loadContentFromStream(final InputStream _in) {
     if (_in == null) return null;
     
     // TBD: is this necessary? Probably not, we already copy with a bufer
-    BufferedInputStream in;
-    in = (_in instanceof BufferedInputStream)
+    final BufferedInputStream in =
+     (_in instanceof BufferedInputStream)
       ? (BufferedInputStream)_in
       : new BufferedInputStream(_in);
     
@@ -116,7 +116,7 @@ public class UData extends NSObject {
    * @param _o - an InputStream/File/URL/path to read the content from
    * @return a byte[] array containing the stream contents or null on error
    */
-  public static byte[] loadContentFromSource(Object _o) {
+  public static byte[] loadContentFromSource(final Object _o) {
     if (_o == null)
       return null;
     
@@ -183,7 +183,7 @@ public class UData extends NSObject {
   }
 
   public static Exception writeToFile
-    (byte[] _data, File _file, boolean _atomically)
+    (final byte[] _data, final File _file, final boolean _atomically)
   {
     if (_file == null)
       return new NSException("got no File to write data to ...");
@@ -273,7 +273,7 @@ public class UData extends NSObject {
   }
   
   public static Exception writeToFile
-    (byte[] _data, String _path, boolean _atomically)
+    (final byte[] _data, final String _path, final boolean _atomically)
   {
     if (_data == null)
       return new NSException("got no data to write ...");
@@ -293,10 +293,10 @@ public class UData extends NSObject {
    * @param _p - a byte array
    * @return a String containing the MD5 hash, or null on error
    */
-  public static String md5HashForData(byte[] _p) {
+  public static String md5HashForData(final byte[] _p) {
     if (_p == null) return null;
 
-    String pwdhash = UString.hexStringFromData(md5DataHashForData(_p));
+    final String pwdhash = UString.hexStringFromData(md5DataHashForData(_p));
     if (pwdhash == null || pwdhash.length() == 0) {
       log.error("could not compute the MD5 hash of a given byte array.");
       return null;
@@ -311,14 +311,14 @@ public class UData extends NSObject {
    * @param _p - a byte array
    * @return the MD5 hash, or null on error
    */
-  public static byte[] md5DataHashForData(byte[] _p) {
+  public static byte[] md5DataHashForData(final byte[] _p) {
     if (_p == null) return null;
     
     try {
       // TODO: cache digest in thread local variable?
-      MessageDigest md5 = MessageDigest.getInstance("MD5");
+      final MessageDigest md5 = MessageDigest.getInstance("MD5");
       md5.update(_p);
-      byte[] res = md5.digest();
+      final byte[] res = md5.digest();
       md5.reset(); // TBD: superflous?
       return res;
     }
@@ -446,7 +446,7 @@ public class UData extends NSObject {
     if (_algo == null)
       _algo = "AES";
     
-    SecretKey key = new SecretKeySpec(_key, _algo);
+    final SecretKey key = new SecretKeySpec(_key, _algo);
     
     /* encrypt */
     
@@ -500,7 +500,7 @@ public class UData extends NSObject {
     if (_algo == null)
       _algo = "AES";
     
-    SecretKey key = new SecretKeySpec(_key, _algo);
+    final SecretKey key = new SecretKeySpec(_key, _algo);
     
     /* encrypt */
     
