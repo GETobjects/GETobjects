@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2008 Helge Hess
 
   This file is part of Go.
 
@@ -50,7 +50,7 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
   }
   
   public static EOKeyGlobalID globalIDWithEntityName
-    (String _entityName, Object[] _values)
+    (final String _entityName, final Object[] _values)
   {
     int len = _values != null ? _values.length : 0;
     
@@ -66,10 +66,12 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
     }
   }
   public static EOKeyGlobalID globalIDWithEntityName
-    (String _entityName, Number _id)
+    (final String _entityName, final Number _id)
   {
-    return globalIDWithEntityName(_entityName,
-        _id != null ? new Object[] { _id } : null);
+    if (_id == null) return null;
+    return (_id instanceof Integer)
+      ? new EOIntSingleKeyGlobalID(_entityName, _id)
+      : new EOObjectSingleKeyGlobalID(_entityName, _id);
   }
   
   /* accessors */
@@ -98,7 +100,7 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
     if (this.values == null || this.values.length != 1)
       return null;
     
-    Object v = this.values[0];
+    final Object v = this.values[0];
     if (v instanceof Number)
       return (Number)v;
     
@@ -121,14 +123,14 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
    * accesses the fields of the other key.
    */
   @Override
-  public boolean equals(Object _other) {
+  public boolean equals(final Object _other) {
     if (this == _other) /* its me */
       return true;
     
     if (!(_other instanceof EOKeyGlobalID))
       return false;
     
-    EOKeyGlobalID otherKey = (EOKeyGlobalID)_other;
+    final EOKeyGlobalID otherKey = (EOKeyGlobalID)_other;
     if (otherKey.hashCode != this.hashCode)
       return false;
     if (this.entityName != otherKey.entityName) /* the name is interned */
@@ -144,8 +146,8 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
     /* we shamefully reuse the variable for iteration */
     len--;
     for (; len >= 0; len--) {
-      Object v = this.values[len];
-      Object ov = otherKey.values[len];
+      final Object v = this.values[len];
+      final Object ov = otherKey.values[len];
       
       if (v == ov) /* best case, identical values */
         continue;
@@ -164,7 +166,7 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     _d.append(' ');
@@ -191,8 +193,12 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
      *       Hm. Profiling ;-)
      */
     
-    EOObjectSingleKeyGlobalID(String _entityName, Object[] _values) {
+    EOObjectSingleKeyGlobalID(final String _entityName, final Object[] _values){
       super(_entityName, _values);
+    }
+    EOObjectSingleKeyGlobalID(final String _entityName, final Object _value) {
+      // TBD: optimize, avoid array creation
+      super(_entityName, _value != null ? new Object[] { _value } : null);
     }
     
     @Override
@@ -205,7 +211,7 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
      * accesses the fields of the other key.
      */
     @Override
-    public boolean equals(Object _other) {
+    public boolean equals(final Object _other) {
       if (this == _other) /* its me */
         return true;
       
@@ -220,8 +226,8 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
       
       /* compare one value */
       
-      Object v  = this.values[0];
-      Object ov = otherKey.values[0];
+      final Object v  = this.values[0];
+      final Object ov = otherKey.values[0];
         
       if (v == ov) /* best case, identical values */
         return true;
@@ -237,9 +243,14 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
     
     private int value;
     
-    EOIntSingleKeyGlobalID(String _entityName, Object[] _values) {
+    EOIntSingleKeyGlobalID(final String _entityName, final Object[] _values) {
       super(_entityName, _values);
       this.value = (Integer)_values[0];
+    }
+    EOIntSingleKeyGlobalID(final String _entityName, final Number _value) {
+      // TBD: optimize, avoid array creation
+      super(_entityName, _value != null ? new Object[] { _value } : null);
+      this.value = _value.intValue();
     }
     
     @Override
@@ -252,14 +263,14 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
      * accesses the fields of the other key.
      */
     @Override
-    public boolean equals(Object _other) {
+    public boolean equals(final Object _other) {
       if (this == _other) /* its me */
         return true;
       
       if (!(_other instanceof EOIntSingleKeyGlobalID))
         return false;
       
-      EOIntSingleKeyGlobalID otherKey = (EOIntSingleKeyGlobalID)_other;
+      final EOIntSingleKeyGlobalID otherKey = (EOIntSingleKeyGlobalID)_other;
       if (otherKey.value != this.value)
         return false;
       if (this.entityName != otherKey.entityName) /* the name is interned */
@@ -271,7 +282,7 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
   
   private static class EOArrayKeyGlobalID extends EOKeyGlobalID {
     
-    EOArrayKeyGlobalID(String _entityName, Object[] _values) {
+    EOArrayKeyGlobalID(final String _entityName, final Object[] _values) {
       super(_entityName, _values);
     }
     
