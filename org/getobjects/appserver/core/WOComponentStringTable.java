@@ -34,8 +34,8 @@ import org.getobjects.foundation.NSObject;
  * <p>
  * Examples:<pre>
  *   Ok: WOString { value = labels.ok; }
- *   &lt;wo:get value="$labels.ok" /&gt;
- *   &lt;wo:get label:value="ok" /&gt;</pre>
+ *   &lt;wo:str value="$labels.ok" /&gt;
+ *   &lt;wo:str label:value="ok" /&gt;</pre>
  */
 public class WOComponentStringTable extends NSObject {
   
@@ -43,7 +43,7 @@ public class WOComponentStringTable extends NSObject {
   protected Class          componentClass = null;
   protected ResourceBundle stringTable    = null;
   
-  public WOComponentStringTable(WOComponent _component) {
+  public WOComponentStringTable(final WOComponent _component) {
     this.component      = _component;
     this.componentClass = this.component.getClass();
   }
