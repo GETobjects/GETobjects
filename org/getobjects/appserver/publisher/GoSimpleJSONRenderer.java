@@ -110,7 +110,7 @@ public class GoSimpleJSONRenderer extends NSObject
     
     WOResponse r = _ctx.response();
     r.setContentEncoding("utf8");
-    r.setHeaderForKey("application/json; utf-8", "content-type");
+    r.setHeaderForKey("application/json; charset=utf-8", "content-type");
     r.enableStreaming();
     r.appendContentString(json.toString());
     return null;
