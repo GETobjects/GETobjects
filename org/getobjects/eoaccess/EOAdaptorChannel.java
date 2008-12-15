@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -400,8 +401,14 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
               else if (value instanceof Long)
                 stmt.setLong(i + 1, (Long)value);
               else if (value instanceof java.util.Date) {
+                // TBD: shouldn't we use setDate with a proper Calendar?
                 stmt.setTimestamp(i + 1,
                   new java.sql.Timestamp(((Date)value).getTime()));
+              }
+              else if (value instanceof java.util.Calendar) {
+                // TBD: shouldn't we use setDate with a proper Calendar?
+                final Date vd = ((Calendar)value).getTime();
+                stmt.setTimestamp(i + 1, new java.sql.Timestamp(vd.getTime()));
               }
               else if (value instanceof java.sql.Date) {
                 /* Note: this is just the DATE component, no TIME */
