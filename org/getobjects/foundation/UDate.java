@@ -153,7 +153,15 @@ public class UDate extends NSObject {
     if (_object == null) return 0;
     
     if (_object instanceof Date) {
-      final Calendar tcal = Calendar.getInstance(_tz, _loc);
+      final Calendar tcal;
+      
+      if (_tz != null && _loc != null)
+        tcal = Calendar.getInstance(_tz, _loc);
+      else if (_tz != null)
+        tcal = Calendar.getInstance(_tz);
+      else
+        tcal = Calendar.getInstance();
+      
       tcal.setTime((Date)_object);
       _object = tcal;
     }
