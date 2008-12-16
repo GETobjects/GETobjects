@@ -149,6 +149,33 @@ public class UDate extends NSObject {
     return _calendar;
   }
   
+  public static int quarterOfYear(Object _object, TimeZone _tz, Locale _loc) {
+    if (_object == null) return 0;
+    
+    if (_object instanceof Date) {
+      final Calendar tcal = Calendar.getInstance(_tz, _loc);
+      tcal.setTime((Date)_object);
+      _object = tcal;
+    }
+
+    if (!(_object instanceof Calendar)) {
+      log.warn("quarterOfYear got unexpected object: " + _object);
+      return -1; /* unexpected object */
+    }
+    
+    final Calendar cal = (Calendar)_object;
+    int month = cal.get(Calendar.MONTH); // Jan=0 ... Dec=11
+    if (month >= 0 && month < 3)  return 1;
+    if (month >= 3 && month < 6)  return 2;
+    if (month >= 6 && month < 9)  return 3;
+    if (month >= 9 && month < 12) return 4;
+    log.warn("quarterOfYear got unexpected month: " + month);
+    return -2;
+  }
+  public static int quarterOfYear(Object _object) {
+    return quarterOfYear(_object, null, null);
+  }  
+  
   /* adding */
   
   /**
