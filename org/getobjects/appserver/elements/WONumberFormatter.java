@@ -41,7 +41,7 @@ import org.getobjects.appserver.core.WOContext;
  * <pre>
  * Text: WOString {
  *   value        = product.price;
- *   numberformat = "#,##0.00;(#,##0.00)";
+ *   numberformat = "#,##0.00 ; (#,##0.00)"; // you need the ';' spaces
  * }
  * 
  * &lt;wo:str value="$product.price" numberformat="#,##0.00"/&gt;</pre>
