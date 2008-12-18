@@ -277,7 +277,7 @@ public abstract class EOAccessDataSource extends EODataSource
    */
   @SuppressWarnings("unchecked")
   public List fetchObjects(final String _fetchSpec, Object... _valsAndKeys) {
-    EOEntity findEntity = this.entity();
+    final EOEntity findEntity = this.entity();
     if (findEntity == null) {
       // TBD: improve exception
       log.error("did not find entity, cannot construct fetchspec");
@@ -294,7 +294,7 @@ public abstract class EOAccessDataSource extends EODataSource
       return null;
     }
     
-    Map<String, Object> binds = UMap.createArgs(_valsAndKeys);
+    final Map<String, Object> binds = UMap.createArgs(_valsAndKeys);
     if (binds != null && binds.size() > 0)
       fs = fs.fetchSpecificationWithQualifierBindings(binds);
     
