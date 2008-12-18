@@ -135,12 +135,22 @@ public class NSTimeRange extends NSObject
   
   /* operations */
   
+  /**
+   * Be careful with using this. For higher-level units (years, months, weeks),
+   * you probably want to use the Calendar!
+   * <p>
+   * But its fine for hours and such, which do not leap.
+   */
   public NSTimeRange nextTimeRange() {
-    // Note: be careful, you probably want to use the Calendar to do such
-    //       calculations!
     return new NSTimeRange
       (this.toTime, this.toTime + (this.toTime - this.fromTime));
   }
+  /**
+   * Be careful with using this. For higher-level units (years, months, weeks),
+   * you probably want to use the Calendar!
+   * <p>
+   * But its fine for hours and such, which do not leap.
+   */
   public NSTimeRange previousTimeRange() {
     // Note: be careful, you probably want to use the Calendar to do such
     //       calculations!
