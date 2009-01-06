@@ -423,20 +423,20 @@
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Extras (PDF generation and charts) -->
-      <zipfileset src="${libs}/iText-2.0.7.jar">
+      <zipfileset src="${libs}/iText-2.1.3.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/jfreechart-1.0.9.jar">
+      <zipfileset src="${libs}/jfreechart-1.0.12.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/jcommon-1.0.12.jar">
+      <zipfileset src="${libs}/jcommon-1.0.15.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Jetty -->
-      <zipfileset src="${libs}/jetty-6.1.11.jar">
+      <zipfileset src="${libs}/jetty-6.1.14.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/jetty-util-6.1.11.jar">
+      <zipfileset src="${libs}/jetty-util-6.1.14.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Database adaptors
