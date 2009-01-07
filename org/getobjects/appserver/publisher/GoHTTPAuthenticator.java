@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2008 Helge Hess <helge.hess@opengroupware.org>
+ * Copyright (C) 2007-2009 Helge Hess <helge.hess@opengroupware.org>
  * 
  * This file is part of Go.
  * 
@@ -100,7 +100,7 @@ public class GoHTTPAuthenticator extends NSObject
     
     /* check session for a cached user */
     
-    WOContext wctx = (WOContext)_context;
+    final WOContext wctx = (WOContext)_context;
     if (wctx.hasSession()) {
       IGoUser user = this.extractUserFromSession(wctx.session());
       if (user != null) {
@@ -116,7 +116,7 @@ public class GoHTTPAuthenticator extends NSObject
     
     /* extract credentials */
     
-    String[] creds = this.parseCredentialsInContext((WOContext)_context);
+    final String[] creds = this.parseCredentialsInContext((WOContext)_context);
     if (creds == null || creds.length == 0) {
       /* Note: We do not distinguish between anonymous and failed logins. The
        *       application needs *some* user object.
@@ -156,7 +156,7 @@ public class GoHTTPAuthenticator extends NSObject
     if (lRealm == null)
       lRealm = defaultRealm;
     
-    String cacheKey = _creds[0] + "\n" + _creds[1] + "\n" + lRealm;
+    final String cacheKey = _creds[0] + "\n" + _creds[1] + "\n" + lRealm;
 
     LoginContext lc = null;
     if ((lc = this.basicAuthContextCache.get(cacheKey)) == null) {
@@ -258,10 +258,10 @@ public class GoHTTPAuthenticator extends NSObject
    * @param _ctx - the context to fetch credentials from
    * @return a String[] array containing the HTTP credentials, or null on error 
    */
-  public String[] parseCredentialsInContext(WOContext _ctx) {
+  public String[] parseCredentialsInContext(final WOContext _ctx) {
     if (_ctx == null) return null;
     
-    WORequest rq = _ctx.request();
+    final WORequest rq = _ctx.request();
     if (rq == null) {
       log.warn("context has no associated request: " + _ctx);
       return null;
@@ -269,10 +269,10 @@ public class GoHTTPAuthenticator extends NSObject
     
     /* extract and parse HTTP authentication header */
     
-    String auth = rq.headerForKey("authorization");
+    final String auth = rq.headerForKey("authorization");
     if (auth == null) return null;
     
-    String[] creds = parseHTTPCredentials(auth);
+    final String[] creds = parseHTTPCredentials(auth);
     if (creds == null || creds.length < 1) return null;
     
     return creds;
@@ -348,12 +348,12 @@ public class GoHTTPAuthenticator extends NSObject
   /**
    * This method returns the realm which should be requested in the HTTP 401
    * response.
-   * 
+   * <p>
    * Note: This is assumed to return a valid HTTP realm. That is, no quotes
    *       or linefeeds inside.
    */
   public String realmForSecurityExceptionInContext
-    (GoSecurityException _authRequest, WOContext _ctx)
+    (final GoSecurityException _authRequest, final WOContext _ctx)
   {
     return this.realm;
   }
@@ -391,7 +391,7 @@ public class GoHTTPAuthenticator extends NSObject
    * @return null if the rendering went fine, an exception otherwise
    */
   public static Exception render401InContext
-    (Object _object, String _realm, WOContext _ctx)
+    (final Object _object, final String _realm, final WOContext _ctx)
   {
     if (!(_object instanceof GoAuthRequiredException)) {
       log.error("got passed unsupported object for rendering: " + _object);
@@ -400,12 +400,12 @@ public class GoHTTPAuthenticator extends NSObject
     
     GoAuthRequiredException authRequest = (GoAuthRequiredException)_object;
     
-    StringBuilder authenticate = new StringBuilder(128);
+    final StringBuilder authenticate = new StringBuilder(128);
     authenticate.append("basic realm=\"");
     authenticate.append(_realm);
     authenticate.append("\"");
     
-    WOResponse r = _ctx.response();
+    final WOResponse r = _ctx.response();
     r.setStatus(WOMessage.HTTP_STATUS_UNAUTHORIZED);
     r.setHeaderForKey(authenticate.toString(), "www-authenticate");
     r.appendContentHTMLString(authRequest.getMessage());
@@ -448,7 +448,7 @@ public class GoHTTPAuthenticator extends NSObject
   
   /* anonymous user */
   
-  public IGoUser anonymousUserInContext(IGoContext _context) {
+  public IGoUser anonymousUserInContext(final IGoContext _context) {
     return new GoUser(this, null /* anonymous login */, GoUser.anonymousRoles);
   }
 

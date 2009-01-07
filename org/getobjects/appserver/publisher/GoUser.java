@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -37,6 +37,9 @@ import org.getobjects.foundation.UString;
  * GoUser
  * <p>
  * A simple default implementation of the IGoUser interface.
+ * <p>
+ * This implementation can wrap a JAAS LoginContext or directly set the
+ * provided roles.
  */
 public class GoUser extends NSObject implements IGoUser {
   public static final String[] anonymousRoles = { GoRole.Anonymous };
@@ -44,8 +47,8 @@ public class GoUser extends NSObject implements IGoUser {
   
   protected IGoAuthenticator authenticator;
   final protected String     name;
-  protected String[]     roles;
-  protected LoginContext loginContext;
+  protected String[]         roles;
+  protected LoginContext     loginContext;
   
   public GoUser
     (final IGoAuthenticator _auth, final String _login, final String[] _roles,
@@ -75,18 +78,18 @@ public class GoUser extends NSObject implements IGoUser {
         rolesInAuthenticatedSubject(_lc != null ? _lc.getSubject():null), _lc);
   }
   
-  public static String[] rolesInAuthenticatedSubject(Subject _subject) {
+  public static String[] rolesInAuthenticatedSubject(final Subject _subject) {
     if (_subject == null)
       return authRoles;
     
-    Set<Group> groups = _subject.getPrincipals(Group.class);
+    final Set<Group> groups = _subject.getPrincipals(Group.class);
     if (groups == null || groups.size() == 0)
       return authRoles;
     
-    List<String> lRoles = new ArrayList<String>(groups.size());
+    final List<String> lRoles = new ArrayList<String>(groups.size());
     
     for (Principal principal: groups) {
-      String n = principal.getName();
+      final String n = principal.getName();
       if (n == null || n.length() == 0) continue;
       if (lRoles.contains(n)) continue;
       lRoles.add(n);

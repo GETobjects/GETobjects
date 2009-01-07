@@ -954,12 +954,14 @@ public class WOContext extends WOCoreContext
    * Returns the user record which was determined by the Go publishing
    * process. If no user is set yet, this will attempt to lookup an
    * authenticator and use that to derive the user from the request.
+   * 
+   * @return the active user
    */
   public IGoUser activeUser() {
     if (this.activeUser != null)
       return this.activeUser;
 
-    IGoAuthenticator authenticator =
+    final IGoAuthenticator authenticator =
       this.lookupAuthenticatorByTraversingLookupPath();
     if (authenticator == null) {
       log.warn("found no authenticator to determine active user");
@@ -982,13 +984,13 @@ public class WOContext extends WOCoreContext
    * @return an IGoAuthenticator or null if none could be located.
    */
   protected IGoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
-    GoTraversalPath joPath = this.goTraversalPath();
+    final GoTraversalPath joPath = this.goTraversalPath();
     if (joPath == null) {
       log.warn("no traversalpath is set: " + this);
       return null;
     }
 
-    Object[] path = joPath.objectTraversalPath();
+    final Object[] path = joPath.objectTraversalPath();
     if (path == null || path.length == 0) {
       log.warn("traversalpath is empty: " + this);
       return null;
@@ -996,7 +998,7 @@ public class WOContext extends WOCoreContext
 
     for (int i = path.length - 1; i >= 0; i--) {
       if (path[i] instanceof IGoAuthenticatorContainer) {
-        IGoAuthenticator authenticator =
+        final IGoAuthenticator authenticator =
           ((IGoAuthenticatorContainer)path[i]).authenticatorInContext(this);
 
         if (authenticator != null) return authenticator;
@@ -1004,7 +1006,7 @@ public class WOContext extends WOCoreContext
     }
 
     if (this.application instanceof IGoAuthenticatorContainer) {
-      IGoAuthenticator authenticator =
+      final IGoAuthenticator authenticator =
         ((IGoAuthenticatorContainer)this.application)
           .authenticatorInContext(this);
 
@@ -1045,13 +1047,13 @@ public class WOContext extends WOCoreContext
       _d.append(this.elementID);
     }
 
-    WOComponent p = this.page();
+    final WOComponent p = this.page();
     if (p != null) _d.append(" page=" + p.name());
-    WOComponent c = this.component();
+    final WOComponent c = this.component();
     if (c != null && c != p) _d.append(" comp=" + c.name());
 
     if (this.goTraversalPath != null) {
-      String[] pns = this.goTraversalPath.path();
+      final String[] pns = this.goTraversalPath.path();
       if (pns != null && pns.length > 0) {
         _d.append(" path=");
         for (int i = 0; i < pns.length; i++) {
