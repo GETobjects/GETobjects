@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -50,7 +50,9 @@ import org.getobjects.ofs.fs.OFSHostFileManager;
 /**
  * OFSApplication
  * <p>
- * An OFS application is a Go application which runs on top of a directory.
+ * An OFS application is a Go application which runs on top of a file system
+ * directory.
+ * <p>
  * This adds an OFSRestorationFactory to the application object and overrides
  * the rootObjectInContext() method to return the root of the OFS hierarchy.
  */
@@ -175,7 +177,7 @@ public class OFSApplication extends WOApplication
    * @return the Object where the GoLookup process will start
    */
   @Override
-  public Object rootObjectInContext(WOContext _ctx, String[] _path) {
+  public Object rootObjectInContext(WOContext _ctx, final String[] _path) {
     if (_path != null && _path.length > 0) {
       if (_path[0].startsWith("-")) {
         /* application code namespace */
@@ -201,7 +203,7 @@ public class OFSApplication extends WOApplication
     
     /* directly pass on to document hierarchy */
     
-    Object root = this.ofsRootObjectInContext(_ctx, _path);
+    final Object root = this.ofsRootObjectInContext(_ctx, _path);
     if (root == null) {
       log.error("got no OFS root object, using application as root" +
         "\n  path: " + UString.componentsJoinedByString(_path, " / ") +
@@ -209,7 +211,7 @@ public class OFSApplication extends WOApplication
       return this;
     }
     
-    Object docroot = this.documentRootObjectInContext(root, _ctx);
+    final Object docroot = this.documentRootObjectInContext(root, _ctx);
     if (docroot == null) {
       log.error("got no OFS docroot object, using OFS root" +
           "\n  path: " + UString.componentsJoinedByString(_path, " / ") +
@@ -293,7 +295,7 @@ public class OFSApplication extends WOApplication
     
     /* lookup fileinfo in filemanager */
     
-    IOFSFileInfo fileInfo = fm.fileInfoForPath(null /* root */);
+    final IOFSFileInfo fileInfo = fm.fileInfoForPath(null /* root */);
     if (fileInfo == null) {
       log().error("got no info for root directory: " + rootPath);
       return null;
@@ -308,7 +310,7 @@ public class OFSApplication extends WOApplication
   
   /* authentication */
   
-  public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
+  public IGoAuthenticator authenticatorInContext(final IGoContext _ctx) {
     /* sets up the GoHTTPAuthenticator with the default JAAS config */
     return new GoHTTPAuthenticator();
   }
@@ -317,9 +319,9 @@ public class OFSApplication extends WOApplication
   /* default methods */
   
   @Override
-  public IGoCallable lookupDefaultMethod(Object _object, WOContext _ctx) {
+  public IGoCallable lookupDefaultMethod(Object _object, final WOContext _ctx) {
     if (_object instanceof OFSFolder) {
-      Object folderIndex = IGoSecuredObject.Utility.lookupName
+      final Object folderIndex = IGoSecuredObject.Utility.lookupName
         (_object, "index", _ctx, false /* do not acquire */);
       
       if (folderIndex instanceof IGoCallable) {
@@ -348,7 +350,7 @@ public class OFSApplication extends WOApplication
   /* rendering */
   
   @Override
-  public Object rendererForObjectInContext(Object _o, WOContext _ctx) {
+  public Object rendererForObjectInContext(Object _o, final WOContext _ctx) {
     if (_o instanceof WOComponent) {
       Object renderer =
         this.rendererForComponentInContext((WOComponent)_o, _ctx);

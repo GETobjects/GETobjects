@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -118,7 +118,7 @@ public class OFSFolder extends OFSBaseObject
       final IOFSFileInfo info = this.fileInfo();
       if (info == null) return null;
       
-      ConcurrentHashMap<IOFSFileInfo, Object> pathToChildInfo =
+      final ConcurrentHashMap<IOFSFileInfo, Object> pathToChildInfo =
         this.fileManager.cacheForSection("OFSFolderChildInfo");
       
       /* check cache */
@@ -171,7 +171,7 @@ public class OFSFolder extends OFSBaseObject
     if (len == 0)
       return emptyStringArray;
     
-    List<String> ids = new ArrayList<String>(8);
+    final List<String> ids = new ArrayList<String>(8);
     for (int i = 0; i < len; i++) {
       final IOFSFileInfo info =
         this.fileManager.fileInfoForPath(this.storagePath, fileNames[i]);
@@ -190,7 +190,7 @@ public class OFSFolder extends OFSBaseObject
   }
   
   public String[] objectIds() {
-    final   OFSFileContainerChildInfo ci = this.childInfo();
+    final OFSFileContainerChildInfo ci = this.childInfo();
     if (ci == null) return null;
     
     return ci != null ? ci.ids() : null;
@@ -370,8 +370,8 @@ public class OFSFolder extends OFSBaseObject
     
     /* check configuration for replacement names */
     
-    Map<String, ?>      cfg     = this.configurationInContext(_ctx);
-    List<KeyMatchEntry> aliases = (List<KeyMatchEntry>)(cfg != null
+    final Map<String, ?>      cfg     = this.configurationInContext(_ctx);
+    final List<KeyMatchEntry> aliases = (List<KeyMatchEntry>)(cfg != null
       ? cfg.get(JoConfigKeys.AliasMatchName) : null);
     if (aliases != null) { // TBD: bad, we grab AliasMatchEntry from htaccess
       if (debugOn) {
@@ -436,6 +436,7 @@ public class OFSFolder extends OFSBaseObject
   /**
    * This method checks the requirements stated in the configuration associated
    * with this object (usually declared in an config.htaccess file).
+   * Its called by validateName() and validateObject().
    * <p>
    * @param _requirements - the requirements to be checked
    * @param _ctx          - the context containing the active user
@@ -477,7 +478,7 @@ public class OFSFolder extends OFSBaseObject
     
     /* check logins and roles against active user */
     
-    IGoUser user = _ctx.activeUser();
+    final IGoUser user = _ctx.activeUser();
     if (user == null)
       authlog.warn("got no activeUser from ctx: " + _ctx);
     
@@ -503,7 +504,7 @@ public class OFSFolder extends OFSBaseObject
 
     if (requiredRoles != null && requiredRoles.size() > 0) {
       // TBD: roles should include Group principals of the user subject?
-      String[] mainRoles = user != null
+      final String[] mainRoles = user != null
         ? user.rolesForObjectInContext(null, _ctx) : null;
       if (mainRoles != null) {
         for (String userRole: mainRoles) {
@@ -562,7 +563,7 @@ public class OFSFolder extends OFSBaseObject
     /* check configuration for requirements */
     
     if (cfg != null) {
-      Exception error = this.validateRequirements(
+      final Exception error = this.validateRequirements(
         (Map<String, Set<String>>)cfg.get(JoConfigKeys.Require), _ctx);
       if (error != null) {
         if (authlog.isInfoEnabled())
@@ -594,7 +595,7 @@ public class OFSFolder extends OFSBaseObject
     /* check configuration for requirements */
     
     if (cfg != null) {
-      Exception error = this.validateRequirements(
+      final Exception error = this.validateRequirements(
         (Map<String, Set<String>>)cfg.get(JoConfigKeys.Require), _ctx);
       if (error != null) {
         if (authlog.isInfoEnabled())
@@ -621,12 +622,15 @@ public class OFSFolder extends OFSBaseObject
    * Returns an IGoAuthenticator managed by the folder. The default
    * implementation uses the 'configurationInContext()' to build the
    * authenticator.
+   * 
+   * @param _ctx - the active IGoContext (usually the WOContext)
+   * @return an authenticator, derived from the configuration
    */
   public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
     if (this.cachedAuthenticator != null)
       return this.cachedAuthenticator;
     
-    Map<String, ?> cfg = this.configurationInContext(_ctx);
+    final Map<String, ?> cfg = this.configurationInContext(_ctx);
     if (cfg == null)
       return null; /* no configuration at all */
     
@@ -652,7 +656,7 @@ public class OFSFolder extends OFSBaseObject
        * Further the session-auth renders AuthExceptions as redirects to a
        * login page.
        */
-      GoSessionAuthenticator auth = new GoSessionAuthenticator();
+      final GoSessionAuthenticator auth = new GoSessionAuthenticator();
       
       String s = (String)cfg.get("authloginpage");
       if (UObject.isNotEmpty(s))
@@ -687,7 +691,7 @@ public class OFSFolder extends OFSBaseObject
    * @return the configuration dictionary, or null if there was none
    */
   @SuppressWarnings("unchecked")
-  public Map<String, Object> configurationInContext(IGoContext _ctx) {
+  public Map<String, Object> configurationInContext(final IGoContext _ctx) {
     if (this.ownConfig != null)
       return this.ownConfig == CACHE_MISS ? null : (Map)this.ownConfig;
 
@@ -696,7 +700,7 @@ public class OFSFolder extends OFSBaseObject
     
     /* setup config context */
     
-    JoConfigContext configContext = new JoConfigContext(_ctx,
+    final JoConfigContext configContext = new JoConfigContext(_ctx,
         "location", this.pathInContainer(),
         "path",     this.storagePath(),
         "filename", "",
@@ -704,8 +708,8 @@ public class OFSFolder extends OFSBaseObject
     
     /* apply config */
     
-    JoConfigProcessor cpu = new JoConfigProcessor();
-    Object cfg = cpu.buildConfiguration(this, configContext);
+    final JoConfigProcessor cpu = new JoConfigProcessor();
+    final Object cfg = cpu.buildConfiguration(this, configContext);
     
     this.ownConfig = cfg != null ? cfg : CACHE_MISS;
     return this.ownConfig == CACHE_MISS ? null : (Map)this.ownConfig;
@@ -751,7 +755,7 @@ public class OFSFolder extends OFSBaseObject
     
     /* apply config */
     
-    JoConfigProcessor cpu = new JoConfigProcessor();
+    final JoConfigProcessor cpu = new JoConfigProcessor();
     cfg = cpu.buildConfiguration(this, configContext);
     
     /* cache */

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -45,6 +45,10 @@ public class OFSResourceFileRenderer extends NSObject
   implements IGoObjectRenderer
 {
   protected static final Log log = LogFactory.getLog("GoOFS");
+  
+  public OFSResourceFileRenderer() {
+    super();
+  }
 
   /* control rendering */
   
@@ -57,26 +61,26 @@ public class OFSResourceFileRenderer extends NSObject
   /**
    * Stream the given OFSResourceFile object to the response.
    */
-  public Exception renderObjectInContext(Object _object, WOContext _ctx) {
+  public Exception renderObjectInContext(Object _object, final WOContext _ctx) {
     if (_object == null)
       return new GoInternalErrorException("got no object to render");
     
     /* retrieve basic info */
     
-    OFSResourceFile doc = (OFSResourceFile)_object;
+    final OFSResourceFile doc = (OFSResourceFile)_object;
 
-    String mimeType = doc.defaultDeliveryMimeType();
+    final String mimeType = doc.defaultDeliveryMimeType();
     
     /* start response */
     
-    WOResponse r = _ctx.response();
+    final WOResponse r = _ctx.response();
     r.setStatus(WOMessage.HTTP_STATUS_OK);
     r.setHeaderForKey(mimeType, "content-type");
     
     /* setup caching headers */
     
-    Date              now = new Date();
-    GregorianCalendar cal = new GregorianCalendar();
+    final Date              now = new Date();
+    final GregorianCalendar cal = new GregorianCalendar();
     
     cal.setTime(doc.lastModified());
     r.setHeaderForKey(WOMessage.httpFormatDate(cal), "last-modified");
@@ -102,7 +106,7 @@ public class OFSResourceFileRenderer extends NSObject
     if (!r.enableStreaming())
       log.warn("could not enable streaming for doc: " + doc);
 
-    InputStream is = doc.openStream();
+    final InputStream is = doc.openStream();
     if (is == null)
       return new GoInternalErrorException("could not open resource stream");
       
