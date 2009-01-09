@@ -229,18 +229,20 @@ public abstract class WOAssociation extends NSObject
    * <p>
    * Prefixes:
    * <ul>
-   *   <li>const  - WOAssociation.associationWithValue
-   *   <li>jo     - GoPathAssociation
-   *   <li>label  - WOLabelAssociation
-   *   <li>ognl   - WOOgnlAssociation
-   *   <li>plist  - WOAssociation.associationWithValue
-   *   <li>q      - WOQualifierAssociation
-   *   <li>regex  - WORegExAssociation
-   *   <li>role   - WOCheckRoleAssociation
-   *   <li>rsrc   - WOResourceURLAssociation
-   *   <li>var    - WOAssociation.associationWithKeyPath
-   *   <li>varpat - WOKeyPathPatternAssociation
-   *   <li>not    - WONegateAssociation on WOKeyPathAssociation
+   *   <li>const   - WOAssociation.associationWithValue
+   *   <li>go      - GoPathAssociation
+   *   <li>jo      - GoPathAssociation (legacy name, use 'go' instead)
+   *   <li>label   - WOLabelAssociation
+   *   <li>ognl    - WOOgnlAssociation
+   *   <li>plist   - WOAssociation.associationWithValue
+   *   <li>q       - WOQualifierAssociation
+   *   <li>regex   - WORegExAssociation
+   *   <li>role    - WOCheckRoleAssociation
+   *   <li>rsrc    - WOResourceURLAssociation
+   *   <li>rsrcpat - WOResourceURLAssociation
+   *   <li>var     - WOAssociation.associationWithKeyPath
+   *   <li>varpat  - WOKeyPathPatternAssociation
+   *   <li>not     - WONegateAssociation on WOKeyPathAssociation
    * </ul>
    * If no prefix matches, associationWithValue will be used.
    *
@@ -261,7 +263,13 @@ public abstract class WOAssociation extends NSObject
           assoc = associationWithValue(_value);
         break;
 
+      case 'g':
+        if (_prefix.equals("go"))
+          assoc = new GoPathAssociation(_value);
+        break;
+
       case 'j':
+        // legacy name for 'go'
         if (_prefix.equals("jo"))
           assoc = new GoPathAssociation(_value);
         break;
