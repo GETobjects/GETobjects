@@ -364,9 +364,16 @@ public class UString {
   /**
    * This method wraps the URLEncoder.encode() method to avoid the exception
    * handling.
+   * <p>
+   * Translates a string into application/x-www-form-urlencoded format using a
+   * specific encoding scheme. This method uses the supplied encoding scheme to
+   * obtain the bytes for unsafe characters.
+   * <p>
+   * ZNeK notes: this encodes a space as '+', not as %20. Correct or not?
+   * TBD: probably not! Path encoding is different to query encoding! (RFC2396)
    * 
    * @param _s       - the string to encode
-   * @param _charset - the charset to use in the encoding
+   * @param _charset - the charset to use in the encoding (eg 'utf-8')
    * @return the encoded string
    */
   public static String stringByEncodingURLComponent(Object _s, String _charset){
