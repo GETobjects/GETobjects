@@ -369,14 +369,15 @@ public class UString {
    * specific encoding scheme. This method uses the supplied encoding scheme to
    * obtain the bytes for unsafe characters.
    * <p>
-   * ZNeK notes: this encodes a space as '+', not as %20. Correct or not?
-   * TBD: probably not! Path encoding is different to query encoding! (RFC2396)
+   * Careful: path component and query encoding work differently! 
    * 
    * @param _s       - the string to encode
    * @param _charset - the charset to use in the encoding (eg 'utf-8')
    * @return the encoded string
    */
-  public static String stringByEncodingURLComponent(Object _s, String _charset){
+  public static String stringByEncodingQueryComponent
+    (final Object _s, String _charset)
+  {
     if (_s == null) return null;
     if (_charset == null) _charset = "utf-8";
     try {
@@ -396,6 +397,20 @@ public class UString {
   }
   
   /**
+   * Currently calls stringByEncodingQueryComponent(), which is wrong because
+   * path encoding works a bit different to query encoding.
+   * 
+   * @param _s       - the string to encode
+   * @param _charset - the charset to use in the encoding (eg 'utf-8')
+   * @return the encoded string
+   */
+  public static String stringByEncodingURLComponent(Object _s, String _charset){
+    // FIXME: path encoding is DIFFERENT to query encoding. See RFC 2396.
+    //        for example spaces are encoded as +, not as %20
+    return stringByEncodingQueryComponent(_s, _charset);
+  }
+  
+  /**
    * This method wraps the URLEncoder.encode() method to avoid the exception
    * handling. It encodes all key/value pairs of the Map as Strings.
    * <p>
@@ -406,7 +421,7 @@ public class UString {
    * @param _charset - the charset to use in the encoding
    * @return the encoded string
    */
-  public static String stringByEncodingURLComponents(Map _m, String _charset) {
+  public static String stringByEncodingQueryParameters(Map _m, String _charset){
     if (_m == null || _m.size() == 0)
       return null;
     
