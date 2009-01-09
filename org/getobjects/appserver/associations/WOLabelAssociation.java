@@ -91,7 +91,7 @@ public class WOLabelAssociation extends WOAssociation {
     this.defaultValue = _defVal;
   }
 
-  
+
   /* accessors */
 
   @Override
@@ -126,8 +126,7 @@ public class WOLabelAssociation extends WOAssociation {
   @Override
   public void setValue(final Object _value, final Object _cursor) {
     // TODO: log some info or raise an exception?
-    if (log.isDebugEnabled())
-      log.debug("attempt to set value in a label association: " + this);;
+    log.error("attempt to set value in a label association: " + this);
   }
 
   @Override
@@ -157,6 +156,10 @@ public class WOLabelAssociation extends WOAssociation {
       if (this.isValueKeyPath)
         lValue = UObject.stringValue(component.valueForKeyPath(lValue));
 
+      if (lKey == null) {
+        log.error("keyPath key didn't resolve for label association: " + this);
+        return lValue != null ? lValue : this.defaultValue;
+      }
       return rm.stringForKey(lKey, lTable, lValue, null, ctx.languages());
     }
     return this.defaultValue;
