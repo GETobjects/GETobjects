@@ -43,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  *   Map person = NSPropertyListSerialization.dictionaryForString
  *     ("{ lastname = Duck; firstname = Donald; }");</pre>
  * </pre>
- * 
+ *
  * <h4>Property Values</h4>
  * <p>
  * The parser returns those objects as values:
@@ -55,12 +55,12 @@ import org.apache.commons.logging.LogFactory;
  *   <li>Boolean (true,false,YES,NO)
  *   <li>byte[] (TBD)
  * </ul>
- * 
+ *
  * <h4>Error Handling</h4>
  * <p>
  * Call parse(). If it returns 'null', retrieve the
  * lastException() from the parser for details.
- * 
+ *
  * <h4>Thread Safety</h4>
  * <p>
  * This class is not threadsafe. Instantiate a new object per parsing
@@ -72,13 +72,13 @@ public class NSPropertyListParser extends NSObject {
 
   protected static Log plistLog = LogFactory.getLog("NSPropertyListParser");
   protected Log log; /* redefined by WODParser */
-  
+
   protected NSPropertyListSyntaxException lastException;
   protected int     idx;
   protected int     len;
   protected char[]  buffer;
   protected boolean isDebugOn; // just a cache of log.isDebugEnabled()
-  
+
   /**
    * Whether or not to parse dictionary keys as value objects,
    * or as identifiers. Example:<pre>
@@ -86,7 +86,7 @@ public class NSPropertyListParser extends NSObject {
    * With value keys enabled, 10 and 11 will be parsed a Number objects. If not,
    * they are parsed as String keys.
    */
-  protected boolean useValueKeys; 
+  protected boolean useValueKeys;
 
   public NSPropertyListParser() {
     this.log = plistLog;
@@ -181,7 +181,7 @@ public class NSPropertyListParser extends NSObject {
   /**
    * This method calls getContent() on the given URL and parses the result as
    * a property list.
-   * 
+   *
    * @param _url - the URL to parse from
    * @return a plist object, or null on error
    */
@@ -218,7 +218,7 @@ public class NSPropertyListParser extends NSObject {
 
   /**
    * Parse a plist from a Java class resource (MyClass.getResource()).
-   * 
+   *
    * @param _baseClass    - Java class to use as a lookup base
    * @param _resourceName - name of the resource
    * @return a plist object, or null on error
@@ -455,14 +455,14 @@ public class NSPropertyListParser extends NSObject {
    *   person.address.street</pre>
    * But <em>NOT</em>:<pre>
    *   "person.address.street"</pre>
-   * 
+   *
    * <p>
    * The method parses a set of identifiers (using _parseIdentifier()) which
    * is separated by a dot.
-   *   
+   *
    * <p>
    * Its also called by the WOD parsers _parseAssociationProperty() method.
-   * 
+   *
    * @return the parsed String, eg "person.address.street"
    */
   protected String _parseKeyPath() {
@@ -537,6 +537,7 @@ public class NSPropertyListParser extends NSObject {
       if (this.buffer[pos] == '\\') {
         containsEscaped = true;
         pos++; /* skip following char */
+        ilen++;
         if (pos == this.len) {
           this.addException("escape in quoted string not finished!");
           return null;
@@ -576,7 +577,7 @@ public class NSPropertyListParser extends NSObject {
           }
         }
       }
-      
+
       return new String(buf, 0, j);
     }
 
@@ -817,7 +818,7 @@ public class NSPropertyListParser extends NSObject {
    *   <li>"null", "nil" - will be returned as Java null
    *   <li>all other Strings will trigger _parseKeyPath()
    * </ul>
-   * 
+   *
    * @return the parsed value
    */
   protected Object _parseProperty() {
