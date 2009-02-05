@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -18,7 +18,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.servlets;
 
 import java.io.File;

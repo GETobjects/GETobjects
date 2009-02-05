@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -18,11 +18,11 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.servlets;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -271,6 +271,20 @@ public class WOServletAdaptor extends HttpServlet {
     if (this.WOApp == null) {
       log.error("Cannot run service, missing application object!");
       return;
+    }
+    
+    try {
+      /* Changed in Jetty 6.1.12/6.1.14 (JETTY-633). Default encoding is now
+       * Latin-1, which breaks Safari/Firefox, which submit forms in UTF-8.
+       * (I think if the page was delivered in UTF-8)
+       * (w/o tagging the charset in the content-type?!) 
+       */
+      if (_rq.getCharacterEncoding() == null)
+        _rq.setCharacterEncoding("UTF-8");
+    }
+    catch (UnsupportedEncodingException e) {
+      log.error("UTF-8 is unsupported encoding?!", e);
+      e.printStackTrace();
     }
 
     WORequest  rq;
