@@ -99,7 +99,6 @@ public class MapKVCWrapper extends KVCWrapper {
     super(_class);
   }
 
-  @SuppressWarnings("synthetic-access")
   public IPropertyAccessor getAccessor(Object _target, final String _name) {
     // this is invoked by valueForKey/takeValueForKey of NSObject and
     // NSKeyValueCoding.DefaultImplementation

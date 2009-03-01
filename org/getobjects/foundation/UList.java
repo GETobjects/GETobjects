@@ -123,7 +123,6 @@ public class UList extends NSObject {
    * @param _batchSize - the size of a batch
    * @return a list of lists containing the objects
    */
-  @SuppressWarnings("unchecked")
   public static List batchToList(final List _list, final int _batchSize) {
     if (_list == null)
       return null;
@@ -171,7 +170,6 @@ public class UList extends NSObject {
    * @param _batchSize - the size of a batch
    * @return a list of lists containing the objects
    */
-  @SuppressWarnings("unchecked")
   public static List batchToList(final Object[] _array, final int _batchSize) {
     if (_array == null)
       return null;

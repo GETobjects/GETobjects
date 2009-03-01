@@ -118,7 +118,6 @@ public class JSUtil {
     return Context.jsToJava(result, Object.class);
   }
   
-  @SuppressWarnings("serial")
   public static ArrayList<Object> unwrapNativeArray(NativeArray _array) {
     if (_array == null)
       return null;

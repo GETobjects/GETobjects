@@ -63,7 +63,6 @@ public class Require extends NSObject implements IHtConfigEvaluation {
   
   private static final Set<String> emptySet = Collections.emptySet();
 
-  @SuppressWarnings("unchecked")
   public Exception evaluateDirective
     (final HtConfigBuilder _builder, HtConfigDirective _directive,
      final Map<String, Object> _cfg, final Object _lookupCtx)

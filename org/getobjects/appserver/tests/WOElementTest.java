@@ -44,7 +44,6 @@ public abstract class WOElementTest extends WOTestWithFullEnvironment {
   
   /* creating elements */
   
-  @SuppressWarnings("unchecked")
   public static WOElement createElement(String _clazz, String _name,
                                         Map<String,WOAssociation> _assocs,
                                         WOElement _template)

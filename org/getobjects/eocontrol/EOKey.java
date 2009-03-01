@@ -232,7 +232,6 @@ public class EOKey<T> extends EOExpression implements EOExpressionEvaluation {
   public <U> EOKey<U> dot(final String _key) {
     return this.append(_key);
   }
-  @SuppressWarnings("unchecked")
   public <U> EOKey<U> dot(final EOKey<U> _key) {
     return this.append(_key);
   }

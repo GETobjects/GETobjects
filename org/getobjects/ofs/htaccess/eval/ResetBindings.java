@@ -49,7 +49,6 @@ public class ResetBindings extends NSObject
     this(null /* derive from lowercase directive name */);
   }
 
-  @SuppressWarnings("unchecked")
   public Exception evaluateDirective
     (final HtConfigBuilder _builder, HtConfigDirective _directive,
      final Map<String, Object> _cfg, final Object _lookupCtx)
