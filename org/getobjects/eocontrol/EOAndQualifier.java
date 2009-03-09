@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -49,12 +49,12 @@ public class EOAndQualifier extends EOCompoundQualifier
    * @param _qs - vararray of qualifiers, or qualifier strings
    * @return a qualifier
    */
-  public static EOQualifier conjoin(Object... _qs) {
+  public static EOQualifier conjoin(final Object... _qs) {
     if (_qs == null || _qs.length == 0)
       return null;
     
-    List<EOQualifier> qs = new ArrayList<EOQualifier>(_qs.length);
-    for (Object o: _qs) {
+    final List<EOQualifier> qs = new ArrayList<EOQualifier>(_qs.length);
+    for (final Object o: _qs) {
       if (o == null)
         continue;
 
