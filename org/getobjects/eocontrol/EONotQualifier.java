@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -37,7 +37,7 @@ public class EONotQualifier extends EOQualifier
 {
   protected EOQualifier qualifier;
   
-  public EONotQualifier(EOQualifier _q) {
+  public EONotQualifier(final EOQualifier _q) {
     this.qualifier = _q;
   }
   
@@ -47,9 +47,14 @@ public class EONotQualifier extends EOQualifier
     return this.qualifier;
   }
   
+  @Override
+  public boolean isEmpty() {
+    return this.qualifier != null ? this.qualifier.isEmpty() : true;
+  }
+  
   /* evaluation */
   
-  public boolean evaluateWithObject(Object _object) {
+  public boolean evaluateWithObject(final Object _object) {
     return !((EOQualifierEvaluation)this.qualifier).evaluateWithObject(_object);
   }
   public Object valueForObject(final Object _object) {
@@ -59,7 +64,7 @@ public class EONotQualifier extends EOQualifier
   /* keys */
   
   @Override
-  public void addReferencedKeysToSet(Set<String> _keys) {
+  public void addReferencedKeysToSet(final Set<String> _keys) {
     if (this.qualifier != null)
       this.qualifier.addReferencedKeysToSet(_keys);
   }
@@ -73,13 +78,13 @@ public class EONotQualifier extends EOQualifier
   }
 
   @Override
-  public void addBindingKeysToSet(Set<String> _keys) {
+  public void addBindingKeysToSet(final Set<String> _keys) {
     if (this.qualifier != null)
       this.qualifier.addBindingKeysToSet(_keys);
   }
   
   @Override
-  public String keyPathForBindingKey(String _variable) {
+  public String keyPathForBindingKey(final String _variable) {
     return this.qualifier.keyPathForBindingKey(_variable);
   }
   
@@ -88,7 +93,7 @@ public class EONotQualifier extends EOQualifier
     if (this.qualifier == null)
       return null;
     
-    EOQualifier boundQualifier =
+    final EOQualifier boundQualifier =
       this.qualifier.qualifierWithBindings(_vals, _requiresAll);
     
     if (boundQualifier == this.qualifier)
@@ -100,7 +105,7 @@ public class EONotQualifier extends EOQualifier
   /* string representation */
   
   @Override
-  public boolean appendStringRepresentation(StringBuilder _sb) {
+  public boolean appendStringRepresentation(final StringBuilder _sb) {
     if (this.qualifier == null) return false; 
     _sb.append("NOT ");
     return this.qualifier.appendStringRepresentation(_sb);

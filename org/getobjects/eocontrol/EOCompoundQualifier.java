@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -34,11 +34,11 @@ import java.util.Set;
 public abstract class EOCompoundQualifier extends EOQualifier {
   protected EOQualifier[] qualifiers = null;
   
-  public EOCompoundQualifier(List<EOQualifier> _qs) {
+  public EOCompoundQualifier(final List<EOQualifier> _qs) {
     this(_qs.toArray(new EOQualifier[0]));
   }
   
-  public EOCompoundQualifier(EOQualifier... _qs) {
+  public EOCompoundQualifier(final EOQualifier... _qs) {
     this.qualifiers = _qs;
   }
 
@@ -46,6 +46,11 @@ public abstract class EOCompoundQualifier extends EOQualifier {
   
   public EOQualifier[] qualifiers() {
     return this.qualifiers;
+  }
+  
+  @Override
+  public boolean isEmpty() {
+    return this.qualifiers == null || this.qualifiers.length == 0;
   }
 
   /* subclass hooks */
@@ -55,7 +60,7 @@ public abstract class EOCompoundQualifier extends EOQualifier {
   /* keys */
   
   @Override
-  public void addReferencedKeysToSet(Set<String> _keys) {
+  public void addReferencedKeysToSet(final Set<String> _keys) {
     if (_keys == null) return;
     if (this.qualifiers == null) return;
     for (int i = 0; i < this.qualifiers.length; i++) {
@@ -83,7 +88,7 @@ public abstract class EOCompoundQualifier extends EOQualifier {
   }
 
   @Override
-  public void addBindingKeysToSet(Set<String> _keys) {
+  public void addBindingKeysToSet(final Set<String> _keys) {
     if (_keys == null) return;
     if (this.qualifiers == null) return;
     for (int i = 0; i < this.qualifiers.length; i++) {
@@ -94,19 +99,19 @@ public abstract class EOCompoundQualifier extends EOQualifier {
   }
   
   @Override
-  public String keyPathForBindingKey(String _variable) {
+  public String keyPathForBindingKey(final String _variable) {
     if (_variable == null) return null;
 
-    int size = this.qualifiers.length;
+    final int size = this.qualifiers.length;
     if (size == 0)
       return null;
     if (size == 1)
       return this.qualifiers[0].keyPathForBindingKey(_variable);
     for (int i = 0; i < size; i++) {
-      EOQualifier q = this.qualifiers[i];
+      final EOQualifier q = this.qualifiers[i];
       if (q == null) continue;
       
-      String s = q.keyPathForBindingKey(_variable);
+      final String s = q.keyPathForBindingKey(_variable);
       if (s != null) return s;
     }
     return null;
@@ -126,7 +131,7 @@ public abstract class EOCompoundQualifier extends EOQualifier {
     boolean hadNull   = false;
     EOQualifier[] boundQualifiers = new EOQualifier[size];
     for (int i = 0; i < size; i++) {
-      EOQualifier q = this.qualifiers[i];
+      final EOQualifier q = this.qualifiers[i];
       if (q == null) {
         boundQualifiers[i] = null;
         hadNull = true; /* trigger a compact */
@@ -176,13 +181,13 @@ public abstract class EOCompoundQualifier extends EOQualifier {
     if (size == 1)
       return this.qualifiers[0].appendStringRepresentation(_sb);
     
-    String seperator = " " + this.operatorAsString() + " ";
+    final String seperator = " " + this.operatorAsString() + " ";
     
     // TODO: this does not work
     for (int i = 0; i < size; i++) {
       if (i > 0) _sb.append(seperator);
       
-      EOQualifier q = this.qualifiers[i];
+      final EOQualifier q = this.qualifiers[i];
       if (q instanceof EOCompoundQualifier) { // this check is kinda hackish
         _sb.append("(");
         q.appendStringRepresentation(_sb);
