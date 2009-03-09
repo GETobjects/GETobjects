@@ -35,10 +35,10 @@ import java.util.List;
 public class EOAndQualifier extends EOCompoundQualifier
   implements EOQualifierEvaluation, EOExpressionEvaluation
 {
-  public EOAndQualifier(List<EOQualifier> _qs) {
+  public EOAndQualifier(final List<EOQualifier> _qs) {
     super(_qs);
   }  
-  public EOAndQualifier(EOQualifier... _qs) {
+  public EOAndQualifier(final EOQualifier... _qs) {
     super(_qs);
   }
   
@@ -75,7 +75,7 @@ public class EOAndQualifier extends EOCompoundQualifier
   /* hook into EOCompoundQualifier */
   
   @Override
-  protected EOQualifier buildSimiliarQualifier(EOQualifier[] _qs) {
+  protected EOQualifier buildSimiliarQualifier(final EOQualifier[] _qs) {
     return new EOAndQualifier(_qs);
   }
   

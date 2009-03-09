@@ -39,11 +39,11 @@ import java.util.List;
 public class EOOrQualifier extends EOCompoundQualifier
   implements EOQualifierEvaluation
 {
-  public EOOrQualifier(List<EOQualifier> _qs) {
+  public EOOrQualifier(final List<EOQualifier> _qs) {
     super(_qs);
   }
   
-  public EOOrQualifier(EOQualifier... _qs) {
+  public EOOrQualifier(final EOQualifier... _qs) {
     super(_qs);
   }
 
@@ -80,13 +80,13 @@ public class EOOrQualifier extends EOCompoundQualifier
   /* subclass hooks */
   
   @Override
-  protected EOQualifier buildSimiliarQualifier(EOQualifier[] _qs) {
+  protected EOQualifier buildSimiliarQualifier(final EOQualifier[] _qs) {
     return new EOOrQualifier(_qs);
   }
 
   /* evaluation */
   
-  public boolean evaluateWithObject(Object _object) {
+  public boolean evaluateWithObject(final Object _object) {
     for (int i = 0; i < this.qualifiers.length; i++) {
       EOQualifierEvaluation eval = (EOQualifierEvaluation)this.qualifiers[i];
       if (eval.evaluateWithObject(_object))
