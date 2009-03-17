@@ -1463,7 +1463,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   } 
   
   protected void _setStatementParameter
-    (PreparedStatement _stmt, int _idx, int _type, Object _value)
+    (final PreparedStatement _stmt, final int _idx, final int _type,
+     final Object _value)
     throws SQLException
   {
     if (_stmt == null)
@@ -1498,6 +1499,10 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
           _stmt.setInt(_idx, (Integer)_value);
         else if (_value instanceof Long)
           _stmt.setLong(_idx, (Long)_value);
+        else if (_value instanceof Double)
+          _stmt.setDouble(_idx, (Double)_value);
+        else if (_value instanceof BigDecimal)
+          _stmt.setBigDecimal(_idx, (BigDecimal)_value);
         else if (_value instanceof java.util.Date) {
           _stmt.setTimestamp(_idx,
             new java.sql.Timestamp(((Date)_value).getTime()));
@@ -1505,6 +1510,11 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         else if (_value instanceof java.sql.Date) {
           /* Note: this is just the DATE component, no TIME */
           _stmt.setDate(_idx, (java.sql.Date)_value);
+        }
+        else if (_value instanceof java.util.Calendar) {
+          // TBD: shouldn't we use setDate with a proper Calendar?
+          final Date vd = ((Calendar)_value).getTime();
+          _stmt.setTimestamp(_idx, new java.sql.Timestamp(vd.getTime()));
         }
         else if (_value instanceof byte[])
           _stmt.setBytes(_idx, (byte[])_value);
