@@ -44,11 +44,24 @@ import org.getobjects.foundation.UObject;
  *   &lt;html&gt;
  *     [template]
  *   &lt;/html&gt;</pre>
+ *   
+ * Constant doctypes:
+ * <ul>
+ *   <li>strict
+ *   <li>strict-xhtml11
+ *   <li>strict-xhtml10
+ *   <li>strict-html
+ *   <li>trans
+ *   <li>trans-xhtml
+ *   <li>trans-html
+ *   <li>quirk
+ * </ul>
  * 
  * Bindings:
  * <pre>
  *   doctype|type  [in] - string (empty string for no doctype, default: quirks)
  *   language|lang [in] - language
+ *   namespace|ns  [in] - default XML namespace
  * </pre>
  */
 public class WOHtml extends WOHTMLDynamicElement {
@@ -56,6 +69,7 @@ public class WOHtml extends WOHTMLDynamicElement {
   
   protected WOAssociation doctype;
   protected WOAssociation lang;
+  protected WOAssociation ns;
   
   protected WOElement template;
 
@@ -69,6 +83,11 @@ public class WOHtml extends WOHTMLDynamicElement {
     
     if ((this.lang = grabAssociation(_assocs, "language")) == null)
       this.lang = grabAssociation(_assocs, "lang");
+
+    if ((this.ns = grabAssociation(_assocs, "namespace")) == null) {
+      if ((this.ns = grabAssociation(_assocs, "ns")) == null)
+        this.ns = grabAssociation(_assocs, "xmlns");
+    }
 
     this.template = _template;
 
@@ -111,6 +130,8 @@ public class WOHtml extends WOHTMLDynamicElement {
     
     boolean renderXmlLang = false;
     String lDocType = this.doctype.stringValueInComponent(cursor);
+    String lXmlNS   = null;
+    
     if (UObject.isNotEmpty(lDocType)) {
       // TBD: refactor this crap ;-)
       
@@ -144,6 +165,7 @@ public class WOHtml extends WOHTMLDynamicElement {
           _ctx.setGenerateEmptyAttributes(false);
           _ctx.setGenerateXMLStyleEmptyElements(true);
           _ctx.setCloseAllElements(true);
+          lXmlNS = WOHtml.xhtmlNS;
         }
         else if (lDocType.equals(xhtml10Type)) {
           _r.appendContentString("<!DOCTYPE html PUBLIC \"");
@@ -155,6 +177,7 @@ public class WOHtml extends WOHTMLDynamicElement {
           _ctx.setGenerateEmptyAttributes(false);
           _ctx.setGenerateXMLStyleEmptyElements(true);
           _ctx.setCloseAllElements(true);
+          lXmlNS = WOHtml.xhtmlNS;
         }
         else if (lDocType.equals(html401Type)) {
           _r.appendContentString("<!DOCTYPE html PUBLIC \"");
@@ -176,6 +199,7 @@ public class WOHtml extends WOHTMLDynamicElement {
           _ctx.setGenerateEmptyAttributes(false);
           _ctx.setGenerateXMLStyleEmptyElements(true);
           _ctx.setCloseAllElements(true);
+          lXmlNS = WOHtml.xhtmlNS;
         }
         else if (lDocType.equals(html401TransitionalType)) {
           _r.appendContentString("<!DOCTYPE html PUBLIC \"");
@@ -196,22 +220,32 @@ public class WOHtml extends WOHTMLDynamicElement {
         /* select by constant */
         
         if (lDocType.startsWith("strict")) {
-          if (lDocType.equals("strict"))
+          if (lDocType.equals("strict")) {
             lDocType = "xhtml11";
-          else if (lDocType.equals("strict-xhtml11"))
+            lXmlNS = WOHtml.xhtmlNS;
+          }
+          else if (lDocType.equals("strict-xhtml11")) {
             lDocType = "xhtml11";
-          else if (lDocType.equals("strict-xhtml10"))
+            lXmlNS = WOHtml.xhtmlNS;
+          }
+          else if (lDocType.equals("strict-xhtml10")) {
             lDocType = "xhtml10";
-          else if (lDocType.equals("strict-xhtml"))
+            lXmlNS = WOHtml.xhtmlNS;
+          }
+          else if (lDocType.equals("strict-xhtml")) {
             lDocType = "xhtml10";
+            lXmlNS = WOHtml.xhtmlNS;
+          }
           else if (lDocType.equals("strict-html"))
             lDocType = "html401";
         }
         else if (lDocType.startsWith("trans")) {
           if (lDocType.equals("trans"))
             lDocType = "html4";
-          else if (lDocType.equals("trans-xhtml"))
+          else if (lDocType.equals("trans-xhtml")) {
             lDocType = "xhtml10-trans";
+            lXmlNS = WOHtml.xhtmlNS;
+          }
           else if (lDocType.equals("trans-html"))
             lDocType = "html4";
         }
@@ -229,6 +263,7 @@ public class WOHtml extends WOHTMLDynamicElement {
           _ctx.setGenerateXMLStyleEmptyElements(true);
           _ctx.setCloseAllElements(true);
           renderXmlLang = true;
+          lXmlNS = WOHtml.xhtmlNS;
           
           if (lDocType.equals("xhtml11")) {
             _r.appendContentString("<!DOCTYPE html PUBLIC \"");
@@ -291,9 +326,17 @@ public class WOHtml extends WOHTMLDynamicElement {
       }
     }
     
+    /* XML namespace */
+    
+    if (this.ns != null)
+      lXmlNS = this.ns.stringValueInComponent(cursor);
+    
     /* render HTML tag */
     
     _r.appendBeginTag("html");
+    
+    if (UObject.isNotEmpty(lXmlNS))
+      _r.appendAttribute("xmlns", lXmlNS);
     
     if (this.lang != null) {
       final String l = this.lang.stringValueInComponent(cursor);
@@ -326,6 +369,8 @@ public class WOHtml extends WOHTMLDynamicElement {
   
   public static final WOAssociation quirksTypeAssoc =
     WOAssociation.associationWithValue("quirks");
+  
+  public static final String xhtmlNS = "http://www.w3.org/1999/xhtml";
   
   public static final String xhtml11Type = "-//W3C//DTD XHTML 1.1//EN";
   public static final String xhtml10Type = "-//W3C//DTD XHTML 1.0 Strict//EN";
