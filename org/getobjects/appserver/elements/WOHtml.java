@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -28,6 +28,7 @@ import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOElementWalker;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.foundation.UObject;
 
 /**
  * WOHtml
@@ -79,13 +80,13 @@ public class WOHtml extends WOHTMLDynamicElement {
   /* request handling */
   
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (this.template != null)
       this.template.takeValuesFromRequest(_rq, _ctx);
   }
   
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     return (this.template != null)
       ? this.template.invokeAction(_rq, _ctx) : null;
   }
@@ -94,14 +95,14 @@ public class WOHtml extends WOHTMLDynamicElement {
   /* response generation */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled()) {
       if (this.template != null)
         this.template.appendToResponse(_r, _ctx);
       return;
     }
     
-    Object cursor = _ctx.cursor();
+    final Object cursor = _ctx.cursor();
     
     // Note: IE6 will consider the doctype only if its on the first line, so
     //       we can't render an <?xml marker
@@ -110,7 +111,7 @@ public class WOHtml extends WOHTMLDynamicElement {
     
     boolean renderXmlLang = false;
     String lDocType = this.doctype.stringValueInComponent(cursor);
-    if (!lDocType.equals("")) {
+    if (UObject.isNotEmpty(lDocType)) {
       // TBD: refactor this crap ;-)
       
       if (lDocType.startsWith("http://")) {
@@ -295,8 +296,8 @@ public class WOHtml extends WOHTMLDynamicElement {
     _r.appendBeginTag("html");
     
     if (this.lang != null) {
-      String l = this.lang.stringValueInComponent(cursor);
-      if (l != null) {
+      final String l = this.lang.stringValueInComponent(cursor);
+      if (UObject.isNotEmpty(l)) {
         _r.appendAttribute("lang", l);
         if (renderXmlLang) _r.appendAttribute("xml:lang", l);
       }
@@ -315,9 +316,9 @@ public class WOHtml extends WOHTMLDynamicElement {
   /* template tree walking */
   
   @Override
-  public void walkTemplate(WOElementWalker _walker, WOContext _ctx) {
+  public void walkTemplate(final WOElementWalker _walk, final WOContext _ctx) {
     if (this.template != null)
-      _walker.processTemplate(this, this.template, _ctx);
+      _walk.processTemplate(this, this.template, _ctx);
   }
   
   
