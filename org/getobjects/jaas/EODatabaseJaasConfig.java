@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2009 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of GETobjects (Go)
 
@@ -60,13 +60,14 @@ public class EODatabaseJaasConfig extends Configuration {
         options);
     this.entries = new AppConfigurationEntry[] { entry };
   }
-  public EODatabaseJaasConfig(EODatabase _db, String _className) {
+  
+  public EODatabaseJaasConfig(final EODatabase _db, final String _className) {
     this(_db, _className, null /* options */);
   }
-  public EODatabaseJaasConfig(EODatabase _db, Class _class) {
+  public EODatabaseJaasConfig(final EODatabase _db, final Class _class) {
     this(_db, _class != null ? _class.getName() : null);
   }
-  public EODatabaseJaasConfig(EODatabase _db) {
+  public EODatabaseJaasConfig(final EODatabase _db) {
     this(_db, EODatabaseLoginModule.class);
   }
 
