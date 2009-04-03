@@ -95,10 +95,10 @@ class WODateFormatter extends WOFormatter {
         if (v instanceof SimpleDateFormat)
           this.fmtString = ((SimpleDateFormat)v).toPattern();
         else if (v instanceof String)
-          this.fmtString      = (String)v;
+          this.fmtString = (String)v;
         else if (v != null) {
           log.warn("using non-string value as date format: " + v);
-          this.fmtString      = v.toString();
+          this.fmtString = v.toString();
         }
         
         this.isCustomFormat = isCustomDateFormat(this.fmtString);
