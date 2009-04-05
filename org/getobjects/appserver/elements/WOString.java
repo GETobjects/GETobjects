@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -55,7 +55,9 @@ import org.getobjects.foundation.UObject;
  *   valueWhenEmpty [in] - object
  *   escapeHTML     [in] - boolean (set to false to avoid HTML escaping)
  *   insertBR       [in] - boolean (replace newlines with &lt;br/&gt; tags)
- *   %value         [in] - string (pattern in %(keypath)s syntax)</pre>
+ *   %value         [in] - string (pattern in %(keypath)s syntax)
+ *   prefix         [in] - string (prefix for non-empty value)
+ *   suffix         [in] - string (suffix for non-empty value)</pre>
  * Bindings (WOFormatter):<pre>
  *   calformat      [in] - a dateformat   (returns java.util.Calendar)
  *   dateformat     [in] - a dateformat   (returns java.util.Date)
@@ -81,6 +83,8 @@ public class WOString extends WOHTMLDynamicElement {
   protected WOAssociation valueWhenEmpty;
   protected WOAssociation escapeHTML;
   protected WOAssociation insertBR;
+  protected WOAssociation prefix;
+  protected WOAssociation suffix;
   protected WOFormatter   formatter;
   protected WOElement     coreAttributes;
 
@@ -94,6 +98,8 @@ public class WOString extends WOHTMLDynamicElement {
     this.escapeHTML     = grabAssociation(_assocs, "escapeHTML");
     this.valueWhenEmpty = grabAssociation(_assocs, "valueWhenEmpty");
     this.insertBR       = grabAssociation(_assocs, "insertBR");
+    this.prefix         = grabAssociation(_assocs, "prefix");
+    this.suffix         = grabAssociation(_assocs, "suffix");
     
     this.formatter = WOFormatter.formatterForAssociations(_assocs);
     
@@ -216,13 +222,25 @@ public class WOString extends WOHTMLDynamicElement {
     /* append */
     
     if (s != null && s.length() > 0) {
+      String t;
+      
       if ((this.extraKeys != null && this.extraKeys.length > 0) ||
           this.coreAttributes != null)
         this.appendWrappedStringToResponse(_r, _ctx, s, doEscape);
-      else if (doEscape)
+      else if (doEscape) {
+        t = this.prefix!=null ? this.prefix.stringValueInComponent(cursor):null;
+        if (t != null) _r.appendContentHTMLString(t);
         _r.appendContentHTMLString(s);
-      else
+        t = this.suffix!=null ? this.suffix.stringValueInComponent(cursor):null;
+        if (t != null) _r.appendContentHTMLString(t);
+      }
+      else {
+        t = this.prefix!=null ? this.prefix.stringValueInComponent(cursor):null;
+        if (t != null) _r.appendContentString(t);
         _r.appendContentString(s);
+        t = this.suffix!=null ? this.suffix.stringValueInComponent(cursor):null;
+        if (t != null) _r.appendContentString(t);
+      }
     }
     else if (isDebugOn)
       this.log.debug("  no content to render.");
@@ -236,7 +254,7 @@ public class WOString extends WOHTMLDynamicElement {
    * @param _doEscape - whether the parts need to be escaped
    * @return the rewritten string
    */
-  public String handleInsertBR(String _s, boolean _doEscape) {
+  public String handleInsertBR(final String _s, final boolean _doEscape) {
     if (_s == null)
       return null;
     
@@ -258,7 +276,6 @@ public class WOString extends WOHTMLDynamicElement {
       else
         sb.append(line);
     }
-    _doEscape = false;
     return sb.toString();
   }
   
@@ -310,11 +327,19 @@ public class WOString extends WOHTMLDynamicElement {
     _r.appendBeginTagEnd();
     
     /* render content */
-    
-    if (doEscape)
+
+    String p=this.prefix!=null?this.prefix.stringValueInComponent(cursor):null;
+    String t=this.suffix!=null?this.suffix.stringValueInComponent(cursor):null;
+    if (doEscape) {
+      if (p != null) _r.appendContentHTMLString(p);
       _r.appendContentHTMLString(s);
-    else
+      if (t != null) _r.appendContentHTMLString(t);
+    }
+    else {
+      if (p != null) _r.appendContentString(p);
       _r.appendContentString(s);
+      if (t != null) _r.appendContentString(t);
+    }
     
     /* end tag */
     
