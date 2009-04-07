@@ -40,7 +40,9 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class NSXMLPropertyListParser extends NSObject  {
@@ -49,25 +51,21 @@ public class NSXMLPropertyListParser extends NSObject  {
   /**
    * http://www.apple.com/DTDs/PropertyList-1.0.dtd
    *
-   * <!ENTITY % plistObject "(array | data | date | dict | real | integer | string | true | false )" >
-   * <!ELEMENT plist %plistObject;>
-   * <!ATTLIST plist version CDATA "1.0" >
-   * <!-- Collections -->
-   * <!ELEMENT array (%plistObject;)*>
-   * <!ELEMENT dict (key, %plistObject;)*>
-   * <!ELEMENT key (#PCDATA)>
-   *
-   * <!--- Primitive types -->
-   * <!ELEMENT string (#PCDATA)>
-   * <!ELEMENT data (#PCDATA)> <!-- Contents interpreted as Base-64 encoded -->
-   * <!ELEMENT date (#PCDATA)> <!-- Contents should conform to a subset of ISO 8601 (in particular, YYYY '-' MM '-' DD 'T' HH ':' MM ':' SS 'Z'.  Smaller units may be omitted with a loss of precision) -->
-   *
-   * <!-- Numerical primitives -->
-   * <!ELEMENT true EMPTY>  <!-- Boolean constant true -->
-   * <!ELEMENT false EMPTY> <!-- Boolean constant false -->
-   * <!ELEMENT real (#PCDATA)> <!-- Contents should represent a floating point number matching ("+" | "-")? d+ ("."d*)? ("E" ("+" | "-") d+)? where d is a digit 0-9.  -->
-   *
    */
+
+    static final String propertyList10DTDString = ""
+      + "<!ENTITY % plistObject \"(array | data | date | dict | real | integer | string | true | false )\" >"
+      + "<!ELEMENT plist %plistObject;>"
+      + "<!ATTLIST plist version CDATA \"1.0\" >"
+      + "<!ELEMENT array (%plistObject;)*>"
+      + "<!ELEMENT dict (key, %plistObject;)*>"
+      + "<!ELEMENT key (#PCDATA)>"
+      + "<!ELEMENT string (#PCDATA)>"
+      + "<!ELEMENT data (#PCDATA)>"
+      + "<!ELEMENT date (#PCDATA)>"
+      + "<!ELEMENT true EMPTY>"
+      + "<!ELEMENT false EMPTY>"
+      + "<!ELEMENT real (#PCDATA)>";
 
   public static enum Tag { PLIST, ARRAY, DICT, KEY, STRING, DATA, DATE, TRUE, FALSE, REAL, INTEGER }
 
@@ -177,12 +175,10 @@ public class NSXMLPropertyListParser extends NSObject  {
     public void endElement(String uri, String localName, String name)
         throws SAXException
     {
-      name = name.intern();
-
-      if (name == "plist") return;
+      if (name.equals("plist")) return;
 
       // reduce ... connect to appropriate collection type upon closure
-      if (name == "array") {
+      if (name.equals("array")) {
         List<Object> a;
         int          last, i;
 
@@ -209,7 +205,7 @@ public class NSXMLPropertyListParser extends NSObject  {
           this.objectStack.remove(i);
         pushObject(a);
       }
-      else if (name == "dict") {
+      else if (name.equals("dict")) {
         Map<Object,Object> d;
         int                last, i;
 
@@ -240,18 +236,18 @@ public class NSXMLPropertyListParser extends NSObject  {
         pushObject(d);
       }
       // any other possible container?
-      else if (name == "string"  ||
-               name == "key"     ||
-               name == "integer" ||
-               name == "real"    ||
-               name == "data"    ||
-               name == "date")
+      else if (name.equals("string")  ||
+               name.equals("key")     ||
+               name.equals("integer") ||
+               name.equals("real")    ||
+               name.equals("data")    ||
+               name.equals("date"))
       {
         Tag tag  = tagForTagName(name);
         int last = this.objectStack.size() - 1;
         int i    = last;
 
-        // traverse stack upwards till array
+        // traverse stack upwards till tag
         while (this.objectStack.get(i) != tag)
           i--;
 
@@ -319,6 +315,17 @@ public class NSXMLPropertyListParser extends NSObject  {
     {
       pushObject(new String(ch, start, length));
     }
+
+    @Override
+    public InputSource resolveEntity(String publicId, String systemId)
+        throws IOException, SAXException
+    {
+      if (systemId.equals("http://www.apple.com/DTDs/PropertyList-1.0.dtd")) {
+        return new InputSource(getClass().getResourceAsStream("PropertyList-1.0.dtd"));
+      }
+      log.error("resolve: " + publicId + ", " + systemId);
+      return null;
+    }
   }
 
 
@@ -329,9 +336,19 @@ public class NSXMLPropertyListParser extends NSObject  {
     SAXParserFactory factory = SAXParserFactory.newInstance();
 
     try {
-      SAXParser parser = factory.newSAXParser();
       NSXMLPlistHandler handler = new NSXMLPlistHandler();
-      parser.parse(_in, handler);
+      XMLReader         reader  = factory.newSAXParser().getXMLReader();
+      InputSource       input   = new InputSource(_in);
+      reader.setContentHandler(handler);
+      reader.setEntityResolver(handler);
+      try {
+        reader.setFeature("http://xml.org/sax/features/validation", false);
+        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      }
+      catch (Exception e) {
+        log.error("Couldn't turn validation off: " + e);
+      }
+      reader.parse(input);
       return handler.rootObject();
     }
     catch (ParserConfigurationException e) {
