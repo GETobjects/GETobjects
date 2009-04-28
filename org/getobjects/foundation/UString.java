@@ -54,6 +54,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UString {
   protected static Log log = LogFactory.getLog("UString");
+  public static final char[] hexchars = {
+    '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+  };
 
   private UString() { } /* do not allow construction */
 
@@ -76,11 +80,11 @@ public class UString {
   }
 
   // Note: use String.split instead of componentsSeparatedByDelimiter
-  
+
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv  - the string to split
    * @param _sep  - the separator to split at
    * @param _trim - whether the parts should be trimmed (using String.trim())
@@ -91,7 +95,7 @@ public class UString {
     (String _csv, final String _sep, boolean _trim, boolean _removeEmpty)
   {
     int csvlen, seplen;
-    
+
     if (_csv == null)
       return null;
     if (_sep==null || (seplen=_sep.length())==0 || (csvlen=_csv.length())==0) {
@@ -101,7 +105,7 @@ public class UString {
         l.add(_csv);
       return l;
     }
-    
+
     ArrayList<String> l = new ArrayList<String>(16);
     int pos, nextSep;
     for (pos = 0; pos < csvlen && (nextSep = _csv.indexOf(_sep, pos)) >= 0; ) {
@@ -117,14 +121,14 @@ public class UString {
       if (!_removeEmpty || s.length() > 0)
         l.add(s);
     }
-    
+
     l.trimToSize();
     return l;
   }
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @return a List of partial strings
@@ -134,11 +138,11 @@ public class UString {
   {
     return componentsListSeparatedByString(_csv, _sep, false, false);
   }
-  
+
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @return an array of partial strings
@@ -155,7 +159,7 @@ public class UString {
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @param _trim - whether the parts should be trimmed (using String.trim())
@@ -175,11 +179,11 @@ public class UString {
     if (_csv.length() == 0)
       return _removeEmpty? emptyStringArray : new String[] { _csv };
 
-    List<String> parts = 
+    List<String> parts =
       componentsListSeparatedByString(_csv, _sep, _trim, _removeEmpty);
     return parts != null ? parts.toArray(new String[parts.size()]) : null;
   }
-  
+
   public static String componentsJoinedByString(Collection _l, String _sep) {
     if (_l == null)
       return null;
@@ -277,7 +281,7 @@ public class UString {
     }
     return -1;
   }
-  
+
   /**
    * Checks whether the path begins with the _prefixPath. Example:<pre>
    *   path:     [ 'hello', 'world', 'Donald' ]
@@ -286,7 +290,7 @@ public class UString {
    *   match:    [ ]
    *   no-match: [ 'hello', 'world', 'Donald', 'Duck' ]
    *   match:    [ 'hello', 'world', 'Donald' ]</pre>
-   *   
+   *
    * @param _self       - base path
    * @param _prefixPath - prefix path
    * @return true if the basepath starts with the prefix path
@@ -294,29 +298,29 @@ public class UString {
   public static boolean startsWith(String[] _self, String[] _prefixPath) {
     if (_self == null || _prefixPath == null)
       return false;
-    
+
     final int plen = _prefixPath.length;
     if (plen == 0)
       return true;
     if (plen > _self.length)
       return false;
-    
+
     for (int i = 0; i < plen; i++) {
       if (!_self[i].equals(_prefixPath[i]))
         return false;
     }
     return true;
   }
-  
-  
+
+
   /* URL encoding */
-  
+
   /**
    * Checks whether the given String has a http://, https://, ftp:// or
    * mailto:// prefix.
    * This method is not exact since and performs no further validation. Its
    * mostly to decide whether a prefix must be added to a generic String.
-   * 
+   *
    * @param _s - an arbitrary string, eg mailto:info@skyrix.de
    * @return the protocol if the String looks like an URL, null otherwise
    */
@@ -324,7 +328,7 @@ public class UString {
     int len;
     if (_s == null || (len = _s.length()) < 7)
       return null;
-    
+
     switch (Character.toLowerCase(_s.charAt(0))) {
       case 'h':
         if (len > 7) {
@@ -369,8 +373,8 @@ public class UString {
    * specific encoding scheme. This method uses the supplied encoding scheme to
    * obtain the bytes for unsafe characters.
    * <p>
-   * Careful: path component and query encoding work differently! 
-   * 
+   * Careful: path component and query encoding work differently!
+   *
    * @param _s       - the string to encode
    * @param _charset - the charset to use in the encoding (eg 'utf-8')
    * @return the encoded string
@@ -387,7 +391,7 @@ public class UString {
         return _s.toString();
       if (_s instanceof Boolean)
         return ((Boolean)_s).booleanValue() ? "1" : "0";
-      
+
       return URLEncoder.encode(_s.toString(), _charset);
     }
     catch (UnsupportedEncodingException e) {
@@ -395,28 +399,81 @@ public class UString {
     }
     return null;
   }
-  
+
   /**
-   * Currently calls stringByEncodingQueryComponent(), which is wrong because
-   * path encoding works a bit different to query encoding.
-   * 
+   * Properly encodes a URL path component according to the percent escaping
+   * rules required for characters of the reserved and unreserved sets as
+   * described in RFC3986 section 2.2 and section 2.3 respectively.
+   *
+   * NOTE: This includes the "/" character as the method name indicates.
+   * @see http://tools.ietf.org/html/rfc3986#section-2.2
+   *
    * @param _s       - the string to encode
    * @param _charset - the charset to use in the encoding (eg 'utf-8')
    * @return the encoded string
    */
   public static String stringByEncodingURLComponent(Object _s, String _charset){
-    // FIXME: path encoding is DIFFERENT to query encoding. See RFC 2396.
-    //        for example spaces are encoded as +, not as %20
-    return stringByEncodingQueryComponent(_s, _charset);
+    if (_s == null) return null;
+    if (_charset == null) _charset = "utf-8";
+
+    final String s;
+    if (_s instanceof String)
+      s = (String)_s;
+    else
+      s = UObject.stringValue(_s);
+
+    int i, count = s.length();
+    for (i = 0; i < count; i++) {
+      char c = s.charAt(i);
+      if (c < 0x2d  ||
+          c == 0x2f ||
+          (c > 0x39 && c < 0x3c) ||
+          (c > 0x3e && c < 0x41) ||
+          c == 0x5a ||
+          c == 0x5d || c > 0x7e)
+        break;
+    }
+
+    if (i == count)
+      return s; // nothing to replace
+
+    StringBuilder sb = new StringBuilder(count + 2);
+    sb.append(s.substring(0, i));
+    try {
+      byte[] rep = s.substring(i).getBytes(_charset);
+      count = rep.length;
+      for (i = 0; i < count; i++) {
+        char c = (char)rep[i];
+        if (c < 0x2d  ||
+            c == 0x2f ||
+            (c > 0x39 && c < 0x3c) ||
+            (c > 0x3e && c < 0x41) ||
+            c == 0x5a ||
+            c == 0x5d || c > 0x7e)
+        {
+          sb.append('%');
+          sb.append(hexchars[(c >> 4) & 0x0f]);
+          sb.append(hexchars[c & 0x0f]);
+        }
+        else {
+          sb.append(c);
+        }
+      }
+      return sb.toString();
+    }
+    catch (UnsupportedEncodingException e) {
+      log.warn("could not encode URL component: " + _s);
+      return null;
+    }
   }
-  
+
   /**
    * This method wraps the URLEncoder.encode() method to avoid the exception
    * handling. It encodes all key/value pairs of the Map as Strings.
    * <p>
    * The result of this method is a string like:<pre>
    *   a=5&b=3&c=10</pre>
-   * 
+   *
    * @param _m       - the key/value pairs to encode
    * @param _charset - the charset to use in the encoding
    * @return the encoded string
@@ -424,20 +481,20 @@ public class UString {
   public static String stringByEncodingQueryParameters(Map _m, String _charset){
     if (_m == null || _m.size() == 0)
       return null;
-    
+
     if (_charset == null) _charset = "utf-8";
     StringBuilder sb = new StringBuilder(_m.size() * 32);
     try {
       boolean didAdd = false;
-      
+
       for (Object key: _m.keySet()) {
         Object value = _m.get(key);
-        
+
         if (key == null && value == null)
           continue;
-        
+
         /* determine key string (usually the key is a string) */
-        
+
         String skey;
         if (key instanceof String)
           skey = URLEncoder.encode((String)key, _charset);
@@ -449,16 +506,16 @@ public class UString {
           skey = "";
         else
           skey = URLEncoder.encode(key.toString(), _charset);
-        
+
         /* add key */
-        
+
         if (didAdd) sb.append("&"); /* separator */
         else didAdd = true;
         sb.append(skey);
-        
+
         /* determine value */
         // TBD: add support for value arrays
-        
+
         if (value == null)
           ; /* do not add a value */
         else if (value instanceof String) {
@@ -481,10 +538,10 @@ public class UString {
       log.warn("could not encode part of URL: " + _m + ", part: " + sb);
       return null;
     }
-    
+
     return sb.length() > 0 ? sb.toString() : null;
   }
-  
+
 
   /* XML escaping (no Java function for that???) */
 
@@ -543,7 +600,7 @@ public class UString {
     return new String(chars);
   }
 
-  
+
   /* hashing */
 
   /**
@@ -551,7 +608,7 @@ public class UString {
    * converted to UTF-8 and then run through the appropriate MessageDigest.
    * This method is not exactly high performance, if you need to encode a lot
    * of strings you might want to do it manually.
-   * 
+   *
    * @param _p - the String which a hash shall be calculated for
    * @return the hash as a String
    */
@@ -579,7 +636,7 @@ public class UString {
       System.err.println("Did not find MD5 hash generator!");
       return null;
     }
-    
+
     if (pwdhash == null || pwdhash.length() == 0) {
       log.error("Could not compute an MD5 hash.");
       return null;
@@ -589,14 +646,14 @@ public class UString {
 
   /**
    * Returns the data as a String containing hex byte pairs (eg 0FAADE...).
-   * 
+   *
    * @param _p - a byte array
    * @return a String representing the data, or null on error
    */
   public static String hexStringFromData(final byte[] _data) {
     if (_data == null)
       return null;
-    
+
     StringBuilder hexString = new StringBuilder(_data.length * 2);
     for (int i = 0; i < _data.length; i++) {
       String s = Integer.toHexString(0xFF & _data[i]);
@@ -606,14 +663,14 @@ public class UString {
     }
     return hexString.toString();
   }
-  
+
 
   /* Base64 */
 
   /**
    * Decodes the given String as BASE64. Since BASE64 decoding results in
    * binary data, a charset must be specified for the resulting String.
-   * 
+   *
    * @param _src     - the String to decode as BASE64
    * @param _charset - the charset to decode the String in (null => UTF-8)
    * @return the String decoded from the BASE64
@@ -624,32 +681,32 @@ public class UString {
 
   /**
    * Decodes the given String as BASE64/UTF-8.
-   * 
+   *
    * @param _src     - the String to decode as BASE64
    * @return the String decoded from the BASE64
    */
   public static String stringByDecodingBase64(final String _src) {
     return stringByDecodingBase64(_src, null /* use default charset */);
   }
-  
+
   /**
    * Encodes the given bytes as BASE64.
-   * 
+   *
    * @param _data - the data to encode as BASE64
    * @return BASE64 representing of the _data
    */
   public static String stringByEncodingBase64(final byte[] _data) {
     if (_data == null)
       return null;
-    
+
     // TBD: use non-private mechanism?!
     return new sun.misc.BASE64Encoder().encodeBuffer(_data);
   }
-  
+
   /**
    * Encodes the given String as BASE64. Since BASE64 encoding works on
    * binary data, a charset must be specified for the input String.
-   * 
+   *
    * @param _src     - the String to encode as BASE64
    * @param _charset - the charset to encode the String in (null => UTF-8)
    * @return BASE64 representing of the String
@@ -657,12 +714,12 @@ public class UString {
   public static String stringByEncodingBase64(String _src, String _charset) {
     return stringByEncodingBase64(getBytes(_src, _charset));
   }
-  
+
   /**
    * This is just like String.getBytes(_charset), except that it does not throw
    * an exception on errors but just returns null (we usually encode in UTF-8
    * which never throws any errors ...).
-   * 
+   *
    * @param _s       - String to get bytes for
    * @param _charset - the charset, use null for UTF-8
    * @return the bytes representing the String in the given charset, or null
@@ -670,7 +727,7 @@ public class UString {
   public static byte[] getBytes(final String _s, final String _charset) {
     if (_s == null)
       return null;
-    
+
     try {
       return _s.getBytes(_charset != null ? _charset : "utf8");
     }
@@ -679,12 +736,12 @@ public class UString {
       return null;
     }
   }
-  
+
   /**
    * This is just like new String(b[], _charset), except that it does not throw
    * an exception on errors but just returns null (we usually encode in UTF-8
    * which never throws any errors ...).
-   * 
+   *
    * @param _s       - String to get bytes for
    * @param _charset - the charset, use null for UTF-8
    * @return the bytes representing the String in the given charset, or null
@@ -708,7 +765,7 @@ public class UString {
    * Loads a file/URL/stream/etc into a String. UData.loadContentFromSource()
    * is used to load the data, then the data is converted to a String in the
    * given encoding (defaults to UTF-8).
-   * 
+   *
    * @param _file     - some kind of object which specifies a file (eg File)
    * @param _encoding - the charset to use (eg utf8)
    * @return the contents of the file as a String, or null on error
@@ -739,7 +796,7 @@ public class UString {
    * Loads a file/URL/stream/etc into a String. UData.loadContentFromSource()
    * is used to load the data, then the data is converted to a String in the
    * default encoding (UTF-8).
-   * 
+   *
    * @param _file     - some kind of object which specifies a file (eg File)
    * @return the contents of the file as a String, or null on error
    */
@@ -750,7 +807,7 @@ public class UString {
 
   /**
    * Writes the given String in the given encoding to the given File.
-   * 
+   *
    * @param _data       - String to write (must not be null, may be empty)
    * @param _encoding   - encoding to write the string in (defaults to UTF-8)
    * @param _file       - File to write to
@@ -778,7 +835,7 @@ public class UString {
 
   /**
    * Writes the given String in UTF-8 encoding.
-   * 
+   *
    * @param _data       - String to write
    * @param _path       - File to write to
    * @param _atomically - whether we should write atomically
@@ -792,23 +849,23 @@ public class UString {
 
     return UData.writeToFile(getBytes(_data, null), _path, _atomically);
   }
-  
-  
+
+
   /* loading lines */
 
   private static final String[] lineCommentStarters = { "#", "//" };
-  
+
   /**
    * Load an array of lines from the given file. Lines starting with # or //
    * and empty lines are ignored. Lines are trimmed (using trim()).
-   * 
+   *
    * @param _file - the File to read the lines from
    * @return an array of Strings, or null if the file could not be opened
    */
   public static String[] loadLinesFromFile(final File _file) {
     if (_file == null)
       return null;
-    
+
     FileInputStream fis;
     try {
       fis = new FileInputStream(_file);
@@ -817,11 +874,11 @@ public class UString {
       log.info("did not find file: " + _file.getAbsolutePath());
       return null;
     }
-    
+
     return loadLinesFromFile(fis, true /* trim */, "\\" /* unfold */,
         lineCommentStarters);
   }
-  
+
   public static String[] loadLinesFromFile
     (InputStream _in, boolean _trim, String _foldToken, String[] _commentTokens)
   {
@@ -843,33 +900,33 @@ public class UString {
         }
 
         if (_trim) s = s.trim();
-        
+
         if (pendingLine != null) { /* unfold */
           s = pendingLine + s;
           pendingLine = null;
         }
-        
+
         if (_foldToken != null) {
           if (s.endsWith(_foldToken)) {
             s = s.substring(0, s.length() - _foldToken.length());
             if (_trim) s = s.trim();
             if (s.length() > 0)
               pendingLine = s;
-            
+
             continue;
           }
         }
-        
+
         if (s.length() > 0)
           lines.add(s);
       }
-      
+
       if (pendingLine != null) { /* unfold */
         // TBD: dangling backslash
         log.info("found a folded line with the fold marker in the last line");
         lines.add(pendingLine);
       }
-      
+
       return lines.toArray(new String[lines.size()]);
     }
     catch (IOException e) {
@@ -1184,14 +1241,14 @@ public class UString {
       }
     }
   }
-  
-  
+
+
   /* char buffer matching */
-  
+
   /**
    * Returns true if the given char buffer starts with the characters of the
    * given string.
-   * 
+   *
    * @param _buf - the buffer to check
    * @param _idx - start to compare at _buf[_idx]
    * @param _s   - the String which must match
@@ -1204,19 +1261,19 @@ public class UString {
     final int slen = _s.length();
     if (slen == 0)
       return true;
-    
+
     final int blen = _buf.length;
     if (blen < slen)
       return false;
-    
+
     for (int i = _idx, j = 0; i < blen && j < slen; i++, j++) {
       if (_buf[i] != _s.charAt(j))
         return false;
     }
     return true;
   }
-  
-  
+
+
   /* HTML */
 
   /**
@@ -1227,20 +1284,20 @@ public class UString {
    *   &lt;!----&gt;</pre>
    * We do not support those valid SGML comments:<pre>
    *   &lt;!----&gt; Hello --&gt;</pre>
-   * 
+   *
    * @param String containing HTML comments
    * @return String which is stripped from HTML comments
    */
   public static String stringByRemovingHTMLComments(final String _s) {
     if (_s == null)
       return null;
-    
+
     final char[] buf  = _s.toCharArray();
     final int    llen = buf.length;
     int j = 0;
-    
+
     for (int i = 0; i < llen; i++) {
-      if (((i + 3) < llen) && 
+      if (((i + 3) < llen) &&
           buf[i] == '<' && buf[i + 1] == '!' &&
           (buf[i + 2] == '-' || buf[i + 2] == '>')) {
         if (buf[i + 2] == '>') { /* empty comment (<!>) */
@@ -1250,7 +1307,7 @@ public class UString {
 
         /* found a comment */
         i += 2; /* skip '<!' */
-        
+
         /* skip dashes */
         int dashCount = 0;
         while (i < llen && buf[i] == '-') {
@@ -1261,7 +1318,7 @@ public class UString {
           }
           i++;
         }
-        
+
         /* scan for close: '-->' */
         for (; i < llen; i++) {
           if (buf[i] == '-' && ((i + 2) < llen)) {
@@ -1283,13 +1340,13 @@ public class UString {
 
     return llen == j ? _s : new String(buf, 0, j);
   }
-  
+
   /**
    * Compresses duplicate whitespace into one. Example:<pre>
    *   "    hello   " =&gt; " hello "</pre>
    * Eg this is used by the WOHTMLParser to compress whitespace in HTML
    * content.
-   * 
+   *
    * @param _s  - the String to be compressed (eg "  Hello  World  ")
    * @param _ws - the whitespace characters (eg " \t\r\n" [default]))
    * @return the compressed String
@@ -1299,34 +1356,34 @@ public class UString {
       return null;
     if (_ws == null)
       _ws = " \t\r\n";
-    
+
     final char[] buf  = _s.toCharArray();
     final int    llen = buf.length;
     if (llen == 0)
       return "";
-    
+
     int j = 1; /* we always consume the first char */
     boolean lastWasWS = _ws.indexOf(buf[0]) >= 0;
     for (int i = 1; i < llen; i++) {
       boolean thisIsWS = _ws.indexOf(buf[i]) >= 0;
-      
+
       if (!thisIsWS || !lastWasWS) { /* regular char or first WS, consume */
         buf[j] = buf[i]; /* move char left */
         j++;
         lastWasWS = thisIsWS;
       }
     }
-    
+
     return j == llen ? _s : new String(buf, 0, j);
   }
-  
+
   /**
    * Removes the escape char from the given String. Example:<pre>
    *   "\$Hello\$  \\ World" => "$Hello$  \ World"</pre>
-   * 
+   *
    * The method does not process special escape chars (like \n => char 10, '\n'
-   * will end up as 'n'). 
-   * 
+   * will end up as 'n').
+   *
    * @param _s - String where escape chars should be removed from
    * @param _c - escape char, eg '\'
    * @return String w/o escape chars
@@ -1334,20 +1391,20 @@ public class UString {
   public static String stringByUnescapingWithEscapeChar(String _s, char _c) {
     if (_s == null)
       return null;
-    
+
     if (_s.indexOf(_c) < 0) /* does not contain escape char */
       return _s;
-    
+
     final char[] buf  = _s.toCharArray();
     final int    llen = buf.length;
     int j = 0;
-    
+
     for (int i = 0; i < llen; i++) {
       if (buf[i] == _c) {
         i++; /* skip escape char */
         if (i >= llen) break; /* when the escape char is the last char */
       }
-      
+
       buf[j] = buf[i];
     }
     return llen == j ? _s : new String(buf, 0, j);
@@ -1365,7 +1422,7 @@ public class UString {
    * Obviously this isn't a very fast way to build multi component pathes, but
    * its convenient for quick hacks.
    * <p>
-   * 
+   *
    * @param _path - the existing String array (can be null)
    * @param _str  - the String to add to the array (can be null)
    * @return a new array containing a copy of the old path plus the String
@@ -1379,5 +1436,11 @@ public class UString {
       System.arraycopy(_path, 0, newPath, 0, len);
     newPath[len] = _str;
     return newPath;
+  }
+
+  public static void main(String[] args) {
+    String s = "DÖF";
+    s = stringByEncodingURLComponent(s, null);
+    System.out.print("enc: " + s);
   }
 }
