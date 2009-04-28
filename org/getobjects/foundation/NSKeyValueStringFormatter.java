@@ -59,7 +59,7 @@ public class NSKeyValueStringFormatter extends NSObject {
      * @param _key - the key to resolve, or null
      * @return the value stored under the key, or the next value from an array
      */
-    public abstract Object valueForKey(String _key);
+    public abstract Object valueForKey(final String _key);
   }
   
   
@@ -85,7 +85,7 @@ public class NSKeyValueStringFormatter extends NSObject {
      *   <li>an Integer is parsed as an index, eg %(2)s => array[2] 
      * </ul>
      */
-    public Object valueForKey(String _key) {
+    public Object valueForKey(final String _key) {
       Object value = null;
       
       if (_key != null) {
@@ -151,7 +151,7 @@ public class NSKeyValueStringFormatter extends NSObject {
 
   @SuppressWarnings("unchecked")
   public static String format
-    (String _pattern, Object _values, boolean _requiresAll)
+    (final String _pattern, final Object _values, final boolean _requiresAll)
   {
     /* check whether the pattern contains any variables ... */
     if (_pattern == null)
@@ -175,7 +175,7 @@ public class NSKeyValueStringFormatter extends NSObject {
     
     /* parse the pattern and replace values */
     
-    char[] pattern = _pattern.toCharArray();
+    final char[] pattern = _pattern.toCharArray();
     StringBuilder sb = new StringBuilder(pattern.length * 2);
     for (int i = 0; i < pattern.length; i++) {
       char c = pattern[i];
@@ -188,7 +188,7 @@ public class NSKeyValueStringFormatter extends NSObject {
       
       /* found a marker */
       
-      int avail = pattern.length - i - 1 /* consume % */;
+      final int avail = pattern.length - i - 1 /* consume % */;
       if (avail == 0) {
         /* last char */
         sb.append("%");
@@ -227,7 +227,7 @@ public class NSKeyValueStringFormatter extends NSObject {
       /* determine value */
       
       boolean keyMiss = false;
-      Object value;
+      final Object value;
       if (valuesHandler != null) {
         if ((value = valuesHandler.valueForKey(key)) == null)
           keyMiss = valuesHandler.lastWasKeyMiss;
@@ -277,11 +277,11 @@ public class NSKeyValueStringFormatter extends NSObject {
     return sb.toString();
   }
   
-  public static String format(String _pattern, Object _values) {
+  public static String format(final String _pattern, final Object _values) {
     return format(_pattern, _values, true /* require all bindings */);
   }
   
-  public static String format(String _pattern, Object... _args) {
+  public static String format(final String _pattern, final Object... _args) {
     if (_args == null || _args.length == 0)
       return _pattern;
     

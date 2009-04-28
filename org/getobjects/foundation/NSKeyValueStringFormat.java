@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -50,12 +50,12 @@ public class NSKeyValueStringFormat extends Format {
   
   @Override
   public StringBuffer format
-    (Object _object, StringBuffer _sb, FieldPosition _pos)
+    (final Object _object, StringBuffer _sb, final FieldPosition _pos)
   {
     if (this.format == null)
       return null;
     
-    String s = NSKeyValueStringFormatter
+    final String s = NSKeyValueStringFormatter
       .format(this.format, _object, this.requiresAll);
     
     if (s == null)
