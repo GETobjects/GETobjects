@@ -40,40 +40,40 @@ import org.getobjects.foundation.kvc.MissingPropertyException;
  * a java.text.Format object which takes a format pattern, eg:<pre>
  *   Format f = new NSKeyValueStringFormat("%(firstname)s %(lastname)s");
  *   System.out.println("Name is: " + f.format(person));</pre>
- * 
+ *
  * <p>
  * Inefficient, crappy implementation, but worx ;-)
  */
 public class NSKeyValueStringFormatter extends NSObject {
-  protected static final Log log = 
+  protected static final Log log =
     LogFactory.getLog("NSKeyValueStringFormatter");
-  
+
   protected static abstract class ValueHandler {
     protected boolean  lastWasKeyMiss = false;
-    
+
     /**
      * Retrieve the next value for the given key. Note that this method may
      * only be called ONCE per pattern binding as some implementation have
      * sideeffects (eg advancing the array position cursor).
-     * 
+     *
      * @param _key - the key to resolve, or null
      * @return the value stored under the key, or the next value from an array
      */
     public abstract Object valueForKey(final String _key);
   }
-  
-  
+
+
   protected static class ArrayValueHandler extends ValueHandler {
     protected int      posArgCursor   = 0;
     protected Object[] valArray;
-    
+
     public ArrayValueHandler(Object[] _array) {
       this.valArray = _array;
     }
     public ArrayValueHandler(List<Object> _list) {
       this.valArray = _list.toArray(new Object[0]);
     }
-    
+
     /**
      * In the array implementation this usually is invoked without a key. When
      * its called, it consumes a position in the value array as a sideeffect.
@@ -82,12 +82,12 @@ public class NSKeyValueStringFormatter extends NSObject {
      * However, it does support some keys which do *not* advance the position:
      * <ul>
      *   <li>'length' or 'size'
-     *   <li>an Integer is parsed as an index, eg %(2)s => array[2] 
+     *   <li>an Integer is parsed as an index, eg %(2)s => array[2]
      * </ul>
      */
     public Object valueForKey(final String _key) {
       Object value = null;
-      
+
       if (_key != null) {
         if ("length".equals(_key) || "size".equals(_key))
           value = new Integer(this.valArray.length);
@@ -111,11 +111,11 @@ public class NSKeyValueStringFormatter extends NSObject {
       return value;
     }
   }
-  
+
   protected static class KeyValueHandler extends ValueHandler {
     protected NSKeyValueCodingAdditions kvc;
     protected Object object;
-    
+
     public KeyValueHandler(Object _object) {
       if (_object == null)
         ;
@@ -124,13 +124,13 @@ public class NSKeyValueStringFormatter extends NSObject {
       else
         this.object = _object;
     }
-    
+
     public Object valueForKey(String _key) {
       if (_key == null) {
         log.error("missing keypath for %(key)s style format!");
         return null;
       }
-      
+
       Object value = null;
       try {
         if (this.kvc != null)
@@ -143,11 +143,11 @@ public class NSKeyValueStringFormatter extends NSObject {
       catch (MissingPropertyException e) {
         this.lastWasKeyMiss = true;
       }
-      
+
       return value;
     }
   }
-  
+
 
   @SuppressWarnings("unchecked")
   public static String format
@@ -159,9 +159,9 @@ public class NSKeyValueStringFormatter extends NSObject {
     if (_pattern.indexOf('%') == -1)
       return _pattern;
 
-    
+
     /* instantiate a proper value handler for the given value object */
-    
+
     ValueHandler valuesHandler = null;
     if (_values != null) {
       if (_values instanceof Object[])
@@ -171,30 +171,30 @@ public class NSKeyValueStringFormatter extends NSObject {
       else
         valuesHandler = new KeyValueHandler(_values);
     }
-    
-    
+
+
     /* parse the pattern and replace values */
-    
+
     final char[] pattern = _pattern.toCharArray();
     StringBuilder sb = new StringBuilder(pattern.length * 2);
     for (int i = 0; i < pattern.length; i++) {
       char c = pattern[i];
-      
+
       if (c != '%') {
         // TODO: improve efficiency, we should delay the adds
         sb.append(c);
         continue;
       }
-      
+
       /* found a marker */
-      
+
       final int avail = pattern.length - i - 1 /* consume % */;
       if (avail == 0) {
         /* last char */
         sb.append("%");
         continue;
       }
-      
+
       int pos = i + 1;
       c = pattern[pos];
       if (c == '%') {
@@ -203,9 +203,9 @@ public class NSKeyValueStringFormatter extends NSObject {
         sb.append("%");
         continue;
       }
-      
+
       /* check for a keypath, eg %(lastname)s */
-      
+
       String key = null;
       if ((c == '(') && (avail >= 4)) { /* %(n)i */
         pos++;
@@ -216,16 +216,16 @@ public class NSKeyValueStringFormatter extends NSObject {
           log.info("pattern was not closed: " + _pattern);
           return null; // TODO: add some log
         }
-        
+
         if ((j - pos) > 0)
           key = new String(pattern, pos, j - pos);
         //System.err.println("KEY: " + key);
-        
+
         pos = j + 1; /* skip ')' */
       }
-      
+
       /* determine value */
-      
+
       boolean keyMiss = false;
       final Object value;
       if (valuesHandler != null) {
@@ -236,19 +236,19 @@ public class NSKeyValueStringFormatter extends NSObject {
         keyMiss = true;
         value   = null;
       }
-      
+
       if (keyMiss && _requiresAll) {
-        log.info("missed required key: " + key); 
+        log.info("missed required key: " + key);
         return null;
       }
-      
+
       /* format */
 
       if (pos == pattern.length) { /* lparen not closed */
         log.info("missing format char in pattern: " + _pattern);
         return null;
       }
-      
+
       switch ((c = pattern[pos])) {
         case 'i':
           if (value == null)
@@ -256,7 +256,7 @@ public class NSKeyValueStringFormatter extends NSObject {
           else
             sb.append(UObject.intValue(value));
           break;
-        
+
         case '@':
         case 's':
           if (value == null)
@@ -264,27 +264,34 @@ public class NSKeyValueStringFormatter extends NSObject {
           else
             sb.append(value);
           break;
-          
+
+        case 'U':
+          if (value == null)
+            sb.append("");
+          else
+            sb.append(UString.stringByEncodingURLComponent(value, null));
+          break;
+
         default:
           log.error("unknown format specifier: " + c);
           return null;
       }
-      
+
       /* skip format */
       i = pos;
     }
-    
+
     return sb.toString();
   }
-  
+
   public static String format(final String _pattern, final Object _values) {
     return format(_pattern, _values, true /* require all bindings */);
   }
-  
+
   public static String format(final String _pattern, final Object... _args) {
     if (_args == null || _args.length == 0)
       return _pattern;
-    
+
     return format(_pattern, (Object)_args);
   }
 }
