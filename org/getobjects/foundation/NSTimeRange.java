@@ -749,9 +749,104 @@ public class NSTimeRange extends NSObject
     return getYearRange(cal);
   }
   public static NSTimeRange getYearRange(final int _year, final TimeZone _tz) {
-    Calendar cal = Calendar.getInstance(_tz);
+    final Calendar cal = Calendar.getInstance(_tz);
     cal.set(Calendar.YEAR, _year);
     return getYearRange(cal);
+  }
+  
+  
+  /**
+   * Returns a timerange representing the first quarter of the year in which
+   * _date is. That is, Jan 1st - March 31st.
+   * 
+   * @param  _date - a Calendar used to select the year
+   * @return an NSTimeRange representing the first quarter of the year
+   */
+  public static NSTimeRange getFirstQuarterRange(final Calendar _date) {
+    // TBD: add tests
+    if (_date == null)
+      return null;
+    
+    final Calendar workingCopy = (Calendar)_date.clone();
+    
+    /* reset to beginning of year */
+    workingCopy.set(Calendar.DAY_OF_YEAR,
+        _date.getMinimum(Calendar.DAY_OF_YEAR));
+    workingCopy.set(Calendar.HOUR_OF_DAY,  0);
+    workingCopy.set(Calendar.MINUTE,       0);
+    workingCopy.set(Calendar.SECOND,       0);
+    workingCopy.set(Calendar.MILLISECOND,  0);
+    
+    final long from = workingCopy.getTimeInMillis();
+
+    /* Add a month, remember the endDate is exclusive, so we don't need to play
+     * 6days 23:59:59:59 tricks.
+     * 
+     * Note: the 'add' respects timezone shifts (I think? ;-)
+     */
+    workingCopy.add(Calendar.MONTH, 3);
+    
+    final long to = workingCopy.getTimeInMillis();
+    return new NSTimeRange(from, to);
+  }
+  
+  /**
+   * Returns 4 timeranges representing the quarters of the year.
+   * 
+   * @param _date - Calendar used to select the year.
+   * @return an array of four NSTimeRanges
+   */
+  public static NSTimeRange[] getQuarterRanges(final Calendar _date) {
+    // TBD: add tests
+    if (_date == null)
+      return null;
+    
+    final Calendar workingCopy = (Calendar)_date.clone();
+    
+    /* reset to beginning of year */
+    workingCopy.set(Calendar.DAY_OF_YEAR,
+        _date.getMinimum(Calendar.DAY_OF_YEAR));
+    workingCopy.set(Calendar.HOUR_OF_DAY,  0);
+    workingCopy.set(Calendar.MINUTE,       0);
+    workingCopy.set(Calendar.SECOND,       0);
+    workingCopy.set(Calendar.MILLISECOND,  0);
+    
+    final long from = workingCopy.getTimeInMillis();
+
+    /* Add a month, remember the endDate is exclusive, so we don't need to play
+     * 6days 23:59:59:59 tricks.
+     * 
+     * Note: the 'add' respects timezone shifts (I think? ;-)
+     */
+    workingCopy.add(Calendar.MONTH, 3);
+    final long q1end = workingCopy.getTimeInMillis();
+    workingCopy.add(Calendar.MONTH, 3);
+    final long q2end = workingCopy.getTimeInMillis();
+    workingCopy.add(Calendar.MONTH, 3);
+    final long q3end = workingCopy.getTimeInMillis();
+    workingCopy.add(Calendar.MONTH, 3);
+    final long q4end = workingCopy.getTimeInMillis();
+    
+    return new NSTimeRange[] {
+      new NSTimeRange(from,  q1end),
+      new NSTimeRange(q1end, q2end),
+      new NSTimeRange(q2end, q3end),
+      new NSTimeRange(q3end, q4end)
+    };
+  }
+  /**
+   * Returns 4 timeranges representing the quarters of the year.
+   * 
+   * @param _year - required year.
+   * @param _tz   - relevant timezone
+   * @return an array of four NSTimeRanges
+   */
+  public static NSTimeRange[] getQuarterRanges
+    (final int _year, final TimeZone _tz)
+  {
+    final Calendar cal = Calendar.getInstance(_tz);
+    cal.set(Calendar.YEAR, _year);
+    return getQuarterRanges(cal);
   }
 
   /**

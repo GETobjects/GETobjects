@@ -149,6 +149,14 @@ public class UDate extends NSObject {
     return _calendar;
   }
   
+  /**
+   * Returns the quarter of the year (1-4) for the given Date or Calendar.
+   * 
+   * @param _object - a Date or a Calendar
+   * @param _tz     - TimeZone
+   * @param _loc    - Locale
+   * @return the quarter (1-4), -1 if _object is no Date/Cal, -2 unknown month
+   */
   public static int quarterOfYear(Object _object, TimeZone _tz, Locale _loc) {
     if (_object == null) return 0;
     
@@ -180,8 +188,16 @@ public class UDate extends NSObject {
     log.warn("quarterOfYear got unexpected month: " + month);
     return -2;
   }
-  public static int quarterOfYear(Object _object) {
-    return quarterOfYear(_object, null, null);
+
+  /**
+   * Returns the quarter of the year (1-4) for the given Date or Calendar,
+   * in the default timezone.
+   * 
+   * @param _dateOrCal - a Date or a Calendar
+   * @return the quarter (1-4), -1 if _object is no Date/Cal, -2 unknown month
+   */
+  public static int quarterOfYear(final Object _dateOrCal) {
+    return quarterOfYear(_dateOrCal, null /* timezone */, null /* locale */);
   }  
   
   /* adding */
