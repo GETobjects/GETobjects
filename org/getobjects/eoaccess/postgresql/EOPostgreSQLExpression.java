@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -21,6 +21,10 @@
 
 package org.getobjects.eoaccess.postgresql;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.getobjects.eoaccess.EOAttribute;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eoaccess.EOSQLExpression;
@@ -30,9 +34,12 @@ import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.foundation.NSTimeRange;
 
 public class EOPostgreSQLExpression extends EOSQLExpression {
+  
+  protected Calendar utcCal;
 
-  public EOPostgreSQLExpression(EOEntity _entity) {
+  public EOPostgreSQLExpression(final EOEntity _entity) {
     super(_entity);
+    this.utcCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
   }
 
   /* database specific SQL */
@@ -140,5 +147,36 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
     }
     
     return sql.toString();
+  }
+
+
+  public String formatDateValue(final Date _date, final EOAttribute _attr) {
+    // TODO: fixme. Use format specifications as denoted in the attribute
+    // TODO: is this called? Probably the formatting should be done using a
+    //       binding in the JDBC adaptor
+    
+    if (_date == null)
+      return null;
+    
+    this.utcCal.setTime(_date);
+    
+    // Format of TIMESTAMP WITH TIME ZONE (8.1 manual, section 8.5.1.3)
+    //   TIMESTAMP WITH TIME ZONE '2004-10-19 10:23:54+02'
+    
+    StringBuilder sb = new StringBuilder(32);
+    sb.append(this.utcCal.get(Calendar.YEAR));
+    sb.append('-');
+    sb.append(this.utcCal.get(Calendar.MONTH) + 1);
+    sb.append('-');
+    sb.append(this.utcCal.get(Calendar.DAY_OF_MONTH));
+    sb.append(' ');
+    sb.append(this.utcCal.get(Calendar.HOUR_OF_DAY));
+    sb.append(':');
+    sb.append(this.utcCal.get(Calendar.MINUTE));
+    sb.append(':');
+    sb.append(this.utcCal.get(Calendar.SECOND));
+    sb.append("+00"); // UTC
+
+    return sb.toString();
   }
 }

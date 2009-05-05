@@ -1236,7 +1236,9 @@ public class EOSQLExpression extends NSObject {
   }
   
   /**
-   * The current implementation just returns the 'toString()' of the Date.
+   * The current implementation just returns the 'toString()' of the Date
+   * (which is rarely the correct thing to do).
+   * You should really use bindings for that.
    * 
    * @param _v - a Date object
    * @param _attr - an EOAttribute containing formatting details
@@ -1246,6 +1248,8 @@ public class EOSQLExpression extends NSObject {
     // TODO: fixme. Use format specifications as denoted in the attribute
     // TODO: is this called? Probably the formatting should be done using a
     //       binding in the JDBC adaptor
+    if (log.isWarnEnabled())
+      log.warn("rendering a Date in SQL as a (Java formatted) String: " + this);
     return _v != null ? _v.toString() : null;
   }
   
