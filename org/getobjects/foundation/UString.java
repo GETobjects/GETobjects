@@ -427,10 +427,10 @@ public class UString {
       char c = s.charAt(i);
       if (c < 0x2d  ||
           c == 0x2f ||
-          (c > 0x39 && c < 0x3c) ||
-          (c > 0x3e && c < 0x41) ||
-          c == 0x5a ||
-          c == 0x5d || c > 0x7e)
+          (c >  0x39 && c <  0x3c) ||
+          (c >  0x3e && c <  0x41) ||
+          (c >= 0x5b && c <= 0x5d) ||
+          c > 0x7e)
         break;
     }
 
