@@ -457,7 +457,7 @@ public class EODatabaseChannel extends NSObject
   public Exception selectObjectsWithFetchSpecification
     (final EOFetchSpecification _fs, final EOObjectTrackingContext _ec)
   {
-    String[] prefetchRelPathes =
+    final String[] prefetchRelPathes =
       _fs != null ? _fs.prefetchingRelationshipKeyPaths() : null;
     
     /* simple case, no prefetches */
@@ -465,7 +465,7 @@ public class EODatabaseChannel extends NSObject
     if (prefetchRelPathes == null || prefetchRelPathes.length == 0)
       return this.primarySelectObjectsWithFetchSpecification(_fs, _ec);
 
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     if (isDebugOn) {
       log.debug("select with prefetch: " +
           UString.componentsJoinedByString(prefetchRelPathes, ", "));
@@ -570,7 +570,7 @@ public class EODatabaseChannel extends NSObject
     }
 
 
-    /* process relationships */
+    /* process relationships (key is a level1 name, value are the subpaths) */
 
     final Map<String, List<String>> leveledPrefetches =
       this.levelPrefetchSpecificiation(entity, _prefetchRelPathes);
@@ -596,6 +596,7 @@ public class EODatabaseChannel extends NSObject
       if (error != null) return error;
     }
 
+    /* fetch flattened relationships (NOT IMPLEMENTED) */
 
     final List<String> flattenedRelationships =
       this.flattenedRelationships(entity, _prefetchRelPathes);
@@ -632,6 +633,11 @@ public class EODatabaseChannel extends NSObject
   /**
    * This is the master of desaster which performs the actual fetch of the
    * relationship for a given set of 'baseObjects'.
+   * <p>
+   * <ul>
+   *   <li>relationship names can contain a repeat '*' parameter,
+   *       eg 'parentDocument*'</li>
+   * </ul>
    * 
    * @param _entity - the entity of the *base* objects
    * @param _relationNameWithParameters - the name of the relationship
@@ -723,12 +729,13 @@ public class EODatabaseChannel extends NSObject
       
       // TBD: we should batch?
       fs = new EOFetchSpecification
-        (rel.destinationEntity().name(), joinQualifier, null);
+        (rel.destinationEntity().name(), joinQualifier, null /* ordering */);
     }
     else {
       
     }
     if (_prefetchPathes != null && _prefetchPathes.size() > 0) {
+      /* apply nested prefetches */
       fs.setPrefetchingRelationshipKeyPaths
         (_prefetchPathes.toArray(new String[0]));
     }
