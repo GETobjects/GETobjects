@@ -301,7 +301,7 @@ public class UObject extends NSObject {
    * otherwise a 'Long' object.
    * Note: this downsizes Long objects!
    * 
-   * @param _objs - some values, usually a List<Number>
+   * @param _objs - some values, usually a List&lt;Number&gt;
    * @return null, or a List of Integer or Long objects
    */
   public static List<Number> listOfIntsOrLongs(final Collection _objs) {

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -18,7 +18,6 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-
 package org.getobjects.appserver.core;
 
 import java.io.File;
@@ -223,7 +222,7 @@ public class WOApplication extends NSObject
    * @param _ctx    - the context of the whole operation
    * @return a default method object, or null if there is none
    */
-  public IGoCallable lookupDefaultMethod(Object _object, WOContext _ctx) {
+  public IGoCallable lookupDefaultMethod(Object _object, final WOContext _ctx) {
     return null;
   }
 
@@ -363,7 +362,7 @@ public class WOApplication extends NSObject
     /* look in traversal path */
 
     if (_ctx != null) {
-      Object renderer =
+      final Object renderer =
         IGoObjectRendererFactory.Utility.rendererForObjectInContext(_o, _ctx);
       if (renderer != null)
         return renderer;
@@ -372,7 +371,7 @@ public class WOApplication extends NSObject
     /* check the products for a renderer */
 
     if (this.joProductManager != null) {
-      Object renderer =
+      final Object renderer =
         this.joProductManager.rendererForObjectInContext(_o, _ctx);
       if (renderer != null)
         return renderer;
@@ -403,7 +402,7 @@ public class WOApplication extends NSObject
     if (_result == null) {
       // TODO: add some customizable way to deal with this (to return some
       //       custom error page)
-      WOResponse r = _ctx.response();
+      final WOResponse r = _ctx.response();
       r.setStatus(WOMessage.HTTP_STATUS_NOT_FOUND);
       r.appendContentHTMLString("did not find requested path");
       return r;
@@ -417,7 +416,7 @@ public class WOApplication extends NSObject
 
     if (renderer == null) {
       log.error("did not find a renderer for result: " + _result);
-      WOResponse r = _ctx.response();
+      final WOResponse r = _ctx.response();
       r.setStatus(WOMessage.HTTP_STATUS_INTERNAL_ERROR);
       r.appendContentHTMLString("did not find renderer for result of class: " +
           (_result != null ? _result.getClass() : "NULL"));
@@ -476,8 +475,8 @@ public class WOApplication extends NSObject
     // TBD: Add a behaviour which makes sense for Go based applications,
     //      eg redirect to default method.
     // This is called by renderObjectInContext()
-    WORequestHandler  drh = this.defaultRequestHandler();
-    WOResourceManager rm  = this.resourceManager();
+    final WORequestHandler  drh = this.defaultRequestHandler();
+    final WOResourceManager rm  = this.resourceManager();
     String url = null;
 
     /* Note: in both cases we use the DA request handler for entry */
@@ -498,8 +497,8 @@ public class WOApplication extends NSObject
       return null;
     }
 
-    Map<String, Object>   qd = new HashMap<String, Object>(1);
-    Map<String, Object[]> fv = _ctx.request().formValues();
+    final Map<String, Object>   qd = new HashMap<String, Object>(1);
+    final Map<String, Object[]> fv = _ctx.request().formValues();
     if (fv != null) qd.putAll(fv);
     if (_ctx.hasSession())
       qd.put(WORequest.SessionIDKey, _ctx.session().sessionID());
@@ -508,7 +507,7 @@ public class WOApplication extends NSObject
     url = _ctx.directActionURLForActionNamed(url, qd);
 
     // TODO: some devices, eg mobile ones, might have issues here
-    WOResponse r = _ctx.response();
+    final WOResponse r = _ctx.response();
     r.setStatus(WOMessage.HTTP_STATUS_FOUND /* Redirect */);
     r.setHeaderForKey(url, "location");
     return r;
@@ -523,8 +522,8 @@ public class WOApplication extends NSObject
    * @param _rq   - the WORequest
    * @param _rqId - the numeric ID of the request (counter)
    */
-  protected void logRequestStart(WORequest _rq, int _rqId) {
-    StringBuilder sb = new StringBuilder(512);
+  protected void logRequestStart(final WORequest _rq, final int _rqId) {
+    final StringBuilder sb = new StringBuilder(512);
     sb.append("WOApp[");
     sb.append(_rqId);
     sb.append("] ");
@@ -533,7 +532,7 @@ public class WOApplication extends NSObject
       sb.append(" ");
       sb.append(_rq.uri());
 
-      String[] qks = _rq.formValueKeys();
+      final String[] qks = _rq.formValueKeys();
       if (qks != null && qks.length > 0) {
         sb.append(" F[");
         for (String qk: qks) {
@@ -546,7 +545,7 @@ public class WOApplication extends NSObject
             continue;
           }
 
-          Object[] vs = _rq.formValuesForKey(qk);
+          final Object[] vs = _rq.formValuesForKey(qk);
           if (vs != null && vs.length > 0) {
             sb.append('=');
             boolean isFirst = true;
@@ -570,7 +569,7 @@ public class WOApplication extends NSObject
         sb.append(" ]");
       }
 
-      Collection<WOCookie> cookies = _rq.cookies();
+      final Collection<WOCookie> cookies = _rq.cookies();
       if (cookies != null && cookies.size() > 0) {
         sb.append(" C[");
         WOCookie.addCookieInfo(cookies, sb);
@@ -591,7 +590,7 @@ public class WOApplication extends NSObject
    * @param _r    - the generated WOResponse
    */
   protected void logRequestEnd(WORequest _rq, int _rqId, WOResponse _r) {
-    StringBuilder sb = new StringBuilder(512);
+    final StringBuilder sb = new StringBuilder(512);
     sb.append("WOApp[");
     sb.append(_rqId);
     sb.append("] ");
@@ -615,7 +614,7 @@ public class WOApplication extends NSObject
         sb.append(s);
       }
 
-      Collection<WOCookie> cookies = _r.cookies();
+      final Collection<WOCookie> cookies = _r.cookies();
       if (cookies != null && cookies.size() > 0) {
         sb.append(" C[");
         WOCookie.addCookieInfo(cookies, sb);
@@ -632,7 +631,7 @@ public class WOApplication extends NSObject
       sb.append("no response");
 
     if (_rq != null) {
-      double duration = _rq.requestDurationSinceStart();
+      final double duration = _rq.requestDurationSinceStart();
       if (duration > 0.0) {
         // TBD: are there more efficient ways to do this? (apparently there is
         //      no way to cache the parsed format?)
@@ -657,7 +656,7 @@ public class WOApplication extends NSObject
    * @param _rq - the WORequest to be handled
    * @return a WORequestHandler object responsible for processing the request
    */
-  public WORequestHandler requestHandlerForRequest(WORequest _rq) {
+  public WORequestHandler requestHandlerForRequest(final WORequest _rq) {
     WORequestHandler rh;
     String k;
 
@@ -687,7 +686,7 @@ public class WOApplication extends NSObject
    * @param _rh  - the request handler object to be mapped
    * @param _key - the request handler key which will trigger the handler
    */
-  public void registerRequestHandler(WORequestHandler _rh, String _key) {
+  public void registerRequestHandler(WORequestHandler _rh, final String _key) {
     this.requestHandlerRegistry.put(_key, _rh);
   }
 
@@ -695,7 +694,7 @@ public class WOApplication extends NSObject
     return (String[])(this.requestHandlerRegistry.keySet().toArray());
   }
 
-  public void setDefaultRequestHandler(WORequestHandler _rh) {
+  public void setDefaultRequestHandler(final WORequestHandler _rh) {
     // THREAD: may not be called at runtime
     this.defaultRequestHandler = _rh;
   }
@@ -719,7 +718,7 @@ public class WOApplication extends NSObject
    *
    * @param _name - the application name to be used
    */
-  public void _setName(String _name) {
+  public void _setName(final String _name) {
     this.name = _name;
   }
   /**
@@ -738,7 +737,7 @@ public class WOApplication extends NSObject
    * line or debugger.
    * @param _properties - non-permanent properties used during this run
    */
-  public void _setVolatileProperties(Properties _properties) {
+  public void _setVolatileProperties(final Properties _properties) {
     this.volatileProperties = _properties;
   }
 
@@ -753,7 +752,7 @@ public class WOApplication extends NSObject
   public String contextClassName() {
     return null; /* use Context class of application package */
   }
-  public WOContext createContextForRequest(WORequest _rq) {
+  public WOContext createContextForRequest(final WORequest _rq) {
     if (this.contextClass == null)
       return new WOContext(this, _rq);
 
@@ -783,11 +782,11 @@ public class WOApplication extends NSObject
    * @param _ctx      - the context for the component
    * @return the WOComponent or null if the WOResourceManager found none
    */
-  public WOComponent pageWithName(String _pageName, WOContext _ctx) {
+  public WOComponent pageWithName(String _pageName, final WOContext _ctx) {
     pageLog.debug("pageWithName:" + _pageName);
 
     WOResourceManager rm = null;
-    WOComponent cursor = _ctx != null ? _ctx.component() : null;
+    final WOComponent cursor = _ctx != null ? _ctx.component() : null;
     if (cursor != null)
       rm = cursor.resourceManager();
     if (rm == null)
@@ -799,7 +798,7 @@ public class WOApplication extends NSObject
       return null;
     }
 
-    WOComponent page = rm.pageWithName(_pageName, _ctx);
+    final WOComponent page = rm.pageWithName(_pageName, _ctx);
     if (page == null) {
       pageLog.error("could not instantiate page " + _pageName + " using: " +rm);
       return null;
@@ -821,7 +820,7 @@ public class WOApplication extends NSObject
    *
    * @param _wss - the session store to be used with this application.
    */
-  public void setSessionStore(WOSessionStore _wss) {
+  public void setSessionStore(final WOSessionStore _wss) {
     // NOTE: only call in threadsafe sections!
     this.sessionStore = _wss;
   }
@@ -848,8 +847,8 @@ public class WOApplication extends NSObject
    * @param _ctx - the WOContext in which the session should be restored
    * @return the restored and awake session or null if it could not be restored
    */
-  public WOSession restoreSessionWithID(String _sid, WOContext _ctx) {
-    WORequest rq = _ctx != null ? _ctx.request() : null;
+  public WOSession restoreSessionWithID(final String _sid, WOContext _ctx) {
+    final WORequest rq = _ctx != null ? _ctx.request() : null;
     //System.err.println("RESTORE: " + _sid + ": " + rq.cookies());
 
     if (_sid == null) {
@@ -857,7 +856,7 @@ public class WOApplication extends NSObject
       return null;
     }
 
-    WOSessionStore st = this.sessionStore();
+    final WOSessionStore st = this.sessionStore();
     if (st == null) {
       log.info("cannot restore session, no store is available: " + _sid);
       return null;
@@ -899,20 +898,20 @@ public class WOApplication extends NSObject
    * @param _ctx - the context which contains the session to be stored
    * @return true if the session could be stored, false on error
    */
-  public boolean saveSessionForContext(WOContext _ctx) {
+  public boolean saveSessionForContext(final WOContext _ctx) {
     // TBD: check whether we always properly check in session! (whether we always
     //      call this method in case we unarchived a session)
     if (_ctx == null || !_ctx.hasSession())
       return false;
 
-    WOSessionStore st = this.sessionStore();
+    final WOSessionStore st = this.sessionStore();
     if (st == null) {
       log.error("cannot save session, missing a session store!");
       return false;
     }
 
     /* first put session to sleep */
-    WOSession sn = _ctx.session();
+    final WOSession sn = _ctx.session();
     if (sn != null) {
       sn._sleepWithContext(_ctx);
 
@@ -944,13 +943,13 @@ public class WOApplication extends NSObject
    * @param _ctx the context in which the session shall be active initially.
    * @return a fresh session
    */
-  public WOSession initializeSession(WOContext _ctx) {
+  public WOSession initializeSession(final WOContext _ctx) {
     if (_ctx == null) {
       log.info("got no context in initializeSession!");
       return null;
     }
 
-    WOSession sn = this.createSessionForRequest(_ctx.request());
+    final WOSession sn = this.createSessionForRequest(_ctx.request());
     if (sn == null) {
       log.debug("createSessionForRequest returned null ...");
       return null;
@@ -972,7 +971,7 @@ public class WOApplication extends NSObject
    * @param _rq  the request which is associated with the new session.
    * @return a new, not-yet-awake session
    */
-  public WOSession createSessionForRequest(WORequest _rq) {
+  public WOSession createSessionForRequest(final WORequest _rq) {
     if (this.sessionClass == null)
       return new WOSession();
 
@@ -990,7 +989,7 @@ public class WOApplication extends NSObject
    * session. If you want to store complex objects in your session, you might
    * want to override this.
    */
-  public WOQuerySession restoreQuerySessionInContext(WOContext _ctx) {
+  public WOQuerySession restoreQuerySessionInContext(final WOContext _ctx) {
     if (_ctx == null) {
       log.error("attempt to restore query session w/o context!");
       return null;
@@ -1015,7 +1014,7 @@ public class WOApplication extends NSObject
    *
    * @param _rm - the new WOResourceManager
    */
-  public void setResourceManager(WOResourceManager _rm) {
+  public void setResourceManager(final WOResourceManager _rm) {
     this.resourceManager = _rm;
   }
   public WOResourceManager resourceManager() {
@@ -1047,7 +1046,7 @@ public class WOApplication extends NSObject
     return _ctx.response();
   }
 
-  public WOActionResults handleSessionRestorationError(WOContext _ctx) {
+  public WOActionResults handleSessionRestorationError(final WOContext _ctx) {
     // TODO: improve exception page
     _ctx.response().appendContentHTMLString("sn fail: " + _ctx.toString());
     return _ctx.response();
@@ -1095,14 +1094,14 @@ public class WOApplication extends NSObject
    * one is active. Otherwise it enters the contexts' page and calls
    * takeValuesFromRequest() on it.
    */
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (_ctx == null)
       return;
 
     if (_ctx.hasSession())
       _ctx.session().takeValuesFromRequest(_rq, _ctx);
     else {
-      WOComponent page = _ctx.page();
+      final WOComponent page = _ctx.page();
 
       if (page != null) {
         _ctx.enterComponent(page, null /* component content */);
@@ -1125,14 +1124,14 @@ public class WOApplication extends NSObject
    * one is active. Otherwise it enters the contexts' page and calls
    * invokeAction() on it.
    */
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
-    Object result;
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
+    final Object result;
 
     if (_ctx.hasSession()) {
       result = _ctx.session().invokeAction(_rq, _ctx);
     }
     else {
-      WOComponent page = _ctx.page();
+      final WOComponent page = _ctx.page();
 
       if (page != null) {
         _ctx.enterComponent(page, null /* component content */);
@@ -1157,11 +1156,11 @@ public class WOApplication extends NSObject
    * @param _response - the response
    * @param _ctx      - the context
    */
-  public void appendToResponse(WOResponse _response, WOContext _ctx) {
+  public void appendToResponse(WOResponse _response, final WOContext _ctx) {
     if (_ctx.hasSession())
       _ctx.session().appendToResponse(_response, _ctx);
     else {
-      WOComponent page = _ctx.page();
+      final WOComponent page = _ctx.page();
 
       if (page != null) {
         _ctx.enterComponent(page, null /* component content */);
@@ -1267,7 +1266,7 @@ public class WOApplication extends NSObject
    * @param _in - a stream containing properties
    * @return true if the loading was successful, false on error
    */
-  protected boolean loadProperties(InputStream _in) {
+  protected boolean loadProperties(final InputStream _in) {
     if (_in == null)
       return true; /* yes, true, resource was not found, no load error */
 
@@ -1282,10 +1281,10 @@ public class WOApplication extends NSObject
 
   /* a trampoline to make the properties accessible via KVC */
   protected NSObject defaults = new NSObject() {
-    public void takeValueForKey(Object _value, String _key) {
+    public void takeValueForKey(final Object _value, final String _key) {
       // do nothing, we do not mutate properties
     }
-    public Object valueForKey(String _key) {
+    public Object valueForKey(final String _key) {
       return WOApplication.this.properties.getProperty(_key);
     }
   };
@@ -1308,9 +1307,9 @@ public class WOApplication extends NSObject
 
   /* page cache */
 
-  public WOResponse handlePageRestorationErrorInContext(WOContext _ctx) {
+  public WOResponse handlePageRestorationErrorInContext(final WOContext _ctx) {
     log.warn("could not restore page from context: " + _ctx);
-    WOResponse r = _ctx.response();
+    final WOResponse r = _ctx.response();
     r.setStatus(500 /* server error */); // TBD?!
     r.appendContentString("<h1>You have backtracked too far</h1>");
     return r;
@@ -1334,18 +1333,18 @@ public class WOApplication extends NSObject
   /* KVC */
 
   @Override
-  public Object handleQueryWithUnboundKey(String _key) {
+  public Object handleQueryWithUnboundKey(final String _key) {
     return this.objectForKey(_key);
   }
   @Override
-  public void handleTakeValueForUnboundKey(Object _value, String _key) {
+  public void handleTakeValueForUnboundKey(Object _value, final String _key) {
     this.setObjectForKey(_value, _key);
   }
 
 
   /* GoClass */
 
-  public GoClass joClassInContext(IGoContext _ctx) {
+  public GoClass joClassInContext(final IGoContext _ctx) {
     return _ctx.goClassRegistry().goClassForJavaObject(this, _ctx);
   }
 
@@ -1369,9 +1368,9 @@ public class WOApplication extends NSObject
 
     /* check class */
 
-    GoClass joClass = this.joClassInContext(_ctx);
+    final GoClass joClass = this.joClassInContext(_ctx);
     if (joClass != null) {
-      Object o = joClass.lookupName(this, _name, _ctx);
+      final Object o = joClass.lookupName(this, _name, _ctx);
       if (o != null) return o;
     }
 
@@ -1389,7 +1388,7 @@ public class WOApplication extends NSObject
 
   /* extra attributes */
 
-  public void setObjectForKey(Object _value, String _key) {
+  public void setObjectForKey(final Object _value, final String _key) {
     if (_value == null) {
       this.removeObjectForKey(_key);
       return;
@@ -1398,14 +1397,14 @@ public class WOApplication extends NSObject
     this.extraAttributes.put(_key, _value);
   }
 
-  public void removeObjectForKey(String _key) {
+  public void removeObjectForKey(final String _key) {
     if (this.extraAttributes == null)
       return;
 
     this.extraAttributes.remove(_key);
   }
 
-  public Object objectForKey(String _key) {
+  public Object objectForKey(final String _key) {
     if (_key == null || this.extraAttributes == null)
       return null;
 
@@ -1424,7 +1423,7 @@ public class WOApplication extends NSObject
   }
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     if (this.name != null) {
@@ -1441,7 +1440,7 @@ public class WOApplication extends NSObject
       this.appendExtraAttributesToDescription(_d);
   }
 
-  public void appendExtraAttributesToDescription(StringBuilder _d) {
+  public void appendExtraAttributesToDescription(final StringBuilder _d) {
     if (this.extraAttributes == null || this.extraAttributes.size() == 0)
       return;
 
@@ -1453,7 +1452,7 @@ public class WOApplication extends NSObject
 
       _d.append(ekey);
 
-      Object v = this.extraAttributes.get(ekey);
+      final Object v = this.extraAttributes.get(ekey);
       if (v == null)
         _d.append("=null");
       else if (v instanceof Number) {
