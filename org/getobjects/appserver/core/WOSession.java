@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -134,6 +134,8 @@ public class WOSession extends NSObject implements INSExtraVariables {
   }
   
   public void setTimeOut(final double _value) {
+    if (log.isInfoEnabled())
+      log.info("setting session timeout to: " + _value + "s");
     this.timeOut = _value;
   }
   public double timeOut() {

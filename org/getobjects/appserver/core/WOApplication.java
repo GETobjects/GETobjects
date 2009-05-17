@@ -954,6 +954,15 @@ public class WOApplication extends NSObject
       log.debug("createSessionForRequest returned null ...");
       return null;
     }
+    
+    final Object tov = this.defaults().valueForKey("WOSessionTimeOut");
+    if (tov != null) {
+      int to = UObject.intValue(tov);
+      if (to < 1)
+        log.error("unexpected WOSessionTimeOut value (must be >0s):" + tov);
+      else
+        sn.setTimeOut(to);
+    }
 
     _ctx.setNewSession(sn);
     sn._awakeWithContext(_ctx);
