@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -50,7 +50,7 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
   
   /* constructor */
   
-  public EOObjectTrackingContext(EOObjectStore _parentStore) {
+  public EOObjectTrackingContext(final EOObjectStore _parentStore) {
     super();
     this.parentStore = _parentStore;
     
@@ -80,7 +80,7 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
   }
   
   public EOObjectStore rootObjectStore() {
-    EOObjectStore os = this.parentObjectStore();
+    final EOObjectStore os = this.parentObjectStore();
     return (os instanceof EOObjectTrackingContext)
       ? ((EOObjectTrackingContext)os).rootObjectStore() : os;
   }
@@ -101,9 +101,11 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
   public List objectsWithFetchSpecification
     (final EOFetchSpecification _fs, final EOObjectTrackingContext _ec)
   {
+    this.lastException = null;
+    
     if (_fs != null && _fs.requiresAllQualifierBindingVariables()) {
-      EOQualifier  q    = _fs.qualifier();
-      List<String> keys = q != null ? q.bindingKeys() : null;
+      final EOQualifier  q    = _fs.qualifier();
+      final List<String> keys = q != null ? q.bindingKeys() : null;
       if (keys != null && keys.size() > 0) {
         log().error("fetch specification has unresolved variables: " + 
             keys + "\n  " + _fs);
@@ -113,11 +115,11 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
     
     final boolean debugPerf = perflog.isDebugEnabled();
     
-    EOObjectStore os = this.rootObjectStore();
+    final EOObjectStore os = this.rootObjectStore();
     
     if (debugPerf) perflog.debug("TC: objectsWithFetchSpecification() ...");
     
-    List r = os.objectsWithFetchSpecification(_fs, _ec);
+    final List r = os.objectsWithFetchSpecification(_fs, _ec);
     
     if (debugPerf) {
       perflog.debug("TC: objectsWithFetchSpecification(): " +
@@ -159,7 +161,7 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
    * @param _gid - the global id which identifies the object
    * @return the object for the GID or null if none could be found
    */
-  public Object objectForGlobalID(EOGlobalID _gid) {
+  public Object objectForGlobalID(final EOGlobalID _gid) {
     return (_gid != null) ? this.gidToObject.get(_gid) : null;
   }
   
@@ -171,11 +173,11 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
    * @param _object - the object to retrieve the GID for
    * @return the GID or null if none could be found
    */
-  public EOGlobalID globalIDForObject(Object _object) {
+  public EOGlobalID globalIDForObject(final Object _object) {
     if (_object == null)
       return null;
     
-    EOGlobalID gid = (EOGlobalID)
+    final EOGlobalID gid = (EOGlobalID)
       NSKeyValueCoding.Utility.valueForKey(_object, "globalID");
     if (gid != null)
       return gid;
@@ -194,8 +196,8 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
     Object[] vals = UList.valuesForKey(_objects, "globalID");
     if (vals == null) return null;
     
-    int len = _objects.length;
-    EOGlobalID[] gids = new EOGlobalID[len];
+    final int len = _objects.length;
+    final EOGlobalID[] gids = new EOGlobalID[len];
     int[] idx      = null;
     int   idxCount = 0;
     
@@ -235,7 +237,7 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
     
     return gids;
   }
-  public EOGlobalID[] globalIDsForObjects(Collection<?> _objects) {
+  public EOGlobalID[] globalIDsForObjects(final Collection<?> _objects) {
     return _objects!=null ? this.globalIDsForObjects(_objects.toArray()) : null;
   }
   
@@ -256,8 +258,8 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
 
   /* description */
   
-  public void printRegisteredObjects(PrintStream _out) {
-    Collection reg = this.registeredObjects();
+  public void printRegisteredObjects(final PrintStream _out) {
+    final Collection reg = this.registeredObjects();
     if (reg.size() == 0) {
       _out.println("EC: no objects registered.");
       return;
@@ -265,8 +267,8 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
     
     _out.println("EC: objects registered: " + reg.size());
     
-    Map<Object, List<Object>> regs = UList.groupByKey(reg, "entityName");
-    for (Object ename: regs.keySet()) {
+    final Map<Object, List<Object>> regs = UList.groupByKey(reg, "entityName");
+    for (final Object ename: regs.keySet()) {
       _out.println("  entity: " + ename);
       
       for (Object object: regs.get(ename))
@@ -275,7 +277,7 @@ public abstract class EOObjectTrackingContext extends EOObjectStore {
   }
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     _d.append(" #objects=");

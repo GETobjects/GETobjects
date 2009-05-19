@@ -845,6 +845,8 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    *     "SELECT DISTINCT function FROM employment" +
    *     " %(where)s ORDER BY function ASC %(limit)s",
    *     "limit", limit, "q", "function LIKE '" + this.F("q").trim() + "*'");
+   *     // 'limit' is not a variable, its the fetchspec limit (hardcoded)
+   *     // you can use variables inside qualifiers, but not in the SQL
    * </pre>
    * For a discussion of the available %(xyz)s patterns, check the
    * EOSQLExpression class.
