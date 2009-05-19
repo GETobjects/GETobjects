@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -20,6 +20,8 @@
 */
 package org.getobjects.eocontrol;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -30,6 +32,7 @@ import org.getobjects.foundation.NSObject;
  * to represent a primary key in a relational database.
  */
 public abstract class EOGlobalID extends NSObject implements Cloneable {
+  protected static final Log log = LogFactory.getLog("EOGlobalID");
 
   /**
    * EOGlobalIDs are always immutable, so the clone() method returns the

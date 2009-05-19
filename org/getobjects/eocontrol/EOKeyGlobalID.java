@@ -23,6 +23,8 @@ package org.getobjects.eocontrol;
 import java.util.Arrays;
 import java.util.List;
 
+import org.getobjects.foundation.UString;
+
 /**
  * EOKeyGlobalID
  * <p>
@@ -41,18 +43,24 @@ public abstract class EOKeyGlobalID extends EOGlobalID {
   protected Object[] values;
   
   /* non-public, do not subclass */
-  EOKeyGlobalID(String _entityName, Object[] _values) {
-    this.entityName = _entityName.intern();
+  EOKeyGlobalID(final String _entityName, final Object[] _values) {
+    this.entityName = _entityName != null ? _entityName.intern() : null;
     this.values     = _values;
     
     Object v = _values[_values.length - 1];
-    this.hashCode = v.hashCode(); // what to do if its null?
+    
+    if (v == null) {
+      log.warn("attempt to create EOKeyGlobalID w/o value (entity=" +
+          _entityName + "): " + UString.componentsJoinedByString(_values, ","));
+    }
+    
+    this.hashCode = v != null ? v.hashCode() : 0; // what to do if its null?
   }
   
   public static EOKeyGlobalID globalIDWithEntityName
     (final String _entityName, final Object[] _values)
   {
-    int len = _values != null ? _values.length : 0;
+    final int len = _values != null ? _values.length : 0;
     
     switch (len) {
       case 0:

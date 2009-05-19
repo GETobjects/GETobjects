@@ -374,11 +374,26 @@ public class EOEntity extends NSObject
     if (count == 0)
       return null;
     
+    boolean hadNonNull = false;
     final Object[] keyValues = new Object[count];
-    for (int i = 0; i < count; i++)
-      keyValues[i] = _row.get(this.primaryKeyAttributeNames[i]);
+    for (int i = 0; i < count; i++) {
+      if ((keyValues[i] = _row.get(this.primaryKeyAttributeNames[i])) != null)
+        hadNonNull = true;
+    }
     
-    return EOKeyGlobalID.globalIDWithEntityName(this.name(), keyValues);
+    if (!hadNonNull) {
+      log.error("found no primary key value in row, entity: " + this +
+          ", row: " + _row);
+      return null;
+    }
+    
+    final String ename = this.name();
+    if (ename == null) {
+      log.error("detected EOEntity w/o name?: " + this);
+      return null;
+    }
+    
+    return EOKeyGlobalID.globalIDWithEntityName(ename, keyValues);
   }
   
   
