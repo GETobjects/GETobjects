@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006,2009 Helge Hess
 
   This file is part of Go.
 
@@ -146,6 +146,19 @@ public class QualifierParser {
                aq.qualifiers()[0] instanceof EOKeyValueQualifier);
     assertTrue("second qualifier is not an OR qualifier",
                aq.qualifiers()[1] instanceof EOOrQualifier);
+  }
+  
+  @Test public void testArrayINQualifier() {
+    EOQualifier q = EOQualifier.qualifierWithQualifierFormat
+      ("person.aksa_status IN ('301','302','303')");
+    assertNotNull("could not parse qualifier", q);
+
+    assertTrue("did not parse a key/value qualifier",
+               q instanceof EOKeyValueQualifier);
+    EOKeyValueQualifier aq = (EOKeyValueQualifier)q;
+    
+    assertEquals("parsed key is incorrect",
+                 "person.aksa_status", aq.key());
   }
   
   @Test public void testSimpleBoolKeyValueQualifier() {

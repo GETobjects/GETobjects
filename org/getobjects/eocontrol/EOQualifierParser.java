@@ -383,7 +383,13 @@ public class EOQualifierParser extends NSObject {
 
     if (this.matchConstant()) {
       /* EOKeyValueQualifier */
-      Object v = this.parseConstant();
+      boolean isIN = false;
+      if (operation != null) {
+        if (operation.equals("IN") || operation.equals("NOT IN"))
+          isIN = true;
+      }
+      
+      final Object v = this.parseConstant(!isIN /* allow cast */);
       if (log.isDebugEnabled())
         log.debug("parsed constant: " + v);
       
@@ -413,7 +419,7 @@ public class EOQualifierParser extends NSObject {
       return null; /* ERROR */
     }
     
-    EOQualifier q = this.parseOneQualifier();
+    final EOQualifier q = this.parseOneQualifier();
     if (q == null) return null; /* parsing failed */
     
     return new EONotQualifier(q);    
@@ -429,7 +435,7 @@ public class EOQualifierParser extends NSObject {
     }
     
     /* parse qualifier */
-    EOQualifier q = this.parseCompoundQualifier();
+    final EOQualifier q = this.parseCompoundQualifier();
     if (q == null) return null; /* parsing failed */
     
     this.skipSpaces();
@@ -703,7 +709,7 @@ public class EOQualifierParser extends NSObject {
   }
   
   protected boolean matchCast() {
-    if (this.idx >= this.string.length)
+    if ((this.idx + 2) >= this.string.length) /* at least (a) */
       return false;
     
     if (this.string[this.idx] == '(') {
@@ -715,6 +721,8 @@ public class EOQualifierParser extends NSObject {
   }
   
   protected String parseCast() {
+    if ((this.idx + 2) >= this.string.length) /* at least (a) */
+      return null;
     if (this.string[this.idx] != '(')
       return null;
     
@@ -723,7 +731,7 @@ public class EOQualifierParser extends NSObject {
       return null;
     }
     
-    String castClass = this.parseIdentifier(false /* on all */);
+    final String castClass = this.parseIdentifier(false /* on all */);
     if (castClass == null) {
       this.addError("expected class cast identifier after parenthesis!");
       return null;        
@@ -752,8 +760,8 @@ public class EOQualifierParser extends NSObject {
    * <p>
    * @return the value of the constant
    */
-  protected Object parseConstant() {
-    String castClass = this.parseCast();
+  protected Object parseConstant(final boolean _allowCast) {
+    final String castClass = _allowCast ? this.parseCast() : null;
     Object v = null;
     
     if (this.string[this.idx] == '\'')
@@ -766,6 +774,11 @@ public class EOQualifierParser extends NSObject {
       v = Boolean.TRUE;
     else if (this.consumeIfMatch(TOK_FALSE) || this.consumeIfMatch(TOK_NO))
       v = Boolean.FALSE;
+    else if (this.match('(')) {
+      /* a plist array after an IN (otherwise a CAST is handled above!) */
+      this.addError("plist array values after IN are not yet supported!");
+      v = null;
+    }
     else if (this.consumeIfMatch(TOK_NULL))
       return null; // do not apply casts for null
     else if (this.consumeIfMatch(TOK_null))
@@ -785,7 +798,7 @@ public class EOQualifierParser extends NSObject {
   }
   
   protected String parseQuotedString() {
-    char quoteChar = this.string[this.idx];
+    final char quoteChar = this.string[this.idx];
     
     /* a quoted string */
     int pos      = this.idx + 1;  /* skip quote */
@@ -846,7 +859,7 @@ public class EOQualifierParser extends NSObject {
     int len = i - this.idx;
     /* Note: len==0 cannot happen, catched above */
     
-    String numstr = new String(this.string, this.idx, len);
+    final String numstr = new String(this.string, this.idx, len);
     this.idx += len; /* consume */
 
     try {
