@@ -592,11 +592,13 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   /**
    * Performs the given SQL and returns the number of objects which got updated
    * during the operation.
+   * If an error occurs, this method returns -1 and sets the lastException
+   * of the channel to the raised error.
    * 
    * @param _sql - the SQL, usually and UPDATE, INSERT or DELETE
    * @return number of affected rows, or a negative number on errors
    */
-  public int performUpdateSQL(String _sql) {
+  public int performUpdateSQL(final String _sql) {
     if (_sql == null || _sql.length() == 0) {
       log.error("performUpdateSQL caller gave us no SQL ...");
       this.lastException = new Exception("got no SQL to perform!");
@@ -617,7 +619,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       
       updateCount = stmt.executeUpdate(_sql);
     }
-    catch (SQLException e) {
+    catch (final SQLException e) {
       this.lastException = e;
       log.info("could not execute SQL statement: " + _sql, e);
       updateCount = -1;

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -52,7 +52,7 @@ public class EOSQLExpressionFactory extends NSObject {
   protected EOAdaptor adaptor;
   protected Class     expressionClass;
   
-  public EOSQLExpressionFactory(EOAdaptor _adaptor) {
+  public EOSQLExpressionFactory(final EOAdaptor _adaptor) {
     this.adaptor = _adaptor;
     
     if (this.adaptor != null)
@@ -67,7 +67,7 @@ public class EOSQLExpressionFactory extends NSObject {
   
   /* factory */
   
-  public EOSQLExpression createExpression(EOEntity _e) {
+  public EOSQLExpression createExpression(final EOEntity _e) {
     if (this.expressionClass != null) {
       return (EOSQLExpression)NSJavaRuntime.NSAllocateObject
                (this.expressionClass, EOEntity.class, _e);
@@ -75,25 +75,25 @@ public class EOSQLExpressionFactory extends NSObject {
     return new EOSQLExpression(_e);
   }
   
-  public EOSQLExpression expressionForString(String _sql) {
+  public EOSQLExpression expressionForString(final String _sql) {
     if (_sql == null || _sql.length() == 0) return null;
-    EOSQLExpression e = this.createExpression(null /* entity */);
+    final EOSQLExpression e = this.createExpression(null /* entity */);
     e.setStatement(_sql);
     return e;
   }
   
   public EOSQLExpression deleteStatementWithQualifier
-    (EOQualifier _qualifier, EOEntity _entity)
+    (final EOQualifier _qualifier, final EOEntity _entity)
   {
-    EOSQLExpression e = this.createExpression(_entity);
+    final EOSQLExpression e = this.createExpression(_entity);
     e.prepareDeleteExpressionForQualifier(_qualifier);
     return e;
   }
   
   public EOSQLExpression insertStatementForRow
-    (Map<String, Object> _row, EOEntity _entity)
+    (final Map<String, Object> _row, final EOEntity _entity)
   {
-    EOSQLExpression e = this.createExpression(_entity);
+    final EOSQLExpression e = this.createExpression(_entity);
     e.prepareInsertExpressionWithRow(_row);
     return e;
   }
@@ -101,7 +101,7 @@ public class EOSQLExpressionFactory extends NSObject {
   public EOSQLExpression updateStatementForRow
     (Map<String, Object> _row, EOQualifier _qualifier, EOEntity _entity)
   {
-    EOSQLExpression e = this.createExpression(_entity);
+    final EOSQLExpression e = this.createExpression(_entity);
     e.prepareUpdateExpressionWithRow(_row, _qualifier);
     return e;
   }
@@ -117,7 +117,7 @@ public class EOSQLExpressionFactory extends NSObject {
     /*
      * Let the adaptor construct a new, database specific expression object. 
      */
-    EOSQLExpression e = this.createExpression(_e);
+    final EOSQLExpression e = this.createExpression(_e);
     
     /*
      * Note: Despite the name 'prepare' this already constructs the SQL inside
@@ -134,7 +134,7 @@ public class EOSQLExpressionFactory extends NSObject {
   
   /* description */
 
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.adaptor != null) _d.append(" adaptor=" + this.adaptor);
