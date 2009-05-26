@@ -149,6 +149,19 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
     return sql.toString();
   }
 
+  private static final String[] mStrings = {
+      "01", "02", "03", "04", "05", "06",
+      "07", "08", "09", "10", "11", "12"
+  };
+  private static final String[] nStrings = {
+      "00",
+      "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+      "11", "12", "13", "14", "15", "16", "17", "18", "19", "10",
+      "21", "22", "23", "24", "25", "26", "27", "28", "29", "10",
+      "31", "32", "33", "34", "35", "36", "37", "38", "39", "10",
+      "41", "42", "43", "44", "45", "46", "47", "48", "49", "10",
+      "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"
+  };
 
   public String formatDateValue(final Date _date, final EOAttribute _attr) {
     // TODO: fixme. Use format specifications as denoted in the attribute
@@ -163,19 +176,21 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
     // Format of TIMESTAMP WITH TIME ZONE (8.1 manual, section 8.5.1.3)
     //   TIMESTAMP WITH TIME ZONE '2004-10-19 10:23:54+02'
     
-    StringBuilder sb = new StringBuilder(32);
+    final StringBuilder sb = new StringBuilder(32);
+    sb.append("'");
     sb.append(this.utcCal.get(Calendar.YEAR));
     sb.append('-');
-    sb.append(this.utcCal.get(Calendar.MONTH) + 1);
+    sb.append(mStrings[this.utcCal.get(Calendar.MONTH)]);
     sb.append('-');
-    sb.append(this.utcCal.get(Calendar.DAY_OF_MONTH));
+    sb.append(nStrings[this.utcCal.get(Calendar.DAY_OF_MONTH)]);
     sb.append(' ');
-    sb.append(this.utcCal.get(Calendar.HOUR_OF_DAY));
+    sb.append(nStrings[this.utcCal.get(Calendar.HOUR_OF_DAY)]);
     sb.append(':');
-    sb.append(this.utcCal.get(Calendar.MINUTE));
+    sb.append(nStrings[this.utcCal.get(Calendar.MINUTE)]);
     sb.append(':');
-    sb.append(this.utcCal.get(Calendar.SECOND));
+    sb.append(nStrings[this.utcCal.get(Calendar.SECOND)]);
     sb.append("+00"); // UTC
+    sb.append("'");
 
     return sb.toString();
   }

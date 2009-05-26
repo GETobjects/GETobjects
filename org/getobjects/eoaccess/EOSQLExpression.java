@@ -1250,7 +1250,8 @@ public class EOSQLExpression extends NSObject {
     //       binding in the JDBC adaptor
     if (log.isWarnEnabled())
       log.warn("rendering a Date in SQL as a (Java formatted) String: " + this);
-    return _v != null ? _v.toString() : null;
+    if (_v == null) return null;
+    return this.formatStringValue(_v.toString());
   }
   
   /**
