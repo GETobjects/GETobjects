@@ -661,6 +661,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    */
   public boolean insertRow(String _table, final Map<String, Object> _record) {
     // Note: this does not support insertion of NULLs
+    this.lastException = null;
     if (_table == null || _record == null)
       return false;
     
@@ -675,9 +676,19 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     return this.insertRow(_table, columns, types, values);
   }
   
+  /**
+   * Inserts a row in a table.
+   * 
+   * @param _table  - table name, eg 'person'
+   * @param _col    - columns array
+   * @param _types  - SQL types array
+   * @param _vals   - column values array
+   * @return true if a record got inserted
+   */
   public boolean insertRow
     (final String _table, String _cols[], int _types[], Object _vals[])
   {
+    this.lastException = null;
     if (_table == null || _cols == null)
       return false;
     
@@ -731,13 +742,14 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     }
     catch (SQLException ex) {
       log.error("could not perform INSERT: " + sql.toString(), ex);
+      this.lastException = ex;
     }
     finally {
       // TODO: fix me
       this._releaseResources(stmt, null);
     }
     
-    return insertCount == 1;
+    return insertCount == 1 ? true : false;
   }
   
   /**
@@ -778,6 +790,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         final Map<String, Object> _record)
   {
     // Note: this does not support insertion of NULLs
+    this.lastException = null;
     if (_table == null || _record == null)
       return false;
     
@@ -807,6 +820,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     (final String _table, final String _colname, final Object _colvalue, 
      final String _cols[], final int _types[], final Object _vals[])
   {
+    this.lastException = null;
+    
     if (_table == null || _cols == null || _colname == null || _colvalue ==null)
       return false;
     
@@ -860,6 +875,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     }
     catch (SQLException ex) {
       log.error("could not perform UPDATE: " + sql.toString(), ex);
+      this.lastException = ex;
     }
     finally {
       // TODO: fix me, check result, check connection
@@ -872,6 +888,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
   
   public Integer nextNumberInSequence(final String _sequence) {
     log.warn("this EOAdaptor does not implement sequence fetches ...");
+    this.lastException =
+      new NSException("adaptor does not implement sequence fetches");
     return null;
   }
   
