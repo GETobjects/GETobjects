@@ -65,6 +65,21 @@ public class UMap extends NSObject {
   }
 
   /**
+   * This method adds to a Map from a set of given key/value arguments.
+   * <p>
+   * Example:
+   * <pre>UMap.add(adr, "zip", 39112, "city", "Magdeburg");</pre>
+   */
+  @SuppressWarnings("unchecked")
+  public static final void add(Map _map, Object... _values) {
+    int len = _values != null ? _values.length : 0;
+    if (len == 0) return;
+    
+    for (int i = 0; i < len; i += 2)
+      _map.put(_values[i], (i + 1 == len) ? null : _values[i + 1]);
+  }
+
+  /**
    * This method creates a new Map from a set of given array containing
    * key/value arguments. The function is almost exactly the same like create()
    * except that it does not take a varargs array.
@@ -82,6 +97,24 @@ public class UMap extends NSObject {
       map.put(_values[i], (i + 1 == len) ? null : _values[i + 1]);
 
     return map;
+  }
+
+  /**
+   * This method adds to a Map from a set of given array containing
+   * key/value arguments. The function is almost exactly the same like add()
+   * except that it does not take a varargs array.
+   * <p>
+   * 
+   * This function always returns a mutable map, even if no arguments are
+   * given.
+   */
+  @SuppressWarnings("unchecked")
+  public static final void addArgs(final Map _map, Object[] _values) {
+    int len = _values != null ? _values.length : 0;
+    if (len == 0) return;
+    
+    for (int i = 0; i < len; i += 2)
+      _map.put(_values[i], (i + 1 == len) ? null : _values[i + 1]);
   }
   
   /**
