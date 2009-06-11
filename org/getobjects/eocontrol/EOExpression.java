@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2009 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of Go.
 
@@ -176,7 +176,7 @@ public class EOExpression extends NSObject implements Cloneable {
    * @param _keysAndValues - the binding key/value pairs
    * @return an EOQualifier with the bindings resolved
    */
-  public EOExpression expressionWithBindings(Object... _keysAndValues) {
+  public EOExpression expressionWithBindings(final Object... _keysAndValues) {
     return this.expressionWithBindings(
         new NSKeyValueHolder(_keysAndValues), true /* requires all */);
   }

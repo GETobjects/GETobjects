@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2009 Helge Hess
 
   This file is part of Go.
 
@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import org.getobjects.foundation.NSObject;
+import java.util.Set;
 
 /**
  * EOSortOrdering
@@ -38,7 +37,7 @@ import org.getobjects.foundation.NSObject;
  *       Instead you might want to use an EOAttribute 'writeformat' to
  *       convert values to upper or lowercase on writes.
  */
-public class EOSortOrdering extends NSObject {
+public class EOSortOrdering extends EOExpression {
 
   public static final Object EOCompareAscending  = "EOCompareAscending"; 
   public static final Object EOCompareDescending = "EOCompareDescending"; 
@@ -242,6 +241,14 @@ public class EOSortOrdering extends NSObject {
         return _sos[i].selector();
     }
     return null; /* not found */
+  }
+  
+  
+  /* EOExpression */
+
+  public void addReferencedKeysToSet(final Set<String> keys_) {
+    if (keys_ != null)
+      keys_.add(this.key());
   }
   
   
