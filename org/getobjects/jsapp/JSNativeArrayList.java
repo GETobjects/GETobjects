@@ -110,7 +110,6 @@ public class JSNativeArrayList implements List {
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   public Object[] toArray(Object[] a) {
     return null;
   }
