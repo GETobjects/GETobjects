@@ -1,0 +1,7 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<wo class="WOFragment">
+  <binding name="name"  />
+  <binding name="onlyOnMatch" defaults="YES/NO" />
+  <binding name="elementName" />
+</wo>

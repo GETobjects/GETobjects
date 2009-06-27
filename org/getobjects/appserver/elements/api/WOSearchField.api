@@ -1,0 +1,8 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<wo class="WOSearchField" superclass="WOTextField">
+  <binding name="isIncremental" defaults="YES/NO"/>
+  <binding name="placeholder" />
+  <binding name="autosaveName" />
+  <binding name="resultCount" />
+</wo>

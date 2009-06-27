@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOConditional">
+<wo class="WOConditional" alias="if">
   <binding name="negate" passthrough="NO" defaults="YES/NO"/>
   <binding name="condition" passthrough="NO" required="YES"/>
   

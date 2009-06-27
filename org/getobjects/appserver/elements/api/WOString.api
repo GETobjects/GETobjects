@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOString">
+<wo class="WOString" alias="get">
   <binding name="value"        passthrough="NO" required="YES"/>
   <binding name="escapeHTML"   passthrough="NO" defaults="YES/NO"/>
   <binding name="numberformat" passthrough="NO" defaults="Number Format Strings"/>

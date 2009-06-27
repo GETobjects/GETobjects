@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<wo class="WEObserveField" superclass="WEPrototypeElement">
+  <binding name="name" required="YES"/>
+  
+  <binding name="frequency"/>
+  <binding name="function"/>
+  <binding name="on"/>
+</wo>

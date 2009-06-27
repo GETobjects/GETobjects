@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<wo class="WEAutocompleteField" superclass="WEPrototypeElement">
+  <bindings class="WOLinkGenerator"/>
+  <bindings class="WOListWalker"/>
+
+  <binding name="name" required="YES"/>
+  <binding name="elementName"/>
+  <binding name="class"/>
+
+  <binding name="tokens"/>
+  <binding name="updateElement"/>
+  <binding name="afterUpdateElement"/>
+  <binding name="frequency"/>
+  <binding name="indicator"/>
+  <binding name="select"/>
+  <binding name="minChars"/>
+</wo>

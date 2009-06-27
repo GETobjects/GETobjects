@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<!-- superclass is "WOElement", which is purely abstract -->
+<wo class="WODynamicElement" abstract="YES">
+  <binding name="otherTagString" />
+  
+  <!-- the following "bindings" are special functionality provided elsewhere
+       but are added here for reference
+  -->
+  <!-- any element may have this -->
+  <binding name="id"  />
+  <!-- these are provided by the template parser... -->
+  <binding name="if" defaults="YES/NO"/>
+  <binding name="ifnot" defaults="YES/NO"/>
+</wo>
