@@ -1,6 +1,9 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WEObserveField" superclass="WEPrototypeElement">
+<wo class="WEObserveField"
+    superclass="WEPrototypeElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="name" required="YES"/>
   
   <binding name="frequency"/>

@@ -1,17 +1,20 @@
 <?xml version="1.0" standalone="yes"?> 
 
 <!-- subclasses WOElement -->
-<wo class="WOLinkGenerator" abstract="YES">
+<wo class="WOLinkGenerator"
+    abstract="YES"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="href"/>
-  <binding name="pageName" passthrough="NO" defaults="Page Names"/>
-  <binding name="action" passthrough="NO" defaults="Actions"/>
-  <binding name="@action" passthrough="NO" defaults="Actions"/>
-  <binding name="directActionName" passthrough="NO" defaults="Direct Actions"/>
-  <binding name="actionClass" passthrough="NO" defaults="Direct Action Classes"/>
+  <binding name="pageName"  defaults="Page Names"/>
+  <binding name="action"  defaults="Actions"/>
+  <binding name="@action"  defaults="Actions"/>
+  <binding name="directActionName"  defaults="Direct Actions"/>
+  <binding name="actionClass"  defaults="Direct Action Classes"/>
 
   <binding name="fragmentIdentifier"/>
-  <binding name="queryDictionary" passthrough="NO"/>
-  <binding name="filename" passthrough="NO" defaults="Resources"/>
+  <binding name="queryDictionary" />
+  <binding name="filename"  defaults="Resources"/>
 
   <validation message="either one of &apos;action&apos;, &apos;href&apos;, or &apos;pageName&apos; may be bound, or either or both of &apos;actionClass&apos; and &apos;directActionName&apos; may be bound">
     <count test="!=1">

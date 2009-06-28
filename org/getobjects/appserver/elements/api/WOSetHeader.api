@@ -1,8 +1,11 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
-<wo class="WOSetHeader">
-  <binding name="header"        required="YES"/>
-  <binding name="value"         required="YES"/>
+<wo class="WOSetHeader"
+    superclass="WODynamicElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <binding name="header" required="YES"/>
+  <binding name="value" required="YES"/>
   <binding name="addToExisting" defaults="YES/NO"/>
-  <binding name="object"        required="NO"/>
+  <binding name="object"/>
 </wo>

@@ -1,6 +1,8 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOFrame">
+<wo class="WOFrame"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="pageName" passthrough="NO" defaults="Page Names"/>
   <binding name="src"/>
   <binding name="value" passthrough="NO"/>

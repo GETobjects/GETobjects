@@ -1,6 +1,10 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WORepetition" superclass="WODynamicElement" alias="for">
+<wo class="WORepetition"
+    superclass="WODynamicElement"
+    alias="for"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <bindings class="WOListWalker"/>
 
   <binding name="separator"/>

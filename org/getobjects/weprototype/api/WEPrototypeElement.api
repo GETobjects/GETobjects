@@ -1,4 +1,7 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WEPrototypeElement" superclass="WODynamicElement" abstract="YES">
-</wo>
+<wo class="WEPrototypeElement"
+    superclass="WODynamicElement"
+    abstract="YES"
+    xmlns="http://www.opengroupware.org/go/api"
+/>

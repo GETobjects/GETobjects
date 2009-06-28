@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<wo class="WELinkToRemote"
+    superclass="WEPrototypeElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <bindings class="WOLinkGenerator"/>
+  <binding name="string"/>
+  <binding name="type" defaults="(synchronous,asynchronous)"/>
+  <binding name="update" defaults="element id or keyed on handler"/>
+  <binding name="position" defaults="(before,top,bottom,after)"/>
+  <binding name="method" defaults="(GET,POST)"/>
+  <binding name="event" defaults="(onclick)"/>
+
+  <binding name="confirm" defaults="JS function or code"/>
+  <binding name="condition" defaults="JS function or code"/>
+  <binding name="before" defaults="JS function or code"/>
+  <binding name="after" defaults="JS function or code"/>
+  <binding name="submit" defaults="element-id of form"/>
+
+  <binding name="loading" defaults="JS function or code"/>
+  <binding name="loaded" defaults="JS function or code"/>
+  <binding name="interactive" defaults="JS function or code"/>
+  <binding name="success" defaults="JS function or code"/>
+  <binding name="failure" defaults="JS function or code"/>
+  <binding name="complete" defaults="JS function or code"/>
+  <binding name="200" defaults="JS function or code"/>
+  <binding name="403" defaults="JS function or code"/>
+  <binding name="404" defaults="JS function or code"/>
+</wo>

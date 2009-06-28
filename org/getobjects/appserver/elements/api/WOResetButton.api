@@ -1,8 +1,7 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOSubmitButton">
-  <binding name="name" />
-  <binding name="value" />
-  <binding name="disabled" passthrough="NO" defaults="YES/NO"/>
-  <binding name="otherTagString" passthrough="NO"/>
+<wo class="WOResetButton"
+    superclass="WOInput"
+    xmlns="http://www.opengroupware.org/go/api"
+>
 </wo>

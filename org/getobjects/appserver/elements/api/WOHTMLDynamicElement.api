@@ -3,4 +3,5 @@
 <wo class="WOHTMLDynamicElement"
     superclass="WODynamicElement"
     abstract="YES"
+    xmlns="http://www.opengroupware.org/go/api"
 />

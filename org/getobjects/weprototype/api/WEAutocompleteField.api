@@ -1,6 +1,9 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WEAutocompleteField" superclass="WEPrototypeElement">
+<wo class="WEAutocompleteField"
+    superclass="WEPrototypeElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <bindings class="WOLinkGenerator"/>
   <bindings class="WOListWalker"/>
 

@@ -1,6 +1,9 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOSearchField" superclass="WOTextField">
+<wo class="WOSearchField"
+    superclass="WOTextField"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="isIncremental" defaults="YES/NO"/>
   <binding name="placeholder" />
   <binding name="autosaveName" />

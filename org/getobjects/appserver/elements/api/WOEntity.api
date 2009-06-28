@@ -1,7 +1,8 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
-<wo class="WOEntity">
+<wo class="WOEntity"
+    superclass="WOHTMLDynamicElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="name" required="YES" />
-
-  <binding name="otherTagString" />
 </wo>

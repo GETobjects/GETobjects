@@ -1,7 +1,10 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
 <!-- subclasses NSObject -->
-<wo class="WOListWalker" abstract="YES">
+<wo class="WOListWalker"
+    abstract="YES"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="list" settable="YES"/>
   <binding name="count" settable="YES"/>
   <binding name="item" settable="YES"/>

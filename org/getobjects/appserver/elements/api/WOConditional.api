@@ -1,9 +1,13 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
-<wo class="WOConditional" alias="if">
-  <binding name="negate" passthrough="NO" defaults="YES/NO"/>
-  <binding name="condition" passthrough="NO" required="YES"/>
-  
-  <!-- SOPE -->
+<wo class="WOConditional"
+    superclass="WODynamicElement"
+    alias="if"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <binding name="condition" required="YES"/>
   <binding name="value" />
+  <binding name="negate" defaults="YES/NO"/>
+  <binding name="qualifier" />
+  <binding name="match" />
 </wo>

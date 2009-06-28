@@ -1,13 +1,14 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOJavaScript">
-  <binding name="hideInComment" passthrough="NO" defaults="YES/NO"/>
-  <binding name="scriptSource" passthrough="NO"/>
-  <binding name="scriptString" passthrough="NO"/>
-  <binding name="scriptFile" passthrough="NO"/>
-
-  <!-- SOPE -->
-  <binding name="otherTagString" passthrough="NO"/>
+<wo class="WOJavaScript"
+    superclass="WOHTMLDynamicElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <binding name="hideInComment" defaults="YES/NO"/>
+  <binding name="escapeHTML" defaults="YES/NO"/>
+  <binding name="scriptSource"/>
+  <binding name="scriptString"/>
+  <binding name="scriptFile"/>
 
   <validation message="one of &apos;scriptFile&apos;, &apos;scriptSource&apos;, or &apos;scriptString&apos; must be bound">
     <count test="!=1">

@@ -1,0 +1,35 @@
+<?xml version="1.0" standalone="yes"?> 
+
+<!-- subclasses NSObject -->
+<wo class="WOFormatter"
+    abstract="YES"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <binding name="dateformat" defaults="Date Format Strings"/>
+  <binding name="calformat"/>
+  <binding name="numberformat" defaults="Number Format Strings"/>
+  <binding name="currencyformat"/>
+  <binding name="percentformat"/>
+  <binding name="intformat"/>
+
+  <!-- dateformat and calformat also have these -->
+  <binding name="lenient" defaults="YES/NO"/>
+  <binding name="locale"/>
+
+  <!-- generic -->
+  <binding name="formatter"/>
+  <binding name="formatterClass"/>
+
+  <!-- TODO: extend -->
+  <validation message="no more than one of &apos;dateformat&apos;, &apos;numberformat&apos;, &apos;calformat&apos;, &apos;currencyformat&apos;, &apos;percentformat&apos;, &apos;intformat&apos; or &apos;formatter&apos; may be bound">
+    <count test="&gt;1">
+      <bound name="numberformat"/>
+      <bound name="dateformat"/>
+      <bound name="formatter"/>
+      <bound name="calformat"/>
+      <bound name="currencyformat"/>
+      <bound name="percentformat"/>
+      <bound name="intformat"/>
+    </count>
+  </validation>
+</wo>

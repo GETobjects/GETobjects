@@ -1,7 +1,10 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
-<!-- superclass is "WOElement", which is purely abstract -->
-<wo class="WODynamicElement" abstract="YES">
+<!-- subclasses "WOElement", which is purely abstract -->
+<wo class="WODynamicElement"
+    abstract="YES"
+    xmlns="http://www.opengroupware.org/go/api"
+>
   <binding name="otherTagString" />
   
   <!-- the following "bindings" are special functionality provided elsewhere

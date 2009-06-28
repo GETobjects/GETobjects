@@ -1,18 +1,16 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
-<wo class="WOForm">
-  <binding name="action" passthrough="NO" defaults="Actions"/>
-  <binding name="href" passthrough="NO"/>
-  <binding name="pageName" passthrough="NO" defaults="Page Names"/>
+<wo class="WOForm"
+    superclass="WOHTMLDynamicElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <bindings class="WOLinkGenerator"/>
+  <binding name="target"/>
+  <binding name="method"/>
+  <binding name="errorReport"/>
+  <binding name="forceTakeValues" defaults="YES/NO"/>
 
-  <binding name="queryDictionary" passthrough="NO"/>
-  <binding name="actionClass" passthrough="NO" defaults="Direct Action Classes"/>
-  <binding name="directActionName" passthrough="NO" defaults="Direct Actions"/>
-
-  <binding name="otherTagString" passthrough="NO"/>
-  <!-- SOPE -->
-  <binding name="method" passthrough="NO"/>
-
+  <!-- TODO: extend -->
   <validation message="either one of &apos;action&apos;, &apos;href&apos; or &apos;pageName&apos; may be bound, or one or both of &apos;actionClass&apos; or &apos;directActionName&apos; may be bound">
     <count test="&gt;1">
       <bound name="action"/>

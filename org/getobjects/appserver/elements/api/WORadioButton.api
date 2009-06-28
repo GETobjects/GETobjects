@@ -1,14 +1,11 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WORadioButton">
-  <binding name="selection" passthrough="NO" settable="YES"/>
-  <binding name="checked" passthrough="NO" settable="YES"/>
-
-  <binding name="name"/>
-  <binding name="value"/>
-  <binding name="disabled" passthrough="NO" defaults="YES/NO"/>
-
-  <binding name="otherTagString" passthrough="NO"/>
+<wo class="WORadioButton"
+    superclass="WOInput"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <binding name="selection" settable="YES"/>
+  <binding name="checked" settable="YES"/>
 
   <validation message="exactly one of &apos;checked&apos; or &apos;value&apos; must be bound">
     <count test="!=1">

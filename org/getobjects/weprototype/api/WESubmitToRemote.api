@@ -1,7 +1,8 @@
 <?xml version="1.0" standalone="yes"?> 
 
-<wo class="WOHiddenField"
+<wo class="WESubmitToRemote"
     superclass="WOInput"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <bindings class="WELinkToRemote"/>
 </wo>
