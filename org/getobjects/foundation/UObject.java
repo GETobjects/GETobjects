@@ -208,6 +208,23 @@ public class UObject extends NSObject {
     return true;
   }
 
+  /**
+   * Returns an int value for the given object. It follows this sequence:
+   * <ul>
+   *   <li>null   - 0
+   *   <li>Number - call intValue() of number
+   *   <li>String - if len=0, returns 0.
+   *     If the string contains a '.', parse as BigDecimal and return the
+   *     intValue().
+   *     Otherwise return the value of Integer.parseInt().
+   *     If a NumberFormatException occurs, return 0.
+   *   <li>for all other objects, intValue() is called with the toString()
+   *     representation of the object.
+   * </ul>
+   * 
+   * @param v - some value object, can be null
+   * @return the int value represented by the object
+   */
   public static int intValue(final Object v) {
     if (v == null)
       return 0;
@@ -234,6 +251,24 @@ public class UObject extends NSObject {
 
     return intValue(v.toString());
   }
+
+  /**
+   * Returns an long value for the given object. It follows this sequence:
+   * <ul>
+   *   <li>null   - 0
+   *   <li>Number - call longValue() of number
+   *   <li>String - if len=0, returns 0.
+   *     If the string contains a '.', parse as BigDecimal and return the
+   *     longValue().
+   *     Otherwise return the value of Long.parseLong().
+   *     If a NumberFormatException occurs, return 0.
+   *   <li>for all other objects, longValue() is called with the toString()
+   *     representation of the object.
+   * </ul>
+   * 
+   * @param v - some value object, can be null
+   * @return the int value represented by the object
+   */
   public static long longValue(final Object v) {
     if (v == null)
       return 0;
