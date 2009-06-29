@@ -1,6 +1,7 @@
-<?xml version="1.0" standalone="yes"?> 
+<?xml version="1.0"?> 
 
 <wo class="WOCopyValue"
+    superclass="WODynamicElement"
     alias="put"
     xmlns="http://www.opengroupware.org/go/api"
 >
