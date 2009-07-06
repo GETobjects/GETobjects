@@ -1,4 +1,4 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 
 <!-- subclasses WOElement -->
 <wo class="WOLinkGenerator"
@@ -12,8 +12,10 @@
   <binding name="directActionName"  defaults="Direct Actions"/>
   <binding name="actionClass"  defaults="Direct Action Classes"/>
 
+  <binding name="fragment"/>
   <binding name="fragmentIdentifier"/>
   <binding name="queryDictionary" />
+
   <binding name="filename"  defaults="Resources"/>
 
   <validation message="either one of &apos;action&apos;, &apos;href&apos;, or &apos;pageName&apos; may be bound, or either or both of &apos;actionClass&apos; and &apos;directActionName&apos; may be bound">

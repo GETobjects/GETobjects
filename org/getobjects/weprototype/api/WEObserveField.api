@@ -4,6 +4,7 @@
     superclass="WEPrototypeElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <bindings class="WELinkToRemote"/>
   <binding name="name" required="YES"/>
   
   <binding name="frequency"/>
