@@ -4,6 +4,8 @@
     superclass="WODynamicElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOFragment" ns="http://www.opengroupware.org/go"/>
+
   <binding name="name"  />
   <binding name="onlyOnMatch" defaults="YES/NO" />
   <binding name="elementName" />

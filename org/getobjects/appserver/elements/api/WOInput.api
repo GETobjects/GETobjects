@@ -2,7 +2,6 @@
 
 <wo class="WOInput"
     superclass="WOHTMLDynamicElement"
-    abstract="YES"
     xmlns="http://www.opengroupware.org/go/api"
 >
   <binding name="name"/>

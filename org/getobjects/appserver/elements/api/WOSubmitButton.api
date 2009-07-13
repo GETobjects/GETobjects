@@ -2,9 +2,11 @@
 
 <wo class="WOSubmitButton"
     superclass="WOInput"
-    alias="submit"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOSubmitButton" ns="http://www.opengroupware.org/go"/>
+  <name value="submit" ns="http://www.opengroupware.org/go"/>
+
   <binding name="action" defaults="Actions"/>
   <binding name="pageName" defaults="Page Names"/>
 

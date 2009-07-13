@@ -2,9 +2,11 @@
 
 <wo class="WORepetition"
     superclass="WODynamicElement"
-    alias="for"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WORepetition" ns="http://www.opengroupware.org/go"/>
+  <name value="for" ns="http://www.opengroupware.org/go"/>
+
   <bindings class="WOListWalker"/>
 
   <binding name="separator"/>

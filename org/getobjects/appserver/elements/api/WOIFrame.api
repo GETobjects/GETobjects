@@ -4,4 +4,5 @@
     superclass="WOFrame"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOIFrame" ns="http://www.opengroupware.org/go"/>
 </wo>

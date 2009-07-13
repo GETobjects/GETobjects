@@ -2,7 +2,6 @@
 
 <!-- subclasses "WOElement", which is purely abstract -->
 <wo class="WODynamicElement"
-    abstract="YES"
     xmlns="http://www.opengroupware.org/go/api"
 >
   <binding name="otherTagString" />

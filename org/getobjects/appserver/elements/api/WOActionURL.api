@@ -4,6 +4,8 @@
     superclass="WODynamicElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOActionURL" ns="http://www.opengroupware.org/go"/>
+
   <bindings class="WOLinkGenerator"/>
 
   <!-- TODO: extend -->

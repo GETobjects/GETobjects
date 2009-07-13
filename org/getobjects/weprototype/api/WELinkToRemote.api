@@ -4,6 +4,8 @@
     superclass="WEPrototypeElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WELinkToRemote" ns="http://www.opengroupware.org/go"/>
+
   <bindings class="WOLinkGenerator"/>
   <binding name="string"/>
   <binding name="type" defaults="(synchronous,asynchronous)"/>

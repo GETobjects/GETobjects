@@ -2,7 +2,6 @@
 
 <!-- subclasses NSObject -->
 <wo class="WOListWalker"
-    abstract="YES"
     xmlns="http://www.opengroupware.org/go/api"
 >
   <binding name="list" settable="YES"/>

@@ -4,5 +4,7 @@
     superclass="WOHTMLDynamicElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOEntity" ns="http://www.opengroupware.org/go"/>
+
   <binding name="name" required="YES" />
 </wo>

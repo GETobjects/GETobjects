@@ -4,6 +4,8 @@
     superclass="WOHTMLDynamicElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOJavaScript" ns="http://www.opengroupware.org/go"/>
+
   <binding name="hideInComment" defaults="YES/NO"/>
   <binding name="escapeHTML" defaults="YES/NO"/>
   <binding name="scriptSource"/>

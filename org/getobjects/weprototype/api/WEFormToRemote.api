@@ -4,5 +4,7 @@
     superclass="WOForm"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WEFormToRemote" ns="http://www.opengroupware.org/go"/>
+
   <bindings class="WELinkToRemote"/>
 </wo>

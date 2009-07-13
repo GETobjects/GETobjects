@@ -2,9 +2,11 @@
 
 <wo class="WOCopyValue"
     superclass="WODynamicElement"
-    alias="put"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOCopyValue" ns="http://www.opengroupware.org/go"/>
+  <name value="put" ns="http://www.opengroupware.org/go"/>
+
   <binding name="copyValues" />
   <binding name="finishValues" />
   <binding name="resetValues"  defaults="YES/NO"/>

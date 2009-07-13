@@ -2,9 +2,12 @@
 
 <wo class="WOString"
     superclass="WOHTMLDynamicElement"
-    alias="get"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOString" ns="http://www.opengroupware.org/go"/>
+  <name value="get"      ns="http://www.opengroupware.org/go"/>
+  <name value="string"   ns="http://www.skyrix.com/od/binding"/>
+
   <bindings class="WOFormatter"/>
   <binding name="value"/>
   <binding name="%value"/>

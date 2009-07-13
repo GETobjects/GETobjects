@@ -2,7 +2,6 @@
 
 <!-- subclasses WOElement -->
 <wo class="WOLinkGenerator"
-    abstract="YES"
     xmlns="http://www.opengroupware.org/go/api"
 >
   <binding name="href"/>

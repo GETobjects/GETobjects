@@ -2,7 +2,6 @@
 
 <!-- subclasses NSObject -->
 <wo class="WOFormatter"
-    abstract="YES"
     xmlns="http://www.opengroupware.org/go/api"
 >
   <binding name="dateformat" defaults="Date Format Strings"/>

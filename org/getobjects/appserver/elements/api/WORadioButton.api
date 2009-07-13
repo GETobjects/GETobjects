@@ -4,6 +4,8 @@
     superclass="WOInput"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WORadioButton" ns="http://www.opengroupware.org/go"/>
+
   <binding name="selection" settable="YES"/>
   <binding name="checked" settable="YES"/>
 

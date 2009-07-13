@@ -4,6 +4,8 @@
     superclass="WOHTMLDynamicElement"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOImage" ns="http://www.opengroupware.org/go"/>
+
   <bindings class="WOLinkGenerator"/>
   <binding name="disabled" defaults="YES/NO"/>
   <binding name="disableOnMissingLink" defaults="YES/NO"/>

@@ -4,6 +4,8 @@
     superclass="WOInput"
     xmlns="http://www.opengroupware.org/go/api"
 >
+  <name value="WOFileUpload" ns="http://www.opengroupware.org/go"/>
+
   <binding name="filePath" settable="YES" required="YES" />
   <binding name="data" settable="YES" required="YES" />
   <binding name="string" />

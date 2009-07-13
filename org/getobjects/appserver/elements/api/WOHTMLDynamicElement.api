@@ -2,6 +2,7 @@
 
 <wo class="WOHTMLDynamicElement"
     superclass="WODynamicElement"
-    abstract="YES"
     xmlns="http://www.opengroupware.org/go/api"
-/>
+>
+    <name value="WOCheckBox" ns="http://www.opengroupware.org/go"/>
+</wo>
