@@ -175,11 +175,11 @@ public class WOForm extends WOHTMLDynamicElement {
       ;
     else if (v != null) {
       oldId = lid;
-      lid = v.toString();
+      lid   = v.toString();
     }
     
     /* push an WOErrorReport object to the WOContext */
-    WOErrorReport er = this.prepareErrorReportObject(_ctx);
+    final WOErrorReport er = this.prepareErrorReportObject(_ctx);
     if (er != null && _ctx != null) _ctx.pushErrorReport(er);
 
     _ctx.setIsInForm(true);
