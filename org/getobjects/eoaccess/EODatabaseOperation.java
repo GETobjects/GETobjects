@@ -38,6 +38,11 @@ import org.getobjects.foundation.NSObject;
  */
 public class EODatabaseOperation extends NSObject {
   protected static final Log log = LogFactory.getLog("EODatabaseChannel");
+
+  public static final int DBLockOperator   = 1;
+  public static final int DBInsertOperator = 2;
+  public static final int DBUpdateOperator = 3;
+  public static final int DBDeleteOperator = 4;
   
   protected EOEntity            entity;
   protected Object              eo;
