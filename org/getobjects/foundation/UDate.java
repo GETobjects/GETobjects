@@ -18,6 +18,8 @@
  */
 package org.getobjects.foundation;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -284,4 +286,79 @@ public class UDate extends NSObject {
       (_cal, _years, _months, _days, _hours, _mins, _secs).getTime() : null;
   }
 
+  /**
+   * Uses the SimpleDateFormat parser to parse a date string.
+   * 
+   * The method catches parse exceptions and returns null on such.
+   * 
+   * @param _fmt    - a date format as described in SimpleDateFormat
+   * @param _date   - a datetime String (Date's are passed through)
+   * @param _locale - some locale to retrieve parsing settings
+   * @return a Date or null
+   */
+  public static Date parseSimpleDate
+    (final String _fmt, final Object _date, Locale _locale)
+  {
+    if (_date == null)
+      return null;
+    if (_date instanceof Date)
+      return (Date)_date;
+    if (_date instanceof Calendar)
+      return ((Calendar)_date).getTime();
+    
+    final String dateString = _date.toString();
+    if (dateString == null || dateString.length() == 0)
+      return null;
+    
+    final SimpleDateFormat df = new SimpleDateFormat(_fmt, _locale);
+
+    Date date = null;
+    try {
+      date = df.parse(dateString);
+    }
+    catch (ParseException e) {
+      log.info("could not parse date", e);
+    }
+    return date;
+  }
+  /**
+   * Uses the SimpleDateFormat parser to parse a date string.
+   * 
+   * The method catches parse exceptions and returns null on such.
+   * 
+   * @param _fmt    - a date format as described in SimpleDateFormat
+   * @param _date   - a datetime String (Date's are passed through)
+   * @return a Date or null
+   */
+  public static Date parseSimpleDate(final String _fmt, final Object _date) {
+    return parseSimpleDate(_fmt, _date, null /* locale */);
+  }
+
+  /**
+   * Uses the SimpleDateFormat parser to parse a date string.
+   * 
+   * The method catches parse exceptions and returns null on such.
+   * 
+   * @param _fmt    - a date format as described in SimpleDateFormat
+   * @param _date   - a datetime String (Date's are passed through)
+   * @param _locale - some locale to retrieve parsing settings
+   * @return a Calendar or null
+   */
+  public static Calendar parseSimpleCalendar
+    (final String _fmt, final Object _date, TimeZone _tz, Locale _locale)
+  {
+    if (_date == null)
+      return null;
+    if (_date instanceof Calendar)
+      return (Calendar)_date;
+
+    final Date date = (_date instanceof Date)
+      ? (Date)_date
+      : parseSimpleDate(_fmt, _date, _locale);
+    if (date == null) return null;
+    
+    final Calendar cal = Calendar.getInstance(_tz, _locale);
+    cal.setTime(date);
+    return cal;
+  }
 }
