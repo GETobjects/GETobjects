@@ -73,7 +73,8 @@ public class NSSelector extends NSObject {
     return null;
   }
   
-  public Method methodOnClass(Class _targetClass) {
+  @SuppressWarnings("unchecked")
+  public Method methodOnClass(final Class _targetClass) {
     /* Note: difference to WO is that we don't throw an exception if we can't
      *       find the method. No point in that ... we just return null.
      */
@@ -90,7 +91,7 @@ public class NSSelector extends NSObject {
     /* we have a signature, 'fast' search */
     
     try {
-      Method m = cls.getMethod(this.name, this.signature);
+      final Method m = cls.getMethod(this.name, this.signature);
       if (m != null) return m;
     }
     catch (NoSuchMethodException nsme) {
@@ -102,7 +103,7 @@ public class NSSelector extends NSObject {
     while ((cls = cls.getSuperclass()) != null) {
       try {
         //System.err.println("check " + _name + " in " + _cls);
-        Method m = cls.getMethod(this.name, this.signature);
+        final Method m = cls.getMethod(this.name, this.signature);
         if (m != null) return m;
       }
       catch (NoSuchMethodException nsme) {
@@ -111,7 +112,7 @@ public class NSSelector extends NSObject {
     return null;
   }
   
-  public boolean implementedByClass(Class _targetClass) {
+  public boolean implementedByClass(final Class _targetClass) {
     if (_targetClass == null)
       return false;
     
@@ -119,7 +120,7 @@ public class NSSelector extends NSObject {
     return this.methodOnClass(_targetClass) != null ? true : false;
   }
 
-  public Method methodOnObject(Object _target) {
+  public Method methodOnObject(final Object _target) {
     /* Note: difference to WO is that we don't throw an exception if we can't
      *       find the method. No point in that ... we just return null.
      */
@@ -128,7 +129,7 @@ public class NSSelector extends NSObject {
     
     return this.methodOnClass(_target.getClass());
   }
-  public boolean implementedByObject(Object _target) {
+  public boolean implementedByObject(final Object _target) {
     return _target != null ? this.implementedByClass(_target.getClass()) :false;
   }
   
@@ -136,14 +137,14 @@ public class NSSelector extends NSObject {
   
   public static final Object[] emptyObjectArray = new Object[0];
   
-  public Object invoke(Object _target)
+  public Object invoke(final Object _target)
     throws NoSuchMethodException, IllegalArgumentException,
            IllegalAccessException, InvocationTargetException
   {
     return this.invoke(_target, emptyObjectArray);
   }
   
-  public Object invoke(Object _target, Object _arg)
+  public Object invoke(final Object _target, final Object _arg)
     throws NoSuchMethodException, IllegalArgumentException,
            IllegalAccessException, InvocationTargetException
   {
@@ -153,7 +154,7 @@ public class NSSelector extends NSObject {
     return this.invoke(_target, new Object[] { _arg });
   }
   
-  public Object invoke(Object _target, Object[] _args)
+  public Object invoke(final Object _target, Object[] _args)
     throws NoSuchMethodException, IllegalArgumentException,
            IllegalAccessException, InvocationTargetException
   {
@@ -179,7 +180,7 @@ public class NSSelector extends NSObject {
   /* equality */
 
   @Override
-  public boolean equals(Object _other) {
+  public boolean equals(final Object _other) {
     if (_other == null)
       return false;
     
@@ -189,7 +190,7 @@ public class NSSelector extends NSObject {
     return ((NSSelector)_other).isEqualToSelector(this);
   }
   
-  public boolean isEqualToSelector(NSSelector _sel) {
+  public boolean isEqualToSelector(final NSSelector _sel) {
     if (_sel == null)
       return false;
     if (_sel == this) /* exact match */
@@ -223,7 +224,7 @@ public class NSSelector extends NSObject {
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.name != null)

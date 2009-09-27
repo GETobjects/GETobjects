@@ -91,7 +91,7 @@ public class OFSHostFileInfo extends NSObject implements IOFSFileInfo {
   }
   
   public URL toURL() {
-    try { return this.file.toURL(); }
+    try { return this.file.toURI().toURL(); }
     catch (MalformedURLException e) { };
     return null;
   }

@@ -47,7 +47,7 @@ public class WOProjectDirectoryResourceManager extends WOClassResourceManager {
     if (file == null)
       return null;
     try {
-      return file.toURL();
+      return file.toURI().toURL();
     }
     catch (MalformedURLException e) {
       return null;

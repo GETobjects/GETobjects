@@ -369,12 +369,12 @@ public class UMap extends NSObject {
    * @param _file - File to load the plist from
    * @return the Map represented by the plist, or null if it wasn't a Map
    */
-  public static Map dictionaryWithContentsOfFile(File _file) {
+  public static Map dictionaryWithContentsOfFile(final File _file) {
     if (_file == null)
       return null;
     
     try {
-      return dictionaryWithContentsOfURL(_file.toURL());
+      return dictionaryWithContentsOfURL(_file.toURI().toURL());
     }
     catch (MalformedURLException e) {
       return null;

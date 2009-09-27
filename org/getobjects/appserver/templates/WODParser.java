@@ -40,6 +40,7 @@ import org.getobjects.foundation.NSPropertyListParser;
  * Note: this is a straight port of the ObjC parser and therefore somewhat
  *       clumsy.
  */
+@SuppressWarnings("unchecked")
 public class WODParser extends NSPropertyListParser {
   // TODO: detect 'null' and 'nil' special values in dictionaries?
   // - need to override NSPropertyListParser constant handling for this?
@@ -50,8 +51,8 @@ public class WODParser extends NSPropertyListParser {
     //      whether the class is available (how?)
     ClassLoader loader = WODParser.class.getClassLoader();
     try {
-      Class clazz = loader.loadClass("org.getobjects.ognl.WOFramework");
-      Method m = clazz.getMethod("setup", new Class[0]);
+      final Class clazz = loader.loadClass("org.getobjects.ognl.WOFramework");
+      final Method m    = clazz.getMethod("setup", new Class[0]);
       
       m.invoke(clazz, new Object[0]);
       System.err.println("DID INVOKE OGNL SETUP");
@@ -115,7 +116,7 @@ public class WODParser extends NSPropertyListParser {
     this.entries.clear();
   }
   
-  public void setHandler(WODParserHandler _handler) {
+  public void setHandler(final WODParserHandler _handler) {
     this.handler = _handler;
   }
   public WODParserHandler handler() {

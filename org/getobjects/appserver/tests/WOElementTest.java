@@ -44,9 +44,10 @@ public abstract class WOElementTest extends WOTestWithFullEnvironment {
   
   /* creating elements */
   
-  public static WOElement createElement(String _clazz, String _name,
+  @SuppressWarnings("unchecked")
+  public static WOElement createElement(String _clazz, String     _name,
                                         Map<String,WOAssociation> _assocs,
-                                        WOElement _template)
+                                        WOElement                 _template)
   {
     Class elementClass = null;
     try {

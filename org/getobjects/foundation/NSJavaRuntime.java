@@ -127,6 +127,7 @@ public class NSJavaRuntime {
    * @param _flat      - whether the search should include superclasses
    * @return the Method, or null if it could not be found
    */
+  @SuppressWarnings("unchecked")
   public static Method NSMethodFromString
     (Class _cls, String _name, Class[] _signature, boolean _flat)
   {
@@ -134,7 +135,7 @@ public class NSJavaRuntime {
       return null;
     
     try {
-      Method m = _cls.getMethod(_name, _signature);
+      final Method m = _cls.getMethod(_name, _signature);
       if (m != null) return m;
     }
     catch (NoSuchMethodException nsme) {
@@ -148,7 +149,7 @@ public class NSJavaRuntime {
     while ((_cls = _cls.getSuperclass()) != null) {
       try {
         //System.err.println("check " + _name + " in " + _cls);
-        Method m = _cls.getMethod(_name, _signature);
+        final Method m = _cls.getMethod(_name, _signature);
         if (m != null) return m;
       }
       catch (NoSuchMethodException nsme) {
@@ -211,8 +212,9 @@ public class NSJavaRuntime {
     return NSAllocateObject(_cls, new Class[] { _t0 }, new Object[] { _a0 });
   }
   
+  @SuppressWarnings("unchecked")
   public static Object NSAllocateObject
-    (Class _cls, Class[] _argTypes, Object[] _args)
+    (final Class _cls, Class[] _argTypes, Object[] _args)
   {
     // TBD: document
     if (_cls == null)
