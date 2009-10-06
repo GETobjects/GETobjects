@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2009 Helge Hess
 
   This file is part of Go.
 
@@ -28,13 +28,15 @@ import java.util.TimeZone;
  * NSTimeRange
  * <p>
  * An object to represent a timerange. The endtime is EXCLUSIVE.
+ * A timerange can have no start or no end, in this case fromTime/toTime are
+ * set to 0.
  */
 public class NSTimeRange extends NSObject
   implements Cloneable, Comparable
 {
   /* Note: from/to are sorted */
-  protected long    fromTime; // ms since 1970-01-01 00:00:00 GMT
-  protected long    toTime;   // ms, EXCLUSIVE
+  protected long    fromTime; // ms since 1970-01-01 00:00:00 GMT, 0=no-start
+  protected long    toTime;   // ms, EXCLUSIVE, 0=no-end
   protected boolean isEmpty;
   
   // TBD: support iCal duration strings
@@ -49,7 +51,7 @@ public class NSTimeRange extends NSObject
       this.fromTime = _to;
       this.toTime   = _from;
     }
-    this.isEmpty  = _from == _to;
+    this.isEmpty  = _from == _to && _from != 0;
   }
   
   public NSTimeRange(final Date _from, final Date _to) {
@@ -57,17 +59,18 @@ public class NSTimeRange extends NSObject
     this.toTime   = _to   == null ? 0 : _to.getTime();
     
     /* Note: a missing _to (toTime=0) marks an OPEN range, not an empty one */
-    this.isEmpty  = _from == _to;
+    this.isEmpty  = this.fromTime == this.toTime && this.fromTime != 0;
   }
   public NSTimeRange(final Date _from, final int _durationInSeconds) {
     this.fromTime = _from == null ? 0 : _from.getTime();
     this.toTime   = this.fromTime + (_durationInSeconds * 1000);
     if (_durationInSeconds < 0) {
-      long x = this.fromTime;
+      long x        = this.fromTime;
       this.fromTime = this.toTime;
-      this.toTime = x;
+      this.toTime   = x;
     }
-    this.isEmpty  = _durationInSeconds == 0 || this.fromTime == this.toTime;
+    this.isEmpty  = (_durationInSeconds == 0 || this.fromTime == this.toTime)
+      && this.fromTime != 0;
   }
   
   public NSTimeRange(final Calendar _from, Calendar _to) {
@@ -83,7 +86,7 @@ public class NSTimeRange extends NSObject
     }
     this.toTime  = _to == null ? 0 : _to.getTimeInMillis();
     /* Note: a missing _to (toTime=0) marks an OPEN range, not an empty one */
-    this.isEmpty = this.fromTime == this.toTime;
+    this.isEmpty = this.fromTime == this.toTime && this.fromTime != 0;
   }
   public NSTimeRange(Calendar _from, final int _durationInSeconds) {
     super();
@@ -95,7 +98,7 @@ public class NSTimeRange extends NSObject
       this.isEmpty = true;
     }
     else {
-      Calendar to = 
+      final Calendar to = 
         UDate.calendarByAdding(_from, 0,0,0, 0,0, _durationInSeconds);
       if (_durationInSeconds < 0) {
         this.fromTime = to.getTimeInMillis();
