@@ -108,10 +108,26 @@ public class NSJavaRuntime {
    * @param _clazz - the class to get the name for
    * @return the name of the class or null if the _class wazz null
    */
-  public static String NSStringFromClass(Class _clazz) {
+  public static String NSStringFromClass(Object _clazz) {
     if (_clazz == null)
       return null;
-    return _clazz.getName();
+    return (_clazz instanceof Class)
+      ? ((Class)_clazz).getName()
+      : _clazz.getClass().getName();
+  }
+
+  /**
+   * Returns the local name of the given class.
+   * 
+   * @param _clazz - the class to get the name for
+   * @return the name of the class or null if the _class wazz null
+   */
+  public static String NSLocalStringFromClass(final Object _clazz) {
+    if (_clazz == null)
+      return null;
+    return (_clazz instanceof Class)
+      ? ((Class)_clazz).getSimpleName()
+      : _clazz.getClass().getSimpleName();
   }
   
   
