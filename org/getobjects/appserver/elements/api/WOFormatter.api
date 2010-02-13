@@ -1,12 +1,12 @@
-<?xml version="1.0"?> 
+<?xml version="1.0"?>
 
 <!-- subclasses NSObject -->
 <wo class="WOFormatter"
     xmlns="http://www.opengroupware.org/go/api"
 >
-  <binding name="dateformat" defaults="Date Format Strings"/>
+  <binding name="dateformat" description="Date Format Strings" defaults='("dd.MM.yyyy", "SHORT", "MEDIUM", "LONG", "FULL", "TIME", "DATE", "DATETIME", "TIME.SHORT", "TIME.MEDIUM", "TIME.LONG", "TIME.FULL", "DATE.SHORT", "DATE.MEDIUM", "DATE.LONG", "DATE.FULL", "DATETIME.SHORT", "DATETIME.MEDIUM", "DATETIME.LONG", "DATETIME.FULL")'/>
   <binding name="calformat"/>
-  <binding name="numberformat" defaults="Number Format Strings"/>
+  <binding name="numberformat" description="Number Format Strings"/>
   <binding name="currencyformat"/>
   <binding name="percentformat"/>
   <binding name="intformat"/>
