@@ -1,0 +1,14 @@
+<?xml version="1.0"?> 
+
+<wo class="WOChangeQuerySession"
+    superclass="WODynamicElement"
+    xmlns="http://www.opengroupware.org/go/api"
+    ns="http://www.opengroupware.org/go"
+>
+  <binding name="preserve" defaults="List / Array / String"/>
+  <binding name="remove" defaults="List / Array / String"/>
+  <binding name="add" defaults="List / Array / String"/>
+  <binding name="?[name]" defaults="boolean (condition whether to preserve 'name')"/>
+  <binding name="+[name]" defaults="boolean (condition whether to add 'name')"/>
+  <binding name="-[name]" defaults="boolean (condition whether to remove 'name')"/>
+</wo>

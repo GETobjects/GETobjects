@@ -6,9 +6,11 @@
 >
   <name value="WOJavaScript" ns="http://www.opengroupware.org/go"/>
 
+  <bindings class="WOLinkGenerator"/>
   <binding name="hideInComment" defaults="YES/NO"/>
   <binding name="escapeHTML" defaults="YES/NO"/>
-  <binding name="scriptSource"/>
+  <binding name="scriptSource" description="WO compat"/>
+  <binding name="src"/>
   <binding name="scriptString"/>
   <binding name="scriptFile"/>
 
