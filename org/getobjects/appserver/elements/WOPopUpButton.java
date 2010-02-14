@@ -142,17 +142,19 @@ public class WOPopUpButton extends WOInput {
     if (this.writeValue != null) {
       /* has a 'value' binding, walk list to find object */
       
-      for (int i = 0, toGo = objects.size(); i < toGo; i++) {
-        Object lItem = objects.get(i);
-        Object cv;
-        
-        if (this.item != null && this.item.isValueSettableInComponent(cursor))
-          this.item.setValue(lItem, cursor);
-        
-        cv = this.readValue.stringValueInComponent(cursor);
-        if (formValue.equals(cv)) {
-          object = lItem;
-          break; /* found it, 'object' locvar is filled */
+      if (objects != null) {
+        for (int i = 0, toGo = objects.size(); i < toGo; i++) {
+          Object lItem = objects.get(i);
+          Object cv;
+
+          if (this.item != null && this.item.isValueSettableInComponent(cursor))
+            this.item.setValue(lItem, cursor);
+
+          cv = this.readValue.stringValueInComponent(cursor);
+          if (formValue.equals(cv)) {
+            object = lItem;
+            break; /* found it, 'object' locvar is filled */
+          }
         }
       }
     }
