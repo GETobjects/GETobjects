@@ -82,6 +82,7 @@ import org.getobjects.appserver.core.WOResponse;
  */
 public class WELinkToRemote extends WEPrototypeElement {
   protected WOAssociation string;
+  protected WOAssociation fragmentIdentifier;
   protected WOElement     template;
   protected WOElement     onClick;
 
@@ -90,8 +91,9 @@ public class WELinkToRemote extends WEPrototypeElement {
   {
     super(_name, _assocs, _template);
 
-    this.onClick  = new WELinkToRemoteScript(_name + "Script", _assocs, null);
     this.string   = grabAssociation(_assocs, "string");
+    this.fragmentIdentifier = grabAssociation(_assocs, "fragmentIdentifier");
+    this.onClick  = new WELinkToRemoteScript(_name + "Script", _assocs, null);
     this.template = _template;
   }
 
@@ -137,7 +139,15 @@ public class WELinkToRemote extends WEPrototypeElement {
     /* start anker */
 
     _r.appendBeginTag("a");
-    _r.appendAttribute("href", "#");
+    if (this.fragmentIdentifier != null) {
+      Object cursor = _ctx.cursor();
+      _r.appendAttribute("href", "#" +
+          this.fragmentIdentifier.stringValueInComponent(cursor));
+    }
+    else {
+      _r.appendAttribute("href", "#");
+    }
+
     this.onClick.appendToResponse(_r, _ctx);
     this.appendExtraAttributesToResponse(_r, _ctx);
     // TODO: otherTagString
