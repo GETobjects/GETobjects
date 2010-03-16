@@ -49,22 +49,22 @@ public class OFSComponentFile extends OFSJavaObject
     IGoCallable, IGoComponentDefinition, IGoObjectRenderer,
     IWOComponentDefinition
 {
-  
+
   /* accessors */
-  
+
   public void setTemplate(WOTemplate _template) {
     this.object = _template;
   }
   public WOTemplate template() {
     return (WOTemplate)this.object();
   }
-  
+
 
   /* IGoCallable */
 
   public Object callInContext(Object _object, IGoContext _ctx) {
     WOContext wctx = (WOContext)_ctx;
-    
+
     // this will just trigger the defaultAction, which returns the component
     Object jr = WODirectActionRequestHandler.primaryCallComponentAction
       (this.nameInContainer, "default", wctx);
@@ -75,7 +75,7 @@ public class OFSComponentFile extends OFSJavaObject
   /**
    * Returns true if the context is a WOContext. A WOContext is required to
    * instantiate components (true?).
-   * 
+   *
    * @param _ctx - the context we want to call the action in
    * @return true if its a WOContext, false otherwise.
    */
@@ -90,7 +90,7 @@ public class OFSComponentFile extends OFSJavaObject
    * result (eg JSGoComponet).
    * <p>
    * The default implementation just returns the result as-is.
-   * 
+   *
    * @param _object - the object the method was called on
    * @param _result - the result of the call
    * @param _ctx    - the context in which all this happens
@@ -104,12 +104,12 @@ public class OFSComponentFile extends OFSJavaObject
 
 
   /* being a component definition */
-  
+
   /**
    * This is called by the GoContainerResourceManager to determine the
    * WOComponent class of a contained component. This is only called for
    * WOComponents, not for dynamic elements.
-   * 
+   *
    * @param _name - the name of the component being instantiated (eg Name)
    * @param _rm   - the resource manager which manages the instantiation
    * @return the WOComponent subclass to be used for the new component
@@ -121,11 +121,11 @@ public class OFSComponentFile extends OFSJavaObject
     Class cls = _rm.lookupClass(_name);
     if (cls == null)
       return WOComponent.class;
-    
+
     if (WOComponent.class.isAssignableFrom(cls))
       return cls;
-    
-    log.error("class is not a WOComponent subclass: " + cls + "\n" + 
+
+    log.error("class is not a WOComponent subclass: " + cls + "\n" +
         "  rm:   " + _rm + "\n" +
         "  name: " + _name);
     return null;
@@ -138,8 +138,8 @@ public class OFSComponentFile extends OFSJavaObject
   public Object loadObject() {
     return this.loadTemplate(null /* name */, null /* rm */);
   }
-  
-  
+
+
   /**
    * This method loads the WOTemplate using the WOWrapperTemplateBuilder. It
    * maintains a cache which is hooked to the fileInfo of this wrapper GoObject.
@@ -147,7 +147,7 @@ public class OFSComponentFile extends OFSJavaObject
    * Usually the <code>_name</code> will equal the GoObject, but theoretically
    * we could store multiple template variants with different names.
    * (TBD: not sure whether this flexibility is useful)
-   * 
+   *
    * @param _name - name of the template to load, eg Main (for Main.html)
    * @param _rm   - the resource manager used for dynamic element lookup
    * @return a WOTemplate, or null if the loading failed
@@ -161,7 +161,7 @@ public class OFSComponentFile extends OFSJavaObject
      */
     final ConcurrentHashMap<IOFSFileInfo, Object> fileInfoToTemplateEntry =
       this.fileManager.cacheForSection("OFSComponentFile");
-    
+
     // TBD: we might want to include languages in the name/lookup
     // TBD: rewrite the function to use IOFSFileInfo
     final IOFSFileInfo info = this.fileInfo();
@@ -185,7 +185,7 @@ public class OFSComponentFile extends OFSJavaObject
       // System.err.println("CACHE HIT!");
       return cacheEntry.template;
     }
-    
+
     /* cache miss, build template */
     // System.err.println("CACHE MISS.");
 
@@ -196,7 +196,7 @@ public class OFSComponentFile extends OFSJavaObject
       // TBD: cache misses?
       return null;
     }
-    
+
     /* build template */
     // Note: we use the wrapper template builder even though its a single file,
     //       thats OK (maybe we should rename the builder).
@@ -213,11 +213,11 @@ public class OFSComponentFile extends OFSJavaObject
     /* done */
     return tmpl;
   }
-  
+
   /**
    * This method is supposed to return an initialized WOComponentDefinition
    * instance, which outlines the 'plan' on how to create the actual component.
-   * 
+   *
    * @param _name  - the name of the component being instantiated (eg Main)
    * @param _langs - the languages the lookup is for
    * @param _rm    - the resource manager in charge
@@ -228,7 +228,7 @@ public class OFSComponentFile extends OFSJavaObject
   {
     return this;
   }
-  
+
   public WOComponent componentInContext(WOContext _ctx) {
     // TBD: maybe we should just use app.pageWithName()? This does not guarantee
     //      that our cdef is triggered, but the RMs will cache our cdef
@@ -238,7 +238,7 @@ public class OFSComponentFile extends OFSJavaObject
       rm = cursor.resourceManager();
     if (rm == null && _ctx != null)
       rm = _ctx.application().resourceManager();
-    
+
     if (rm == null) {
       log.warn("found no resource manager in context: " + _ctx);
       return null;
@@ -246,21 +246,22 @@ public class OFSComponentFile extends OFSJavaObject
 
     return this.instantiateComponent(rm, _ctx);
   }
-  
-  
+
+
   /* being a WOComponentDefinition */
 
   public WOComponent instantiateComponent
     (WOResourceManager _rm, WOContext _ctx)
   {
-    Class componentClass = this.lookupComponentClass(null, _rm);
+    Class componentClass = this.lookupComponentClass(this.nameInContainer(),
+        _rm);
     WOComponent component = (WOComponent)
       NSJavaRuntime.NSAllocateObject(componentClass);
     if (component == null) {
       log.error("could not instantiate component: " + componentClass);
       return null;
     }
-  
+
     /* Set the name of the component. This is important because not all
      * components need to have a strictly associated class (eg templates w/o
      * a class or scripted components)
@@ -271,7 +272,7 @@ public class OFSComponentFile extends OFSJavaObject
      * choose to return a replacement.
      */
     component = component.initWithContext(_ctx);
-    
+
     /* fix resource manager */
     component.setResourceManager(_rm);
     //System.err.println("RM: " + _rm);
@@ -291,7 +292,7 @@ public class OFSComponentFile extends OFSJavaObject
     /* return new component */
     return component;
   }
-  
+
   public void touch() { // called when the CDEF was used
   }
 
@@ -300,30 +301,30 @@ public class OFSComponentFile extends OFSJavaObject
   {
     if (this.object == null)
       this.object = this.loadTemplate(null /* name */, _rm);
-    
+
     return this.object != null;
   }
 
-  
+
   /* acting as a renderer (a template) */
-  
+
   public boolean isFrameComponent() {
     return this.pathExtension().equals("joframe");
   }
-  
+
   public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
     // TBD: we could support rendering of arbitary objects (push to some
     //      component ivar, and then render the component)
     return this.isFrameComponent() && _object instanceof WOComponent;
   }
-  
+
   public Exception renderObjectInContext(Object _object, WOContext _ctx) {
     return GoDefaultRenderer.sharedRenderer
       .renderObjectWithFrame(_object, (IWOComponentDefinition)this, _ctx);
   }
-  
+
   /* template cache */
-  
+
   public static class TemplateCacheEntry extends Object {
     public WOTemplate template;
     public long       timestamp;
