@@ -22,12 +22,14 @@ package org.getobjects.appserver.core;
 
 import java.net.URI;
 
+import org.getobjects.foundation.UObject;
+
 /**
  * WORedirect
  * <p>
  * An action result which can be used to trigger an HTTP redirect (302 Status
  * plus Location header).
- * 
+ *
  * <p>
  * Note: this only inherits from WOComponent for legacy reasons, no real
  * point in that?!
@@ -38,7 +40,7 @@ public class WORedirect extends WOComponent {
   protected int    status = WOMessage.HTTP_STATUS_FOUND;
   protected int    timeout; /* for meta refresh */
   protected String url;
-  
+
   public WORedirect(String _url) {
     super();
     this.setUrl(_url);
@@ -51,13 +53,13 @@ public class WORedirect extends WOComponent {
   public WORedirect() {
     super();
   }
-  
+
   /* accessors */
-  
+
   /**
    * Contrary to WebObjects, this will convert a URI into a proper
    * URL as is required by the HTTP standard.
-   * 
+   *
    * @param _url String representing a relative (URI) or absolute URL
    */
   public void setUrl(String _url) {
@@ -70,14 +72,18 @@ public class WORedirect extends WOComponent {
       /* a relative url without a scheme, needs to be turned into proper URL */
       WOContext ctx   = this.context();
       if (ctx != null) {
-        WORequest rq    = ctx.request();
-        String    rqUrl = rq.url();
-        if (rqUrl == null) {
+        WORequest rq        = ctx.request();
+        String    originUrl = rq.headerForKey("origin");
+        if (UObject.isNotEmpty(originUrl))
+          this.log().info("using provided origin header to construct URL");
+        else
+          originUrl = rq.url();
+        if (originUrl == null) {
           this.log().warn("request doesn't provide info about URL, falling " +
                           "back to URIs which isn't proper according to RFCs!");
-          rqUrl = rq.uri();
+          originUrl = rq.uri();
         }
-        URI base  = URI.create(rqUrl);
+        URI base  = URI.create(originUrl);
         URI redir = URI.create(_url);
         _url      = base.resolve(redir).toASCIIString();
       }
@@ -88,25 +94,25 @@ public class WORedirect extends WOComponent {
   public String url() {
     return this.url;
   }
-  
+
   public int status() {
     return this.status < 1 ? WOMessage.HTTP_STATUS_FOUND : this.status;
   }
   public int timeout() {
     return this.timeout < 0 ? 0 : this.timeout;
   }
-  
+
   /* some WOComponent infrastructure sanity */
-  
+
   @Override
   public WOElement template() {
     /* we never have a template */
     return null;
   }
-  
-  
+
+
   /* WOActionResults */
-  
+
   /**
    * Returns a new WOResponse object representing the redirect.
    */
@@ -119,7 +125,7 @@ public class WORedirect extends WOComponent {
 
     WOContext  ctx = this.context();
     WOResponse r;
-    
+
     r = ctx != null ? ctx.response() : new WOResponse();
     this.appendToResponse(r, ctx);
     return r;
@@ -127,7 +133,7 @@ public class WORedirect extends WOComponent {
 
 
   /* generate response */
-  
+
   /**
    * Since WORedirect is a WOComponent, we need to mark it as 'frameless', so
    * that it does not get embedded into a Frame.joframe ...
@@ -143,21 +149,21 @@ public class WORedirect extends WOComponent {
       log().warn("WORedirect has no URL assigned.");
       return;
     }
-    
+
     if (_r.isStreaming()) {
       /* we could try to be clever here and encode a JavaScript to do the
        * redirect during the streaming?
        */
       log().warn("invoked WORedirect on a streaming response!");
     }
-    
+
     if ("xjson".equals(F("redir"))) {
       /* hack, XMLHttpRequest or Prototype attempt to resolve 302 responses
        * even when we override the on302 handler. Sigh.
        */
       _r.setStatus(WOMessage.HTTP_STATUS_OK);
       _r.setHeaderForKey("{ redirect: '" + location + "' }", "X-JSON");
-      
+
       /* Hm, we set the meta-refresh as the body. Just to be sure. */
       this.appendMetaRefreshToResponse(_r, _ctx);
     }
@@ -165,28 +171,28 @@ public class WORedirect extends WOComponent {
       _r.setStatus(this.status());
       _r.setHeaderForKey(location, "location");
       _r.removeHeadersForKey("content-type");
- 
+
       /* reset content, could contain a partial response */
       _r.setContent(new byte[0]);
     }
-    
+
     // TBD: we could play clever here and generate a META REFRESH and/or
     //      a JavaScript if the element is used in a specific page section
   }
-  
+
   public void appendMetaRefreshToResponse(WOResponse _r, WOContext _ctx) {
     // <meta http-equiv="refresh" content="5; URL=http://de.selfhtml.org/">
-    
+
     StringBuilder content = new StringBuilder(128);
     content.append(this.timeout());
     content.append("; URL=");
     content.append(this.url());
-    
+
     _r.appendBeginTag("meta", "http-equiv", "refresh", "content", content);
     _r.appendBeginTagClose(_ctx.closeAllElements());
   }
 
-  
+
   /* request processing */
 
   @Override
