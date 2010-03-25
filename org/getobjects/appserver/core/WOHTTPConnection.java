@@ -137,7 +137,6 @@ public class WOHTTPConnection extends NSObject {
           this.urlConnection.setConnectTimeout(this.sendTimeout);
           this.urlConnection.setAllowUserInteraction(false);
           this.urlConnection.setDoInput(true);
-          this.urlConnection.setDoOutput(true);
       }
 
       // set properties and headers
@@ -154,12 +153,20 @@ public class WOHTTPConnection extends NSObject {
       String connectionProp = this.keepAlive ? "keep-alive" : "close";
       this.urlConnection.setRequestProperty("connection", connectionProp);
 
-      // send content body
-      OutputStream os = this.urlConnection.getOutputStream();
       byte[] content = _rq.content();
-      if (UObject.isNotEmpty(content))
+      boolean hasContent = UObject.isNotEmpty(content);
+      // NOTE: setting doOutput(true) has the effect of also setting
+      // the request method to POST? WTF?
+      this.urlConnection.setDoOutput(hasContent);
+      if (hasContent) {
+        // send content body
+        OutputStream os = this.urlConnection.getOutputStream();
         os.write(content);
-      os.flush();
+        os.close();
+      }
+      else {
+        this.urlConnection.connect();
+      }
 
       // save request for response
       this.request = _rq;
@@ -244,8 +251,17 @@ public class WOHTTPConnection extends NSObject {
       return r;
     }
     catch (IOException e) {
-      // TODO: find a better status to apply in this case
-      this.status = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
+      if (this.urlConnection != null) {
+        try {
+          this.status = this.urlConnection.getResponseCode();
+        }
+        catch (IOException e1) {
+          this.status = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
+        }
+      }
+      else {
+        this.status = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
+      }
       log.error("readResponse() failed: " + e);
       return null;
     }
