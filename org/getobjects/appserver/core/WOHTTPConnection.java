@@ -42,8 +42,6 @@ public class WOHTTPConnection extends NSObject {
 
   protected String  host;
   protected int     port;
-  protected String  httpVersion;
-  protected int     status          = WOMessage.HTTP_STATUS_OK;
   protected int     receiveTimeout  = 30 * 1000; // milliseconds
   protected int     sendTimeout     = 10 * 1000; // milliseconds
   protected int     readTimeout     = 0;
@@ -180,63 +178,66 @@ public class WOHTTPConnection extends NSObject {
 
   // Response
 
+  protected static void attachToResponse(HttpURLConnection _urlConnection,
+      WOResponse _r)
+  {
+    // check status first
+    String   resp      = _urlConnection.getHeaderField(0);
+    String[] fields    = resp.split(" ");
+    String httpVersion = null;
+    int    status      = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
+
+    if (fields.length >= 2) {
+      try {
+        httpVersion = fields[0];
+        status      = Integer.parseInt(fields[1]);
+      }
+      catch (Exception e) {
+        try {
+          status = _urlConnection.getResponseCode();
+        }
+        catch (IOException e1) {
+        }
+      }
+    }
+
+    // apply status
+    _r.setStatus(status);
+    // kinda hackish
+    _r.httpVersion = httpVersion;
+
+    for (int i = 1; _urlConnection.getHeaderField(i) != null; i++) {
+      String headerProp = _urlConnection.getHeaderField(i);
+      String headerKey  = _urlConnection.getHeaderFieldKey(i).toLowerCase();
+      String[] headerValues = headerProp.split(" , ");
+      if (headerValues.length == 1) {
+        _r.setHeaderForKey(headerProp, headerKey);
+      }
+      else {
+        List<String> header = new ArrayList<String>(headerValues.length);
+        for (String value : headerValues) {
+          header.add(value.trim());
+        }
+        _r.setHeadersForKey(header, headerKey);
+      }
+    }
+  }
+
   public WOResponse readResponse() {
+    WOResponse r = new WOResponse(this.request);
     try {
-      WOResponse r = new WOResponse(this.request);
       this.urlConnection.setReadTimeout(this.readTimeout);
 
       // read content body
 
-      byte[] content;
       InputStream is  = this.urlConnection.getInputStream();
-      int len = this.urlConnection.getContentLength();
-      if (len != -1) {
-        content = new byte[len];
-        is.read(content, 0, len);
-      }
-      else {
-        // TODO: in order to properly support receiveTimeout, we'd need
-        // to implement stream loading here and check the receiveTimeout
-        // exhaustion for all successive read operations.
-        content = UData.loadContentFromStream(is);
-      }
+      // TODO: in order to properly support receiveTimeout, we'd need
+      // to implement stream loading here and check the receiveTimeout
+      // exhaustion for all successive read operations.
+      byte[] content = UData.loadContentFromStream(is);
       r.setContent(content);
 
-      // read status and headers
-
-      // check status first
-      String   resp   = this.urlConnection.getHeaderField(0);
-      String[] fields = resp.split(" ");
-      if (fields.length >= 2)
-      try {
-        this.httpVersion = fields[0];
-        this.status      = Integer.parseInt(fields[1]);
-      }
-      catch (Exception e) {
-        this.httpVersion = null;
-        this.status      = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
-      }
-
-      // apply status
-      r.setStatus(this.status);
-      // kinda hackish
-      r.httpVersion = this.httpVersion;
-
-      for (int i = 1; this.urlConnection.getHeaderField(i) != null; i++) {
-        String headerProp = this.urlConnection.getHeaderField(i);
-        String headerKey  = this.urlConnection.getHeaderFieldKey(i).toLowerCase();
-        String[] headerValues = headerProp.split(" , ");
-        if (headerValues.length == 1) {
-          r.setHeaderForKey(headerProp, headerKey);
-        }
-        else {
-          List<String> header = new ArrayList<String>(headerValues.length);
-          for (String value : headerValues) {
-            header.add(value.trim());
-          }
-          r.setHeadersForKey(header, headerKey);
-        }
-      }
+      attachToResponse(this.urlConnection, r);
 
       String connValue = r.headerForKey("connection");
       if (UObject.isNotEmpty(connValue)) {
@@ -247,23 +248,16 @@ public class WOHTTPConnection extends NSObject {
           this.urlConnection = null;
         }
       }
-
-      return r;
     }
-    catch (IOException e) {
+    catch (Exception e) {
       if (this.urlConnection != null) {
-        try {
-          this.status = this.urlConnection.getResponseCode();
-        }
-        catch (IOException e1) {
-          this.status = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
-        }
+        attachToResponse(this.urlConnection, r);
       }
       else {
-        this.status = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
+        r.setStatus(WOMessage.HTTP_STATUS_INTERNAL_ERROR);
       }
       log.error("readResponse() failed: " + e);
-      return null;
     }
+    return r;
   }
 }
