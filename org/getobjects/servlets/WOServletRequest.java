@@ -576,6 +576,9 @@ public class WOServletRequest extends WORequest {
 
   @Override
   public String url() {
-    return this.sRequest.getRequestURL().toString();
+    String url = super.url();
+    if (UObject.isEmpty(url))
+      url = this.sRequest.getRequestURL().toString();
+    return url;
   }
 }

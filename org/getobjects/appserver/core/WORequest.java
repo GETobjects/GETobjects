@@ -30,11 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.getobjects.foundation.UObject;
+
 /**
  * WORequest
  * <p>
  * Wraps a Servlet request in the WO API.
- * 
+ *
  * <p>
  * Threading: this object is for use in one thread only (not synced)
  */
@@ -180,7 +182,17 @@ public class WORequest extends WOMessage {
    * i.e. http://localhost:8181/HelloWorld/wr/a.gif
    */
   public String url() {
-    // TODO: extract URL from headers hinted by other adaptors
+    // If "origin" header is available, the exact URL can be constructed
+    String origin = this.headerForKey("origin");
+    if (UObject.isNotEmpty(origin)) {
+      return origin + this.uri();
+    }
+
+    // NOTE: extract URL from headers hinted by other adaptors?
+    // NOTE2: WOServletRequest is a subclass of WORequest and already knows
+    // how to find the proper URL information, hence it doesn't need to
+    // set any special headers!
+
     return null;
   }
 
@@ -435,7 +447,7 @@ public class WORequest extends WOMessage {
   /**
    * Returns a COPY of the internal form-values map. (so that KVC pushes do not
    * touch our internal map.
-   * 
+   *
    * @return a copy of the internal map.
    */
   public Map<String,Object[]> formValues() {
@@ -529,7 +541,7 @@ public class WORequest extends WOMessage {
     v = this.stringFormValueForKey(WORequest.SessionIDKey);
     if (v != null) v = v.trim();
     if (v != null && (v.equals("-") || v.length() == 0)) v = null;
-    
+
     if (v == null) {
       Collection<String> vals = this.cookieValuesForKey(WORequest.SessionIDKey);
       if (vals != null) {
@@ -538,7 +550,7 @@ public class WORequest extends WOMessage {
           vs = vs.trim();
           if (vs.length() == 0 || vs.equals("-") || vs.equals("nil"))
             continue;
-          
+
           v = vs;
           break;
         }
@@ -547,7 +559,7 @@ public class WORequest extends WOMessage {
 
     if (v != null && v.equals("nil"))
       v = null;
-    
+
     return v;
   }
   public boolean isSessionIDInRequest() {
@@ -595,9 +607,9 @@ public class WORequest extends WOMessage {
     return this.cc;
   }
 
-  
+
   /* Zope style :action form values */
-  
+
   /**
    * Checks whether the form parameters contain Zope style :action form values.
    */
@@ -609,17 +621,17 @@ public class WORequest extends WOMessage {
     String[] formKeys = this.formValueKeys();
     if (formKeys == null)
       return null;
-    
+
     for (String formValueKey: formKeys) {
       int l = formValueKey.length();
       if (l < 7) continue;
-      
+
       if (l >= 7 && formValueKey.endsWith(":action")) {
         return l == 7
           ? this.stringFormValueForKey(formValueKey)
           : formValueKey.substring(0, l - 7);
       }
-      
+
       /* Note: image submits have no values (only coordinates) */
       if (l > 9 && formValueKey.endsWith(":action.x"))
         return formValueKey.substring(0, l - 9);

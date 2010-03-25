@@ -72,18 +72,15 @@ public class WORedirect extends WOComponent {
       /* a relative url without a scheme, needs to be turned into proper URL */
       WOContext ctx   = this.context();
       if (ctx != null) {
-        WORequest rq        = ctx.request();
-        String    originUrl = rq.headerForKey("origin");
-        if (UObject.isNotEmpty(originUrl))
-          this.log().info("using provided origin header to construct URL");
-        else
-          originUrl = rq.url();
-        if (originUrl == null) {
+        WORequest rq    = ctx.request();
+        String    rqUrl = rq.url();
+
+        if (rqUrl == null) {
           this.log().warn("request doesn't provide info about URL, falling " +
                           "back to URIs which isn't proper according to RFCs!");
-          originUrl = rq.uri();
+          rqUrl = rq.uri();
         }
-        URI base  = URI.create(originUrl);
+        URI base  = URI.create(rqUrl);
         URI redir = URI.create(_url);
         _url      = base.resolve(redir).toASCIIString();
       }
