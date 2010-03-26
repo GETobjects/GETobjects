@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +58,7 @@ import org.xml.sax.SAXException;
  * <p>
  * Abstract superclass of WORequest and WOResponse. Manages HTTP headers and
  * the entity content. Plus some extras (eg cookies and userInfo).
- * 
+ *
  * <p>
  * Note:
  * Why do the write methods do not throw exceptions? Because 99% of the time
@@ -141,7 +142,7 @@ public abstract class WOMessage extends NSObject
   public Map userInfo() {
     return this.userInfo;
   }
-  
+
   public NSTextCoder contentCoder() {
     return this.contentCoder;
   }
@@ -153,13 +154,13 @@ public abstract class WOMessage extends NSObject
     this.attributeCoder = _valCoder;
   }
 
-  
+
   /* headers */
 
   /**
    * Replaces all header values for the given key with the given values. If the
    * given array is null, the header is removed.
-   * 
+   *
    * @param _v   - the values (eg [ 'text/html', 'text/plain' ])
    * @param _key - the name of the header (eg 'accept')
    */
@@ -178,14 +179,14 @@ public abstract class WOMessage extends NSObject
   /**
    * Adds a value to the value array of the header with the given key. If there
    * is no array yet, a new one is created.
-   * 
+   *
    * @param _v   - the value to add (eg 'text/html')
    * @param _key - the name of the header (eg 'accept')
    */
   public void appendHeader(final String _v, final String _key) {
     if (_v == null || _key == null)
       return;
-    
+
     if (this.headers == null)
       this.setHeaderForKey(_v, _key);
     else {
@@ -200,7 +201,7 @@ public abstract class WOMessage extends NSObject
 
   /**
    * Removes all values stored for the header with the given name.
-   * 
+   *
    * @param _key - the name of the header to clear
    */
   public void removeHeadersForKey(final String _key) {
@@ -211,7 +212,7 @@ public abstract class WOMessage extends NSObject
 
   /**
    * Returns all values for the requester header as an array.
-   * 
+   *
    * @param _key - the name of the header to retrieve (eg 'accept')
    * @return the values of the header (eg [ 'text/html', 'text/plain'])
    */
@@ -255,7 +256,7 @@ public abstract class WOMessage extends NSObject
     return this.headers;
   }
 
-  
+
   /* cookies */
 
   public Collection<WOCookie> cookies() {
@@ -274,7 +275,7 @@ public abstract class WOMessage extends NSObject
     this.cookies.remove(_cookie);
   }
 
-  
+
   /* fail status */
 
   public boolean didFail() {
@@ -287,7 +288,7 @@ public abstract class WOMessage extends NSObject
     this.lastException = null;
   }
 
-  
+
   /* default encodings */
 
   protected static String defaultEncoding    = "utf-8";
@@ -306,7 +307,7 @@ public abstract class WOMessage extends NSObject
   public static String defaultURLEncoding() {
     return defaultURLEncoding;
   }
-  
+
 
   /* content representations */
 
@@ -323,7 +324,7 @@ public abstract class WOMessage extends NSObject
    * Returns the content of the message as a String. This uses the
    * <code>contentEncoding()</code> to determine the necessary charset to
    * convert the content buffer into a String.
-   * 
+   *
    * @return the content of the message, or null
    */
   public String contentString() {
@@ -343,7 +344,7 @@ public abstract class WOMessage extends NSObject
     }
   }
 
-  
+
   /* content DOM support */
 
   static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -352,7 +353,7 @@ public abstract class WOMessage extends NSObject
   /**
    * Parse the content of the message as a DOM document. The DOM is cached as
    * part of the message.
-   * 
+   *
    * @return a DOM Document for the message entity
    */
   public Document contentAsDOMDocument() {
@@ -384,7 +385,7 @@ public abstract class WOMessage extends NSObject
    * Internal method to construct the XML document builder used by
    * <code>contentAsDOMDocument</code> to build the XML for a message
    * entity.
-   *  
+   *
    * @return a DocumentBuilder, or null if none could be build
    */
   protected DocumentBuilder createDocumentBuilder() {
@@ -396,7 +397,7 @@ public abstract class WOMessage extends NSObject
       return null;
     }
   }
-  
+
 
   /* raw content handling */
 
@@ -404,7 +405,7 @@ public abstract class WOMessage extends NSObject
    * Returns whether the message is streaming its append messages (instead of
    * collecting the data in a byte[] array). This is done by checking whether
    * the outputstream is a ByteArrayOutputStream.
-   * 
+   *
    * @return whether the message directly streams its output
    */
   public boolean isStreaming() {
@@ -416,7 +417,7 @@ public abstract class WOMessage extends NSObject
    * mode.
    * Subclasses override this to 'enable' streaming (by setting an appropriate
    * output stream after generating the HTTP head and previously added content).
-   * 
+   *
    * @return true if streaming was or got enabled, false otherwise
    */
   public boolean enableStreaming() {
@@ -438,13 +439,13 @@ public abstract class WOMessage extends NSObject
     if (this.contents != null && this.contents.length > 0)
       this.appendContentData(this.contents, this.contents.length);
   }
-  
+
   protected Exception flushStringBuffer() {
     if (this.stringBuffer != null && this.stringBuffer.length() > 0) {
       try {
         final byte[] a = this.stringBuffer.toString()
           .getBytes(this.contentEncoding());
-        
+
         try {
           this.outputStream.write(a, 0 /* start-idx */, a.length);
           this.stringBuffer.setLength(0);
@@ -464,13 +465,13 @@ public abstract class WOMessage extends NSObject
   /**
    * Returns the entity of the message as a byte[] array. This flushes the
    * caches and then returns the array.
-   * 
+   *
    * @return the contents of the message
    */
   public byte[] content() {
     if (this.stringBuffer != null)
       this.flushStringBuffer();
-    
+
     if (this.contents != null)
       return this.contents;
 
@@ -484,12 +485,12 @@ public abstract class WOMessage extends NSObject
 
   /**
    * Just flushes the output stream.
-   * 
+   *
    * @return null if everything went fine, the Exception object otherwise.
    */
   public Exception flush() {
     if (this.stringBuffer != null) this.flushStringBuffer();
-    
+
     if (this.outputStream == null)
       return null /* no error */;
 
@@ -505,7 +506,7 @@ public abstract class WOMessage extends NSObject
 
   /**
    * Writes the given bytes to the output stream.
-   * 
+   *
    * @param _data - the bytes to write
    * @param _len  - number of bytes to write, if below <0, all bytes are written
    * @return null if everything went fine, the Exception otherwise
@@ -527,7 +528,7 @@ public abstract class WOMessage extends NSObject
       return (this.lastException = ioe);
     }
   }
-  
+
   protected void _ensureStringBuffer() {
     if (this.stringBuffer == null)
       this.stringBuffer = new StringBuilder(32000);
@@ -536,14 +537,14 @@ public abstract class WOMessage extends NSObject
   /**
    * Converts the String to a byte[] array using the
    * <code>contentEncoding()</code> and writes that to the output stream
-   * 
+   *
    * @param _s - the String to add
    * @return null if everything was awesome-O, the Exception otherwise
    */
   public Exception appendContentString(final String _s) {
     if (_s == null || _s.length() == 0)
       return null;
-    
+
     if (this.stringBuffer == null) this._ensureStringBuffer();
     this.stringBuffer.append(_s);
     // TBD: flush at a certain size?
@@ -552,7 +553,7 @@ public abstract class WOMessage extends NSObject
 
   /**
    * Writes a single character to the output stream.
-   * 
+   *
    * @param _c - the char to add
    * @return null if everything is green, the Exception otherwise.
    */
@@ -574,7 +575,7 @@ public abstract class WOMessage extends NSObject
   public Exception appendContentHTMLString(final String _s) {
     if (_s == null || _s.length() == 0)
       return null;
-    
+
     // TBD: flush at a certain size?
     if (this.stringBuffer == null) this._ensureStringBuffer();
     return this.contentCoder.encodeString(this.stringBuffer, _s);
@@ -592,7 +593,7 @@ public abstract class WOMessage extends NSObject
   public Exception appendContentHTMLAttributeValue(final String _s) {
     if (_s == null || _s.length() == 0)
       return null;
-    
+
     // TBD: flush at a certain size?
     if (this.stringBuffer == null) this._ensureStringBuffer();
     return this.attributeCoder.encodeString(this.stringBuffer, _s);
@@ -607,7 +608,7 @@ public abstract class WOMessage extends NSObject
    */
   public Exception appendContentScript(final WOJavaScriptWriter js) {
     if (js == null) return null;
-    
+
     StringBuilder sb = this.stringBuffer != null
       ? this.stringBuffer : new StringBuilder(1024);
     sb.append("<script type=\"text/javascript\">\n");
@@ -659,7 +660,7 @@ public abstract class WOMessage extends NSObject
    */
   public Exception appendBeginTag(final String _tagName, Object... _attrs) {
     if (this.stringBuffer == null) this._ensureStringBuffer();
-    
+
     if (_attrs != null) {
       final StringBuilder sb = this.stringBuffer;
 
@@ -683,7 +684,7 @@ public abstract class WOMessage extends NSObject
       }
       return null;
     }
-    
+
     this.stringBuffer.append('<');
     this.stringBuffer.append(_tagName);
     return null;
@@ -794,7 +795,7 @@ public abstract class WOMessage extends NSObject
     return this.appendAttribute(_attrName, String.valueOf(_value));
   }
 
-  
+
   /* Escaping (old static methods, do not use!) */
 
   /**
@@ -822,7 +823,7 @@ public abstract class WOMessage extends NSObject
     return NSHtmlAttributeEntityTextCoder.stringByEscapingHTMLAttributeValue(_v);
   }
 
-  
+
   /* Appendable */
 
   public Appendable append(final CharSequence _s) throws IOException {
@@ -841,7 +842,7 @@ public abstract class WOMessage extends NSObject
     return this;
   }
 
-  
+
   /* CharSequence */
 
   public char charAt(final int _idx) {
@@ -869,6 +870,12 @@ public abstract class WOMessage extends NSObject
     "Jan", "Tue", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
     "Nov", "Dec"
   };
+
+  public static String httpFormatDate(final Date _date) {
+    GregorianCalendar cal = new GregorianCalendar();
+    cal.setTime(_date);
+    return httpFormatDate(cal);
+  }
 
   public static String httpFormatDate(final GregorianCalendar _cal) {
     /*
@@ -904,6 +911,28 @@ public abstract class WOMessage extends NSObject
     sb.append(" GMT");
 
     return sb.toString();
+  }
+
+  public static Date dateFromHttpFormattedString(final String _httpDate) {
+    int dayOfMonth = Integer.parseInt(_httpDate.substring(5, 7));
+    int year       = Integer.parseInt(_httpDate.substring(12, 16));
+    int hourOfDay  = Integer.parseInt(_httpDate.substring(17, 19));
+    int minute     = Integer.parseInt(_httpDate.substring(20, 22));
+    int second     = Integer.parseInt(_httpDate.substring(23, 25));
+
+    int monthOfYear;
+    String monthName = _httpDate.substring(8, 11);
+    for (monthOfYear = 0; monthOfYear < 12; monthOfYear++) {
+      if (httpMonthNames[monthOfYear].equals(monthName))
+        break;
+    }
+    String   tzName = _httpDate.substring(26);
+    TimeZone tz     = tzName.equals("GMT") ? gmt :TimeZone.getTimeZone(tzName);
+
+    GregorianCalendar cal = new GregorianCalendar();
+    cal.set(year, monthOfYear, dayOfMonth, hourOfDay, minute, second);
+    cal.setTimeZone(tz);
+    return cal.getTime();
   }
 
 
