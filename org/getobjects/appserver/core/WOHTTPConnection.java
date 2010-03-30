@@ -181,22 +181,25 @@ public class WOHTTPConnection extends NSObject {
   protected static void attachToResponse(HttpURLConnection _urlConnection,
       WOResponse _r)
   {
-    // check status first
-    String   resp      = _urlConnection.getHeaderField(0);
-    String[] fields    = resp.split(" ");
     String httpVersion = null;
     int    status      = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
 
-    if (fields.length >= 2) {
-      try {
-        httpVersion = fields[0];
-        status      = Integer.parseInt(fields[1]);
-      }
-      catch (Exception e) {
+    // retrieve status and HTTP version
+    String resp = _urlConnection.getHeaderField(0);
+    if (resp != null) {
+      String[] fields = resp.split(" ");
+
+      if (fields.length >= 2) {
         try {
-          status = _urlConnection.getResponseCode();
+          httpVersion = fields[0];
+          status      = Integer.parseInt(fields[1]);
         }
-        catch (IOException e1) {
+        catch (Exception e) {
+          try {
+            status = _urlConnection.getResponseCode();
+          }
+          catch (IOException e1) {
+          }
         }
       }
     }
