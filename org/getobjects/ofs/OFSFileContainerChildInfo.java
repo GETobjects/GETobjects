@@ -47,16 +47,16 @@ public class OFSFileContainerChildInfo extends NSObject {
   // TODO: we should probably drop this class, move ID processing to the
   //       OFSFolder and caching to a caching filemanager.
   protected static final Log log = LogFactory.getLog("GoOFS");
-  
+
   protected IOFSFileManager fileManager;
   protected IOFSFileInfo    fileInfo;    /* a directory */
   protected long timestamp;
-  
+
   protected String[] fileNames;
   protected String[] fileIds;   /* index maps to files array */
   protected String[] fileTypes; /* index maps to files array */
   protected String[] ids;       /* there can be DUPs in the file ids! */
-  
+
   public OFSFileContainerChildInfo
     (final IOFSFileManager _fm, final IOFSFileInfo _info)
   {
@@ -71,9 +71,9 @@ public class OFSFileContainerChildInfo extends NSObject {
     return _fm != null && _info != null
       ? new OFSFileContainerChildInfo(_fm, _info) : null;
   }
-  
+
   /* accessors */
-  
+
   public String[] fileNames() {
     if (this.fileNames == null) this.load();
     return this.fileNames;
@@ -82,74 +82,98 @@ public class OFSFileContainerChildInfo extends NSObject {
     if (this.fileNames /* <= correct load indicator! */ == null) this.load();
     return this.ids;
   }
-  
+
   public long timestamp() {
     return this.timestamp;
   }
-  
+
   /* loading */
-  
+
   protected static final String[] emptyStringArray = new String[0];
-  
+
   protected Exception load() {
     // IMPORTANT: object must be threadsafe after the load! Its cached in a
     //            global map
     if (this.fileNames != null)
       return null; /* already loaded */
-    
+
     /* load subfiles */
-    
+
     this.timestamp = this.fileInfo.lastModified();
     this.fileNames = this.fileManager.childNamesAtPath(this.fileInfo.getPath());
-    
+
     if (this.fileNames == null) {
       log().warn("directory returned no files: " + this);
       return new GoInternalErrorException
         ("could not list directory: " + this.fileInfo.getName());
     }
-    
+
     /* check if its empty */
-    
+
     if (this.fileNames.length == 0) {
       this.fileIds = emptyStringArray;
       this.ids     = this.fileIds;
       return null;
     }
-    
+
     /* extract file information */
-    
+
     final HashSet<String> idUniquer =
       new HashSet<String>(this.fileNames.length);
     this.fileIds   = new String[this.fileNames.length];
     this.fileTypes = new String[this.fileNames.length];
-    
+
+    int removeCount = 0;
     for (int i = (this.fileNames.length - 1); i >= 0; i--) {
       String fn     = this.fileNames[i];
       int    dotIdx = fn != null ? fn.indexOf('.') : -1;
-      
-      if (!this.accept(fn))
+
+      if (!this.accept(fn)) {
+        this.fileNames[i] = null;
+        removeCount += 1;
         continue;
-      if (dotIdx == 0) /* this is a .dot file, we never expose those */
-        continue; // Note: this should be catched in the filename filter
-      
+      }
+
       if (dotIdx == -1) /* not recommended, file has no extension (README) */
         this.fileIds[i] = fn;
       else {
         this.fileIds[i]   = fn.substring(0, dotIdx);
         this.fileTypes[i] = fn.substring(dotIdx + 1);
       }
-      
+
       if (this.fileIds[i] != null && !(fn.startsWith(this.fileIds[i]))) {
         System.err.println("map: " + fn);
         System.err.println(" to: " + this.fileIds[i]);
       }
-      
+
       if (this.fileIds[i] != null)
         idUniquer.add(this.fileIds[i]);
     }
-    
+
+    if (removeCount > 0) {
+      int len = this.fileNames.length - removeCount;
+      if (len == 0) {
+        this.fileNames = emptyStringArray;
+        this.fileIds   = this.fileNames;
+        this.ids       = this.fileIds;
+        return null;
+      }
+      String[] censoredFileNames = new String[len];
+      String[] censoredFileIds   = new String[len];
+      int dstIdx = 0;
+      for (int i = 0; i < this.fileNames.length; i++) {
+        if (this.fileNames[i] != null) {
+          censoredFileNames[dstIdx] = this.fileNames[i];
+          censoredFileIds[dstIdx]   = this.fileIds[i];
+          dstIdx++;
+        }
+      }
+      this.fileNames = censoredFileNames;
+      this.fileIds   = censoredFileIds;
+    }
+
     /* check whether all files where unique and included */
-    
+
     if (this.fileNames.length == idUniquer.size()) {
       /* all IDs were unique */
       this.ids = this.fileIds;
@@ -171,35 +195,35 @@ public class OFSFileContainerChildInfo extends NSObject {
 
     /* debug */
     if (false) {
-      for (int j = 0; j < this.fileNames.length; j++) { 
+      for (int j = 0; j < this.fileNames.length; j++) {
         System.err.println("  id: " + this.fileIds[j]);
         System.err.println("  =>: " + this.fileNames[j]);
       }
     }
     return null; /* everything is awesome */
   }
-  
+
   /* name lookup */
-  
+
   public boolean hasKey(String _key) {
     if (this.fileNames == null) this.load();
-    
+
     if (this.ids == null || _key == null || _key.length() == 0)
       return false;
-      
+
     int idx = _key.indexOf('.');
     if (idx > 0)
       _key = _key.substring(0, idx);
-    
+
     for (int i = 0; i < this.ids.length; i++) {
       if (_key.equals(this.ids[i]))
         return true;
     }
     return false;
   }
-  
+
   /* basic filter */
-  
+
   public boolean accept(final String _filename) {
     if (_filename == null || _filename.length() == 0)
       return false;
@@ -218,22 +242,22 @@ public class OFSFileContainerChildInfo extends NSObject {
 
     return true;
   }
-  
+
   /* logging */
-  
+
   public Log log() {
     return log;
   }
-  
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.fileInfo != null)
       _d.append(" base=" + this.fileInfo);
-    
+
     if (this.fileNames == null)
       _d.append(" not-loaded");
     else {
@@ -241,7 +265,7 @@ public class OFSFileContainerChildInfo extends NSObject {
       if (this.ids != null) {
         if (this.fileNames.length != this.ids.length)
           _d.append(" has-dups");
-          
+
         if (this.ids != null)
           _d.append(" ids=" + UString.componentsJoinedByString(this.ids, ","));
       }
