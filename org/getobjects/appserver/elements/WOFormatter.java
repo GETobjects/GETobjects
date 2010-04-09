@@ -175,7 +175,12 @@ public abstract class WOFormatter extends NSObject {
     if (fmt == null)
       return (_o != null ? _o.toString() : null);
     
-    return fmt.format(_o);
+    try {
+      return fmt.format(_o);
+    }catch (Exception e) {
+    }
+    
+    return _o.toString();
   }
   
   /**
