@@ -126,7 +126,7 @@ public class OFSFileContainerChildInfo extends NSObject {
     int removeCount = 0;
     for (int i = (this.fileNames.length - 1); i >= 0; i--) {
       String fn     = this.fileNames[i];
-      int    dotIdx = fn != null ? fn.indexOf('.') : -1;
+      int    dotIdx = fn != null ? fn.lastIndexOf('.') : -1;
 
       if (!this.accept(fn)) {
         this.fileNames[i] = null;
@@ -156,20 +156,24 @@ public class OFSFileContainerChildInfo extends NSObject {
         this.fileNames = emptyStringArray;
         this.fileIds   = this.fileNames;
         this.ids       = this.fileIds;
+        this.fileTypes = this.ids;
         return null;
       }
       String[] censoredFileNames = new String[len];
       String[] censoredFileIds   = new String[len];
+      String[] censoredFileTypes = new String[len];
       int dstIdx = 0;
       for (int i = 0; i < this.fileNames.length; i++) {
         if (this.fileNames[i] != null) {
           censoredFileNames[dstIdx] = this.fileNames[i];
           censoredFileIds[dstIdx]   = this.fileIds[i];
+          censoredFileTypes[dstIdx] = this.fileTypes[i];
           dstIdx++;
         }
       }
       this.fileNames = censoredFileNames;
       this.fileIds   = censoredFileIds;
+      this.fileTypes = censoredFileTypes;
     }
 
     /* check whether all files where unique and included */
@@ -211,7 +215,7 @@ public class OFSFileContainerChildInfo extends NSObject {
     if (this.ids == null || _key == null || _key.length() == 0)
       return false;
 
-    int idx = _key.indexOf('.');
+    int idx = _key.lastIndexOf('.');
     if (idx > 0)
       _key = _key.substring(0, idx);
 

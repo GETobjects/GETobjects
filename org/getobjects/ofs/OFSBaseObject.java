@@ -51,46 +51,46 @@ public abstract class OFSBaseObject extends NSObject
   implements IGoObject, IGoLocation, EOValidation
 {
   protected static final Log log = LogFactory.getLog("GoOFS");
-  
+
   protected IOFSFileManager fileManager;
   protected String[]        storagePath; /* path in filemanager */
-  
+
   protected Object container;
   protected String nameInContainer;
-  
-  
+
+
   /* init */
-  
+
   /**
    * Sets the lookup location of the controller object.
    * <p>
    * This is not done in the constructor, so that a custom object does not need
    * to provide custom constructors. Its usually called by
    * restoreObjectFromFileInContext().
-   * 
+   *
    * @param _container - the parent of this controller in the lookup hierarchy
    * @param _name      - the name of this object in the lookup hierarchy
    */
   public void setLocation(Object _container, String _name) {
     this.container       = _container;
     this.nameInContainer = _name;
-    
-    if (this.nameInContainer == null && this.container != null && 
+
+    if (this.nameInContainer == null && this.container != null &&
         log().isWarnEnabled())
     {
       log().warn("OFS object created with container but w/o name:" +
-                 "\n  file:      " + 
+                 "\n  file:      " +
                  UString.componentsJoinedByString(this.storagePath, "/") +
                  "\n  container: " + _container +
                  "\n  class:     " + this.getClass().getSimpleName());
     }
   }
-  
-  
+
+
   /**
    * Sets the location of the object in the storage backend. This is the backend
    * object itself plus the array of filenames.
-   * 
+   *
    * @param _fm        - the storage backend (IOFSFileManager)
    * @param _storepath - the storage path as an array of filenames
    */
@@ -98,17 +98,17 @@ public abstract class OFSBaseObject extends NSObject
     this.fileManager = _fm;
     this.storagePath = _storepath;
   }
-  
-  
+
+
   /* IGoLocation interface */
-  
+
   public Object container() {
     return this.container;
   }
   public String nameInContainer() {
     return this.nameInContainer;
   }
-  
+
   public String[] pathInContainer() {
     return IGoLocation.Utility.pathToRoot(this);
   }
@@ -120,7 +120,7 @@ public abstract class OFSBaseObject extends NSObject
     if (p.length == 0)    return "/";
     return "/" + UString.componentsJoinedByString(this.pathInContainer(), "/");
   }
-  
+
   /**
    * Derives an object-id from the given filename. The default implementation
    * just cuts of everything after the first dot (all extensions). This is
@@ -129,28 +129,28 @@ public abstract class OFSBaseObject extends NSObject
   public String idFromName(final String _name, final IGoContext _ctx) {
     if (_name == null)
       return null;
-    
-    final int idx = _name.indexOf('.');
+
+    final int idx = _name.lastIndexOf('.');
     if (idx == -1) return _name;
-    
+
     return _name.substring(0, idx);
   }
-  
-  
+
+
   /* container */
-  
+
   public boolean isFolderish() {
     return this instanceof IGoFolderish;
   }
-  
-  
+
+
   /* EOValidation interface */
 
   public Exception validateForSave() {
     // TODO: iterate over properties and send them validateValueForKey
     return null; /* everything is awesome */
   }
-  
+
   public Exception validateForInsert() {
     return this.validateForSave();
   }
@@ -160,29 +160,29 @@ public abstract class OFSBaseObject extends NSObject
   public Exception validateForUpdate() {
     return this.validateForSave();
   }
-  
-  
+
+
   /* file attributes */
-  
+
   public IOFSFileManager fileManager() {
     return this.fileManager;
   }
   public String[] storagePath() {
     return this.storagePath;
   }
-  
+
   /**
    * Returns the fileinfo for the storage path represented by this controller.
    * The fileinfo is just like a File object, in fact it wraps the File object
    * in the default storage.
-   * 
+   *
    * @return a fileinfo object or null if the storage path could not be resolved
    */
   public IOFSFileInfo fileInfo() {
     IOFSFileInfo[] fileInfos = this.fileInfos();
     return fileInfos != null && fileInfos.length > 0 ? fileInfos[0] : null;
   }
-  
+
   /**
    * Returns the fileinfos for the storage path represented by this controller.
    * The fileinfo is just like a File object, in fact it wraps the File object
@@ -194,30 +194,30 @@ public abstract class OFSBaseObject extends NSObject
    * The the OFS client this is exposed as just one object 'Component'. Its the
    * responsibility of the OFS object to do something useful with multiple
    * IOFSFileInfo's.
-   * 
+   *
    * @return an array of IOFSFileInfo objects, or null on error
    */
   public IOFSFileInfo[] fileInfos() {
     return this.fileManager != null
       ? this.fileManager.fileInfosForPath(this.storagePath) : null;
   }
-  
+
   /**
    * Retrieves a Date representing the lastmodified date of the represented file
    * in the storage.
-   * 
+   *
    * @return a Date representing the timestamp
    */
   public Date lastModified() {
     IOFSFileInfo info = this.fileInfo();
     return info != null ? new Date(info.lastModified()) : null;
   }
-  
+
   /**
    * Returns the 'stored' size (size of the source). Note that this is rather
    * useless except for internal applications. You usually want to know the
    * size of the external representation, not the size of the source.
-   * 
+   *
    * @return the size in bytes
    */
   public long size() {
@@ -225,112 +225,112 @@ public abstract class OFSBaseObject extends NSObject
     IOFSFileInfo info = this.fileInfo();
     return info != null ? info.length() : null;
   }
-  
+
   public String pathExtension() {
     /* Note: this is the path extension in the store */
     IOFSFileInfo info = this.fileInfo();
     return info != null ? info.pathExtension() : null;
   }
-  
-  
+
+
   /* WebDAV support */
-  
+
   /**
    * Returns the WebDAV resource type of the collection. Per default this is
    * just "collection" ...
-   * 
+   *
    * @return the WebDAV resource type
    */
   public Object davResourceType() {
     return this.isFolderish() ? "collection" : null;
   }
-  
-  
+
+
   /* GoClass */
-  
+
   public GoClass joClassInContext(final IGoContext _ctx) {
     if (_ctx == null) {
       log.warn("missing context to determine JoClass: " + this);
       return null;
     }
-    
+
     final GoClassRegistry reg = _ctx.goClassRegistry();
     if (reg == null) {
       log.warn("context has no class registry: " + _ctx);
       return null;
     }
-    
+
     return reg.goClassForJavaObject(this, _ctx);
   }
-  
+
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     /* lookup using GoClass */
-    
+
     final GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
     }
-    
+
     /* if we shall acquire, continue at parent */
-    
+
     if (_acquire && this.container != null)
       return ((IGoObject)this.container).lookupName(_name, _ctx, true /* aq */);
-    
+
     return null;
   }
-  
-  
+
+
   /* content (avoid necessity for a special "OFSFile" class) */
 
   /**
    * Open the content stream of the file by invoking the openStreamOnPath method
    * with the storage path on the filemanager.
-   * 
+   *
    * @return an InputStream or null if none could be opened
    */
   public InputStream openStream() {
     if (this.fileManager == null)
       return null;
-    
+
     return this.fileManager.openStreamOnPath(this.storagePath);
   }
-  
+
   protected static long contentLoadSizeLimit = 128 * 1024 * 1024; /* 128MB */
-  
+
   /**
    * Returns the full contents of the file as a byte array. Works by calling
    * openStream() and then sucking the contents into the array.
-   * 
+   *
    * @return a byte[] array containing the contents or null on error
    */
   public byte[] content() {
     // TODO: move to Foundation (NSReadStreamAsByteArray() or sth like this)
     long size = this.size();
     if (size == 0) return new byte[0]; /* empty file */
-    
+
     InputStream in = this.openStream();
     if (in == null) return null;
-    
+
     if (size > contentLoadSizeLimit || size > Integer.MAX_VALUE) {
       log.error("refusing to load a huge file into memory: " + this +
           "\n  limit: " + contentLoadSizeLimit +
           "\n  size:  " + size);
       return null;
     }
-    
+
     byte[] contents = null;
     try {
       contents = new byte[(int)size /* we check the limit above */];
       byte[] buffer = new byte[4096];
       int gotlen, pos = 0;
-      
+
       while ((gotlen = in.read(buffer)) != -1) {
         System.arraycopy(buffer, 0, contents, pos, gotlen);
         pos += gotlen;
       }
     }
-    catch (IOException ioe) {      
+    catch (IOException ioe) {
       // TODO: what to do with failed requests?
       log().warn("could not read content of file: " + this);
       contents = null;
@@ -348,21 +348,21 @@ public abstract class OFSBaseObject extends NSObject
     }
     return contents;
   }
-  
+
   public String defaultDeliveryMimeType() {
     return "application/octet-stream";
   }
-  
+
   public Exception writeContent(Object _content) {
     if (_content == null) {
       log().warn("got no content to write!");
       return new NSException("missing content to write");
     }
-    
+
     if (_content instanceof String) {
       String enc = this.contentEncoding();
       String s   = (String)_content;
-      
+
       try {
         _content = enc != null ? s.getBytes(enc) : s.getBytes();
       }
@@ -371,32 +371,32 @@ public abstract class OFSBaseObject extends NSObject
         return e;
       }
     }
-    
+
     if (!(_content instanceof byte[])) {
       log().warn("unexpected content value: " + _content.getClass());
       return new NSException("unexpected content value");
     }
-    
+
     if (this.fileManager == null)
       return new NSException("missing file manager!");
-    
+
     return this.fileManager.writeToFile((byte[])_content, this.storagePath);
   }
-  
+
   public String contentEncoding() {
     return null;
   }
   public String contentAsString() {
     String enc = this.contentEncoding();
-    
+
     // TODO: directly read string from stream using a Reader
     byte[] contents = this.content();
     if (contents == null)
       return null;
-    
+
     if (enc == null)
       return new String(contents);
-    
+
     try {
       return new String(contents, enc);
     }
@@ -405,58 +405,58 @@ public abstract class OFSBaseObject extends NSObject
       return null;
     }
   }
-  
-  
+
+
   /* key/value coding */
-  
+
   public Object valueForFileSystemKey(final String _key) {
     if ("NSFileType".equals(_key))
       return this.isFolderish() ? "NSFileTypeDirectory" : "NSFileTypeRegular";
-    
+
     if ("NSFileName".equals(_key))
       return this.nameInContainer();
-    
+
     if ("NSFilePath".equals(_key))
       return this.pathInContainer();
-    
+
     if ("NSFileModificationDate".equals(_key))
       return this.lastModified();
-    
+
     if (this.fileManager == null || this.storagePath == null)
       return null;
-    
+
     if ("NSFileSize".equals(_key))
       return this.storagePath != null ? new Long(this.size()) : null;
-    
+
     log().warn("unprocessed NSFile.. KVC key: '" + _key + "': " + this);
     return null;
   }
-  
+
   @Override
   public Object handleQueryWithUnboundKey(final String _key) {
     if ("this".equals(_key) || "self".equals(_key))
       return this;
-    
+
     if (_key.startsWith("NSFile"))
       return this.valueForFileSystemKey(_key);
-    
+
     return super.handleQueryWithUnboundKey(_key);
   }
-  
-  
+
+
   /* logging */
-  
+
   public Log log() {
     return log;
   }
-  
-  
+
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.container == null)
       _d.append(" ROOT");
     else {
@@ -474,14 +474,14 @@ public abstract class OFSBaseObject extends NSObject
       }
       else
         _d.append('x'); // not an IGoLocation object
-      
+
       if (this.nameInContainer != null) {
         _d.append(" as='");
         _d.append(this.nameInContainer);
         _d.append('\'');
       }
     }
-    
+
     if (this.storagePath != null) {
       _d.append(" store=");
       _d.append(UString.componentsJoinedByString(this.storagePath, "/"));
