@@ -42,7 +42,7 @@ import org.getobjects.foundation.NSObject;
  */
 public abstract class WOFormatter extends NSObject {
   protected static final Log log = LogFactory.getLog("WOFormatter");
-  
+
   /**
    * Extracts a WOFormatter for the given associations. This checks the
    * following bindings:
@@ -52,7 +52,7 @@ public abstract class WOFormatter extends NSObject {
    *   <li>formatter
    *   <li>formatterClass
    * </ul>
-   * 
+   *
    * @param _assocs - the bindings of the element
    * @return a WOFormatter object used to handle the bindings
    */
@@ -63,9 +63,9 @@ public abstract class WOFormatter extends NSObject {
     //       compound formatter and return that.
     final WOAssociation  formatterClass;
     WOAssociation fmt;
-    
+
     /* specific formatters */
-    
+
     fmt = WODynamicElement.grabAssociation(_assocs,"dateformat");
     if (fmt != null) {
       return new WODateFormatter(fmt,
@@ -81,43 +81,43 @@ public abstract class WOFormatter extends NSObject {
           WODynamicElement.grabAssociation(_assocs,"locale"),
           java.util.Calendar.class);
     }
-    
+
     fmt = WODynamicElement.grabAssociation(_assocs,"numberformat");
     if (fmt != null) return new WONumberFormatter(fmt, 0);
-    
+
     fmt = WODynamicElement.grabAssociation(_assocs,"currencyformat");
     if (fmt != null) return new WONumberFormatter(fmt, 1 /* currency */);
-    
+
     fmt = WODynamicElement.grabAssociation(_assocs,"percentformat");
     if (fmt != null) return new WONumberFormatter(fmt, 2 /* percent */);
-    
+
     fmt = WODynamicElement.grabAssociation(_assocs,"intformat");
     if (fmt != null) return new WONumberFormatter(fmt, 3 /* integer */);
-    
+
     /* generic formatter */
-    
+
     formatterClass = WODynamicElement.grabAssociation(_assocs,"formatterClass");
     fmt            = WODynamicElement.grabAssociation(_assocs,"formatter");
-    
+
     if (formatterClass != null)
       return new WOClassFormatter(formatterClass, fmt);
-    
+
     if (fmt != null)
       return new WOObjectFormatter(fmt);
-    
+
     if (log.isInfoEnabled())
       log.info("did not find formatter bindings in given assocs: " + _assocs);
     return null;
   }
-  
+
   protected WOFormatter() {
   }
-  
+
   /* methods */
-  
+
   public abstract Format formatInContext(final WOContext _ctx);
-  
-  
+
+
   /* NSFormatter like wrappers */
 
   /**
@@ -126,7 +126,7 @@ public abstract class WOFormatter extends NSObject {
    * <p>
    * As a special hack, it converts Long objects into Integer objects when the
    * latter can cover the scope.
-   * 
+   *
    * @param _s   - String to parse
    * @param _ctx - WOContext in which the operation takes place
    * @return the parsed Object
@@ -136,15 +136,15 @@ public abstract class WOFormatter extends NSObject {
   {
     if (_s == null)
       return null;
-    
+
     final Format fmt = this.formatInContext(_ctx);
     //System.err.println("FORMAT WITH: " + fmt);
     //System.err.println("  value: " + _s + " [" + _s.getClass() + "]");
     if (fmt == null)
       return _s;
-    
+
     Object v = fmt.parseObject(_s);
-    
+
     /* Downcast large values, eg if a Long fits into an Integer,
      * we return an Integer.
      * A bit hackish, but better for various reasons (eg JS bridge)
@@ -157,12 +157,12 @@ public abstract class WOFormatter extends NSObject {
     //System.err.println("  IS: " + v + " [" + v.getClass() + "]");
     return v;
   }
-  
+
   /**
    * This method extracts the java.text.Format object of the formatter. It then
    * calls format() on it to retrieve the String representation of the given
    * value object _o.
-   * 
+   *
    * @param _o   - Object to render as a String, eg java.util.Date
    * @param _ctx - WOContext in which the operation takes place
    * @return a String representing the value, or null
@@ -170,19 +170,21 @@ public abstract class WOFormatter extends NSObject {
   public String stringForObjectValue(final Object _o, final WOContext _ctx) {
     if (_o == null)
       return null;
-    
+
     final Format fmt = this.formatInContext(_ctx);
     if (fmt == null)
       return (_o != null ? _o.toString() : null);
-    
+
     try {
       return fmt.format(_o);
-    }catch (Exception e) {
     }
-    
-    return _o.toString();
+    catch (Exception e) {
+      log.error("cannot format object ' + _o + " +
+      		"' with format '" + fmt + "': " + e);
+      return _o.toString();
+    }
   }
-  
+
   /**
    * The default implementation of this method just returns the
    * stringForObjectValue().
@@ -193,7 +195,7 @@ public abstract class WOFormatter extends NSObject {
    * But when the textfield is used to edit the date, it would be rendered
    * as<pre>
    *   2032-05-21</pre>
-   * 
+   *
    * @param _o   - object to render, eg java.util.Date
    * @param _ctx - the WOContext
    * @return a String suitable for editing fields, eg WOTextField
