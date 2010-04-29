@@ -36,6 +36,10 @@ import org.getobjects.appserver.core.WOSession;
  */
 public class GoObjectRequestHandler extends WORequestHandler {
 
+  // TBD: Remove this hack and instead fix the problems documented below!
+  public static boolean isAcquisitionEnabled = false;
+
+
   public GoObjectRequestHandler(final WOApplication _app) {
     super(_app);
   }
@@ -54,14 +58,14 @@ public class GoObjectRequestHandler extends WORequestHandler {
   public WOResponse handleRequest(WORequest _rq, WOContext _ctx, WOSession _s) {
     WOResponse r = null;
     boolean    debugOn = log.isDebugEnabled();
-    
+
     /* now perform the GoObject path traversal */
 
     GoTraversalPath tpath = null;
     if (r == null) {
       tpath = GoTraversalPath.traversalPathForContext(_ctx);
       _ctx._setGoTraversalPath(tpath);
-      
+
       // TBD: when do we want to enable acquisition? Eg we don't want it on
       //      WebDAV requests (I think?).
       //      Also we want to make sure that URL acquisition only traverses
@@ -75,9 +79,11 @@ public class GoObjectRequestHandler extends WORequestHandler {
       // => first fix component to return a Callable for 'xyzAction' methods.
       // Actually thats the GoPageInvocation/JSActivePageActionInvocation?
       // Hm, or the OFSComponentWrapper / OFSComponentFile.
-      // WOComponent itself is NOT a Callable. 
-      //tpath.enableAcquisition();
-      
+      // WOComponent itself is NOT a Callable.
+
+      if (isAcquisitionEnabled)
+        tpath.enableAcquisition();
+
       if (tpath.traverse() != null) {
         WOActionResults ar =
           this.application.handleException(tpath.lastException(), _ctx);
@@ -95,7 +101,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
     Object result = null;
     if (tpath != null && r == null) {
       result = tpath.resultObject();
-      
+
       if (result == null) {
         log.warn("object lookup returned no result: " + tpath);
         result = new GoNotFoundException("did not find object for path");
@@ -118,11 +124,11 @@ public class GoObjectRequestHandler extends WORequestHandler {
          * call that.
          * If a default method is missing too, the object is returned for
          * rendering as-is.
-         * 
+         *
          * TODO: Whether a default method is returned probably depends on
-         *       the protocol? 
+         *       the protocol?
          */
-        IGoCallable method = 
+        IGoCallable method =
           this.application.lookupDefaultMethod(result, _ctx);
 
         if (method != null) {
@@ -143,10 +149,10 @@ public class GoObjectRequestHandler extends WORequestHandler {
       r = this.application.renderObjectInContext(result, _ctx);
       if (debugOn) log.debug("rendered object: " + result + ", as: " + r);
     }
-    
+
     return r;
   }
-  
+
   /**
    * This method does the GoStyle request processing. Its called by
    * dispatchRequest() if requesthandler-processing is turned off. Otherwise
@@ -175,7 +181,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
       log.error("application did not create a context for request: " + _rq);
       return null;
     }
-    
+
     try {
       if (debugOn) log.debug("  created context: " + ctx);
       ctx.awake();
@@ -214,14 +220,14 @@ public class GoObjectRequestHandler extends WORequestHandler {
             if (!this.application.refusesNewSessions()) {
               session = this.application.initializeSession(ctx);
               if (session == null) {
-                WOActionResults ar = 
+                WOActionResults ar =
                   this.application.handleSessionRestorationError(ctx);
                 r = ar != null ? ar.generateResponse() : null;
               }
             }
             else {
               // TODO: this already failed once? will it return null again?
-              WOActionResults ar = 
+              WOActionResults ar =
                 this.application.handleSessionRestorationError(ctx);
               r = ar != null ? ar.generateResponse() : null;
             }
@@ -235,7 +241,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
             log.debug("  did not restore session with id: " + sessionId);
         }
       }
-      
+
       /* this try is to ensure that checked out sessions are checked in,
        * even after runtime exceptions (eg from Rhino)
        */
@@ -304,17 +310,17 @@ public class GoObjectRequestHandler extends WORequestHandler {
 
     return r;
   }
-  
+
   protected void savePageWhenRequired(final WOContext _ctx) {
     if (!_ctx.isSavePageRequired())
       return;
-    
+
     final WOComponent page = _ctx.page();
     if (page == null) {
       log.warn("requested save page, but got no page in context:" + _ctx);
       return;
     }
-    
+
     /* Create session when required. Hm, but this is too late anyways?
      * (because all links got generated, no way to include the SID
      *  anymore).
@@ -326,9 +332,9 @@ public class GoObjectRequestHandler extends WORequestHandler {
       log.error("got no session to save page ...");
       return;
     }
-    
+
     /* finally save the page :-) */
     sn.savePage(page);
   }
-  
+
 }
