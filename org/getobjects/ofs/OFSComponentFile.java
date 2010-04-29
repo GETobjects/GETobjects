@@ -34,6 +34,7 @@ import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoObjectRenderer;
 import org.getobjects.appserver.publisher.GoDefaultRenderer;
 import org.getobjects.appserver.templates.WOTemplate;
+import org.getobjects.appserver.templates.WOTemplateBuilder;
 import org.getobjects.appserver.templates.WOWrapperTemplateBuilder;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.ofs.fs.IOFSFileInfo;
@@ -200,7 +201,7 @@ public class OFSComponentFile extends OFSJavaObject
     /* build template */
     // Note: we use the wrapper template builder even though its a single file,
     //       thats OK (maybe we should rename the builder).
-    WOWrapperTemplateBuilder builder = new WOWrapperTemplateBuilder();
+    WOTemplateBuilder builder = templateBuilder();
     WOTemplate tmpl = builder.buildTemplate(info.toURL(), null, _rm);
 
     /* cache */
@@ -212,6 +213,15 @@ public class OFSComponentFile extends OFSJavaObject
 
     /* done */
     return tmpl;
+  }
+
+  /**
+   * Returns a new WOTemplateBuilder instance used for building the template
+   * represented by this file's content.
+   * @return the WOTemplateBuilder
+   */
+  protected WOTemplateBuilder templateBuilder() {
+    return new WOWrapperTemplateBuilder();
   }
 
   /**
