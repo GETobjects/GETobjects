@@ -49,13 +49,13 @@ import org.getobjects.foundation.UString;
  *
  * The syntax is:
  *   <pre>&lt;wo:wod-name&gt;...&lt;/wo:wod-name&gt;</pre>
- * 
+ *
  * <h3>Internals</h3>
  * <p>
- *  The root parse function is _parseElement() which calls either 
- *  _parseWOElement() or _parseHashElement() if it finds a NGObjWeb tag at the 
- *  beginning of the buffer. 
- *  If it doesn't it collects all content until it encounteres an NGObjWeb tag, 
+ *  The root parse function is _parseElement() which calls either
+ *  _parseWOElement() or _parseHashElement() if it finds a NGObjWeb tag at the
+ *  beginning of the buffer.
+ *  If it doesn't it collects all content until it encounteres an NGObjWeb tag,
  *  and reports that content as "static text" to the callback.
  * <p>
  *  Parsing a dynamic element is:
@@ -76,7 +76,7 @@ import org.getobjects.foundation.UString;
  * for this class.
  */
 public class WOHTMLParser extends NSObject implements WOTemplateParser {
-  
+
   protected static final Log log = LogFactory.getLog("WOTemplates");
 
   protected WOTemplateParserHandler handler;
@@ -85,14 +85,14 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
   protected int    len;
   protected char[] buffer;
   protected URL    url;
-  
+
   protected static final boolean debugOn = false;
-  
+
   /* do process markers inside HTML tags ? */
   protected boolean skipPlainTags;
   protected boolean compressHTMLWhitespace;
   protected boolean omitComments;
-  
+
   public WOHTMLParser() {
     this.idx = -1;
     this.len = -1;
@@ -100,21 +100,21 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     this.compressHTMLWhitespace = true;
     this.omitComments = true;
   }
-  
+
   /* accessors */
-  
+
   public void setHandler(WOTemplateParserHandler _handler) {
     this.handler = _handler;
   }
-  
-  
+
+
   /* top-level parsing */
-  
+
   /**
    * This is the main entry point of the parser. It parses a set of WOElements,
    * either WOStaticHTML ones, or real dynamic elements. The actual elements
    * are constructed by the handler, not by the parser.
-   * 
+   *
    * @param _data - template to parse
    * @return List of WOElement's
    */
@@ -123,16 +123,16 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       return null;
     if (_data == null)
       return null;
-    
+
     /* reset state */
 
     this.lastException = null;
     this.buffer = _data;
     this.idx    = 0;
     this.len    = this.buffer.length;
-    
+
     /* start parsing */
-    
+
     List<WOElement> topLevel = new ArrayList<WOElement>(16);
     while ((this.idx < this.len) && (this.lastException == null)) {
       int lastIdx = this.idx;
@@ -144,38 +144,38 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
         }
         continue;
       }
-      
+
       topLevel.add(element);
     }
-    
+
     /* notify handler of result */
-    
+
     if (this.handler != null) {
       if (this.lastException != null)
         this.handler.failedParsingHTMLData(this, _data, this.lastException);
       else
         this.handler.finishedParsingHTMLData(this, _data, topLevel);
     }
-    
+
     /* reset temporary state */
-    
+
     this.buffer = null;
     this.idx    = -1;
     this.len    = -1;
-    
+
     return this.lastException != null ? null : topLevel;
   }
-  
+
   public List<WOElement> parseHTMLData(String _data) {
     if (_data == null)
       return null;
     return this.parseHTMLData(_data.toCharArray());
   }
-  
+
   public List<WOElement> parseHTMLData(byte[] _buf) {
     if (_buf == null)
       return null;
-    
+
     // TODO: check prefix for encoding
     try {
       return this.parseHTMLData(new String(_buf, "utf8"));
@@ -189,30 +189,30 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
   public List<WOElement> parseHTMLData(final InputStream _in) {
     if (_in == null)
       return null;
-    
+
     return this.parseHTMLData(UData.loadContentFromStream(_in));
   }
-  
+
   public List<WOElement> parseHTMLData(final URL _url) {
     if (_url == null)
       return null;
-    
+
     this.url = _url;
     List<WOElement> results = parseHTMLData(UData.loadContentFromSource(_url));
     this.url = null;
     return results;
   }
-  
-  
+
+
   /* error handling */
-  
+
   public Exception lastException() {
     return this.lastException;
   }
   public void resetLastException() {
     this.lastException = null;
   }
-  
+
   protected void addException(final String _error) {
     // TODO: keep old exceptions?
     // TODO: SOPE has some elaborate error tracking which we might want to add
@@ -220,18 +220,18 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       log.info("line " + this.currentLine() + " exception: " + _error +
                "  context: |" + this.stringContext() + "|");
     }
-    
+
     this.lastException = new WOHTMLParseException(
         _error, this.currentLine(), this.stringContext(), this.url);
   }
-  
-  
+
+
   /* parsing */
-  
+
   /**
    * This returns false if the current parse position contains a tag which we
    * understand and need to process.
-   * 
+   *
    * @return true if the parser should continue parsing raw text, or false
    */
   protected boolean shouldContinueParsingText() {
@@ -243,22 +243,22 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       return false;
     if (_isWOCloseTag())
       return false;
-    
+
     return true;
   }
-  
+
   /**
    * This method parses either a text, or raw HTML text which will get
    * returned as a WOStaticHTMLElement object.
-   * 
+   *
    * @return the next WOElement in the template
    */
   protected WOElement parseElement() {
     final boolean isDebugOn = log.isDebugEnabled();
-    
+
     if (this.idx >= this.len) /* EOF */
       return null;
-    
+
     if (this._isHashTag()) {
       /* start parsing of dynamic content */
       if (isDebugOn) log.debug("detected hash element ...");
@@ -281,20 +281,20 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
 
     return this.parseRawContent();
   }
-  
+
   protected WOElement parseRawContent() {
     final boolean isDebugOn = log.isDebugEnabled();
 
     if (this.idx >= this.len) /* EOF */
       return null;
-    
+
     boolean containsComment = false;
     boolean containsMultiWS = !this.compressHTMLWhitespace;
-    
+
     /* parse text/tag content */
     int startPos = this.idx;
     while (this.idx < this.len) {
-      
+
       /* scan until we find a tag marker '<' */
       boolean lastWasWS = false;
       while ((this.idx < this.len) && (this.buffer[this.idx] != '<')) {
@@ -304,13 +304,13 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
             containsMultiWS = true;
           lastWasWS = thisIsWS;
         }
-        
+
         this.idx++;
       }
-      
+
       if (this.idx >= this.len) /* EOF was reached */
         break;
-      
+
       /* check whether its a tag which we parse */
 
       if (!this.shouldContinueParsingText())
@@ -326,8 +326,8 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
 
         while (this.idx < this.len) {
           if (this.buffer[this.idx] == '-') {
-            if (this.idx + 2 < this.len) { /* scan for '-->' */ 
-              if ((this.buffer[this.idx + 1] == '-') && 
+            if (this.idx + 2 < this.len) { /* scan for '-->' */
+              if ((this.buffer[this.idx + 1] == '-') &&
                   (this.buffer[this.idx + 2] == '>')) {
                 // found '-->'
                 this.idx += 3; // skip '-->'
@@ -342,14 +342,14 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       }
       else {
         if (isDebugOn) log.debug("read regular tag: " + this.stringContext());
-        
+
         // skip '<', read usual tag
         this.idx++;
         if (this.idx >= this.len) { // EOF was reached with opening '<'
           log.warn("reached EOF with '<' at end !");
           break;
         }
-      
+
         if (this.skipPlainTags) {
           /* Skip until end of HTML tag (not wo:/#-tag). If this is enabled,
            * WO-tags inside regular HTML tags are NOT processed (aka invalid
@@ -368,42 +368,42 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
           while ((this.buffer[this.idx] != '>') && (this.idx < this.len));
           if (this.idx >= this.len) break; // EOF
         }
-      
+
         this.idx++;
       }
     }
-    
+
     if (this.idx - startPos <= 0) {
       if (isDebugOn) log.debug("static string element w/o content ...");
       return null;
     }
-    
+
     String s = new String(this.buffer, startPos, this.idx - startPos);
-    
+
     if (this.omitComments && containsComment)
       s = UString.stringByRemovingHTMLComments(s);
     if (this.compressHTMLWhitespace && containsMultiWS)
       s = UString.stringByCompressingWhiteSpace(s, " \t\r\n");
-    
+
     if (isDebugOn) {
       String ctx = (s.length() > 32 ? s.substring(0, 32) : s);
       ctx = ctx.replace("\n", "\\n");
       ctx = ctx.replace("\r", "\\r");
-      log.debug("line " + this.currentLine() + "/" + this.idx + 
+      log.debug("line " + this.currentLine() + "/" + this.idx +
                 ": static string (len=" + s.length() + "): '" + ctx + "'");
     }
-    
+
     return new WOStaticHTMLElement(s);
   }
-  
+
   protected void _skipSpaces() {
     int pos = this.idx;
-    
+
     if (pos >= this.len) return; /* EOF */
-    
+
     while ((pos < this.len) && _isHTMLSpace(this.buffer[pos]))
       pos++;
-    
+
     this.idx = pos;
   }
 
@@ -413,7 +413,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
   private static Map<String, String> elementNameAliasMap =
     (Map<String, String>)NSPropertyListParser.parse(
         WOWrapperTemplateBuilder.class, "WOShortNameAliases.plist");
-  
+
   protected String replaceShortWOName(final String _name) {
     // TBD: WOnder also supports wo:textfield instead of wo:WOTextField. We
     //      can't deal with this in the WOWrapperTemplateBuilder because this
@@ -422,85 +422,86 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     String newName = elementNameAliasMap.get(_name);
     return newName != null ? newName : _name;
   }
-  
+
   /**
    * Parses a &lt;wo:tag/&gt; style element tag.
-   * 
+   *
    * @return the WOElement
    */
   protected WOElement parseInlineElement() {
     final boolean isDebugOn = log.isDebugEnabled();
-    
+
     if (this.idx >= this.len) return null; /* EOF */
-    
+
     if (!this._isHashTag())
       return null; /* not a hash tag */
-    
+
     if (isDebugOn) log.debug("parse hash element ...");
-    
+
     boolean wasWO = false;
-    if (this.buffer[this.idx + 1] == '#')
-      this.idx += 2; /* skip '<#' */
-    else if (this.buffer[this.idx + 1] == 'w') {
-      this.idx += 4; /* skip '<wo:' */
+    this.idx += 1; /* skip '<' */
+    if (this.buffer[this.idx] == '#')
+      this.idx += 1; /* skip '#' */
+    else if (this.buffer[this.idx] == 'w') {
+      this.idx += 3; /* skip 'wo:' */
       wasWO = true;
     }
     final boolean hadSlashAfterHash = this.buffer[this.idx] == '/';
 
     if (hadSlashAfterHash) {
-      /* a tag starting like this: "<#/", probably an typo */
+      /* a tag starting like this: "<#/", probably a typo */
       log.error("typo in hash close tag ('<#/' => '</#').");
     }
-    
+
     /* parse tag name */
-    
+
     String name;
     if ((name = this._parseStringValue()) == null) {
       if (this.lastException != null) // if there was an error ..
         return null;
     }
     this._skipSpaces();
-    
+
     /* WOnder hacks (not sure how exactly its done there ...) */
-    
+
     if (wasWO && name != null)
       name = this.replaceShortWOName(name);
-    
+
     /* parse attributes */
-    
+
     if (isDebugOn) log.debug("  parse hash attributes ...");
     Map<String,String> attrs = this._parseTagAttributes();
     if (this.lastException != null)
       return null; // invalid tag attrs
-    
-    
+
+
     if (this.idx >= this.len) {
       this.addException("unexpected EOF: missing '>' in hash tag (EOF).");
       return null; // unexpected EOF
     }
-    
+
     /* parse tag end (> or /) */
     if (this.buffer[this.idx] != '>' && this.buffer[this.idx] != '/') {
       this.addException("missing '>' in hash element tag.");
       return null; // unexpected EOF
     }
-    
+
     boolean isAutoClose = false;
     boolean foundEndTag = false;
     List<WOElement> children = null;
-    
+
     if (this.buffer[this.idx] == '>') { /* hashtag is closed */
       /* has sub-elements (<wo:name>...</wo:name>) */
       this.idx += 1; // skip '>'
-      
+
       if (isDebugOn) log.debug("  parsing hash children ...");
-    
+
       while ((this.idx < this.len) && (this.lastException == null)) {
         if (this._isHashCloseTag()) {
           foundEndTag = true;
           break;
         }
-  
+
         final WOElement subElement = this.parseElement();
         if (subElement != null) {
           if (children == null)
@@ -520,28 +521,28 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       }
       this.idx += 1; // skip '>'
     }
-    
+
     /* produce elements */
-  
+
     if (name.length() < 1) {
       this.addException("missing name in hash element tag.");
       return null;
     }
-    
+
     final Map<String, String> nameDict = new HashMap<String,String>(1);
     nameDict.put("NAME", name);
     if (attrs != null)
       attrs.putAll(nameDict);
-    
+
     final WOElement element = this.handler.dynamicElementWithName
       (name, (attrs != null ? attrs : nameDict), children);
     if (isDebugOn) log.debug("  hash element: " + element);
-    
+
     if (element == null) { // build error
       this.addException("could not build hash element: " + name);
       return null;
     }
-    
+
     if (!foundEndTag && !isAutoClose) {
       this.addException("did not find Go end tag (</wo:" + name + ">) ..");
       return null;
@@ -550,7 +551,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       /* skip close tag ('</wo:name>') */
       if (!this._isHashCloseTag())
         log.error("invalid parser state ..");
-      
+
       if (this.buffer[this.idx + 2] == '#')
         this.idx += 3; // skip '</#'
       else if (this.buffer[this.idx + 2] == 'w')
@@ -561,26 +562,26 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     }
     return element;
   }
-  
+
   protected WOElement parseWOElement() {
     boolean isDebugOn = log.isDebugEnabled();
-    
+
     if (this.idx >= this.len) return null; /* EOF */
-    
+
     if (!this._isWOTag())
       return null; /* not a WEBOBJECT tag */
-    
+
     if (isDebugOn) log.debug("parse WEBOBJECT element ...");
-    
+
     this.idx += 10; /* skip '<WEBOBJECT' */
-    
+
     /* parse attributes */
-    
+
     if (isDebugOn) log.debug("  parse WEBOBJECT attributes ...");
     Map<String,String> attrs = this._parseTagAttributes();
     if (this.lastException != null || attrs == null)
-      return null; // invalid tag attrs    
-    
+      return null; // invalid tag attrs
+
     String name = null;
     if ((name = attrs.get("NAME")) == null)
       name = attrs.get("name");
@@ -592,52 +593,52 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       this.addException("missing name in WEBOBJECT element tag.");
       return null;
     }
-        
+
     if (this.idx >= this.len) {
       this.addException("unexpected EOF: missing '>' in WEBOBJECT tag (EOF).");
       return null; // unexpected EOF
     }
-    
+
     /* parse tag end '>' */
     if (this.buffer[this.idx] != '>') {
       this.addException("missing '>' in WEBOBJECT element tag.");
       return null; // unexpected EOF
     }
     this.idx += 1; // skip '>'
-    
+
     boolean foundEndTag = false;
     List<WOElement> children = null;
-          
+
     if (isDebugOn) log.debug("  parsing WEBOBJECT children ...");
-    
+
     while ((this.idx < this.len) && (this.lastException == null)) {
       WOElement subElement = null;
-      
+
       if (this._isWOCloseTag()) {
         foundEndTag = true;
         break;
       }
 
       subElement = this.parseElement();
-    
+
       if (subElement != null) {
         if (children == null)
           children = new ArrayList<WOElement>(16);
         children.add(subElement);
       }
     }
-    
+
     /* produce elements */
-  
+
     WOElement element =
       this.handler.dynamicElementWithName(name, attrs, children);
     if (isDebugOn) log.debug("  WEBOBJECT element: " + element);
-    
+
     if (element == null) { // build error
       this.addException("could not build WEBOBJECT element !.");
       return null;
     }
-    
+
     if (!foundEndTag) {
       this.addException("did not find WEBOBJECT end tag (</WEBOBJECT>) ..");
       return null;
@@ -646,122 +647,122 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     /* skip close tag ('</WEBOBJECT>') */
     if (!this._isWOCloseTag())
       log.error("invalid parser state ..");
-      
+
     this.idx += 11; // skip '</WEBOBJECT'
     while ((this.idx < this.len) && (this.buffer[this.idx] != '>'))
       this.idx += 1;
     this.idx += 1; // skip '>'
-    
+
     return element;
   }
-  
+
   /**
    * This method parses a set of tag key=value attributes, eg:<pre>
    *   style = "green" size = 4</pre>
    * Values are not required to be quoted.
-   * 
+   *
    * @return the parsed tag attributes as a String,String Map
    */
   protected Map<String,String> _parseTagAttributes() {
-    this._skipSpaces();    
+    this._skipSpaces();
     if (this.idx >= this.len) return null; /* EOF */
-    
+
     Map<String,String> attrs = null;
     do {
-      this._skipSpaces();    
+      this._skipSpaces();
       if (this.idx >= this.len) break; /* EOF */
-      
+
       /* read key */
-      
+
       final String key = this._parseStringValue();
       if (key == null) /* ended */
         break;
-      
+
       /* The following parses:  space* '=' space* */
 
-      this._skipSpaces();    
+      this._skipSpaces();
       if (this.idx >= this.len) { /* EOF */
         this.addException("expected '=' after key in attributes ..");
         break; /* unexpected EOF */
       }
-      
+
       if (this.buffer[this.idx] != '=') {
         this.addException("expected '=' after key in attributes ..");
         break;
       }
       this.idx++; /* skip '=' */
-      
-      this._skipSpaces();    
+
+      this._skipSpaces();
       if (this.idx >= this.len) { /* EOF */
         this.addException("expected value after key in attributes ..");
         break; /* unexpected EOF */
       }
-      
+
       /* read value */
-      
+
       final String value = this._parseStringValue();
       if (value == null) {
         this.addException("expected value after key in attributes ..");
         break; /* unexpected EOF */
       }
-      
+
       /* add to Map */
-      
+
       if (attrs == null)
         attrs = new HashMap<String,String>(2);
       attrs.put(key, value);
     }
     while (this.idx < this.len);
-    
+
     return attrs;
   }
-  
+
   /**
    * This parses quoted and unquoted strings. Unquoted strings are terminated
    * by '>', '=', '/' and HTML space.
-   * 
+   *
    * @return a String, or null on EOF/empty-string
    */
   protected String _parseStringValue() {
     this._skipSpaces();
-    
+
     int pos = this.idx;
     if (pos >= this.len) return null; /* EOF */
-    
+
     char c = this.buffer[pos];
     if (c == '>' || c == '/' || c == '=') return null;
-    
-    if (this.buffer[pos] == '"') { /* quoted string */    
+
+    if (this.buffer[pos] == '"') { /* quoted string */
       pos++; /* skip starting quote ('"') */
       int ilen = 0;
       int startPos = pos;
-      
+
       /* loop until closing quote */
       while ((pos < this.len) && (this.buffer[pos] != '"')) {
         pos++;
         ilen++;
       }
-      
+
       if (pos == this.len) { /* syntax error, quote not closed */
         this.idx = pos;
         this.addException("quoted string not closed (expected '\"')");
         return null;
       }
-      
+
       pos++;          /* skip closing quote */
       this.idx = pos; /* store pointer      */
-      
+
       if (ilen == 0)   /* empty string */
         return "";
-      
+
       return new String(this.buffer, startPos, ilen);
     }
-    
+
     /* string without quotes */
-    
+
     int startPos = pos;
     if (pos >= this.len) return null; /* EOF */
-    
+
     /* loop until '>' or '=' or '/' or space */
     c = this.buffer[pos];
     while ((c != '>' && c != '=' && c != '/') && !_isHTMLSpace(c)) {
@@ -770,31 +771,31 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       c = this.buffer[pos];
     }
     this.idx = pos;
-    
+
     if ((pos - startPos) == 0) /* wasn't a string .. */
       return null;
-    
+
     return new String(this.buffer, startPos, pos - startPos);
   }
-  
+
   /* lookahead */
-  
+
   protected boolean _isComment() {
     /* checks whether a comment is upcoming (<!), doesn't consume */
     if ((this.idx + 5) >= this.len) /* check whether it is long enough */
       return false;
     if (this.buffer[this.idx] != '<') /* check whether it is a tag */
       return false;
-    
+
     if (this.buffer[this.idx + 1] != '!') return false;
     return true;
   }
-  
+
   /**
    * Checks for<pre>
    *   &lt;wo:.&gt; (len 6)
    *   &lt;#.&gt; (len 4)</pre>
-   * 
+   *
    * @return true if the parse position contains a wo: tag
    */
   protected boolean _isHashTag() {
@@ -815,7 +816,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     /* eg: <#Hello> */
     if (this.buffer[this.idx + 1] == '#')
       return true;
-    
+
     return false;
   }
 
@@ -823,7 +824,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
    * Checks for<pre>
    *   &lt;/wo:.&gt; (len 7)
    *   &lt;/#.&gt; (len 5)</pre>
-   * 
+   *
    * @return true if the parse position contains a wo: close tag
    */
   protected boolean _isHashCloseTag() {
@@ -831,7 +832,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       return false;
     if (this.buffer[this.idx] != '<' && this.buffer[this.idx + 1] != '/')
       return false; /* not a close tag */
-    
+
     /* eg </wo:WOHyperlink> */
     if (this.buffer[this.idx + 2] == 'w' &&
         this.buffer[this.idx + 3] == 'o' &&
@@ -842,7 +843,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     /* eg: </#Hello> */
     return (this.buffer[this.idx + 2] == '#') ? true : false;
   }
-  
+
   /**
    * check for "&lt;WEBOBJECT .......&gt;" (len 19) (lowercase is allowed)
    */
@@ -852,7 +853,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     if (this.buffer[this.idx] != '<') /* check whether it is a tag */
       return false;
 
-    return this.handler != null && 
+    return this.handler != null &&
       _ucIsCaseEqual(this.buffer, this.idx, "<WEBOBJECT");
   }
 
@@ -864,7 +865,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       return false;
     if (this.buffer[this.idx] != '<' && this.buffer[this.idx + 1] != '/')
       return false; /* not a close tag */
-    
+
     return _ucIsCaseEqual(this.buffer, this.idx, "</WEBOBJECT>");
   }
 
@@ -882,14 +883,14 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     }
     return true;
   }
-  
+
   protected String stringContext() { // TODO: move to superclass
     int ctxStart = this.idx - 10;
     int ctxEnd   = this.idx + 20;
     if (ctxStart < 0) ctxStart = 0;
     if (ctxEnd >= this.len) ctxEnd = this.len - 1;
     String ctx = new String(this.buffer, ctxStart, ctxEnd - ctxStart);
-    
+
     if (ctx.indexOf('\n') != -1) {
       int clen = ctx.length();
       final StringBuilder sb = new StringBuilder(clen);
@@ -903,7 +904,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       }
       ctx = sb.toString();
     }
-    
+
     return ctx;
   }
   protected int currentLine() { // TODO: move to superclass
@@ -914,13 +915,13 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     }
     return line;
   }
-  
-  
+
+
   /* charset classification */
-  
+
   /**
    * Returns true for ' ', '\t', '\r' and '\n'.
-   * 
+   *
    * @param _c - the character to check
    * @return true if the character is a space HTML wise
    */
@@ -932,21 +933,21 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
         return false;
     }
   }
-  
-  
+
+
   /* description */
-  
+
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.buffer != null) {
       _d.append(" #buf=");
       _d.append(this.buffer.length);
     }
     _d.append(" idx=");
     _d.append(this.idx);
-    
+
     if (this.url != null) {
       _d.append(" url=");
       _d.append(this.url);
