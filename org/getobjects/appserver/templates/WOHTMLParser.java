@@ -319,10 +319,7 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
       if (this._isComment()) {
         containsComment = true;
         if (isDebugOn) log.debug("detected comment ...");
-        this.idx += 2; // skip '<!'
-        /* skip dashes */
-        while (this.idx < this.len && this.buffer[this.idx] == '-')
-          this.idx++;
+        this.idx += 4; // skip '<!--'
 
         while (this.idx < this.len) {
           if (this.buffer[this.idx] == '-') {
@@ -732,20 +729,25 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     char c = this.buffer[pos];
     if (c == '>' || c == '/' || c == '=') return null;
 
-    if (this.buffer[pos] == '"') { /* quoted string */
+    if (this.buffer[pos] == '"' ||
+        this.buffer[pos] == '\'')
+    {
+      /* quoted string */
+      char quot = this.buffer[pos];
+
       pos++; /* skip starting quote ('"') */
       int ilen = 0;
       int startPos = pos;
 
       /* loop until closing quote */
-      while ((pos < this.len) && (this.buffer[pos] != '"')) {
+      while ((pos < this.len) && (this.buffer[pos] != quot)) {
         pos++;
         ilen++;
       }
 
       if (pos == this.len) { /* syntax error, quote not closed */
         this.idx = pos;
-        this.addException("quoted string not closed (expected '\"')");
+        this.addException("quoted string not closed (expected " + quot + ")");
         return null;
       }
 
@@ -781,13 +783,16 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
   /* lookahead */
 
   protected boolean _isComment() {
-    /* checks whether a comment is upcoming (<!), doesn't consume */
-    if ((this.idx + 5) >= this.len) /* check whether it is long enough */
+    /* checks whether a comment is upcoming (<!--), doesn't consume */
+    if ((this.idx + 7) >= this.len) /* check whether it is long enough */
       return false;
     if (this.buffer[this.idx] != '<') /* check whether it is a tag */
       return false;
 
-    if (this.buffer[this.idx + 1] != '!') return false;
+    if (this.buffer[this.idx + 1] != '!' &&
+        this.buffer[this.idx + 2] != '-' &&
+        this.buffer[this.idx + 3] != '-')
+      return false;
     return true;
   }
 
