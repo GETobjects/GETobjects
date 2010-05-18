@@ -179,7 +179,7 @@ public abstract class WOFormatter extends NSObject {
       return fmt.format(_o);
     }
     catch (Exception e) {
-      log.error("cannot format object ' + _o + " +
+      log.error("cannot format object '" + _o +
       		"' with format '" + fmt + "': " + e);
       return _o.toString();
     }
