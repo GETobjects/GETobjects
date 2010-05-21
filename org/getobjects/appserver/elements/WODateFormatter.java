@@ -27,10 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
+import org.getobjects.appserver.core.WODynamicElement;
 
 /**
  * WODateFormatter
@@ -40,7 +42,7 @@ import org.getobjects.appserver.core.WOContext;
  * The transformation can either use a predefined key, like 'SHORT' or
  * 'DATETIME.SHORT', or a custom format (eg 'dd-MMM-yy') as implemented by
  * the java.text.SimpleDateFormat parser.
- * 
+ *
  * <p>
  * Custom Formats (of java.text.SimpleDateFormat):
  * <pre>
@@ -66,26 +68,41 @@ import org.getobjects.appserver.core.WOContext;
  *                                   Pacific Standard Time; PST; GMT-08:00</pre>
  */
 class WODateFormatter extends WOFormatter {
-  
+
   protected WOAssociation format;
   protected WOAssociation isLenient;
   protected WOAssociation locale;
-  
+  protected WOAssociation timeZone;
+
   /* optimization for constant formats */
   protected String        fmtString;
   protected Boolean       isLenientConst;
   protected boolean       isCustomFormat;
   protected boolean       returnCalendar;
-  
+
+  public static WOAssociation grabTimeZoneAssociation(
+      final Map<String, WOAssociation> _assocs)
+  {
+    WOAssociation tz = WODynamicElement.grabAssociation(_assocs, "timezone");
+    if (tz == null) {
+      tz = WODynamicElement.grabAssociation(_assocs, "timeZone");
+    }
+    if (tz == null) {
+      tz = WODynamicElement.grabAssociation(_assocs, "tz");
+    }
+    return tz;
+  }
+
   public WODateFormatter
-    (WOAssociation _fmt, WOAssociation _isLenient, WOAssociation _locale, 
-     final Class _resultClass)
+    (WOAssociation _fmt, WOAssociation _isLenient, WOAssociation _locale,
+        WOAssociation _timeZone, final Class _resultClass)
   {
     this.format    = _fmt;
     this.isLenient = _isLenient;
     this.locale    = _locale;
+    this.timeZone  = _timeZone;
     this.returnCalendar = _resultClass == java.util.Calendar.class;
-    
+
     this.isLenientConst = null;
     if (_fmt != null && this.locale == null) {
       if (_fmt.isValueConstant() &&
@@ -100,17 +117,17 @@ class WODateFormatter extends WOFormatter {
           log.warn("using non-string value as date format: " + v);
           this.fmtString = v.toString();
         }
-        
+
         this.isCustomFormat = isCustomDateFormat(this.fmtString);
-        
+
         if (_isLenient != null)
           this.isLenientConst = _isLenient.booleanValueInComponent(null);
       }
     }
   }
-  
+
   /* creating Format */
-  
+
   protected static final String[] dateStyleFormats = {
     "SHORT", "MEDIUM", "LONG", "FULL",
     "TIME",  "DATE", "DATETIME",
@@ -118,7 +135,7 @@ class WODateFormatter extends WOFormatter {
     "DATE.SHORT",     "DATE.MEDIUM",     "DATE.LONG",     "DATE.FULL",
     "DATETIME.SHORT", "DATETIME.MEDIUM", "DATETIME.LONG", "DATETIME.FULL"
   };
-  
+
   /**
    * Returns true if the the given date format string contains a custom date
    * format, that is, not a keyword value like:
@@ -131,7 +148,7 @@ class WODateFormatter extends WOFormatter {
    * </ul>
    * Example:<pre>
    *   dd.MM.yyyy</pre>
-   * 
+   *
    * @param _fmt
    * @return
    */
@@ -140,22 +157,22 @@ class WODateFormatter extends WOFormatter {
      * constant dateformats so that we can do it once
      */
     if (_fmt == null || _fmt.length() == 0) return false;
-    
+
     if ("SMLFTD".indexOf(_fmt.charAt(0)) == -1)
       return true;
-    
+
     for (int i = 0; i < dateStyleFormats.length; i++) {
       if (_fmt.equals(dateStyleFormats[i]))
         return false;
     }
-    
+
     return true;
   }
-  
+
   /**
    * Returns a java.text.Format object suitable for the bindings in the given
    * context (more exactly, this returns a java.text.DateFormat object).
-   * 
+   *
    * @param _ctx - the WOContext
    * @return a java.text.Format, or null if none could be built
    */
@@ -169,7 +186,7 @@ class WODateFormatter extends WOFormatter {
     final String  fmt;
     final boolean isCustom;
     final Boolean lIsLenient;
-    
+
     if (this.fmtString != null) { /* we had constant bindings, faster */
       fmt        = this.fmtString;
       isCustom   = this.isCustomFormat;
@@ -180,16 +197,16 @@ class WODateFormatter extends WOFormatter {
       fmt = this.format.stringValueInComponent(cursor);
       if (fmt == null)
         return null;
-      
+
       isCustom = isCustomDateFormat(fmt);
-      
+
       lIsLenient = this.isLenient != null
         ? this.isLenient.booleanValueInComponent(cursor)
         : null;
     }
-    
+
     /* determine locale */
-    
+
     Locale lLocale = null;
     if (this.locale != null) {
       Object v = this.locale.valueInComponent(_ctx != null?_ctx.cursor() :null);
@@ -204,9 +221,9 @@ class WODateFormatter extends WOFormatter {
       lLocale = _ctx != null ? _ctx.locale() : null;
 
     /* create the java.text.Format object for the given format string */
-    
+
     DateFormat lFormat;
-    
+
     if (isCustom) {
       /* a custom format String, eg: "E, dd-MMM-yyyy k:m:s 'GMT'" */
       try {
@@ -227,7 +244,7 @@ class WODateFormatter extends WOFormatter {
       else if (fmt.endsWith("MEDIUM")) mode = DateFormat.MEDIUM;
       else if (fmt.endsWith("LONG"))   mode = DateFormat.LONG;
       else if (fmt.endsWith("FULL"))   mode = DateFormat.FULL;
-      
+
       if (fmt.startsWith("DATETIME")) {
         lFormat = _ctx != null
           ? DateFormat.getDateTimeInstance(mode, mode, lLocale)
@@ -246,24 +263,37 @@ class WODateFormatter extends WOFormatter {
     }
 
     /* final customizations */
-    
+
     if (lFormat != null) {
-      /* apply timezone stored in WOContext */
-      final TimeZone tz = _ctx != null ? _ctx.timezone() : null;
+      TimeZone tz = null;
+      if (this.timeZone != null) {
+        Object v = this.timeZone.valueInComponent(_ctx != null ? _ctx.cursor()
+                                                               : null);
+        if (v instanceof TimeZone)
+          tz = (TimeZone)v;
+        else if (v instanceof String)
+          tz = TimeZone.getTimeZone((String)v);
+        else if (v != null)
+          log.error("unexpected 'timeZone' object: " + v);
+      }
+      if (tz == null) {
+        /* apply timezone stored in WOContext */
+        tz = _ctx != null ? _ctx.timezone() : null;
+      }
       if (tz != null) lFormat.setTimeZone(tz);
-      
+
       /* apply lenient configuration */
-    
+
       if (lIsLenient != null && lFormat instanceof SimpleDateFormat)
         ((SimpleDateFormat)lFormat).setLenient(lIsLenient.booleanValue());
     }
-    
+
     return lFormat;
   }
 
-  
+
   /* treat empty strings like null */
-  
+
   @Override
   public Object objectValueForString(String _s, final WOContext _ctx)
     throws ParseException
@@ -271,18 +301,18 @@ class WODateFormatter extends WOFormatter {
     // trimming should never hurt in date strings
     if (_s != null) {
       _s = _s.trim();
-      
+
       // and empty strings are never parsed anyways ...
       if (_s.length() == 0)
         _s = null;
     }
-    
+
     /* Invoke the WOFormatter method, which calls formatInContext() and then
      * use the returned Format to convert the String into an object.
      */
     Object v = super.objectValueForString(_s, _ctx);
-    
-    
+
+
     if (this.returnCalendar) {
       /* a 'calformat' binding was used (instead of 'dateformat') */
       if (v instanceof Date) {
@@ -297,36 +327,36 @@ class WODateFormatter extends WOFormatter {
         v = cal;
       }
     }
-    
+
     return v;
   }
-  
-  
+
+
   /* support for Calendar objects */
-  
+
   @Override
   public String stringForObjectValue(Object _o, final WOContext _ctx) {
     if (_o == null) // do not trigger DateFormat on 'null'
       return null;
-    
+
     /* convert calendars into dates for formatting */
     if (_o instanceof Calendar)
       _o = ((Calendar)_o).getTime();
 
     return super.stringForObjectValue(_o, _ctx);
   }
-  
+
   /* description */
-  
+
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.format != null) {
       _d.append(" format=");
       _d.append(this.format);
     }
     else
       _d.append(" no-format");
-  }    
+  }
 }

@@ -71,6 +71,7 @@ public abstract class WOFormatter extends NSObject {
       return new WODateFormatter(fmt,
           WODynamicElement.grabAssociation(_assocs,"lenient"),
           WODynamicElement.grabAssociation(_assocs,"locale"),
+          WODateFormatter.grabTimeZoneAssociation(_assocs),
           java.util.Date.class);
     }
 
@@ -79,6 +80,7 @@ public abstract class WOFormatter extends NSObject {
       return new WODateFormatter(fmt,
           WODynamicElement.grabAssociation(_assocs,"lenient"),
           WODynamicElement.grabAssociation(_assocs,"locale"),
+          WODateFormatter.grabTimeZoneAssociation(_assocs),
           java.util.Calendar.class);
     }
 
