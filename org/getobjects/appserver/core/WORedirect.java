@@ -22,8 +22,6 @@ package org.getobjects.appserver.core;
 
 import java.net.URI;
 
-import org.getobjects.foundation.UObject;
-
 /**
  * WORedirect
  * <p>
