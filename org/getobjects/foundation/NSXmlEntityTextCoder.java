@@ -20,16 +20,108 @@
 */
 package org.getobjects.foundation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
   // TBD: not sure whether all this makes sense from a perf perspective ...
   //      (let me know ...)
-  
+
   public static final NSXmlEntityTextCoder sharedCoder =
     new NSXmlEntityTextCoder();
 
-  public Exception decodeString(StringBuilder _out, final String _in) {
-    return new NSException("not supported");
+  protected Map<String, String> entityStringMap =
+    new HashMap<String, String>(5);
+
+  public NSXmlEntityTextCoder() {
+    this.entityStringMap.put("amp",  "&");
+    this.entityStringMap.put("apos", "'");
+    this.entityStringMap.put("quot", "\"");
+    this.entityStringMap.put("lt",   "<");
+    this.entityStringMap.put("gt",   ">");
   }
+
+  public Exception decodeNumericEntity(StringBuilder _out, final String _s) {
+    if (_out == null || _s == null) return null;
+    if (!_s.startsWith("#") || _s.length() < 5)
+      return new NSException("not a numeric entity");
+    try {
+      if (_s.charAt(1) == 'x') {
+        _out.append(Integer.parseInt(_s.substring(2), 16));
+      }
+      else {
+        _out.append(Integer.parseInt(_s.substring(1), 10));
+      }
+      return null;
+    }
+    catch (NumberFormatException e) {
+      return e;
+    }
+  }
+
+  public Exception decodeEntity(StringBuilder _out, final String _s) {
+    if (_out == null || _s == null) return null;
+    if (_s.startsWith("#"))
+      return decodeNumericEntity(_out, _s);
+
+    final String entity = this.entityStringMap.get(_s);
+    if (entity != null) {
+      _out.append(entity);
+    }
+    else {
+      _out.append('&');
+      _out.append(_s);
+      _out.append(';');
+    }
+    return null;
+  }
+
+  /**
+   * Escapes XML core entities with the matching characters. The decoder
+   * is lenient and will work on all sorts of strings, even improperly
+   * formatted content.
+   *
+   * NOTE: subclasses only need to add/remove entity mappings to the
+   * entityStringMap instance variable.
+   */
+
+  public Exception decodeString(StringBuilder _out, final String _s) {
+    if (_out == null || _s == null) return null;
+
+    final int len = _s.length();
+    if (len == 0)
+      return null;
+
+    int start = -1;
+    for (int i = 0; i < len; i++) {
+      char c = _s.charAt(i);
+      if (c == '&') {
+        if (start != -1) {
+          _out.append(_s.substring(start - 1, i));
+        }
+        start = i + 1;
+      }
+      else  if (c == ';') {
+        if (start != -1) {
+          Exception e = decodeEntity(_out, _s.substring(start, i));
+          if (e != null)
+            return e;
+          start = -1;
+        }
+        else {
+          _out.append(c);
+        }
+      }
+      else if (start == -1) {
+        _out.append(c);
+      }
+    }
+    if (start != -1) {
+      _out.append(_s.substring(start - 1, len));
+    }
+    return null;
+  }
+
 
   /**
    * Escapes XML special characters with the matching XML core entities.
@@ -41,7 +133,7 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
     final int    len   = chars.length;
     if (len == 0)
       return null;
-  
+
     // TBD: is the pre-scanning actually more efficient?
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
@@ -59,7 +151,7 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
       _out.append(_s);
       return null;
     }
-  
+
     // TBD: is this buffer actually more efficient?
     final char[] echars = new char[len + escapeCount];
     int j = 0;
@@ -85,21 +177,21 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
           echars[j] = '&'; j++; echars[j] = 'a'; j++; echars[j] = 'p'; j++;
           echars[j] = 'o'; j++; echars[j] = 's'; j++; echars[j] = ';'; j++;
           break;
-  
+
         default:
           echars[j] = chars[i];
           j++;
           break;
       }
     }
-    
+
     _out.append(echars, 0, j);
     return null;
   }
-  
+
   public Exception encodeChar(StringBuilder _out, final char _in) {
     if (_out == null) return null;
-    
+
     switch(_in) {
     case '&': _out.append("&amp;");  break;
     case '<': _out.append("&lt;");   break;
@@ -107,27 +199,27 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
     case '"': _out.append("&quot;"); break;
     case 39:  _out.append("&apos;"); break;
     }
-    
+
     return null;
   }
-  
+
   public Exception encodeInt(StringBuilder _out, final int _in) {
     if (_out != null) _out.append(_in); /* nothing needs to be escaped */
     return null;
   }
-  
-  
+
+
   /* static method */
-  
+
   public static String stringByEscapingXMLString(final String _s) {
     if (_s == null)
       return null;
-  
+
     final char[] chars = _s.toCharArray();
     final int    len   = chars.length;
     if (len == 0)
       return "";
-  
+
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -142,7 +234,7 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
     }
     if (escapeCount == 0)
       return _s;
-  
+
     final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
@@ -167,14 +259,14 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
           echars[j] = '&'; j++; echars[j] = 'a'; j++; echars[j] = 'p'; j++;
           echars[j] = 'o'; j++; echars[j] = 's'; j++; echars[j] = ';'; j++;
           break;
-  
+
         default:
           echars[j] = chars[i];
           j++;
           break;
       }
     }
-  
+
     return new String(echars, 0, j);
   }
 }

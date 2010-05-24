@@ -20,16 +20,26 @@
 */
 package org.getobjects.foundation;
 
+import java.util.Map;
+
 public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
 
   @SuppressWarnings("hiding")
   public static final NSHtmlEntityTextCoder sharedCoder =
     new NSHtmlEntityTextCoder();
-  
+
+  @SuppressWarnings("unchecked")
+  public NSHtmlEntityTextCoder() {
+    Map<String, String> html40EntityStringMap =
+      (Map<String, String>)NSPropertyListSerialization.propertyListWithPathURL(
+          this.getClass().getResource("HTMLEntityStringMap.plist"));
+    this.entityStringMap.putAll(html40EntityStringMap);
+  }
+
   @Override
   public Exception encodeChar(StringBuilder _out, final char _in) {
     if (_out == null) return null;
-    
+
     switch(_in) {
     case '&': _out.append("&amp;");   break;
     case '<': _out.append("&lt;");    break;
@@ -44,10 +54,10 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
     case 246: _out.append("&ouml;");  break;
     case 214: _out.append("&Ouml;");  break;
     }
-    
+
     return null;
   }
-  
+
   @Override
   public Exception encodeString(StringBuilder _out, final String _s) {
     if (_out == null || _s == null) return null;
@@ -56,7 +66,7 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
     final int    len   = chars.length;
     if (len == 0)
       return null;
-  
+
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -73,7 +83,7 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
       _out.append(_s);
       return null;
     }
-  
+
     final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
@@ -94,13 +104,13 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'q'; j++; echars[j] = 'u'; j++;
           echars[j] = 'o'; j++; echars[j] = 't'; j++; echars[j] = ';'; j++;
           break;
-  
+
         case 223: /* szlig */
           echars[j] = '&'; j++; echars[j] = 's'; j++; echars[j] = 'z'; j++;
           echars[j] = 'l'; j++; echars[j] = 'i'; j++; echars[j] = 'g'; j++;
           echars[j] = ';'; j++;
           break;
-  
+
         case 252: /* uuml */
           echars[j] = '&'; j++; echars[j] = 'u'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
@@ -125,14 +135,14 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'O'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
           break;
-  
+
         default:
           echars[j] = chars[i];
           j++;
           break;
       }
     }
-  
+
     _out.append(echars, 0, j);
     return null;
   }
@@ -140,12 +150,12 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
   public static String stringByEscapingHTMLString(final String _s) {
     if (_s == null)
       return null;
-  
+
     char[] chars = _s.toCharArray();
     int    len   = chars.length;
     if (len == 0)
       return "";
-  
+
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -160,7 +170,7 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
     }
     if (escapeCount == 0)
       return _s;
-  
+
     char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
@@ -181,13 +191,13 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'q'; j++; echars[j] = 'u'; j++;
           echars[j] = 'o'; j++; echars[j] = 't'; j++; echars[j] = ';'; j++;
           break;
-  
+
         case 223: /* szlig */
           echars[j] = '&'; j++; echars[j] = 's'; j++; echars[j] = 'z'; j++;
           echars[j] = 'l'; j++; echars[j] = 'i'; j++; echars[j] = 'g'; j++;
           echars[j] = ';'; j++;
           break;
-  
+
         case 252: /* uuml */
           echars[j] = '&'; j++; echars[j] = 'u'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
@@ -212,14 +222,14 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'O'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
           break;
-  
+
         default:
           echars[j] = chars[i];
           j++;
           break;
       }
     }
-  
+
     return new String(echars, 0, j);
   }
 }
