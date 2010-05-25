@@ -43,14 +43,14 @@ public class NSXmlEntityTextCoder extends NSObject implements NSTextCoder {
 
   public Exception decodeNumericEntity(StringBuilder _out, final String _s) {
     if (_out == null || _s == null) return null;
-    if (!_s.startsWith("#") || _s.length() < 5)
+    if (!_s.startsWith("#") || _s.length() < 3)
       return new NSException("not a numeric entity");
     try {
       if (_s.charAt(1) == 'x') {
-        _out.append(Integer.parseInt(_s.substring(2), 16));
+        _out.append(Character.toChars(Integer.parseInt(_s.substring(2), 16)));
       }
       else {
-        _out.append(Integer.parseInt(_s.substring(1), 10));
+        _out.append(Character.toChars(Integer.parseInt(_s.substring(1), 10)));
       }
       return null;
     }
