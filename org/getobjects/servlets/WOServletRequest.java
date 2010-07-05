@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2009 Helge Hess
+  Copyright (C) 2006-2010 Helge Hess
 
   This file is part of Go.
 
@@ -68,7 +68,9 @@ public class WOServletRequest extends WORequest {
   protected static File tmpFileLocation =
     new File(System.getProperty("java.io.tmpdir"));
 
-  public WOServletRequest(HttpServletRequest _rq, HttpServletResponse _r) {
+  public WOServletRequest
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
+  {
     super();
     this.init(_rq, _r);
   }
@@ -85,7 +87,10 @@ public class WOServletRequest extends WORequest {
    * @param _rq - the HttpServletRequest
    * @param _r  - the HttpServletResponse
    */
-  protected void init(HttpServletRequest _rq, HttpServletResponse _r) {
+  @SuppressWarnings("unchecked")
+  protected void init
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
+  {
     this.init(_rq.getMethod(), _rq.getRequestURI(), _rq.getProtocol(),
         null /* headers  */,
         null /* contents */,
@@ -102,13 +107,13 @@ public class WOServletRequest extends WORequest {
     if (contentType != null) contentType = contentType.toLowerCase();
 
     if (contentType != null && contentType.startsWith("multipart/form-data")) {
-      FileItemFactory factory =
+      final FileItemFactory factory = // Apache stuff
         new DiskFileItemFactory(maxRAMFileSize, tmpFileLocation);
 
-      ServletFileUpload upload = new ServletFileUpload(factory);
+      final ServletFileUpload upload = new ServletFileUpload(factory);
       upload.setSizeMax(maxRequestSize);
 
-      List items = null;
+      List<FileItem> items = null;
       try {
         items = upload.parseRequest(_rq);
       }
@@ -148,7 +153,7 @@ public class WOServletRequest extends WORequest {
 
   public void dispose() {
     if (this.formValues != null) {
-      for (Object value: this.formValues.values()) {
+      for (final Object value: this.formValues.values()) {
         if (value instanceof FileItem)
           ((FileItem)value).delete();
       }
@@ -159,16 +164,16 @@ public class WOServletRequest extends WORequest {
 
   /* loading WORequest data from the Servlet */
 
-  protected void loadHeadersFromServletRequest(HttpServletRequest _rq) {
-    Enumeration e = _rq.getHeaderNames();
+  protected void loadHeadersFromServletRequest(final HttpServletRequest _rq) {
+    final Enumeration e = _rq.getHeaderNames();
     while (e.hasMoreElements()) {
       String name = (String)e.nextElement();
 
-      Enumeration ve = _rq.getHeaders(name);
+      final Enumeration ve = _rq.getHeaders(name);
       name = name.toLowerCase();
 
       while (ve.hasMoreElements()) {
-        String v = (String)ve.nextElement();
+        final String v = (String)ve.nextElement();
         this.appendHeader(v, name);
       }
     }
@@ -180,8 +185,8 @@ public class WOServletRequest extends WORequest {
    *
    * @param _v - a String representing the cookie
    */
-  protected void loadCookieFromHeaderString(String _v) {
-    WOCookie cookie = WOCookie.parseCookieString(_v);
+  protected void loadCookieFromHeaderString(final String _v) {
+    final WOCookie cookie = WOCookie.parseCookieString(_v);
     if (cookie == null) {
       servLog.error("could not parse cookie: '" + _v + "'");
       return;
@@ -195,14 +200,16 @@ public class WOServletRequest extends WORequest {
      * Note: this is loading using the 'Cookie' syntax. That is, ';' separates
      *       individual cookies, not cookie options.
      */
-    for (String v: this.headersForKey("cookie")) {
-      String[] cookieStrings = v.split(";");
+    for (final String v: this.headersForKey("cookie")) {
+      final String[] cookieStrings = v.split(";");
       for (int i = 0; i < cookieStrings.length; i++)
         this.loadCookieFromHeaderString(cookieStrings[i].trim());
     }
   }
 
-  protected IOException loadContentFromStream(int len, InputStream _in) {
+  protected IOException loadContentFromStream
+    (final int len, final InputStream _in)
+  {
     // TODO: directly load into contents buffer w/o copying
     // TODO: deal with requests which have no content-length?
     // TODO: add support for streamed input?
@@ -259,59 +266,61 @@ public class WOServletRequest extends WORequest {
    * The facility is quite powerful, eg filters can be nested.
    */
   @SuppressWarnings("deprecation")
-  protected Object formatFormValue(String _s, String _format) {
+  protected static Object formatFormValue(final String _s, final String _fmt) {
     // TODO: we should use java.text.Format in an extensible way (map the filter
     //       to a Format object)
+    // TODO: Why is this in the WOServletRequest, shouldn't that be in
+    //       WORequest? Hm. Not sure, more like an adaptor thing?
 
-    int len = _format != null ? _format.length() : 0;
+    final int len = _fmt != null ? _fmt.length() : 0;
     if (len < 3) return _s;
 
-    if ("int".equals(_format))
+    if ("int".equals(_fmt))
       return _s != null ? Integer.valueOf(_s) : null;
 
-    if ("boolean".equals(_format))
+    if ("boolean".equals(_fmt))
       return _s != null ? UObject.boolValue(_s) : Boolean.FALSE;
 
-    if ("long".equals(_format))
+    if ("long".equals(_fmt))
       return _s != null ? Long.valueOf(_s) : null;
 
-    if ("float".equals(_format))
+    if ("float".equals(_fmt))
       return _s != null ? Float.valueOf(_s) : null;
 
-    if ("string".equals(_format))
+    if ("string".equals(_fmt))
       return _s;
 
-    if ("text".equals(_format)) // normalize line endings
+    if ("text".equals(_fmt)) // normalize line endings
       return _s != null ? _s.replace("\r", "") : null;
 
-    if ("date".equals(_format)) {
+    if ("date".equals(_fmt)) {
       // TODO: improve date support
       return _s != null ? new Date(_s) : null;
     }
 
-    if ("lines".equals(_format))
+    if ("lines".equals(_fmt))
       return _s != null ? _s.split("\n") : null;
 
-    if ("tokens".equals(_format))
+    if ("tokens".equals(_fmt))
       return _s != null ? _s.split("\\s") : null;
 
-    if ("required".equals(_format)) {
+    if ("required".equals(_fmt)) {
       // TODO: include name
       // TODO: raise a better exception
-      String c = _s != null ? _s.trim() : null;
+      final String c = _s != null ? _s.trim() : null;
       if (c == null || c.length() == 0)
         throw new NSException("missing required field");
       return c;
     }
 
-    if ("ignore_empty".equals(_format)) {
-      String c = _s != null ? _s.trim() : null;
+    if ("ignore_empty".equals(_fmt)) {
+      final String c = _s != null ? _s.trim() : null;
       return (c == null || c.length() == 0) ? null : c;
     }
 
     /* Method prefixes, we should not process them in here */
 
-    if ("method".equals(_format) || "action".equals(_format)) {
+    if ("method".equals(_fmt) || "action".equals(_fmt)) {
       /*
        * This is processed in the lookup phase. Example:
        *   <input type="submit"
@@ -319,7 +328,7 @@ public class WOServletRequest extends WORequest {
        */
       return _s;
     }
-    if ("default_method".equals(_format) || "default_action".equals(_format)) {
+    if ("default_method".equals(_fmt) || "default_action".equals(_fmt)) {
       /*
        * This is processed in the lookup phase. Example:
        *   <input type="hidden"
@@ -330,10 +339,19 @@ public class WOServletRequest extends WORequest {
 
     /* failed to lookup format, treat as string */
 
-    log.error("unsupported request value format: " + _format);
+    log.error("unsupported request value format: " + _fmt);
     return _s;
   }
 
+  /**
+   * This iterates over the 'getParameterNames' of the Servlet request and
+   * puts the results into the 'formValues' ivar.
+   * <p>
+   * Also: This applies the Zope form value magic. Zope magic works
+   *       parameters which contain a colon in the name, eg 'dates:list:int'.
+   *       
+   * @param _rq - the Servlet request
+   */
   @SuppressWarnings("unchecked")
   protected void loadFormValuesFromRequest(final HttpServletRequest _rq) {
     servLog.debug("loading form values from Servlet request ...");
@@ -343,25 +361,21 @@ public class WOServletRequest extends WORequest {
 
     List<String> convertToTuples = null;
 
-    Enumeration e = _rq.getParameterNames();
+    final Enumeration e = _rq.getParameterNames();
     while (e.hasMoreElements()) {
       String         name = (String)e.nextElement();
       final String[] vals = _rq.getParameterValues(name);
 
-      if (vals.length == 0) {
-        this.formValues.put(name, emptyObjectArray);
-        continue;
-      }
-
       int colIdx = name.indexOf(':');
-      if (colIdx < 0) {
+      if (colIdx < 0) { // the generic case, no colon in the name
         // TODO: do we need to morph the String[] into an Object[]?
-        this.formValues.put(name, vals);
-        continue;
+        this.formValues.put(name, vals.length == 0 ? emptyObjectArray : vals);
+        continue; // usual, plain case, no Zope magic applied
       }
+      
+      // hh: recent code change: vals.length can be 0 below here
 
-      /*
-       * Handle special method path triggering in forms (avoid treating them
+      /* Handle special method path triggering in forms (avoid treating them
        * as convertes.
        */
       if (name.endsWith(":method") || name.endsWith(":default_method") ||
@@ -412,11 +426,11 @@ public class WOServletRequest extends WORequest {
           valArray = new Object[] { new ArrayList(4) };
           this.formValues.put(name, valArray);
         }
-        List values = (List)valArray[0];
+        final List values = (List)valArray[0];
 
         for (int i = 0; i < vals.length; i++) {
-          Object v = colIdx < 0
-            ? vals[i] : this.formatFormValue(vals[i], format);
+          final Object v = colIdx < 0
+            ? vals[i] : formatFormValue(vals[i], format);
 
           values.add(v);
         }
@@ -433,7 +447,7 @@ public class WOServletRequest extends WORequest {
         colIdx = format.indexOf(':');
         format = colIdx >= 0 ? format.substring(colIdx + 1) : null;
 
-        String[] path = name.split("\\.");
+        final String[] path = name.split("\\.");
         if (path.length == 0) {
           log.warn("empty keypath in form value record: " + name +": "+ format);
           continue;
@@ -454,9 +468,9 @@ public class WOServletRequest extends WORequest {
         // TODO: values could also be lists
       }
       else {
-        Object[] ovals  = new Object[vals.length];
+        final Object[] ovals  = new Object[vals.length];
         for (int i = 0; i < vals.length; i++)
-          ovals[i] = this.formatFormValue(vals[i], format);
+          ovals[i] = formatFormValue(vals[i], format);
         this.formValues.put(name, ovals);
       }
     }
@@ -466,43 +480,49 @@ public class WOServletRequest extends WORequest {
     if (convertToTuples != null) {
       for (String name: convertToTuples) {
         /* Note: we directly modify the array reference */
-        Object[] vals = this.formValues.get(name);
-        List l = (List)vals[0];
+        final Object[] vals = this.formValues.get(name);
+        final List     l    = (List)vals[0];
         vals[0] = l.toArray(emptyObjectArray);
       }
     }
   }
 
-  protected void loadFormValuesFromFileItems(final List _items) {
+  /**
+   * Adds the 'FileItem' objects produced by the Apache multipart handler to
+   * the 'formValues' ivar.
+   * If its a formfield, the String value is attached, if its a FileItem, its
+   * preserved as-is in the formValues dictionary (and processed by
+   * WOFileUpload)
+   * <p>
+   * Note: this does NOT apply the Zope key magic!!
+   * 
+   * @param _items - FileItem objects
+   */
+  protected void loadFormValuesFromFileItems(final List<FileItem> _items) {
     if (_items == null || _items.size() == 0)
       return;
 
     if (this.formValues == null)
       this.formValues = new HashMap<String, Object[]>(16);
 
-    for (Object item: _items) {
-      final FileItem fileItem = (FileItem)item;
-      final String   name  = fileItem.getFieldName();
-      Object         value = null;
-
-      if (fileItem.isFormField())
-        value = fileItem.getString();
-      else
-        value = fileItem; // the WOFileUpload will deal directly with this
+    for (final FileItem fileItem: _items) {
+      // FIXME: add support for Zope key magic
+      final String name  = fileItem.getFieldName();
+      final Object value = fileItem.isFormField()
+        ? fileItem.getString()
+        : fileItem; // the WOFileUpload will deal directly with this
 
       /* check whether we need to add a value */
 
-      Object[] vals = this.formValues.get(name);
+      final Object[] vals = this.formValues.get(name);
 
       if (vals == null)
         this.formValues.put(name, new Object[] { value });
       else {
-        Object[] newVals = new Object[vals.length + 1];
+        final Object[] newVals = new Object[vals.length + 1];
         System.arraycopy(vals, 0, newVals, 0, vals.length);
         newVals[vals.length] = value;
         this.formValues.put(name, newVals);
-        newVals = null;
-        vals    = null;
       }
     }
   }
@@ -511,12 +531,12 @@ public class WOServletRequest extends WORequest {
     servLog.debug("loading content from Servlet request ...");
 
     InputStream is = null;
-
     try {
       is = _rq.getInputStream();
     }
     catch (IOException ioe) {
       // TODO: could be a real exception? we might need to compare content-len?
+      servLog.warn("Could not acquire InputStream from Servlet", ioe);
     }
 
     if (is != null)
@@ -557,6 +577,8 @@ public class WOServletRequest extends WORequest {
 
   /**
    * Returns the OutputStream associated with the ServletResponse.
+   * <p>
+   * Note: this starts the HTTP response delivery to the client.
    */
   public OutputStream outputStream() {
     if (this.sResponse == null)

@@ -150,17 +150,22 @@ public class WOServletAdaptor extends HttpServlet {
 
   /* deliver WOResponse to ServletResponse */
 
+  /**
+   * This applies a WOResponse on a HttpServletResponse. Its a static because
+   * this is called from the Adaptor AND from the WOServletRequest, when
+   * streaming mode gets enabled.
+   */
   public static boolean prepareResponseHeader
-    (final WOResponse _wr, final HttpServletResponse _sr)
+    (final WOResponse _woResponse, final HttpServletResponse _sr)
   {
     boolean didSetLength = false;
 
     /* set response status */
-    _sr.setStatus(_wr.status());
+    _sr.setStatus(_woResponse.status());
 
     /* setup content type */
 
-    String s = _wr.headerForKey("content-type");
+    String s = _woResponse.headerForKey("content-type");
     if (s != null) {
       if (s.startsWith("text/html") && !s.contains("charset")) {
         /* Explicitly add charset to content type, let me know if there are any
@@ -170,13 +175,13 @@ public class WOServletAdaptor extends HttpServlet {
          *       in WOResponse in case you manually patch the contents of it.
          *       (eg if you serve a static HTML file)
          */
-        s += "; charset=" + _wr.contentEncoding();
+        s += "; charset=" + _woResponse.contentEncoding();
       }
 
       _sr.setContentType(s);
     }
     else {
-      switch (_wr.status()) {
+      switch (_woResponse.status()) {
         case WOMessage.HTTP_STATUS_FOUND:
         case WOMessage.HTTP_STATUS_MOVED_PERMANENTLY:
           break;
@@ -190,7 +195,7 @@ public class WOServletAdaptor extends HttpServlet {
     /* setup content length */
 
     int contentLen = -1;
-    if ((s = _wr.headerForKey("content-length")) != null) {
+    if ((s = _woResponse.headerForKey("content-length")) != null) {
       try {
         contentLen = Integer.parseInt(s);
       }
@@ -199,6 +204,7 @@ public class WOServletAdaptor extends HttpServlet {
         contentLen = -1;
       }
     }
+    // FIXME: hh, who commented this out and why?
 //    if (contentLen == -1 && content != null)
 //      contentLen = content.length;
 
@@ -209,28 +215,24 @@ public class WOServletAdaptor extends HttpServlet {
 
     /* deliver headers */
 
-    final Map<String,List<String>> headers = _wr.headers();
+    final Map<String,List<String>> headers = _woResponse.headers();
     if (headers != null) {
       for (final String k: headers.keySet()) {
-        if (k.equals("content-type"))
-          continue;
-        if (k.equals("content-length"))
-          continue;
-        if (k.equals("cookie") || k.equals("set-cookie"))
-          continue;
+        if (k.equals("content-type"))                     continue;
+        if (k.equals("content-length"))                   continue;
+        if (k.equals("cookie") || k.equals("set-cookie")) continue;
 
         final List<String> v = headers.get(k);
-        if (v == null) continue;
+        if (v == null)     continue;
         if (v.size() == 0) continue;
 
-        s = UString.componentsJoinedByString(v, ", ");
-        _sr.addHeader(k, s);
+        _sr.addHeader(k, UString.componentsJoinedByString(v, ", "));
       }
     }
 
     /* deliver cookies */
 
-    for (WOCookie k: _wr.cookies())
+    for (final WOCookie k: _woResponse.cookies())
       _sr.addHeader("set-cookie", k.headerString());
 
     return didSetLength;
