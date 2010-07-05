@@ -163,6 +163,7 @@ public class EOPostgreSQLExpression extends EOSQLExpression {
       "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"
   };
 
+  @Override
   public String formatDateValue(final Date _date, final EOAttribute _attr) {
     // TODO: fixme. Use format specifications as denoted in the attribute
     // TODO: is this called? Probably the formatting should be done using a
