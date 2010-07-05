@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2009 Helge Hess
+  Copyright (C) 2006-2010 Helge Hess
 
   This file is part of Go.
 
@@ -73,7 +73,8 @@ public class WOServletAdaptor extends HttpServlet {
    * its init() method).
    */
   public void initApplicationWithName
-    (String _appName, String _appClassName, Properties _properties)
+    (final String _appName, final String _appClassName,
+     final Properties _properties)
   {
     synchronized(this) {
       if (this.WOApp != null) // TODO: is this valid in THREADs?
@@ -150,7 +151,7 @@ public class WOServletAdaptor extends HttpServlet {
   /* deliver WOResponse to ServletResponse */
 
   public static boolean prepareResponseHeader
-    (WOResponse _wr, HttpServletResponse _sr)
+    (final WOResponse _wr, final HttpServletResponse _sr)
   {
     boolean didSetLength = false;
 
@@ -208,9 +209,9 @@ public class WOServletAdaptor extends HttpServlet {
 
     /* deliver headers */
 
-    Map<String,List<String>> headers = _wr.headers();
+    final Map<String,List<String>> headers = _wr.headers();
     if (headers != null) {
-      for (String k: headers.keySet()) {
+      for (final String k: headers.keySet()) {
         if (k.equals("content-type"))
           continue;
         if (k.equals("content-length"))
@@ -218,7 +219,7 @@ public class WOServletAdaptor extends HttpServlet {
         if (k.equals("cookie") || k.equals("set-cookie"))
           continue;
 
-        List<String> v = headers.get(k);
+        final List<String> v = headers.get(k);
         if (v == null) continue;
         if (v.size() == 0) continue;
 
@@ -245,27 +246,30 @@ public class WOServletAdaptor extends HttpServlet {
    * @throws IOException
    */
   public void sendWOResponseToServletResponse
-    (WOResponse _woResponse, HttpServletResponse _servletResponse)
+    (final WOResponse _woResponse, final HttpServletResponse _servletResponse)
     throws IOException
   {
     log.debug("sending WOResponse to Servlet ...");
 
-    boolean didSetLength = prepareResponseHeader(_woResponse, _servletResponse);
+    final boolean didSetLength =
+      prepareResponseHeader(_woResponse, _servletResponse);
 
     /* deliver content */
 
-    byte[] content = _woResponse.content();
+    final byte[] content = _woResponse.content();
     if (!didSetLength && content != null)
       _servletResponse.setContentLength(content.length);
 
-    OutputStream os = _servletResponse.getOutputStream();
+    final OutputStream os = _servletResponse.getOutputStream();
     if (content != null)
       os.write(content);
     os.flush();
   }
 
 
-  protected void woService(HttpServletRequest _rq, HttpServletResponse _r) {
+  protected void woService
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
+  {
     log.debug("woService ...");
 
     if (this.WOApp == null) {
@@ -287,10 +291,8 @@ public class WOServletAdaptor extends HttpServlet {
       e.printStackTrace();
     }
 
-    WORequest  rq;
-    WOResponse r;
-
-    rq = new WOServletRequest(_rq, _r);
+    final WORequest  rq = new WOServletRequest(_rq, _r);
+    final WOResponse r;
 
     try {
       log.debug("  dispatch ...");
@@ -307,24 +309,25 @@ public class WOServletAdaptor extends HttpServlet {
         log.debug("  got no response.");
     }
     catch (Exception e) {
+      log.debug("dispatch exception", e);
       e.printStackTrace();
     }
 
-    if (rq != null) {
+    if (rq != null)
       rq.dispose(); /* this will delete temporary files, eg of file uploads */
-      rq = null;
-    }
 
     log.debug("done woService.");
   }
 
 
-  protected String valueFromServletConfig(ServletConfig _cfg, String _key) {
+  protected String valueFromServletConfig
+    (final ServletConfig _cfg, final String _key)
+  {
     String an = _cfg.getInitParameter(_key);
     if (an != null)
       return an;
 
-    ServletContext sctx = _cfg.getServletContext();
+    final ServletContext sctx = _cfg.getServletContext();
     if (sctx == null)
       return null;
 
@@ -370,7 +373,7 @@ public class WOServletAdaptor extends HttpServlet {
      * It's probably best to have a real UserDefaults concept, but for the
      * time being this is better than nothing.
      */
-    Properties  properties = new Properties();
+    final Properties  properties = new Properties();
     Enumeration parameterNamesEnum = _cfg.getInitParameterNames();
     while (parameterNamesEnum.hasMoreElements()) {
       String name = (String)parameterNamesEnum.nextElement();
@@ -380,16 +383,16 @@ public class WOServletAdaptor extends HttpServlet {
     /* The ServletContext may override the previous init parameters.
      * ServletContext init parameters will be overridden by attributes.
      */
-    ServletContext sctx = _cfg.getServletContext();
+    final ServletContext sctx = _cfg.getServletContext();
     if (sctx != null) {
       parameterNamesEnum = sctx.getInitParameterNames();
       while (parameterNamesEnum.hasMoreElements()) {
-        String name = (String)parameterNamesEnum.nextElement();
+        final String name = (String)parameterNamesEnum.nextElement();
         properties.put(name, sctx.getInitParameter(name));
       }
-      Enumeration attributeNamesEnum = sctx.getAttributeNames();
+      final Enumeration attributeNamesEnum = sctx.getAttributeNames();
       while (attributeNamesEnum.hasMoreElements()) {
-        String name = (String)attributeNamesEnum.nextElement();
+        final String name = (String)attributeNamesEnum.nextElement();
         properties.put(name, sctx.getAttribute(name));
       }
     }
@@ -398,14 +401,16 @@ public class WOServletAdaptor extends HttpServlet {
   }
 
   @Override
-  protected void doGet(final HttpServletRequest _rq, HttpServletResponse _r)
+  protected void doGet
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
     throws ServletException, IOException
   {
     this.woService(_rq, _r);
   }
 
   @Override
-  protected void doPost(final HttpServletRequest _rq, HttpServletResponse _r)
+  protected void doPost
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
     throws ServletException, IOException
   {
     /* Note: apparently the Servlet service() method performs additional
@@ -425,11 +430,12 @@ public class WOServletAdaptor extends HttpServlet {
    * The default implementation then calls doGet/doPost.
    */
   @Override
-  protected void service(HttpServletRequest _rq, HttpServletResponse _r)
+  protected void service
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
     throws ServletException, IOException
   {
     boolean isStdMethod = false;
-    String m = _rq.getMethod();
+    final String m = _rq.getMethod();
     for (int i = 0; i < stdMethods.length; i++) {
       if (m.equals(stdMethods[i])) {
         isStdMethod = true;
