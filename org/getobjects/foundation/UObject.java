@@ -189,6 +189,7 @@ public class UObject extends NSObject {
       char c0 = s.charAt(0);
       if (c0 == 'N' && s.equals("NO"))    return false;
       if (c0 == 'f' && s.equals("false")) return false;
+      if (c0 == 'u' && s.equals("undefined")) return false;
       if (s.length() == 1) {
         if (c0 == '0') return false;
         if (c0 == ' ') return false;
