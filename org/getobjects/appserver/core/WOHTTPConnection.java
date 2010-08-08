@@ -496,15 +496,18 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
     protected PasswordAuthentication getPasswordAuthentication() {
       String auth = getRequestingURL().getAuthority();
       if (auth != null) {
-        int idx = auth.indexOf(":");
+        int idx = auth.indexOf("@");
         if (idx != -1) {
-          String user     = auth.substring(0, idx);
-          String password = auth.substring(idx + 1);
-          idx = password.lastIndexOf("@");
-          if (idx != -1)
-            password = password.substring(0, idx);
-          return new PasswordAuthentication(user, password.toCharArray());
+          auth = auth.substring(0, idx);
+          idx  = auth.indexOf(":");
+          if (idx != -1) {
+            String user     = auth.substring(0, idx);
+            String password = auth.substring(idx + 1);
+            return new PasswordAuthentication(user, password.toCharArray());
+          }
+          return new PasswordAuthentication(auth, "".toCharArray());
         }
+        return new PasswordAuthentication("", "".toCharArray());
       }
       return super.getPasswordAuthentication();
     }
