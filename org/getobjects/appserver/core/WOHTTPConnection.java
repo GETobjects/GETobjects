@@ -24,8 +24,11 @@ package org.getobjects.appserver.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.Socket;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -52,8 +55,10 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
 
   protected static final Log log = LogFactory.getLog("WOHTTPConnection");
 
-  protected String  host;
-  protected int     port;
+  protected static final Authenticator sharedURLAuthorityBasedAuthenticator =
+    new URLAuthorityBasedAuthenticator();
+
+  protected URL     url;
   protected int     receiveTimeout   = 30 * 1000; // milliseconds
   protected int     sendTimeout      = 10 * 1000; // milliseconds
   protected int     readTimeout      = 0;
@@ -61,6 +66,7 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
   protected boolean keepAlive        = true;
   protected boolean isSSL            = false;
   protected boolean allowInsecureSSL = false;
+  protected Authenticator authenticator = sharedURLAuthorityBasedAuthenticator;
 
   protected HttpURLConnection urlConnection;
   protected WORequest request; // last used request, attached to response
@@ -70,8 +76,14 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
    * Creates an 'http' connection to _host on _port.
    */
   public WOHTTPConnection(String _host, int _port) {
-    this.host = _host;
-    this.port = _port;
+    try {
+      this.url = new URL("http://" + _host + (_port != 80 ? (":" + _port)
+                                                          : ""));
+    }
+    catch (MalformedURLException e) { // won't happen
+      e.printStackTrace();
+    }
+    this.setupURL();
   }
 
   /**
@@ -86,13 +98,13 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
    * to the host specified in _url.
    */
   public WOHTTPConnection(URL _url) {
-    this.host = _url.getHost();
-    this.port = _url.getPort();
-    String protocol = _url.getProtocol().toLowerCase();
-    if (protocol.equals("https"))
-      this.isSSL = true;
-    else if (!protocol.equals("http"))
-      log.warn("given URL not for HTTP connection: " + _url);
+    try {
+      this.url = new URL(_url, "/");
+    }
+    catch (MalformedURLException e) { // won't happen
+      log.error(e);
+    }
+    this.setupURL();
   }
 
   // Accessors
@@ -163,7 +175,35 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
     return this.allowInsecureSSL;
   }
 
+  /**
+   * (GETobjects extension):
+   * Sets the authenticator to use for this WOHTTPConnection, if authentication
+   * is required.
+   */
+  public void setAuthenticator(Authenticator _authenticator) {
+    this.authenticator = _authenticator;
+  }
+
+  /**
+   * (GETobjects extension):
+   * Returns the authenticator currently in use for this connection.
+   * The default is to use the URLAuthorityBasedAuthenticator.
+   *
+   * @see org.getobjects.appserver.core.WOHTTPConnection.URLAuthorityBasedAuthenticator
+   */
+  public Authenticator authenticator() {
+    return this.authenticator;
+  }
+
   // Setup
+
+  protected void setupURL() {
+    String protocol = this.url.getProtocol().toLowerCase();
+    if (protocol.equals("https"))
+      this.isSSL = true;
+    else if (!protocol.equals("http"))
+      log.warn("given URL not for HTTP connection: " + this.url);
+  }
 
   /**
    * (GETobjects extension):
@@ -205,6 +245,7 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
   // SSL
 
   public boolean verify(String _hostname, SSLSession _session) {
+    // TODO: tie this to allowInsecureSSL and really validate hostname?
     return true;
   }
 
@@ -214,24 +255,26 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
     if (_rq == null) return false;
 
     try {
-      URL     url        = new URL(this.isSSL ? "https" : "http",
-                                   this.host, this.port, _rq.uri());
+      URL     rqURL      = new URL(this.url, _rq.uri());
       boolean needsSetup = true;
 
       if (this.urlConnection != null &&
-          this.urlConnection.getURL().equals(url))
+          this.urlConnection.getURL().equals(rqURL))
       {
         needsSetup = false;
       }
 
       if (needsSetup) {
-        this.urlConnection = (HttpURLConnection)url.openConnection();
+        this.urlConnection = (HttpURLConnection)rqURL.openConnection();
 
         this.setupHttpURLConnection(this.urlConnection);
         if (this.urlConnection instanceof HttpsURLConnection) {
           this.setupHttpsURLConnection((HttpsURLConnection)this.urlConnection);
         }
       }
+
+      // unfortunately there's no better API...
+      Authenticator.setDefault(this.authenticator());
 
       // set properties and headers
       this.urlConnection.setRequestMethod(_rq.method());
@@ -435,6 +478,35 @@ public class WOHTTPConnection extends NSObject implements HostnameVerifier {
 
     public String[] getSupportedCipherSuites() {
       return this.factory.getSupportedCipherSuites();
+    }
+  }
+
+  // Authenticator
+
+  /**
+   * This authenticator uses the "authority" part of a URL to provide
+   * the required authentication, i.e. for a URL like this:
+   * <code>
+   * URL url = new URL("http://foo:bar@example.org");
+   * </code>
+   * this authenticator would authenticate as user "foo" with password "bar".
+   */
+  protected static class URLAuthorityBasedAuthenticator extends Authenticator {
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication() {
+      String auth = getRequestingURL().getAuthority();
+      if (auth != null) {
+        int idx = auth.indexOf(":");
+        if (idx != -1) {
+          String user     = auth.substring(0, idx);
+          String password = auth.substring(idx + 1);
+          idx = password.lastIndexOf("@");
+          if (idx != -1)
+            password = password.substring(0, idx);
+          return new PasswordAuthentication(user, password.toCharArray());
+        }
+      }
+      return super.getPasswordAuthentication();
     }
   }
 }
