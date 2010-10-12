@@ -4,7 +4,7 @@
 <wo class="WOFormatter"
     xmlns="http://www.opengroupware.org/go/api"
 >
-  <binding name="dateformat" description="Date Format Strings" defaults='("dd.MM.yyyy", "EEEE, dd. MMMM yyyy, HH:mm", "SHORT", "MEDIUM", "LONG", "FULL", "TIME", "DATE", "DATETIME", "TIME.SHORT", "TIME.MEDIUM", "TIME.LONG", "TIME.FULL", "DATE.SHORT", "DATE.MEDIUM", "DATE.LONG", "DATE.FULL", "DATETIME.SHORT", "DATETIME.MEDIUM", "DATETIME.LONG", "DATETIME.FULL")'/>
+  <binding name="dateformat" description="Date Format Strings" defaults='("dd.MM.yyyy", "EEE, dd MMM yyyy HH:mm:ss z", "EEEE, dd. MMMM yyyy, HH:mm", "SHORT", "MEDIUM", "LONG", "FULL", "TIME", "DATE", "DATETIME", "TIME.SHORT", "TIME.MEDIUM", "TIME.LONG", "TIME.FULL", "DATE.SHORT", "DATE.MEDIUM", "DATE.LONG", "DATE.FULL", "DATETIME.SHORT", "DATETIME.MEDIUM", "DATETIME.LONG", "DATETIME.FULL")'/>
   <binding name="calformat"/>
   <binding name="numberformat" description="Number Format Strings"/>
   <binding name="currencyformat"/>
@@ -13,8 +13,8 @@
 
   <!-- dateformat and calformat also have these -->
   <binding name="lenient" defaults="YES/NO"/>
-  <binding name="locale"/>
-  <binding name="timezone" defaults="('Europe/Berlin')"/>
+  <binding name="locale" defaults="(en, de)"/>
+  <binding name="timezone" defaults="('Europe/Berlin', GMT)"/>
 
   <!-- generic -->
   <binding name="formatter"/>
