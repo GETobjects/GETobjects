@@ -25,49 +25,50 @@ import org.getobjects.foundation.NSObject;
 
 /*
  * WEClientCapabilities
- * 
- * 
- * 
+ *
+ *
+ *
  * TODO: complete user-agent parsing
  */
 public class WEClientCapabilities extends NSObject {
-  
+
   protected String  userAgent  = null;
   protected short   browserMajorVersion = 0;
   protected short   browserMinorVersion = 0;
   protected short   browser    = WEUA_UNKNOWN;
   protected short   os         = WEOS_UNKNOWN;
   protected short   cpu        = WECPU_UNKNOWN;
-  protected boolean acceptUTF8 = true; 
-  
+  protected short   renderer   = WERENDERER_UNKNOWN;
+  protected boolean acceptUTF8 = true;
+
   public WEClientCapabilities(WORequest _rq) {
     this.loadFromRequest(_rq);
   }
-  
+
   protected void loadFromRequest(WORequest _rq) {
     if (_rq == null) // TODO: print a warning?
       return;
-    
+
     /* check charset */
-    
+
     String ac = _rq.headerForKey("accept-charset");
     if (ac != null) {
       ac = ac.toLowerCase();
       this.acceptUTF8 = ac.contains("utf-8") || ac.contains("utf8");
     }
-    
+
     /* process user-agent */
-    
+
     this.userAgent = _rq.headerForKey("user-agent");
     if (this.userAgent == null) {
       /* no user-agent, eg telnet */
       this.userAgent = "";
     }
-    
+
     this.loadBrowserTypeForUserAgent(this.userAgent);
-    
+
     /* detect OS */
-    
+
     if (this.userAgent.contains("Windows") || this.userAgent.contains("WinNT"))
       this.os = WEOS_WINDOWS;
     else if (this.userAgent.contains("Maemo")) /* also: Linux! */
@@ -96,15 +97,15 @@ public class WEClientCapabilities extends NSObject {
           this.os = WEOS_UNKNOWN;
       }
     }
-  
+
     /* detect CPU */
-  
+
     if (this.userAgent.contains("sun4u"))
       this.cpu = WECPU_SPARC;
     else if (this.userAgent.contains("i686") || this.userAgent.contains("i586"))
       this.cpu = WECPU_IX86;
-    else if (this.userAgent.contains("PowerPC") || 
-             this.userAgent.contains("ppc") || 
+    else if (this.userAgent.contains("PowerPC") ||
+             this.userAgent.contains("ppc") ||
              this.userAgent.contains("PPC"))
       this.cpu = WECPU_PPC;
     else if (this.os == WEOS_WINDOWS)
@@ -123,28 +124,28 @@ public class WEClientCapabilities extends NSObject {
       }
     }
   }
-  
+
   protected void loadBrowserTypeForUserAgent(String ua) {
     @SuppressWarnings("unused")
     int tmp;
-    
+
     if ((tmp = ua.indexOf("Opera")) != -1) {
       /* Opera (can fake to be MSIE or Netscape) */
       this.browser = WEUA_Opera;
-  
+
       // TODO: Opera detection
       /* go to next space */
       //while (!isspace(*tmp) && (*tmp != '\0')) tmp++;
       /* skip spaces */
       //while (isspace(*tmp) && (*tmp != '\0')) tmp++;
-      
+
       //this.browserMajorVersion = atoi(tmp);
       //if ((tmp = index(tmp, '.'))) {
       //  tmp++;
       //  this.browserMinorVersion = atoi(tmp);
       //}
     }
-    else if (ua.contains("NeonConnection") || 
+    else if (ua.contains("NeonConnection") ||
              ua.contains("ZIDEStore") ||
              ua.contains("ZideLook-Codeon")) {
       this.browser = WEUA_ZideLook;
@@ -153,7 +154,8 @@ public class WEClientCapabilities extends NSObject {
     }
     else if ((tmp = ua.indexOf("Safari/")) != -1) {
       /* Hm, Safari says it is a Mozilla/5.0 ? */
-      this.browser = WEUA_Safari;
+      this.browser  = WEUA_Safari;
+      this.renderer = WERENDERER_WEBKIT;
 
       // TODO: Safari detection
 //      int combinedVersion;
@@ -196,13 +198,13 @@ public class WEClientCapabilities extends NSObject {
     else if ((tmp = ua.indexOf("MSIE")) != -1) {
       /* Internet Explorer */
       this.browser = WEUA_IE;
-  
+
       // TODO: IE detection
 //      /* go to next space */
 //      while (!isspace(*tmp) && (*tmp != '\0')) tmp++;
 //      /* skip spaces */
 //      while (isspace(*tmp) && (*tmp != '\0')) tmp++;
-//      
+//
 //      this.browserMajorVersion = atoi(tmp);
 //      if ((tmp = index(tmp, '.'))) {
 //        tmp++;
@@ -225,8 +227,8 @@ public class WEClientCapabilities extends NSObject {
     }
     else if ((tmp = ua.indexOf("Netscape6")) != -1) {
       /* Netscape 6 */
-      this.browser = WEUA_Netscape;
-
+      this.browser  = WEUA_Netscape;
+      this.renderer = WERENDERER_GECKO;
       // TODO: Netscape detection
 //      if ((tmp = index(tmp, '/'))) {
 //        tmp++;
@@ -338,6 +340,8 @@ public class WEClientCapabilities extends NSObject {
       this.browser = WEUA_CURL;
     }
     else if (ua.contains("Mozilla")) {
+      this.renderer = WERENDERER_GECKO;
+
       /* other Netscape browser */
       if (ua.contains("Mozilla/5")) {
         this.browser = WEUA_Mozilla;
@@ -380,31 +384,32 @@ public class WEClientCapabilities extends NSObject {
     else {
       /* unknown browser */
       this.browser = WEUA_UNKNOWN;
-      
+
       if (this.userAgent != null) {
         // TODO: improve log
         System.err.println("Unknown WebClient: user-agent=" + this.userAgent);
       }
     }
-
+    if (ua.contains("WebKit"))
+      this.renderer = WERENDERER_WEBKIT;
   }
-  
+
   /* accessors */
-  
+
   public short majorVersion() {
     return this.browserMajorVersion;
   }
-  
+
   public short minorVersion() {
     return this.browserMinorVersion;
   }
-  
+
   /* string accessors */
-  
+
   public String userAgent() {
     return this.userAgent;
   }
-  
+
   public String userAgentType() {
     switch (this.browser) {
       case WEUA_IE:               return "IE";
@@ -450,7 +455,7 @@ public class WEClientCapabilities extends NSObject {
       default:                    return "unknown";
     }
   }
-  
+
   public String os() {
     switch (this.os) {
       case WEOS_WINDOWS: return "Windows";
@@ -462,7 +467,7 @@ public class WEClientCapabilities extends NSObject {
       default:           return "unknown";
     }
   }
-  
+
   public String cpu() {
     switch (this.cpu) {
       case WECPU_IX86:  return "ix86";
@@ -471,7 +476,7 @@ public class WEClientCapabilities extends NSObject {
       default:          return "unknown";
     }
   }
-  
+
   /* browser capabilities */
 
   public boolean isJavaScriptBrowser() {
@@ -483,41 +488,41 @@ public class WEClientCapabilities extends NSObject {
       case WEUA_OmniWeb:
       case WEUA_Konqueror:
         return true;
-        
+
       default:
         return false;
     }
   }
-  
+
   public boolean isVBScriptBrowser() {
     switch (this.browser) {
       case WEUA_IE:
         return true;
-      
+
       default:
         return false;
     }
   }
-  
+
   public boolean isFastTableBrowser() {
     switch (this.browser) {
       case WEUA_Mozilla:
       case WEUA_IE:
       case WEUA_Opera:
         return true;
-  
+
       case WEUA_Safari:
       case WEUA_Konqueror:
         return true;
-        
+
       case WEUA_Netscape:
         return (this.browserMajorVersion >= 6);
-        
+
       default:
         return false;
     }
   }
-  
+
   public boolean isCSS1Browser() {
     switch (this.browser) {
       case WEUA_IE:        return (this.browserMajorVersion >= 4);
@@ -528,7 +533,7 @@ public class WEClientCapabilities extends NSObject {
       default:             return false;
     }
   }
-  
+
   public boolean isCSS2Browser() {
     switch (this.browser) {
       case WEUA_IE:        return (this.browserMajorVersion >= 5);
@@ -540,32 +545,32 @@ public class WEClientCapabilities extends NSObject {
       default:             return false;
     }
   }
-  
+
   public boolean ignoresCSSOnFormElements() {
     if (this.browser == WEUA_Safari) /* Safari always displays Aqua buttons */
       return true;
-    
+
     return !this.isCSS1Browser();
   }
-  
+
   public boolean isTextModeBrowser() {
     if (this.browser == WEUA_Lynx)  return true;
     if (this.browser == WEUA_Links) return true;
     if (this.browser == WEUA_Emacs) return true;
     return false;
   }
-  
+
   public boolean isIFrameBrowser() {
     if ((this.browser == WEUA_IE) && (this.browserMajorVersion >= 5))
       return true;
-    
+
     /* as suggested in OGo bug #634 */
     if ((this.browser == WEUA_Mozilla) && (this.browserMajorVersion >= 5))
       return true;
-    
+
     return false;
   }
-  
+
   public boolean isXULBrowser() {
     if (this.browser == WEUA_Safari) // TODO: Safari supports some XUL stuff
       return false;
@@ -575,7 +580,7 @@ public class WEClientCapabilities extends NSObject {
       return true;
     return false;
   }
-  
+
   public boolean isRobot() {
     if (this.browser == WEUA_Wget)         return true;
     if (this.browser == WEUA_JavaSDK)      return true;
@@ -583,7 +588,7 @@ public class WEClientCapabilities extends NSObject {
     if (this.browser == WEUA_Google)       return true;
     return false;
   }
-  
+
   public boolean isDAVClient() {
     if (this.browser == WEUA_WebFolder)        return true;
     if (this.browser == WEUA_DAVFS)            return true;
@@ -603,20 +608,20 @@ public class WEClientCapabilities extends NSObject {
     if (this.browser == WEUA_PerlHTTPDAV)      return true;
     return false;
   }
-  
+
   public boolean isXmlRpcClient() {
     if (this.browser == WEUA_xmlrpclib_py) return true;
     if (this.browser == WEUA_KungLog)      return true;
     if (this.browser == WEUA_Ecto)         return true;
     return false;
   }
-  
+
   public boolean isBLogClient() {
     if (this.browser == WEUA_KungLog) return true;
     if (this.browser == WEUA_Ecto)    return true;
     return false;
   }
-  
+
   public boolean isRSSClient() {
     if (this.browser == WEUA_NetNewsWire) return true;
     if (this.browser == WEUA_NewsFire)    return true;
@@ -630,25 +635,25 @@ public class WEClientCapabilities extends NSObject {
     // TODO: also supported by Firefox now?
     return this.browser == WEUA_IE && this.browserMajorVersion >= 5;
   }
-  
+
   public boolean doesSupportDHTMLDragAndDrop() {
     if (!this.isJavaScriptBrowser())
       return false;
     if (this.os != WEOS_WINDOWS) // TODO: Safari also supports this!
       return false;
-    
+
     return this.browser == WEUA_IE && this.browserMajorVersion >= 5;
   }
-  
+
   public boolean doesSupportXMLDataIslands() {
     return this.browser == WEUA_IE && this.browserMajorVersion >= 5;
   }
-  
+
   public boolean doesSupportUTF8Encoding() {
     if (this.acceptUTF8)
       /* explicit UTF-8 support signaled in HTTP header */
       return true;
-    
+
     switch (this.browser) {
     case WEUA_Mozilla:
     case WEUA_Safari:
@@ -737,18 +742,29 @@ public class WEClientCapabilities extends NSObject {
         return false;
     }
   }
-  
+
   public boolean isX11Browser() {
     if (this.isTextModeBrowser())
       return false;
     if (!this.isUnixBrowser()) /* well, could be Win/X11 ... ;-) */
       return false;
-    
+
     return true;
   }
 
+  /* Renderers */
+
+  public boolean isWebKitRenderer() {
+    return this.renderer == WERENDERER_WEBKIT;
+  }
+
+  public boolean hasWebKit3DTransforms() {
+    // TODO: really need to extract version of rendering engine
+    return this.isWebKitRenderer();
+  }
+
   /* constants */
-  
+
   public static final short WEUA_UNKNOWN          = 0;
   public static final short WEUA_IE               = 1;
   public static final short WEUA_Netscape         = 2;
@@ -805,4 +821,9 @@ public class WEClientCapabilities extends NSObject {
   public static final short WECPU_IX86     = 1;
   public static final short WECPU_SPARC    = 2;
   public static final short WECPU_PPC      = 3;
+
+  public static final short WERENDERER_UNKNOWN = 0;
+  public static final short WERENDERER_WEBKIT  = 1;
+  public static final short WERENDERER_GECKO   = 2;
+
 }
