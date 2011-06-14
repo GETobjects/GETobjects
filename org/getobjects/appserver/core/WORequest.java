@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.getobjects.foundation.UObject;
+import org.getobjects.foundation.UString;
 
 /**
  * WORequest
@@ -83,7 +84,8 @@ public class WORequest extends WOMessage {
     this.startTimeStampInMS = new Date().getTime();
 
     this.method = _method;
-    this.uri    = _url;
+    this.uri    = UString.stringByDecodingURLComponent(_url,
+        WOMessage.defaultURLEncoding());
 
     this._processURL();
   }
