@@ -145,9 +145,8 @@ public class WORequestGoPath extends NSObject {
     // TBD: be more clever?
     for (int i = 0; i < urlParts.length; i++) {
       String s = UString.stringByDecodingURLComponent(urlParts[i], charset);
-      if (s == null) { 
-        /* Note: in this case we leave the part as-is */
-        s = urlParts[i];
+      if (s != null) { 
+        urlParts[i] = s;
       }
     }
     return urlParts;
