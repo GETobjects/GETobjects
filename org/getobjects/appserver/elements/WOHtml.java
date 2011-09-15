@@ -55,6 +55,7 @@ import org.getobjects.foundation.UObject;
  *   <li>trans-xhtml
  *   <li>trans-html
  *   <li>quirk
+ *   <li>html5
  * </ul>
  * 
  * Bindings:
@@ -315,6 +316,9 @@ public class WOHtml extends WOHTMLDynamicElement {
             _r.appendContentString("\" \"");
             _r.appendContentString(html401DTD);
             _r.appendContentString("\">\n");
+          }
+          else if (lDocType.equals("html5")) {
+            _r.appendContentString("<!DOCTYPE html>\n");
           }
           else {
             log().warn("got unknown HTML doctype: " + lDocType);
