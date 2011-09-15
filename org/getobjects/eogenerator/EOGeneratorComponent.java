@@ -34,6 +34,7 @@ public class EOGeneratorComponent extends WOComponent {
     sqlJavaTypeMap.put("int",       "Integer");
     sqlJavaTypeMap.put("integer",   "Integer");
     sqlJavaTypeMap.put("timestamp", "Date");
+    sqlJavaTypeMap.put("date",      "Date");
 
     scalarTypeMap.put("Integer",    "int");
     scalarTypeMap.put("Boolean",    "boolean");
@@ -82,7 +83,7 @@ public class EOGeneratorComponent extends WOComponent {
 
   private void scanImports() {
     for (EOAttribute attr : this.entity.attributes()) {
-      if (this.javaTypeForAttribute(attr, false).intern() == "Date") {
+      if ("date".equalsIgnoreCase(this.javaTypeForAttribute(attr, false))) {
         this.usesDates = true;
         break;
       }
