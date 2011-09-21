@@ -21,8 +21,10 @@
 package org.getobjects.appserver.elements;
 
 import java.text.DateFormat;
+import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,6 +35,7 @@ import java.util.TimeZone;
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODynamicElement;
+import org.getobjects.foundation.UObject;
 
 /**
  * WODateFormatter
@@ -225,16 +228,35 @@ class WODateFormatter extends WOFormatter {
     DateFormat lFormat;
 
     if (isCustom) {
-      /* a custom format String, eg: "E, dd-MMM-yyyy k:m:s 'GMT'" */
-      try {
-        lFormat = lLocale != null
-          ? new SimpleDateFormat(fmt, lLocale)
-          : new SimpleDateFormat(fmt);
+      /* check if this is a common ISO 8601 based format, i.e.
+       * yyyyMMddTHHmmssZ
+       *
+       * SimpleDateFormat can't handle the 'T' and a trailing 'Z' implies
+       * that UTC timeZone must be used
+       */
+
+      if (fmt.indexOf('T') != -1) {
+        try {
+          lFormat = new ISO8601DateTimeFormat(fmt);
+        }
+        catch (IllegalArgumentException e) {
+          WOFormatter.log.error("invalid date format: " + fmt, e);
+          lFormat =
+            DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        }
       }
-      catch (IllegalArgumentException e) {
-        WOFormatter.log.error("invalid date format: " + fmt, e);
-        lFormat =
-          DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+      else {
+        /* a custom format String, eg: "E, dd-MMM-yyyy k:m:s 'GMT'" */
+        try {
+          lFormat = lLocale != null
+            ? new SimpleDateFormat(fmt, lLocale)
+            : new SimpleDateFormat(fmt);
+        }
+        catch (IllegalArgumentException e) {
+          WOFormatter.log.error("invalid date format: " + fmt, e);
+          lFormat =
+            DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        }
       }
     }
     else {
@@ -358,5 +380,130 @@ class WODateFormatter extends WOFormatter {
     }
     else
       _d.append(" no-format");
+  }
+
+  @SuppressWarnings("serial")
+  private static class ISO8601DateTimeFormat extends DateFormat {
+    protected static final TimeZone gmtTz = TimeZone.getTimeZone("GMT");
+    protected static final String[] validFormats = {
+      "yyyymmddthhmmss",
+      "yyyymmddthhmm",
+      "yyyy-mm-ddthh:mm:ss",
+      "yyyy-mm-ddthh:mm",
+    };
+    protected static final String[] processingPatterns = {
+      "YMDThms",
+      "YMDThm",
+      "Y-M-DTh:m:s",
+      "Y-M-DTh:m",
+    };
+
+    protected TimeZone tz;
+    protected boolean isUTC;
+    protected String  pattern;
+
+    public ISO8601DateTimeFormat(final String _fmt) {
+      if (UObject.isNotEmpty(_fmt)) {
+        int zIdx = _fmt.lastIndexOf('Z');
+        this.isUTC = (zIdx != -1);
+        String fmt = this.isUTC ? _fmt.substring(0, zIdx).toLowerCase()
+                                : _fmt.toLowerCase();
+
+        for (int i = 0; i < validFormats.length; i++) {
+          if (validFormats[i].equals(fmt)) {
+            this.pattern = processingPatterns[i];
+            break;
+          }
+        }
+      }
+      if (this.pattern == null)
+        throw new IllegalArgumentException("Illegal ISO8601DateTimeFormat: " +
+                                           _fmt);
+    }
+
+    @Override
+    public void setTimeZone(TimeZone _tz) {
+      this.tz = _tz;
+    }
+
+    @Override
+    public TimeZone getTimeZone() {
+      return this.tz;
+    }
+
+    @Override
+    public StringBuffer format(Date _date, StringBuffer _buffer,
+        FieldPosition fieldPosition)
+    {
+      TimeZone tz = this.isUTC ? gmtTz : getTimeZone();
+      Calendar dateCal = tz == null ? Calendar.getInstance()
+                                    : Calendar.getInstance(tz);
+      dateCal.setTime(_date);
+
+      for (int i = 0; i < this.pattern.length(); i++) {
+        char c = this.pattern.charAt(i);
+        switch (c) {
+          case '-':
+          case ':':
+          case 'T':
+            _buffer.append(c);
+            break;
+          case 'Y':
+            int year = dateCal.get(Calendar.YEAR);
+            if (year < 0)
+              throw new IllegalArgumentException(
+                  "cannot format negative years: " + _date);
+            formatNumber(year, 4, _buffer);
+            break;
+          case 'M':
+            int month = dateCal.get(Calendar.MONTH) + 1; // java snafu
+            formatNumber(month, 2, _buffer);
+            break;
+          case 'D':
+            int dayOfMonth = dateCal.get(Calendar.DAY_OF_MONTH);
+            formatNumber(dayOfMonth, 2, _buffer);
+            break;
+          case 'h':
+            int hourOfDay = dateCal.get(Calendar.HOUR_OF_DAY);
+            formatNumber(hourOfDay, 2, _buffer);
+            break;
+          case 'm':
+            int minute = dateCal.get(Calendar.MINUTE);
+            formatNumber(minute, 2, _buffer);
+            break;
+          case 's':
+            int second = dateCal.get(Calendar.SECOND);
+            formatNumber(second, 2, _buffer);
+            break;
+
+          default:
+            throw new InternalError("Unknown processing directive '" + c + "'");
+        }
+      }
+      if (this.isUTC)
+        _buffer.append('Z');
+      return _buffer;
+    }
+
+    private void formatNumber(int _num, int _zeros, StringBuffer _buffer) {
+      if (_zeros == 2) {
+        if (_num < 10)
+        _buffer.append("0");
+      }
+      else if (_zeros == 4) {
+        if (_num < 1000)
+          _buffer.append("0");
+        else if (_num < 100)
+          _buffer.append("00");
+        else if (_num < 10)
+          _buffer.append("000");
+      }
+      _buffer.append(Integer.toString(_num));
+    }
+
+    @Override
+    public Date parse(String source, ParsePosition pos) {
+      return null; // we're not interested in parsing, yet
+    }
   }
 }
