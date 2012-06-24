@@ -383,7 +383,7 @@ class WODateFormatter extends WOFormatter {
   }
 
   @SuppressWarnings("serial")
-  private static class ISO8601DateTimeFormat extends DateFormat {
+  public static class ISO8601DateTimeFormat extends DateFormat {
     protected static final TimeZone gmtTz = TimeZone.getTimeZone("GMT");
     protected static final String[] validFormats = {
       "yyyymmddthhmmss",
