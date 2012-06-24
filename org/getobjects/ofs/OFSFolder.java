@@ -69,13 +69,20 @@ public class OFSFolder extends OFSBaseObject
   // TBD: document class
   protected static final Log cfglog  = LogFactory.getLog("GoConfig");
   protected static final Log authlog = LogFactory.getLog("GoAuthenticator");
-  
+
   /**
    * This is a cache of the child names for the specific folder object (after
    * it got looked up in the <code>pathToChildInfo</code> hashmap.
    */
   protected OFSFileContainerChildInfo childInfo;
-  
+
+  /**
+   * This timestamp indicates the last time this folder was modified.
+   * This information is necessary for deciding if caches can be used or need
+   * to be rebuilt.
+   */
+  protected long lastModified;
+
   /**
    * Here we cache objects which we found using lookupName(). Note that we only
    * use the lookup name as the lookup criterion. Subclasses might use
@@ -85,7 +92,7 @@ public class OFSFolder extends OFSBaseObject
   protected Map<String, Object> cacheNameToObject;
   protected Map<String, Object> cacheNameToConfig;
   protected Object ownConfig;
-  
+
   /**
    * The resource manager associated with the folder.
    */
@@ -109,18 +116,25 @@ public class OFSFolder extends OFSBaseObject
     this.context = _ctx;
     return this;
   }
-  
-  
+
+
   /* directory contents */
-  
+
   public OFSFileContainerChildInfo childInfo() {
+    final IOFSFileInfo info = this.fileInfo();
+    if (info == null) return null;
+
+    final long currentTimestamp = info.lastModified();
+
+    // need to rebuild caches?
+    if (this.childInfo != null && currentTimestamp != this.lastModified)
+      this.childInfo = null;
+
     if (this.childInfo == null) {
-      final IOFSFileInfo info = this.fileInfo();
-      if (info == null) return null;
-      
+
       final ConcurrentHashMap<IOFSFileInfo, Object> pathToChildInfo =
         this.fileManager.cacheForSection("OFSFolderChildInfo");
-      
+
       /* check cache */
 
       this.childInfo = (OFSFileContainerChildInfo)pathToChildInfo.get(info);
@@ -128,21 +142,20 @@ public class OFSFolder extends OFSBaseObject
         // Hm, this does not seem to speedup the operation, even though we get
         // a good hitrate? Maybe the kernel cache is sufficient or the File
         // does some caching?
-        final long currentTimestamp = info.lastModified();
         if (currentTimestamp != this.childInfo.timestamp()) {
           // no gain in removing the old info? Will be overridden below
           this.childInfo = null;
         }
       }
-      
+
       /* fetch item if cache was empty or item got changed */
-      
+
       if (this.childInfo == null) {
         this.childInfo = OFSFileContainerChildInfo
           .infoForFile(this.fileManager(), this.fileInfo());
         if (this.childInfo != null) {
           this.childInfo.load(); /* ensure a threadsafe state */
-          
+
           pathToChildInfo.put(info, this.childInfo);
         }
       }
@@ -150,27 +163,27 @@ public class OFSFolder extends OFSBaseObject
     return this.childInfo;
   }
 
-  
+
   /* container */
-  
+
   public boolean isFolderish() {
     return true; /* not strictly necessary, but this is static info anyways */
   }
 
-  
+
   /* contents */
-  
+
   protected static final String[] emptyStringArray = new String[0];
-  
+
   protected String[] collectIds(final boolean _directories) {
     final OFSFileContainerChildInfo ci = this.childInfo();
     if (ci == null) return null;
-    
+
     final String[] fileNames = ci.fileNames();
     int len = fileNames.length;
     if (len == 0)
       return emptyStringArray;
-    
+
     final List<String> ids = new ArrayList<String>(8);
     for (int i = 0; i < len; i++) {
       final IOFSFileInfo info =
@@ -181,37 +194,37 @@ public class OFSFolder extends OFSBaseObject
     len = ids.size();
     return len == 0 ? emptyStringArray : ids.toArray(new String[len]);
   }
-  
+
   public String[] toOneRelationshipKeys() {
     return this.collectIds(false /* files */);
   }
   public String[] toManyRelationshipKeys() {
     return this.collectIds(true /* directories */);
   }
-  
+
   public String[] objectIds() {
     final OFSFileContainerChildInfo ci = this.childInfo();
     if (ci == null) return null;
-    
+
     return ci != null ? ci.ids() : null;
   }
-  
-  
+
+
   /* IGoFolderish */
-  
+
   /**
    * The default implementation returns an OFSFolderDataSource focused on this
    * object.
-   * 
+   *
    * @return a datasource representing the contents of this folder
    */
   public EODataSource folderDataSource(final IGoContext _ctx) {
     return new OFSFolderDataSource(this, _ctx);
   }
-  
-  
+
+
   /* stored keys */
-  
+
   /**
    * This method first locates the IOFSFileInfo for the given name in the
    * folder. It then uses the OFSRestorationFactory derived from the context
@@ -220,8 +233,8 @@ public class OFSFolder extends OFSBaseObject
    * This object does no caching of the resulting object. All caching is done
    * by the lookupName() method.
    * <p>
-   * The method is called by lookupName(), you usually don't call it manually. 
-   * 
+   * The method is called by lookupName(), you usually don't call it manually.
+   *
    * @param _name - name of the object to lookup
    * @param _ctx  - the context to perform the operation in
    * @return a freshly created object, or an Exception/null on error
@@ -229,13 +242,13 @@ public class OFSFolder extends OFSBaseObject
   public Object lookupStoredName(final String _name, final IGoContext _ctx) {
     // Note: do not call configurationForNameInContext() in here, might result
     //       in a cycle! (since the config is also looked up using the method)
-    
+
     final IOFSFileInfo linfo = this.lookupInfoForName(_name, _ctx);
     if (linfo == null)
       return null;
-    
+
     /* find factory using the context */
-    
+
     final OFSRestorationFactory factory =
       OFSRestorationFactory.restorationFactoryInContext(_ctx);
     if (factory == null) {
@@ -243,11 +256,11 @@ public class OFSFolder extends OFSBaseObject
         log.debug("did not find OFS restoration factory!");
       return null;
     }
-    
+
     /* attempt to restore object */
     final Object o = factory.restoreObjectFromFileInContext
       (this, this.fileManager, linfo, _ctx);
-    
+
     if (log.isDebugEnabled()) {
       if (o != null)
         log.debug("restored OFS object: " + o);
@@ -256,11 +269,11 @@ public class OFSFolder extends OFSBaseObject
     }
     return o;
   }
-  
+
   /**
    * This method first locates the IOFSFileInfo for the given name in the
    * folder.
-   * 
+   *
    * @param _name - name of the object to lookup
    * @param _ctx  - the context to perform the operation in
    * @return the IOFSFileInfo object, or null if the name could not be resolved
@@ -269,14 +282,14 @@ public class OFSFolder extends OFSBaseObject
     (final String _name, final IGoContext _ctx)
   {
     final boolean debugOn = log.isDebugEnabled();
-    
+
     /* first turn lookup name into lookup id (aka: cut off extension */
-    
+
     final String lookupId = this.idFromName(_name, _ctx);
     if (debugOn) log.debug("lookupStoredName(" + _name + ") => id=" + lookupId);
-    
+
     /* lookup File object for given id */
-    
+
     final OFSFileContainerChildInfo ci = this.childInfo();
     if (ci == null) {
       if (debugOn) log.debug("did not find childinfo of container: " + this);
@@ -284,7 +297,7 @@ public class OFSFolder extends OFSBaseObject
     }
     else if (debugOn)
       log.debug("  childinfo: " + ci);
-    
+
     final String[] files = ci.fileNames();
     int      len   = files.length;
     if (len == 0) {
@@ -293,18 +306,18 @@ public class OFSFolder extends OFSBaseObject
       return null;
     }
     if (debugOn) log.debug("  number of files: " + files.length);
-    
+
     String lfile = null;
     for (int i = 0; i < len; i++) {
       if (debugOn) log.debug("    check[" + i + "]: " + ci.fileIds[i]);
       if (lookupId.equals(ci.fileIds[i])) {
         lfile = files[i];
-        
+
         // TODO: DEBUG
         if (!files[i].startsWith(lookupId)) {
           log.error("FOUND " + lookupId + " as " + lfile);
-          
-          for (int j = 0; j < len; j++) { 
+
+          for (int j = 0; j < len; j++) {
             log.error("  id: " + ci.fileIds[j]);
             log.error("  =>: " + ci.fileNames[j]);
           }
@@ -316,7 +329,7 @@ public class OFSFolder extends OFSBaseObject
       if (debugOn) log.debug("did not find file for id: " + lookupId);
       return null;
     }
-    
+
     final IOFSFileInfo linfo =
       this.fileManager.fileInfoForPath(this.storagePath, lfile);
 
@@ -324,16 +337,16 @@ public class OFSFolder extends OFSBaseObject
       log.debug("found file for id=" + lookupId + " => " + lfile + ": " +linfo);
     return linfo;
   }
-  
+
   /* IGoObject */
-  
+
   /**
    * Lookup the given name in this object. This works by first checking the
    * GoClass of the object and then calling lookupStoredName() to discover an
    * object on-disk.
    * <p>
    * This method maintains a cache of restored disk objects.
-   * 
+   *
    * @param _name - name of the object to lookup
    * @param _ctx  - the context to perform the operation in
    * @param _acquire - whether the object should attempt to acquire names
@@ -345,9 +358,9 @@ public class OFSFolder extends OFSBaseObject
     (final String _name, final IGoContext _ctx, final boolean _acquire)
   {
     final boolean debugOn = log.isDebugEnabled();
-    
+
     /* first check cache */
-    
+
     if (this.cacheNameToObject != null) {
       final Object o = this.cacheNameToObject.get(_name);
       if (o != null) {
@@ -358,18 +371,18 @@ public class OFSFolder extends OFSBaseObject
     }
     else if (debugOn)
       log.debug("no child cache in container: " + this);
-    
+
     /* lookup using GoClass */
-    
+
     final GoClass cls = this.joClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
     }
-    
-    
+
+
     /* check configuration for replacement names */
-    
+
     final Map<String, ?>      cfg     = this.configurationInContext(_ctx);
     final List<KeyMatchEntry> aliases = (List<KeyMatchEntry>)(cfg != null
       ? cfg.get(JoConfigKeys.AliasMatchName) : null);
@@ -379,39 +392,39 @@ public class OFSFolder extends OFSBaseObject
             UString.componentsJoinedByString(aliases, ","));
         log.debug("  in: " + this);
       }
-      
+
       for (KeyMatchEntry entry: aliases) {
         final String newName = entry.match(_name);
         if (newName != null && !newName.equals(_name)) {
           if (debugOn)
             log.debug("  match, rewrite '" + _name + "' to '" + newName + "'");
           Object o = this.lookupName(newName, _ctx, _acquire);
-          
+
           if (o instanceof OFSBaseObject) {
             /* push *old* name as the (virtual) location of the replacement */
             ((OFSBaseObject)o).setLocation(this, _name);
           }
-          
+
           /* Cache replacement object under lookup name (already cached under
            * its own name) */
           if (this.cacheNameToObject != null)
             this.cacheNameToObject.put(_name, o);
-          
+
           return o;
         }
       }
     }
-    
-    
+
+
     /* check children */
-    
+
     final OFSFileContainerChildInfo ci = this.childInfo();
     if (ci != null && ci.hasKey(_name)) {
       final Object o = this.lookupStoredName(_name, _ctx);
       if (o != null) {
         if (this.cacheNameToObject != null)
           this.cacheNameToObject.put(_name, o);
-        
+
         return o;
       }
     }
@@ -421,18 +434,18 @@ public class OFSFolder extends OFSBaseObject
       else
         log.debug("container has no child info: " + this);
     }
-    
+
     /* if we shall acquire, continue at parent */
-    
+
     if (_acquire && this.container != null)
       return ((IGoObject)this.container).lookupName(_name, _ctx, true /* aq */);
-    
+
     return null;
   }
-  
-  
+
+
   /* IGoSecuredObject */
-  
+
   /**
    * This method checks the requirements stated in the configuration associated
    * with this object (usually declared in an config.htaccess file).
@@ -447,7 +460,7 @@ public class OFSFolder extends OFSBaseObject
   {
     if (_requirements == null || _requirements.size() == 0)
       return null; /* nothing to be done */
-    
+
     Set<String> requiredRoles  = null;
     Set<String> requiredLogins = null;
     for (String requireType: _requirements.keySet()) {
@@ -469,36 +482,36 @@ public class OFSFolder extends OFSBaseObject
       else
         log.warn("not processing requirement: " + requireType);
     }
-    
+
     if (requiredRoles == null && requiredLogins == null) {
       if (authlog.isInfoEnabled())
         authlog.info("no requirements configured.");
       return null; /* nothing was required */
     }
-    
+
     /* check logins and roles against active user */
-    
+
     final IGoUser user = _ctx.activeUser();
     if (user == null)
       authlog.warn("got no activeUser from ctx: " + _ctx);
-    
+
     if (authlog.isInfoEnabled()) {
       authlog.info("checking against user: " + user + "\n" +
-          "  rq-logins: " + 
+          "  rq-logins: " +
           UString.componentsJoinedByString(requiredLogins, ",") + "\n" +
-          "  rq-roles: " + 
+          "  rq-roles: " +
           UString.componentsJoinedByString(requiredRoles, ","));
     }
-    
-    /* first check whether the user is part of the required ones */ 
-    
+
+    /* first check whether the user is part of the required ones */
+
     if (requiredLogins != null && requiredLogins.contains(user.getName())) {
       // TBD: check all principals of the subject?
       if (authlog.isInfoEnabled())
         authlog.info("  user matched by login: " + user);
       return null; /* access is OK, requirements contain user name */
     }
-    
+
     /* next check whether the roles intersect (whether the user has a role
      * which is required) */
 
@@ -518,24 +531,24 @@ public class OFSFolder extends OFSBaseObject
       else if (authlog.isInfoEnabled())
         authlog.info("user has no roles configured, required: "+requiredRoles);
     }
-    
+
     /* requirements check failed, raise an exception */
-    
+
     return new GoAuthRequiredException(
         this.authenticatorInContext(_ctx),
         "user does not match configured requirements: " +
         user != null ? user.getName() : "<null>");
   }
-  
+
   @SuppressWarnings("unchecked")
   public Exception validateName(final String _name, final IGoContext _ctx) {
     /* do not rerun validation on cached objects */
-    
+
     if (this.cacheNameToObject != null) {
       if (this.cacheNameToObject.containsKey(_name))
         return null;
     }
-    
+
     // TBD: Should this run for names which are not contained in the folder? Eg
     //      aquired frame templates are a common situation.
     //      Tricky, not sure yet what the proper thing is.
@@ -555,13 +568,13 @@ public class OFSFolder extends OFSBaseObject
       else
         return null; /* we do not provide the given name */
     }
-    
+
     final Map<String, ?> cfg = this.configurationForNameInContext(_name, _ctx);
     if (cfglog.isDebugEnabled())
       cfglog.debug("validateName('" + _name + "') with cfg: " + cfg);
-    
+
     /* check configuration for requirements */
-    
+
     if (cfg != null) {
       final Exception error = this.validateRequirements(
         (Map<String, Set<String>>)cfg.get(JoConfigKeys.Require), _ctx);
@@ -574,9 +587,9 @@ public class OFSFolder extends OFSBaseObject
 
     if (authlog.isInfoEnabled())
       authlog.info("requirements ok, continue ...");
-    
+
     /* also run the default implementation */
-    
+
     return IGoSecuredObject.DefaultImplementation
       .validateNameOfObject(this, _name, _ctx);
   }
@@ -585,15 +598,15 @@ public class OFSFolder extends OFSBaseObject
   public Exception validateObject(final IGoContext _ctx) {
     if (true)
       return null; // DOES NOT WORK YET
-    
+
     final Map<String, ?> cfg = this.configurationInContext(_ctx);
     if (cfglog.isDebugEnabled()) {
-      cfglog.debug("validate('" + this.getClass().getSimpleName() + 
+      cfglog.debug("validate('" + this.getClass().getSimpleName() +
           "') with cfg: " + cfg);
     }
-    
+
     /* check configuration for requirements */
-    
+
     if (cfg != null) {
       final Exception error = this.validateRequirements(
         (Map<String, Set<String>>)cfg.get(JoConfigKeys.Require), _ctx);
@@ -606,48 +619,48 @@ public class OFSFolder extends OFSBaseObject
 
     if (authlog.isInfoEnabled())
       authlog.info("requirements ok, continue ...");
-    
+
     /* also run the default implementation */
-    
+
     return IGoSecuredObject.DefaultImplementation.validateObject(this, _ctx);
   }
   public Exception validatePermission(String _perm, final IGoContext _ctx) {
     return IGoSecuredObject.DefaultImplementation
       .validatePermissionOnObject(_perm, this, _ctx);
   }
-  
+
   protected IGoAuthenticator cachedAuthenticator;
-  
+
   /**
    * Returns an IGoAuthenticator managed by the folder. The default
    * implementation uses the 'configurationInContext()' to build the
    * authenticator.
-   * 
+   *
    * @param _ctx - the active IGoContext (usually the WOContext)
    * @return an authenticator, derived from the configuration
    */
   public IGoAuthenticator authenticatorInContext(IGoContext _ctx) {
     if (this.cachedAuthenticator != null)
       return this.cachedAuthenticator;
-    
+
     final Map<String, ?> cfg = this.configurationInContext(_ctx);
     if (cfg == null)
       return null; /* no configuration at all */
-    
+
     String authType = (String)cfg.get(JoConfigKeys.AuthType);
     if (UObject.isEmpty(authType))
       return null; /* no AuthType configured */
-    
+
     // TBD: move to some generic Config=>Authenticator factory object
 
     String authName = (String)cfg.get(JoConfigKeys.AuthName);
-    
+
     if ("Basic".equalsIgnoreCase(authType)) {
       Configuration jaasCfg = null; // TBD
       GoHTTPAuthenticator auth = new GoHTTPAuthenticator(authName, jaasCfg);
       return (this.cachedAuthenticator = auth);
     }
-    
+
     if ("WOSession".equalsIgnoreCase(authType)) {
       /* Note: no JAAS is required, actual login is done in the LoginPage. The
        * session authenticator just checks the session for an active user,
@@ -657,7 +670,7 @@ public class OFSFolder extends OFSBaseObject
        * login page.
        */
       final GoSessionAuthenticator auth = new GoSessionAuthenticator();
-      
+
       String s = (String)cfg.get("authloginpage");
       if (UObject.isNotEmpty(s))
         auth.setPageName(s);
@@ -665,17 +678,17 @@ public class OFSFolder extends OFSBaseObject
       s = (String)cfg.get("authloginurl");
       if (UObject.isNotEmpty(s))
         auth.setRedirectURL(s);
-      
+
       return (this.cachedAuthenticator = auth);
     }
-    
+
     log.error("unsupported authenticator type: " + authType);
     return null;
   }
-  
-  
+
+
   /* configuration */
-  
+
   private static final Object CACHE_MISS = new Object();
 
   /**
@@ -686,7 +699,7 @@ public class OFSFolder extends OFSBaseObject
    *   <li>to check permissions of the folder in validateObject()
    *   <li>to determine replacement objects in lookupName()
    * </ul>
-   * 
+   *
    * @param _ctx - the active GoContext
    * @return the configuration dictionary, or null if there was none
    */
@@ -697,31 +710,31 @@ public class OFSFolder extends OFSBaseObject
 
     if (_ctx instanceof JoConfigContext)
       return null; /* this got called during a config-lookup */
-    
+
     /* setup config context */
-    
+
     final JoConfigContext configContext = new JoConfigContext(_ctx,
         "location", this.pathInContainer(),
         "path",     this.storagePath(),
         "filename", "",
         "dirpath",  this.storagePath());
-    
+
     /* apply config */
-    
+
     final JoConfigProcessor cpu = new JoConfigProcessor();
     final Object cfg = cpu.buildConfiguration(this, configContext);
-    
+
     this.ownConfig = cfg != null ? cfg : CACHE_MISS;
     return this.ownConfig == CACHE_MISS ? null : (Map)this.ownConfig;
   }
-  
+
   /**
    * Retrieves the OFS configuration for the given name. Note that the returned
    * configuration is relative to the folder, eg a subfolder could add
    * additional information to its own configuration.
    * <p>
    * Eg this is called by 'validateName()' to check for access restrictions.
-   * 
+   *
    * @param _name - the name of the object to retrieve configuration for
    * @param _ctx  - the web transaction context
    * @return an Object representing the configuration for the name
@@ -733,65 +746,65 @@ public class OFSFolder extends OFSBaseObject
     // TBD: this only works for contained objects because the storagePath
     //      depends on lookup! (could be acquired or remapped)
     Object cfg;
-    
+
     if (this.cacheNameToConfig != null) {
       if ((cfg = this.cacheNameToConfig.get(_name)) != null)
         return cfg == CACHE_MISS ? null : (Map)cfg;
     }
     if (_ctx instanceof JoConfigContext)
       return null; /* this got called during a config-lookup */
-    
+
     /* setup config context */
-    
+
     String   objId = this.idFromName(_name, _ctx);
     String[] childPath = UString.addStringToStringArray(this.storagePath, objId);
     String[] childLoc  = UString.addStringToStringArray(this.pathInContainer(), _name);
-    
+
     JoConfigContext configContext = new JoConfigContext(_ctx,
         "location", childLoc,
         "path",     childPath,
         "filename", objId,
         "dirpath",  this.storagePath());
-    
+
     /* apply config */
-    
+
     final JoConfigProcessor cpu = new JoConfigProcessor();
     cfg = cpu.buildConfiguration(this, configContext);
-    
+
     /* cache */
-    
+
     if (this.cacheNameToConfig == null)
       this.cacheNameToConfig = new HashMap<String, Object>(16);
     this.cacheNameToConfig.put(_name, cfg != null ? cfg : CACHE_MISS);
-    
+
     return (Map)cfg;
   }
-  
+
   /**
    * Lookup and cache a resource manager for the folder.
-   * 
+   *
    * @return a WOResourceManager instance
    */
   public WOResourceManager resourceManager() {
     if (this.resourceManager != null)
       return this.resourceManager;
-    
+
     final WOResourceManager parentRM =
       GoContainerResourceManager.lookupResourceManager
         (this.container(), this.context);
-    
-    this.resourceManager = 
+
+    this.resourceManager =
       new GoContainerResourceManager(this, parentRM, this.context);
     return this.resourceManager;
   }
-  
-  
+
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.childInfo != null)
       _d.append(" has-childinfo");
   }
