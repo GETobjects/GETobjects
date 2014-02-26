@@ -435,12 +435,14 @@ public class WOServletRequest extends WORequest {
           values.add(v);
         }
 
-        if (format.startsWith("tuple") || format.startsWith("array")) {
-          if (convertToTuples == null)
-            convertToTuples = new ArrayList<String>(4);
-          if (!convertToTuples.contains(name))
-            convertToTuples.add(name);
-        }
+          if (format != null) {
+            if (format.startsWith("tuple") || format.startsWith("array")) {
+              if (convertToTuples == null)
+                convertToTuples = new ArrayList<String>(4);
+              if (!convertToTuples.contains(name))
+                convertToTuples.add(name);
+            }
+          }
       }
       else if (format.startsWith("record")) {
         /* eg: <input type="text" name="person.age:int:record"> */
