@@ -4,13 +4,13 @@ EOAccess
 Database access library. Some ideas and a lot of naming taken from EOF, some
 stuff from Ruby on Rails ActiveRecord. Overall developed to meet my own needs.
 
-The basic setup is that EOAccess has two levels of access:
-a) adaptor level (EOAdaptor, EOAdaptorChannel)
+The basic setup is that EOAccess has two levels of abstraction:
+a) adaptor  level (EOAdaptor,  EOAdaptorChannel)
 b) database level (EODatabase, EODatabaseChannel, EODatabaseDataSource)
 
-In general its recommended to write an EOModel or an EOModel pattern, and then
+In general it is recommended to write an EOModel or an EOModel pattern, and then
 use the EODatabaseDataSource to fetch mapped objects.
-However, for simple SQL you can also do that in rather convinient ways at the
+However, for simple SQL you can also do that in rather convenient ways at the
 adaptor level.
 
 Important: to inject raw SQL you don't have to go down to adaptor level! You
@@ -83,9 +83,8 @@ Classes:
       *   andQualifier eg AND lastname LIKE 'Duck%'   (nothing w/o qualifier) 
       *   orQualifier  eg OR  lastname LIKE 'Duck%'   (nothing w/o qualifier) 
       *   orderby      eg ORDER BY mod_date DESC (nothing w/o orderings) 
-      - Note: wenn Joins fuer den Query gemacht werden, sollte die Basis-Tabelle
-              als BASE benannt werden, damit die anderen Features genutzt werden
-              koennen!
+      - Note: when using joins in a query, the base table should be named
+              'BASE', so that all the other features can be used.
     
     - EOCustomQueryExpressionHintKeyBindPattern
       - zB: %%(tables)s WHERE id = %(id)s
@@ -134,8 +133,8 @@ Classes:
     int affected = channel.performAdaptorOperationN(op);
 
 - EOAttribute Formats:
-  - man kann auch in readformat/writeformat SQL einschleusen, zB um alle
-    Werte nach lowercase beim Schreiben zu wandeln:
+  - one can also inject readformat/writeformat SQL, e.g. to change all values
+    to lowercase on writes:
       writeformat="LOWER(TRIM(%P))"
-    oder Case-Dinge:
+    or case-stuff, like::
       readformat="CASE %P WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' END"
