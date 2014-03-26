@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2006-2008 Helge Hess <helge.hess@opengroupware.org>
- * Copyright (C) 2006 Marcus Mueller <znek@mulle-kybernetik.com>
- * Copyright (C) 2011 Burkhard Sell <sell@nesoft.de>
+ * Copyright (C) 2006-2014 Helge Hess     <helge.hess@opengroupware.org>
+ * Copyright (C) 2006      Marcus Mueller <znek@mulle-kybernetik.com>
+ * Copyright (C) 2011      Burkhard Sell  <sell@nesoft.de>
  *
  * This file is part of Go.
  *
@@ -1354,9 +1354,7 @@ public class UString {
         i += 2; /* skip '<!' */
 
         /* skip dashes */
-        int dashCount = 0;
         while (i < llen && buf[i] == '-') {
-          dashCount++;
           if (((i + 2) < llen)) {
             if ((buf[i + 1] == '-') && (buf[i + 2] == '>'))
               break; /* found end marker */

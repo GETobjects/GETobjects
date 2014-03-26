@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -485,6 +485,15 @@ public class NSJavaRuntime {
         classes_.add(className.replace('/', '.'));
     }
     while (true);
+    
+    if (jarFile != null) {
+      try {
+        jarFile.close();
+      }
+      catch (IOException e) {
+        // TBD: log?
+      }
+    }
   }
   
   static Set<Class<?>> getClassesFromClassNames(String[] _names) {

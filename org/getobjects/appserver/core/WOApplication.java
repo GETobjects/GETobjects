@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2009 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -637,6 +637,7 @@ public class WOApplication extends NSObject
         //      no way to cache the parsed format?)
         Formatter formatter = new Formatter(sb, Locale.US);
         formatter.format(" (%.3fs)", duration);
+        formatter.close(); // didn't know that ;-)
       }
     }
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -404,10 +404,11 @@ class WODateFormatter extends WOFormatter {
 
     public ISO8601DateTimeFormat(final String _fmt) {
       if (UObject.isNotEmpty(_fmt)) {
-        int zIdx = _fmt.lastIndexOf('Z');
+        final int zIdx = _fmt.lastIndexOf('Z');
         this.isUTC = (zIdx != -1);
-        String fmt = this.isUTC ? _fmt.substring(0, zIdx).toLowerCase()
-                                : _fmt.toLowerCase();
+        
+        final String fmt = this.isUTC ? _fmt.substring(0, zIdx).toLowerCase()
+                                      : _fmt.toLowerCase();
 
         for (int i = 0; i < validFormats.length; i++) {
           if (validFormats[i].equals(fmt)) {
@@ -433,15 +434,15 @@ class WODateFormatter extends WOFormatter {
 
     @Override
     public StringBuffer format(Date _date, StringBuffer _buffer,
-        FieldPosition fieldPosition)
+                               FieldPosition fieldPosition)
     {
-      TimeZone tz = this.isUTC ? gmtTz : getTimeZone();
-      Calendar dateCal = tz == null ? Calendar.getInstance()
-                                    : Calendar.getInstance(tz);
+      final TimeZone lTZ = this.isUTC ? gmtTz : getTimeZone();
+      final Calendar dateCal = lTZ == null ? Calendar.getInstance()
+                                           : Calendar.getInstance(lTZ);
       dateCal.setTime(_date);
 
       for (int i = 0; i < this.pattern.length(); i++) {
-        char c = this.pattern.charAt(i);
+        final char c = this.pattern.charAt(i);
         switch (c) {
           case '-':
           case ':':
