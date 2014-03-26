@@ -91,7 +91,7 @@ public class UData extends NSObject {
     }
     finally {
       try {
-        _in.close();
+        in.close();
       }
       catch (IOException e) {
         log.warn("could not close input stream", e);
