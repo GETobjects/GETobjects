@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -204,12 +204,12 @@ public class EODatabaseChannel extends NSObject
    * @return a Map as described
    */
   protected Map<String, List<String>> levelPrefetchSpecificiation
-    (EOEntity _entity, String[] _pathes)
+    (final EOEntity _entity, final String[] _pathes)
   {
     if (_entity == null || _pathes == null || _pathes.length == 0)
       return null;
     
-    Map<String, List<String>> level = new HashMap<String, List<String>>(8);
+    final Map<String,List<String>> level = new HashMap<String, List<String>>(8);
     
     for (String path: _pathes) {
       String relname;
@@ -217,7 +217,7 @@ public class EODatabaseChannel extends NSObject
       
       /* split off first part of relationship */
       
-      dotidx = path.indexOf('.'); 
+      dotidx  = path.indexOf('.'); 
       relname = (dotidx >= 0) ? path.substring(0, dotidx) : path;
       
       EORelationship rel = _entity.relationshipNamed
@@ -233,7 +233,7 @@ public class EODatabaseChannel extends NSObject
       if (rel.isFlattened()) {
         path = rel.relationshipPath();
         
-        dotidx = path.indexOf('.'); 
+        dotidx  = path.indexOf('.'); 
         relname = (dotidx >= 0) ? path.substring(0, dotidx) : path;
         
         if ((rel = _entity.relationshipNamed(relname)) == null) {
@@ -245,7 +245,7 @@ public class EODatabaseChannel extends NSObject
       
       /* process relationship */
       
-      EOJoin[] joins = rel.joins();
+      final EOJoin[] joins = rel.joins();
       if (joins == null || joins.length == 0) {
         log.warn("prefetch relationship has no joins, ignoring: " + rel);
         continue;
@@ -286,20 +286,17 @@ public class EODatabaseChannel extends NSObject
    * @return the list of flattened relationships or null if there was none
    */
   public List<String> flattenedRelationships
-    (EOEntity _entity, String[] _pathes)
+    (final EOEntity _entity, final String[] _pathes)
   {
     if (_entity == null || _pathes == null || _pathes.length == 0)
       return null;
     
     List<String> flattened = null;
     for (String path: _pathes) {
-      String relname;
-      int    dotidx;
-      
       /* split off first part of relationship */
       
-      dotidx = path.indexOf('.'); 
-      relname = (dotidx >= 0) ? path.substring(0, dotidx) : path;
+      final int dotidx = path.indexOf('.'); 
+      String relname = (dotidx >= 0) ? path.substring(0, dotidx) : path;
       
       /* split off fetch parameters */
 
@@ -307,7 +304,7 @@ public class EODatabaseChannel extends NSObject
         
       /* lookup relationship */
       
-      EORelationship rel = _entity.relationshipNamed(relname);
+      final EORelationship rel = _entity.relationshipNamed(relname);
       if (rel == null || !rel.isFlattened())
         continue;
       
@@ -321,7 +318,7 @@ public class EODatabaseChannel extends NSObject
   public EOAttribute[] selectListForFetchSpecification
     (final EOEntity _entity, final EOFetchSpecification _fs)
   {
-    String[] fetchKeys = _fs != null ? _fs.fetchAttributeNames() : null;
+    final String[] fetchKeys = _fs != null ? _fs.fetchAttributeNames() : null;
 
     if (fetchKeys == null) {
       if (_entity != null)
@@ -390,10 +387,11 @@ public class EODatabaseChannel extends NSObject
     
     /* determine object class */
     
-    if (!this.fetchesRawRows)
+    if (!this.fetchesRawRows) {
       // TBD: support per-object classes by setting this to null if the
       //      entity says its multi-class
       this.currentClass = this.database.classForEntity(this.currentEntity);
+    }
     
     /* setup */
     
@@ -425,7 +423,7 @@ public class EODatabaseChannel extends NSObject
       }
       
       this.recordCount = results.size();
-      this.records = results.iterator();
+      this.records     = results.iterator();
     }
     catch (Exception e) {
       error = e;
@@ -934,7 +932,7 @@ public class EODatabaseChannel extends NSObject
     
     /* apply row values */
     
-    Set<String> keys = row.keySet();
+    final Set<String> keys = row.keySet();
     
     if (eo instanceof EOKeyValueCoding) {
       if (isDebugOn) log.debug("    push row: " + row);
