@@ -182,7 +182,11 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       final int[]    colHashes = new int[columnCount];
       final int[]    colTypes  = new int[columnCount];
       for (int i = 1; i <= columnCount; i++) {
-        colNames [i - 1] = meta.getColumnName(i);
+        if (_optAttrs != null)
+          colNames[i - 1] = _optAttrs[i - 1].columnName();
+        else
+          colNames[i - 1] = meta.getColumnName(i);
+          
         colHashes[i - 1] = colNames[i - 1].hashCode();
         colTypes [i - 1] = meta.getColumnType(i);
       }
@@ -193,7 +197,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         final EORecordMap record = new EORecordMap(colNames, colHashes);
         
         boolean ok = this.fillRecordMapFromResultSet
-          (record, rs, colNames, colTypes, _optAttrs);
+          (record, rs, colNames, colTypes);
         if (ok) records.add(record);
       }
     }
@@ -534,7 +538,11 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       final int[]    colHashes = new int[columnCount];
       final int[]    colTypes = new int[columnCount];
       for (int i = 1; i <= columnCount; i++) {
-        colNames [i - 1] = meta.getColumnName(i);
+        if (_optAttrs != null)
+          colNames [i - 1] = _optAttrs[i].columnName();
+        else
+          colNames [i - 1] = meta.getColumnName(i);
+        
         colHashes[i - 1] = colNames[i - 1].hashCode();
         colTypes [i - 1] = meta.getColumnType(i);
       }
@@ -545,7 +553,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         EORecordMap record = new EORecordMap(colNames, colHashes);
         
         boolean ok = this.fillRecordMapFromResultSet
-          (record, rs, colNames, colTypes, _optAttrs);
+          (record, rs, colNames, colTypes);
         if (ok) records.add(record);
       }
     }
@@ -1395,7 +1403,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    */
   protected boolean fillRecordMapFromResultSet
     (final Map<String,Object> _record,
-     ResultSet _rs, String[] _colNames, int[] _colTypes, EOAttribute[] _attrs)
+     final ResultSet _rs, final String[] _colNames, final int[] _colTypes)
     throws SQLException
   {
     // TODO: this might be a nice utility function, but its better to convert
