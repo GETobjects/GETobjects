@@ -539,7 +539,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       final int[]    colTypes = new int[columnCount];
       for (int i = 1; i <= columnCount; i++) {
         if (_optAttrs != null)
-          colNames [i - 1] = _optAttrs[i].columnName();
+          colNames [i - 1] = _optAttrs[i - 1].columnName();
         else
           colNames [i - 1] = meta.getColumnName(i);
         
