@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -144,9 +144,12 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     final List<Map<String, Object>> binds = _sqlexpr.bindVariableDictionaries();
     
+    // FIXME: this does not properly pass down attributes, eg this breaks
+    //   !!!  with readformat, which changes the selected name
+    
     if (binds == null || binds.size() == 0)
       /* expression has no binds, perform a plain SQL query */
-      return this.performSQL(_sqlexpr.statement());
+      return this.performSQL(_sqlexpr.statement()); // FIXME: no attr passdown
     
     /* otherwise, create a PreparedStatement */
     
