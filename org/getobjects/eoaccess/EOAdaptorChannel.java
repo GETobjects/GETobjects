@@ -131,7 +131,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * @return the fetch results as a List of Maps
    */
   public List<Map<String, Object>> evaluateQueryExpression
-    (final EOSQLExpression _sqlexpr)
+    (final EOSQLExpression _sqlexpr, final EOAttribute[] _optAttrs)
   {
     this.lastException = null;
     
@@ -144,12 +144,9 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     final List<Map<String, Object>> binds = _sqlexpr.bindVariableDictionaries();
     
-    // FIXME: this does not properly pass down attributes, eg this breaks
-    //   !!!  with readformat, which changes the selected name
-    
     if (binds == null || binds.size() == 0)
       /* expression has no binds, perform a plain SQL query */
-      return this.performSQL(_sqlexpr.statement()); // FIXME: no attr passdown
+      return this.performSQL(_sqlexpr.statement(), _optAttrs);
     
     /* otherwise, create a PreparedStatement */
     
@@ -195,9 +192,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       while (rs.next()) {
         final EORecordMap record = new EORecordMap(colNames, colHashes);
         
-        // TODO: somehow add model information
         boolean ok = this.fillRecordMapFromResultSet
-          (record, rs, colNames, colTypes, null /* attrs */);
+          (record, rs, colNames, colTypes, _optAttrs);
         if (ok) records.add(record);
       }
     }
@@ -499,7 +495,9 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * 
    * @return null on error (check lastException), or the fetch results
    */
-  public List<Map<String, Object>> performSQL(final String _sql) {
+  public List<Map<String, Object>> performSQL
+    (final String _sql, final EOAttribute[] _optAttrs)
+  {
     if (_sql == null || _sql.length() == 0) {
       log.error("performSQL caller gave us no SQL ...");
       this.lastException = new Exception("got no SQL to perform!");
@@ -547,7 +545,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
         EORecordMap record = new EORecordMap(colNames, colHashes);
         
         boolean ok = this.fillRecordMapFromResultSet
-          (record, rs, colNames, colTypes, null /*attrs*/);
+          (record, rs, colNames, colTypes, _optAttrs);
         if (ok) records.add(record);
       }
     }
@@ -590,7 +588,9 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
 
     return records;
   }
-  
+  public List<Map<String, Object>> performSQL(final String _sql) {
+    return this.performSQL(_sql, null /* no attrs available */);
+  }
   
   /**
    * Performs the given SQL and returns the number of objects which got updated
@@ -1143,7 +1143,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * @return a list of records which contain keys mapped using the model
    */
   public List<Map<String, Object>> selectAttributes
-    (EOAttribute[] _attrs, EOFetchSpecification _fs, boolean _lock, EOEntity _e)
+    (EOAttribute[] _attrs, final EOFetchSpecification _fs,
+     final boolean _lock, final EOEntity _e)
   {
     /* This is called by the EODatabaseChannel
      *   selectObjectsWithFetchSpecification(fs)
@@ -1170,7 +1171,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     /* perform fetch */
     
-    final List<Map<String, Object>> rows = this.evaluateQueryExpression(expr);
+    final List<Map<String, Object>> rows =
+        this.evaluateQueryExpression(expr, _attrs);
     
     if (_fs != null && _fs.fetchesRawRows()) // TBD: no mapping for raw rows?!
       return rows;
@@ -1772,7 +1774,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
       this.adaptor.expressionFactory().createExpression(null);
     e.prepareSelectExpressionWithAttributes(null, _fs.locksObjects(), _fs);
     
-    return this.evaluateQueryExpression(e);
+    return this.evaluateQueryExpression(e, null /* no attrs */);
   }
   /**
    * Creates a pattern EOFetchSpecification (EOCustomQueryExpressionHintKey)

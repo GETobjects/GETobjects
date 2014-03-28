@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -808,7 +808,9 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     final EOAdaptorChannel channel = this.openChannelFromPool();
     if (channel == null) return null;
 
-    final List<Map<String, Object>> result = channel.evaluateQueryExpression(e);
+    final List<Map<String, Object>> result =
+      channel.evaluateQueryExpression(e, null /* no attrs */);
+    
     if (result == null) { /* failed with some error */
       final Exception error = channel.consumeLastException();
       if (error != null)
