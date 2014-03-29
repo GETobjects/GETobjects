@@ -1152,11 +1152,12 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    */
   public List<Map<String, Object>> selectAttributes
     (EOAttribute[] _attrs, final EOFetchSpecification _fs,
-     final boolean _lock, final EOEntity _e)
+     final boolean _lock,  final EOEntity _e)
   {
     /* This is called by the EODatabaseChannel
      *   selectObjectsWithFetchSpecification(fs)
      */
+    final boolean isRawFetch = (_fs != null && _fs.fetchesRawRows());
     if (this.adaptor == null) {
       this.lastException = new Exception("missing adaptor!");
       return null;
@@ -1166,6 +1167,8 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     if (_attrs == null && _e != null) {
       /* If no attributes where given explicitly (the usual case) */
+      // Note: see isRawFetch below. I think we might still need the data
+      //       for SQL generation, hence we still grab them if missing.
       _attrs = (_fs != null && _fs.fetchAttributeNames() != null)
         ? _e.attributesWithNames(_fs.fetchAttributeNames())
         : _e.attributes();
@@ -1176,13 +1179,21 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     final EOSQLExpression expr = this.adaptor.expressionFactory()
       .selectExpressionForAttributes(_attrs, _lock, _fs, _e);
     
+    if (isRawFetch) {
+      // Raw means: Do not use model, right? By resetting the _attrs the
+      //            fetch is going to use what SQL returns. (instead of
+      //            rewriting to the columnName's of the attributes).
+      // But for now I'm keeping the info for SQL generation. Maybe this
+      // has something like %attrs?
+      _attrs = null;
+    }
     
     /* perform fetch */
     
     final List<Map<String, Object>> rows =
         this.evaluateQueryExpression(expr, _attrs);
     
-    if (_fs != null && _fs.fetchesRawRows()) // TBD: no mapping for raw rows?!
+    if (isRawFetch) // TBD: no mapping for raw rows?!
       return rows;
     if (rows == null || rows.size() == 0)
       return rows;
