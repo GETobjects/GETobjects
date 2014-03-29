@@ -1157,7 +1157,6 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     /* This is called by the EODatabaseChannel
      *   selectObjectsWithFetchSpecification(fs)
      */
-    final boolean isRawFetch = (_fs != null && _fs.fetchesRawRows());
     if (this.adaptor == null) {
       this.lastException = new Exception("missing adaptor!");
       return null;
@@ -1167,8 +1166,6 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     
     if (_attrs == null && _e != null) {
       /* If no attributes where given explicitly (the usual case) */
-      // Note: see isRawFetch below. I think we might still need the data
-      //       for SQL generation, hence we still grab them if missing.
       _attrs = (_fs != null && _fs.fetchAttributeNames() != null)
         ? _e.attributesWithNames(_fs.fetchAttributeNames())
         : _e.attributes();
@@ -1179,32 +1176,32 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
     final EOSQLExpression expr = this.adaptor.expressionFactory()
       .selectExpressionForAttributes(_attrs, _lock, _fs, _e);
     
-    if (isRawFetch) {
-      // Raw means: Do not use model, right? By resetting the _attrs the
-      //            fetch is going to use what SQL returns. (instead of
-      //            rewriting to the columnName's of the attributes).
-      // But for now I'm keeping the info for SQL generation. Maybe this
-      // has something like %attrs?
-      _attrs = null;
-    }
+    /* rawrows only relates to what is returned to the caller, NOT how the
+     * SQL expression is built. The SQL expression can still use mapped attrs
+     * and what else EOSQLExpression provides.
+     * Sample model:
+     *   <fetch name="xx" flags="readonly,rawrows,allbinds">
+     *     <attributes>objectId</attributes>
+     *     <qualifier>objectId IN $ids</qualifier>
+     *     <sql>
+     *       %(select)s %(columns)s FROM %(tables)s %(where)s GROUP BY obj_id;
+     *     </sql>
+     */
+    final boolean isRawFetch = (_fs != null && _fs.fetchesRawRows());
     
     /* perform fetch */
     
     final List<Map<String, Object>> rows =
-        this.evaluateQueryExpression(expr, _attrs);
+        this.evaluateQueryExpression(expr, isRawFetch ? null : _attrs);
     
-    if (isRawFetch) // TBD: no mapping for raw rows?!
+    if (isRawFetch) // no SQL name to EOEntity name mapping for rawrows
       return rows;
+    
     if (rows == null || rows.size() == 0)
       return rows;
     
-    //System.err.println("ROWS: " + rows);
-    
     
     /* map row names */
-    // TODO: this should be already done when converting the JDBC resultset */
-    
-    //System.err.println("ATTRS: " + Arrays.asList(_attrs));
     
     final EOAttribute[] attributesToMap =
       this.attributesWhichRequireRowNameMapping(_attrs);
