@@ -31,17 +31,22 @@ public class EOGeneratorComponent extends WOComponent {
     sqlJavaTypeMap.put("bytea",     "byte[]");
     sqlJavaTypeMap.put("blob",      "byte[]");
     sqlJavaTypeMap.put("boolean",   "Boolean");
+    sqlJavaTypeMap.put("bit",       "Boolean");
     sqlJavaTypeMap.put("int",       "Integer");
     sqlJavaTypeMap.put("integer",   "Integer");
+    sqlJavaTypeMap.put("smallint",  "Short");
+    sqlJavaTypeMap.put("tinyint",   "Short");
+    sqlJavaTypeMap.put("bigint",    "Long");
     sqlJavaTypeMap.put("timestamp", "Date");
     sqlJavaTypeMap.put("date",      "Date");
 
+    scalarTypeMap.put("Short",      "short");
     scalarTypeMap.put("Integer",    "int");
+    scalarTypeMap.put("Long",       "long");
     scalarTypeMap.put("Boolean",    "boolean");
   }
 
   public    boolean        usesDates = false;
-
   public    String         packageName;
   public    String         className;
   public    String         templateClassName;
