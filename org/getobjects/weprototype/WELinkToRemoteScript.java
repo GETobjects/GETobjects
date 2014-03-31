@@ -511,13 +511,13 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
       else {
         // TODO: add support for queryParameters etc
         if ((s = strForAssoc(this.name, _ctx.cursor())) != null) {
-          /* eg "'q=' + escape($F('q'))" */
+          /* eg "{'q': $F('q')}" */
           s =  UString.replaceInSequence(s, WOJavaScriptWriter.JSEscapeList);
-          _js.append("'");
+          _js.append("{'");
           _js.append(s);
-          _js.append("=' + escape($F('");
+          _js.append("': $F('");
           _js.append(s);
-          _js.append("'))");
+          _js.append("')}");
         }
         else
           _js.append("value");
