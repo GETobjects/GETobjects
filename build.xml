@@ -47,8 +47,8 @@
   <!-- global compile options -->
   <property name="compile.debug"     value="off" />
   <property name="compile.listfiles" value="false" />
-  <property name="compile.source"    value="1.4" />
-  <property name="compile.target"    value="1.2" />
+  <property name="compile.source"    value="1.6" />
+  <property name="compile.target"    value="1.6" />
 
   <!--
   <property name="build.compiler"
@@ -221,6 +221,8 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
            debug="${compile.debug}"
+           target="${compile.target}"
+           source="${compile.source}"
            listfiles="${compile.listfiles}"
     >
       <classpath  refid="build.classpath" />
@@ -237,6 +239,8 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
            debug="${compile.debug}"
+           target="${compile.target}"
+           source="${compile.source}"
            listfiles="${compile.listfiles}"
     >
       <classpath  refid="build.classpath" />
@@ -265,6 +269,8 @@
     <javac srcdir="${src}"
            destdir="${bin.jetty}"
            debug="${compile.debug}"
+           target="${compile.target}"
+           source="${compile.source}"
            listfiles="${compile.listfiles}"
     >
       <classpath refid="build.classpath" />
@@ -276,6 +282,8 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
            debug="${compile.debug}"
+           target="${compile.target}"
+           source="${compile.source}"
            listfiles="${compile.listfiles}"
     >
       <classpath refid="build.classpath" />
@@ -287,6 +295,8 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
            debug="${compile.debug}"
+           target="${compile.target}"
+           source="${compile.source}"
            listfiles="${compile.listfiles}"
     >
       <classpath refid="build.classpath" />
