@@ -18,11 +18,11 @@
       defaultAccess = "allow";
       
       slots = {
-				"-ControlPanel" = {
+        "-ControlPanel" = {
           protectedBy = "<public>";
-				  valueClass  =
-				    "org.getobjects.appserver.publisher.GoControlPanel";
-				};
+          valueClass  =
+            "org.getobjects.appserver.publisher.GoControlPanel";
+        };
       };
       
       methods = {
@@ -81,11 +81,11 @@
       defaultAccess = "allow";
       
       slots = {
-				"Products" = {
+        "Products" = {
           protectedBy = "<public>";
-				  valueClass  =
-				    "org.getobjects.appserver.products.GoControlPanelProducts";
-				};
+          valueClass  =
+            "org.getobjects.appserver.products.GoControlPanelProducts";
+         };
       };
       
       methods = {
