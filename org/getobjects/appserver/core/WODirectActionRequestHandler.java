@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -381,7 +381,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
   }
   
   /**
-   * This method is invoked by primaryCalAction() if the direct action class is
+   * This method is invoked by primaryCallAction() if the direct action class is
    * a WOComponent subclass. Or, by some external code (eg OFSComponentWrapper)
    * if the code already instantiated a WOComponent to run a DA on.
    * <p>
@@ -400,7 +400,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
     (String _pageName, String _action, WOContext _ctx)
   {
     // TBD: should we pass in a resource manager?
-    WOComponent page = _ctx.application().pageWithName(_pageName, _ctx);
+    final WOComponent page = _ctx.application().pageWithName(_pageName, _ctx);
     if (page == null) {
       daLog.error("could not instantiate page: "+ _pageName);
       return null;
@@ -409,7 +409,7 @@ public class WODirectActionRequestHandler extends WORequestHandler {
     _ctx.setPage(page);
     page.ensureAwakeInContext(_ctx);
     
-    WORequest wrq     = _ctx.request();
+    final WORequest wrq     = _ctx.request();
     Object    results = null;
     
     if (_action != null && _action.startsWith("@")) {
