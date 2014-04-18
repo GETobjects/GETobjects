@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -80,7 +80,7 @@ public class WEBatchLink extends WEDisplayGroupLink {
       img = _prefix + _task + (on ? ".gif" : "-off.gif");
     else {
       /* a pattern */
-      Map<String, Object> info = new HashMap<String, Object>(8);
+      final Map<String, Object> info = new HashMap<String, Object>(8);
       if (_task != null) info.put("task",    _task);
       if (_ctx  != null) info.put("context", _ctx);
       info.put("onoff",  on ? "on" : "off");
@@ -103,7 +103,7 @@ public class WEBatchLink extends WEDisplayGroupLink {
         return;
       }
       
-      String imgURL = rm.urlForResourceNamed
+      final String imgURL = rm.urlForResourceNamed
         (img, null /* framework */, _ctx.languages(), _ctx);
       if (imgURL == null) {
         this.log().warn("did not find URL for image: " + img);
@@ -121,9 +121,9 @@ public class WEBatchLink extends WEDisplayGroupLink {
   }
   
   protected Map<String, Object> queryDictInContext
-    (WODisplayGroup dg, Object _page, WOContext _ctx)
+    (final WODisplayGroup dg, final Object _page, final WOContext _ctx)
   {
-    Map<String, Object> qd = super.queryDictInContext(dg, _ctx);
+    final Map<String, Object> qd = super.queryDictInContext(dg, _ctx);
 
     /* patch */
     // TODO: improve, this should be done by the WODisplayGroup?
@@ -184,8 +184,8 @@ public class WEBatchLink extends WEDisplayGroupLink {
   }
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    Object         cursor  = _ctx != null ? _ctx.cursor() : null;
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    final Object   cursor  = _ctx != null ? _ctx.cursor() : null;
     WODisplayGroup dg      = null;
     Object         pageId  = null;
     
@@ -198,7 +198,7 @@ public class WEBatchLink extends WEDisplayGroupLink {
       this.log().warn("got no page-id (idx or key) for batch link");
       return;
     }
-    boolean isOn = this.isTaskEnabled(dg, pageId);
+    final boolean isOn = this.isTaskEnabled(dg, pageId);
     
     /* open anker */
 
@@ -206,11 +206,11 @@ public class WEBatchLink extends WEDisplayGroupLink {
       _r.appendBeginTag("a");
   
       // TODO: add more options
-      String daName = _ctx.page().name() + "/" + "default";
+      final String daName = _ctx.page().name() + "/" + "default";
         
-      Map<String, Object> qd = this.queryDictInContext(dg, pageId, _ctx);
+      final Map<String, Object> qd = this.queryDictInContext(dg, pageId, _ctx);
         
-      String url = _ctx.directActionURLForActionNamed(daName, qd);
+      final String url = _ctx.directActionURLForActionNamed(daName, qd);
       if (url != null) _r.appendAttribute("href", url);
       
       // TODO: support client-side display group
@@ -224,7 +224,7 @@ public class WEBatchLink extends WEDisplayGroupLink {
     /* render icon if requested (either bool or icon-resource prefix) */
     
     if (this.icons != null && pageId instanceof String) {
-      Object iconPrefix = this.icons.valueInComponent(cursor);
+      final Object iconPrefix = this.icons.valueInComponent(cursor);
       
       if (iconPrefix instanceof Boolean) {
         if (((Boolean)iconPrefix).booleanValue())

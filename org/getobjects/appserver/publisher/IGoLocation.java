@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -33,7 +33,7 @@ import org.getobjects.foundation.NSKeyValueCodingAdditions;
  * their container and the name under which they are stored in that container.
  * <p>
  * Note: usually you want to work with the traversal path from the context, not
- *       with the containment hierarchy. Though its often a 1:1 mapping.
+ *       with the containment hierarchy. Though it is often a 1:1 mapping.
  */
 public interface IGoLocation {
   
@@ -61,7 +61,7 @@ public interface IGoLocation {
      * @param _object The object to be checked.
      * @return true if the object is contained, false if not ...
      */
-    public static boolean isContained(Object _object) {
+    public static boolean isContained(final Object _object) {
       /* Note: more or less the opposite of isRoot */
       return containerForObject(_object) != null;
     }
@@ -74,7 +74,7 @@ public interface IGoLocation {
      * @param _object The object which we want to know the container of.
      * @return The container of the object or null if it isn't contained.
      */
-    public static Object containerForObject(Object _object) {
+    public static Object containerForObject(final Object _object) {
       if (_object == null)
         return null; /* well, not really useful ;-) */
       
@@ -97,7 +97,7 @@ public interface IGoLocation {
      * @return The name of the object in the given container.
      */
     public static String nameOfObjectInContainer
-      (Object _object, Object _container)
+      (final Object _object, final Object _container)
     {
       if (_object == null || _container == null)
         return null;
@@ -128,11 +128,11 @@ public interface IGoLocation {
      * @param _object - the object to determine the containment path for
      * @return an array of object name strings
      */
-    public static String[] pathToRoot(Object _object) {
+    public static String[] pathToRoot(final Object _object) {
       if (_object == null)
         return null;
       
-      List<String> list = new ArrayList<String>(16);
+      final List<String> list = new ArrayList<String>(16);
       Object current = _object;
       while (current != null) {
         Object container = containerForObject(current);
@@ -147,8 +147,8 @@ public interface IGoLocation {
         current = container;
       }
       
-      int      len  = list.size();
-      String[] path = new String[len];
+      final int      len  = list.size();
+      final String[] path = new String[len];
       for (int i = 0; i < len; i++)
         path[len - i - 1] = list.get(i);
       
@@ -167,7 +167,7 @@ public interface IGoLocation {
      * @return The _object if it implements IGoLocation, otherwise a wrapper.
      */
     public static IGoLocation locate
-      (Object _container, String _name, Object _object)
+      (final Object _container, final String _name, final Object _object)
     {
       if (_object == null)
         return null;
@@ -287,7 +287,7 @@ public interface IGoLocation {
     
     protected NSKeyValueCoding wrappedObject;
     
-    public NSObjectWrapper(NSKeyValueCoding _object) {
+    public NSObjectWrapper(final NSKeyValueCoding _object) {
       this.wrappedObject   = _object;
     }
     
@@ -306,7 +306,7 @@ public interface IGoLocation {
     
     /* GoClass */
     
-    public GoClass joClassInContext(IGoContext _ctx) {
+    public GoClass joClassInContext(final IGoContext _ctx) {
       return _ctx.goClassRegistry().goClassForJavaObject
         (this.wrappedObject, _ctx);
     }
@@ -314,7 +314,7 @@ public interface IGoLocation {
     public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
       /* lookup using GoClass */
       
-      GoClass cls = this.joClassInContext(_ctx);
+      final GoClass cls = this.joClassInContext(_ctx);
       if (cls != null) {
         Object o = cls.lookupName(this, _name, _ctx);
         if (o != null) return o;
@@ -367,9 +367,9 @@ public interface IGoLocation {
     public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
       /* lookup using GoClass */
       
-      GoClass cls = this.joClassInContext(_ctx);
+      final GoClass cls = this.joClassInContext(_ctx);
       if (cls != null) {
-        Object o = cls.lookupName(this, _name, _ctx);
+        final Object o = cls.lookupName(this, _name, _ctx);
         if (o != null) return o;
       }
       

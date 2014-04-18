@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of Go.
 
@@ -101,7 +101,7 @@ public class WOCheckRoleAssociation extends WOAssociation {
     
     /* find context and user object */
     
-    IGoContext ctx = this.locateContextInCursor(_cursor);
+    final IGoContext ctx = this.locateContextInCursor(_cursor);
     if (ctx == null) {
       if (log.isInfoEnabled()) {
         log.info("could not find a IJoContext for cursor, rejecting access: " +
@@ -110,7 +110,7 @@ public class WOCheckRoleAssociation extends WOAssociation {
       return false;
     }
     
-    IGoUser user = ctx != null ? ctx.activeUser() : null;
+    final IGoUser user = ctx != null ? ctx.activeUser() : null;
     if (user == null) {
       log.info("could not find a user for cursor, rejecting access: " +_cursor);
       return false;
@@ -122,7 +122,7 @@ public class WOCheckRoleAssociation extends WOAssociation {
     if (hasRoles == null || hasRoles.length == 0)
       return false;
     
-    for (String requiredRole: this.roles) {
+    for (final String requiredRole: this.roles) {
       if (requiredRole == null)
         continue;
 

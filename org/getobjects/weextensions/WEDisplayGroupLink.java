@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -81,7 +81,7 @@ public abstract class WEDisplayGroupLink extends WEDynamicElement {
     /* append query dictionary */
     
     if (this.queryDictionary != null) {
-      Map dqd = (Map)this.queryDictionary.valueInComponent(cursor);
+      final Map dqd = (Map)this.queryDictionary.valueInComponent(cursor);
       if (dqd != null) {
         for (Object k: dqd.keySet())
           qd.put(k.toString(), dqd.get(k));

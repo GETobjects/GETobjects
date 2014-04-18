@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -293,7 +293,7 @@ public interface IGoSecuredObject {
      * @return true if the given user owns the given object, no otherwise
      */
     public static boolean isUserOwnerOfObjectInContext
-      (IGoUser _user, Object _obj, IGoContext _ctx)
+      (final IGoUser _user, final Object _obj, final IGoContext _ctx)
     {
       return false; // TBD
     }
@@ -325,10 +325,10 @@ public interface IGoSecuredObject {
      * @return null if the user has access to the permission, else the Exception
      */
     public static Exception validatePermissionOnObject
-      (String _permission, Object _self, IGoContext _ctx)
+      (final String _permission, final Object _self, final IGoContext _ctx)
     {
       // TBD: NO LOCAL ROLES PROCESSING YET
-      boolean isInfoOn = log.isInfoEnabled();
+      final boolean isInfoOn = log.isInfoEnabled();
       
       if (_permission == null) {
         if (isInfoOn) log.info("got no permission to validate on " + _self);
@@ -398,7 +398,7 @@ public interface IGoSecuredObject {
       
       /* process roles against user */
       
-      IGoUser user = _ctx != null ? _ctx.activeUser() : null;
+      final IGoUser user = _ctx != null ? _ctx.activeUser() : null;
       if (user == null) {
         /* In SOPE we attach the authenticator, but I suppose we want to do this
          * at rendering time in Go.
@@ -408,7 +408,7 @@ public interface IGoSecuredObject {
         return new GoAuthRequiredException(null, "could not determine user");
       }
       
-      String[] userRoles = user.rolesForObjectInContext(_self, _ctx);
+      final String[] userRoles = user.rolesForObjectInContext(_self, _ctx);
       if (userRoles == null || userRoles.length == 0) {
         if (log.isWarnEnabled())
           log.warn("user has no associated roles: " + user);
@@ -418,8 +418,8 @@ public interface IGoSecuredObject {
       /* check whether we have one of the required roles */
       
       String matchingRole = null;
-      for (String role: rolesHavingPermission) {
-        for (String userRole: userRoles) {
+      for (final String role: rolesHavingPermission) {
+        for (final String userRole: userRoles) {
           if (role.equals(userRole)) {
             matchingRole = role; /* user has a proper role */
             break;
@@ -450,7 +450,7 @@ public interface IGoSecuredObject {
       /* check whether we found a role and raise if not */
       
       if (matchingRole == null) {
-        String login = user.getName();
+        final String login = user.getName();
         
         if (login == null || "anonymous".equals(login)) {
           /* still anonymous, requesting login */
@@ -541,8 +541,8 @@ public interface IGoSecuredObject {
       
       /* check explicit permission */
       
-      String permission = sinfo.permissionRequiredForObject();
-      Exception error =
+      final String permission = sinfo.permissionRequiredForObject();
+      final Exception error =
         Utility.validatePermissionOnObject(permission, _self, _ctx);
       if (error != null) return error;
       
@@ -599,13 +599,13 @@ public interface IGoSecuredObject {
        * given key.
        */
       
-      GoClassRegistry reg = _ctx != null ? _ctx.goClassRegistry() : null;
+      final GoClassRegistry reg = _ctx != null ? _ctx.goClassRegistry() : null;
       if (reg == null) {
         log.warn("did not find joClassRegistry in ctx: " + _ctx);
         return null;
       }
       
-      GoClass cls = reg.goClassForJavaObject(_self, _ctx);
+      final GoClass cls = reg.goClassForJavaObject(_self, _ctx);
       GoSecurityInfo sinfo = null;
       GoSecurityInfo sDefaultInfo = null;
       
@@ -702,7 +702,7 @@ public interface IGoSecuredObject {
       //      I guess this assumes that the 'security policy' is always on
       //      exactly one object, while *we* may have the container defined
       //      specific policies for names (<FilesMatch *.gif>require-user abc).
-      String permission = sinfo.permissionRequiredForKey(_name);
+      final String permission = sinfo.permissionRequiredForKey(_name);
       error = Utility.validatePermissionOnObject(permission, _self, _ctx);
       if (error != null) {
         if (isInfoOn) {
@@ -730,11 +730,12 @@ public interface IGoSecuredObject {
      * @return a security exception if the access was denied
      */
     public static Exception validateValueForNameOfObject
-      (Object _self, String _name, Object _value, IGoContext _ctx)
+      (final Object _self, final String _name, final Object _value,
+       final IGoContext _ctx)
     {
       /* this additionally checks object restrictions of the value */
       if (_value != null) {
-        Exception error = Utility.validateObject(_value, _ctx);
+        final Exception error = Utility.validateObject(_value, _ctx);
         if (error != null) return error;
       }
 

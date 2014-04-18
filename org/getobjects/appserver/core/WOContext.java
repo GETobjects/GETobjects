@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -57,32 +57,32 @@ public class WOContext extends WOCoreContext
   // TBD: document, eg how they are autocreated and the effect on links which
   // got generated before ...
   // TBD: move element-id handling to an own class like in SOPE (necessary?)
-  protected WOSession     session;
-  protected List<String>  languages;
-  protected Locale        locale;
-  protected TimeZone      timezone;
-  protected boolean       hasNewSession;
-  protected boolean       savePageRequired;
-  protected boolean       isRenderingDisabled;
+  protected WOSession       session;
+  protected List<String>    languages;
+  protected Locale          locale;
+  protected TimeZone        timezone;
+  protected boolean         hasNewSession;
+  protected boolean         savePageRequired;
+  protected boolean         isRenderingDisabled;
 
   /* preserving query parameters */
-  protected WOQuerySession querySession;
+  protected WOQuerySession  querySession;
 
   /* component tracking */
 
-  protected WOComponent   page;
-  protected WOComponent[] componentStack;
-  protected WOElement[]   contentStack;
-  protected int           stackPos;
+  protected WOComponent     page;
+  protected WOComponent[]   componentStack;
+  protected WOElement[]     contentStack;
+  protected int             stackPos;
 
   /* HTML form management and element IDs */
 
-  protected boolean       isInForm;
-  protected WOElement     activeFormElement;
-  protected StringBuilder elementID;
-  protected String        reqElementID;
-  protected String        fragmentID;
-  protected WOErrorReport errorReport;
+  protected boolean         isInForm;
+  protected WOElement       activeFormElement;
+  protected StringBuilder   elementID;
+  protected String          reqElementID;
+  protected String          fragmentID;
+  protected WOErrorReport   errorReport;
 
   /* GoObject support */
   protected GoTraversalPath goTraversalPath;
@@ -107,9 +107,9 @@ public class WOContext extends WOCoreContext
     this.isInForm            = false;
     this.elementID           = new StringBuilder(128);
 
-    this.componentStack = new WOComponent[20];
-    this.contentStack   = new WOElement[20];
-    this.stackPos       = -1;
+    this.componentStack      = new WOComponent[20];
+    this.contentStack        = new WOElement[20];
+    this.stackPos            = -1;
 
     if (_rq != null) {
       if ((this.fragmentID = _rq.fragmentID()) != null) {
@@ -820,7 +820,7 @@ public class WOContext extends WOCoreContext
    * @return a URL pointing to the direct action
    */
   public String directActionURLForActionNamed
-    (String _name, Map<String, Object> _queryDict,
+    (final String _name, final Map<String, Object> _queryDict,
      boolean _addSnId, boolean _incQuerySession)
   {
     if (!_addSnId && !_incQuerySession)
@@ -850,7 +850,7 @@ public class WOContext extends WOCoreContext
     if (qs == null && snId == null)
       return this.directActionURLForActionNamed(_name, _queryDict);
 
-    Map<String, Object> qd = _queryDict != null
+    final Map<String, Object> qd = _queryDict != null
       ? new HashMap<String, Object>(_queryDict)
       : new HashMap<String, Object>(8);
 

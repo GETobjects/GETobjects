@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -28,7 +28,7 @@ import org.getobjects.appserver.core.WOContext;
 /**
  * IGoObjectRendererFactory
  * <p>
- * Instances returned be the factory should be IGoObjectRenderer objects.
+ * Instances returned by the factory should be IGoObjectRenderer objects.
  * <p>
  * Unlike IGoObjectRenderer objects IGoObjectRendererFactory objects are
  * usually part of the object traversal path. Eg they could be folder objects
