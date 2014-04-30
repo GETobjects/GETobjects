@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go JMI.
 
@@ -73,7 +73,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     "\n" +
     "  _o.invokeOnLocation = function(_methodName, _params) {\n" +
     "    var url = this.baseURL + '/' + _methodName;\n" +
-    "    if (_params != undefined) url += '?' + _params.toQueryString();\n" +
+    "    if (_params != undefined) url += '?' + $H(_params).toQueryString();\n" +
     "    window.location.href = url;\n" +
     "  };\n" +
     "}\n"
