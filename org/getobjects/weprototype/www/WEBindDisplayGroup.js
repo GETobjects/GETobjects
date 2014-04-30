@@ -89,10 +89,10 @@ function WEBindDisplayGroup() {
     /* batch index and count */
     
     if (this.currentBatchIndex > 0)
-      qp[this.qpPrefix + this.qpIndex] = this.currentBatchIndex;
+      qp.set(this.qpPrefix + this.qpIndex, this.currentBatchIndex);
     
     if (this.numberOfObjectsPerBatch > 0)
-      qp[this.qpPrefix + this.qpBatchSize] = this.numberOfObjectsPerBatch;
+      qp.set(this.qpPrefix + this.qpBatchSize, this.numberOfObjectsPerBatch);
     
     /* orderings */
     
@@ -102,26 +102,26 @@ function WEBindDisplayGroup() {
         if (i != 0) sos = sos + ",";
         sos += this.sortOrderings[i].queryValue();
       }
-      qp[this.qpPrefix + this.qpOrderKey] = sos;
+      qp.set(this.qpPrefix + this.qpOrderKey, sos);
     }
     
     /* queryMatch, queryOperator, queryMin, queryMax */
     
     if (this.queryMatch) {
       for (var key in this.queryMatch)
-        qp[this.qpPrefix + this.qpMatchPrefix + key] = this.queryMatch[key];
+        qp.set(this.qpPrefix + this.qpMatchPrefix + key, this.queryMatch[key]);
     }
     if (this.queryOperator) {
       for (var key in this.queryOperator)
-        qp[this.qpPrefix + this.qpOpPrefix + key] = this.queryOperator[key];
+        qp.set(this.qpPrefix + this.qpOpPrefix + key, this.queryOperator[key]);
     }
     if (this.queryMin) {
       for (var key in this.queryMin)
-        qp[this.qpPrefix + this.qpMinPrefix + key] = this.queryMin[key];
+        qp.set(this.qpPrefix + this.qpMinPrefix + key, this.queryMin[key]);
     }
     if (this.queryMax) {
       for (var key in this.queryMax)
-        qp[this.qpPrefix + this.qpMaxPrefix + key] = this.queryMax[key];
+        qp.set(this.qpPrefix + this.qpMaxPrefix + key, this.queryMax[key]);
     }
     
     // TODO
@@ -129,7 +129,7 @@ function WEBindDisplayGroup() {
     /* fragment */
     
     if (_fragment) {
-      qp['wofid'] = _fragment;
+      qp.set('wofid', _fragment);
     }
     
     return qp;
@@ -172,7 +172,7 @@ function WEBindDisplayGroup() {
     }
     
     this.updateCounter++;
-    //qp['__up__'] = this.updateCounter;
+    //qp.set('__up__', this.updateCounter);
     
     var qs = qp.toQueryString();
     // alert("Q: " + qs);
