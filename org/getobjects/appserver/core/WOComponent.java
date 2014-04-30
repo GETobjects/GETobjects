@@ -233,8 +233,12 @@ public class WOComponent extends WOElement
 
     // TODO: Is the following necessary? I don't think so. But might be more
     //       secure.
+    // Note: also done in _sleepWithContext after calling sleep()
     this.isAwake = false;
-    this.context = null;
+    if (this.context != null) {
+      if (!this.context.isSavePageRequired())
+        this.context = null;
+    }
     this.session = null;
   }
 
@@ -324,7 +328,10 @@ public class WOComponent extends WOElement
       this.sleep();
     }
 
-    this._setContext(null);
+    if (this.context != null) {
+      if (!this.context.isSavePageRequired())
+        this._setContext(null);
+    }
     this.session = null;
   }
 
