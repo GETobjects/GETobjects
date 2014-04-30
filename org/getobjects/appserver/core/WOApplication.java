@@ -167,9 +167,9 @@ public class WOApplication extends NSObject
 
     String ctxClassName = this.contextClassName();
     if (ctxClassName == null)
-      ctxClassName = pkgname + "Context";
+      ctxClassName = "Context";
 
-    this.contextClass = NSJavaRuntime.NSClassFromString(ctxClassName);
+    this.contextClass = NSJavaRuntime.NSClassFromString(pkgname + ctxClassName);
     this.sessionClass = NSJavaRuntime.NSClassFromString(pkgname + "Session");
     this.querySessionClass =
       NSJavaRuntime.NSClassFromString(pkgname + "QuerySession");
