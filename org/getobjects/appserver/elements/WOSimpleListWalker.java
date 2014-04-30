@@ -136,6 +136,8 @@ public class WOSimpleListWalker extends WOListWalker {
     }
     
     /* tear down */
+
+    _ctx.deleteLastElementIDComponent(); /* repetition index */
     
     // cursor support:
     // if (this.item == null)
