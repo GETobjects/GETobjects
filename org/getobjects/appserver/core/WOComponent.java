@@ -313,7 +313,10 @@ public class WOComponent extends WOElement
       compLog.debug("sleep in ctx" + _ctx);
 
     if (_ctx != this.context && _ctx != null && this.context != null) {
-      compLog.error("component is awake in different context!");
+      compLog.error("sleep: component is awake in different context"
+                  + " new=" + _ctx.contextID()
+                  + " component=" + this.context.contextID()
+                  + " name=" + this.name());
       return;
     }
 
