@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of Go.
 
@@ -32,13 +32,17 @@ import org.getobjects.ofs.config.JoConfigKeys;
 /**
  * OFSDatabaseObjectFolder
  * <p>
- * Wraps an EOEnterpriseObject.
+ * Will wraps an EOEnterpriseObject. Currently it doesn't fetch anything!
+ * It is just used as a fetch-config holder: Check OFSDatabaseDataSourceFolder
+ * for a sample.
+ * <p>
+ * @see OFSDatabaseDataSourceFolder
  */
 public class OFSDatabaseObjectFolder extends OFSFolder
   implements IOFSContextObject
 {
 
-  protected IGoContext goctx;
+  protected IGoContext  goctx;
 
   protected EOQualifier qualifier;
   protected Object      object; // TBD: who assigns this?

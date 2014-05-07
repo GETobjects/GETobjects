@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of GETobjects (Go).
 
@@ -35,7 +35,76 @@ import org.getobjects.ofs.config.JoConfigKeys;
 /**
  * OFSDatabaseDataSourceFolder
  * <p>
- * Wraps an EODataSource.
+ * Wraps an EODataSource (not yet, really).
+ * <p>
+ * Usually mapped to .jods suffix by the OFS factory.
+ * <p>
+ * NOTE: Can't actually execute queries, yet.
+ *       All those ivars are unused AFAIK:<br/>
+ *       <ul>
+ *         <li>EOEntity</li>
+ *         <li>EOObjectTrackingContext</li>
+ *         <li>EODataSource</li>
+ *       </ul>
+ *       This object can't acquire a DB connection or a model, yet.
+ * <p>      
+ * It can however be used to store configuration information and help
+ * a component to execute a query.
+ * <p>
+ * Sample:<pre>
+ *   /persons.jods
+ *     .htaccess
+ *     index.wo/
+ *     item.jodo/
+ *       view.wo/</pre>
+ * .htaccess:<pre>
+ *    AuthType      WOSession
+ *    AuthName      "YoYo"
+ *    AuthLoginURL  /yoyo/index
+ *    
+ *    EOEntity    Persons
+ *    EOQualifier "type IS NULL OR (type != 'NSA')"
+ *
+ *    AliasMatchName "^/\d+.*" item
+ *    &lt;LocationMatch "^.+/persons/\d+.*"&gt;
+ *      // Note: EOQualifier overwrites the folder one, but EOEntity is
+ *      //       inherited.
+ *      EOQualifier "id = $configObject.nameInContainer"
+ *    &lt;/LocationMatch&gt;</pre>
+ *    
+ * The OFSDatabaseDataSourceFolder extracts the entity name and the qualifier
+ * from the .htaccess config. They can be accessed in a component, e.g.
+ * index.wo/:<pre>
+ *   WOComponent defaultAction() {
+ *     OFSDatabaseDataSourceFolder co = this.context().clientObject();
+ *     this.results = this.context().objectContext().doFetch(
+ *       co.entityName(), // NOTE: from .htaccess
+ *       "limit",     this.F("limit", 42),
+ *       "prefetch",  "employments,phones,addresses",
+ *       "qualifier", co.qualifier(), // NOTE the magic (can also .and() etc)
+ *       "orderby",   "lastname,firstname",
+ *       "distinct",  true
+ *      );
+ *      return null; // and render this.results in the template.
+ *   }</pre>
+ * Note that the database connection itself is provided via the context,
+ * e.g. could be setup in the main Application object.
+ * <p>
+ * About that AliasMatchName/&lt;LocationMatch&gt;. This comes into action when
+ * the user navigates below the folder, like:<pre>
+ *   /yoyo/persons/42/view</pre>
+ * There is no '42' object in the OFS tree below. The AliasMatch tell OFS that
+ * the '42' needs to be replaced with 'item' when the OFS object is restored.
+ * <br />
+ * So OFS loads the item.jodo - an OFSDatabaseObjectFolder, which is similar
+ * to OFSDatabaseDataSourceFolder (intended to represent a single object).
+ * The *name* of the folder in the lookup path will still be '42'. This fact is
+ * used in the LocationMatch. The resulting qualifier is 'id = "42"'
+ * (careful with ints ;-).
+ * GoMethods of that (eg view.wo) can then again use co.qualifier().
+ * 
+ * <p>
+ * @see OFSDatabaseObjectFolder
  */
 public class OFSDatabaseDataSourceFolder extends OFSFolder
   implements IOFSContextObject
