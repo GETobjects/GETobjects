@@ -23,3 +23,22 @@ A parsed directive. Has a name (eg SetHandler) and an array of String[]
 arguments.
 The actual processing of the directive is done by an 'IHtConfigEvaluation'
 objects. Those processing objects are stored in the 'eval' subpackage.
+
+
+
+Sample
+======
+
+Configure authentication and provide context info to an
+OFSDatabaseDataSourceFolder (e.g. contacts.jods/):
+
+    AuthType      WOSession
+    AuthName      "YoYo"
+    AuthLoginURL  /yoyo/index
+    
+    EOEntity    Persons
+    EOQualifier "type IS NULL OR (type != 'NSA')"
+
+    <LocationMatch "^.+/persons/\d+.*">
+      EOQualifier "id = $configObject.nameInContainer"
+    </LocationMatch>
