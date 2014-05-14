@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -32,7 +32,7 @@ import org.getobjects.foundation.NSKeyValueCoding;
  * Evaluates a path against the clientObject of the WOComponent's WOContext.
  * <p>
  * Example:<pre>
- *   &lt;wo:for jo:list="-manage_options"&gt;</pre>
+ *   &lt;wo:for go:list="-manage_options"&gt;</pre>
  */
 public class GoPathAssociation extends WOAssociation {
 
