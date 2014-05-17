@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -25,7 +25,13 @@ import org.getobjects.foundation.NSObject;
 /**
  * GoRole
  * <p>
- * Just a set of standard role names.
+ * Just a set of standard role names:
+ * <ul>
+ *   <li>Manager
+ *   <li>Anonymous
+ *   <li>Authenticated
+ *   <li>Owner
+ * </u>
  */
 public class GoRole extends NSObject {
 

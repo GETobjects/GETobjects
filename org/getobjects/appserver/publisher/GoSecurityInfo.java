@@ -112,6 +112,11 @@ public class GoSecurityInfo extends NSObject {
   /* key security */
   
   public void setDefaultAccess(final String _access) {
+    // FIXME: add constraint?
+    if (_access != null) {
+      if (!_access.equals("allow") && !_access.equals("deny"))
+        log.error("Invalid default-access argument: " + _access);
+    }
     this.defaultAccess = _access;
   }
   public String defaultAccess() {
