@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2009 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -75,7 +75,7 @@ public class OFSApplication extends WOApplication
     this.defaultRestorationFactory = new OFSRestorationFactory();
 
     /* load OFS product */
-    this.joProductManager.loadProduct
+    this.goProductManager.loadProduct
       (null, OFSApplication.class.getPackage().getName());
   }
   

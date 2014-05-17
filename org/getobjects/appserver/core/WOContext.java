@@ -984,13 +984,13 @@ public class WOContext extends WOCoreContext
    * @return an IGoAuthenticator or null if none could be located.
    */
   protected IGoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
-    final GoTraversalPath joPath = this.goTraversalPath();
-    if (joPath == null) {
+    final GoTraversalPath goPath = this.goTraversalPath();
+    if (goPath == null) {
       log.warn("no traversalpath is set: " + this);
       return null;
     }
 
-    final Object[] path = joPath.objectTraversalPath();
+    final Object[] path = goPath.objectTraversalPath();
     if (path == null || path.length == 0) {
       log.warn("traversalpath is empty: " + this);
       return null;

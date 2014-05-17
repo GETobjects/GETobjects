@@ -85,8 +85,8 @@ public class WOApplication extends NSObject
   protected Properties        properties;
   protected WOSessionStore    sessionStore;
   protected WOStatisticsStore statisticsStore;
-  protected GoClassRegistry   joClassRegistry;
-  protected GoProductManager  joProductManager;
+  protected GoClassRegistry   goClassRegistry;
+  protected GoProductManager  goProductManager;
   protected Class             contextClass;
   protected Class             sessionClass;
   protected Class             querySessionClass;
@@ -113,8 +113,8 @@ public class WOApplication extends NSObject
     this.pageCacheSize = 5;
     this.permanentPageCacheSize = 5;
 
-    this.joClassRegistry   = new GoClassRegistry(this);
-    this.joProductManager  = new GoProductManager(this);
+    this.goClassRegistry   = new GoClassRegistry(this);
+    this.goProductManager  = new GoProductManager(this);
 
     this.resourceManager = WOPackageLinker.linkApplication(this);
 
@@ -370,9 +370,9 @@ public class WOApplication extends NSObject
 
     /* check the products for a renderer */
 
-    if (this.joProductManager != null) {
+    if (this.goProductManager != null) {
       final Object renderer =
-        this.joProductManager.rendererForObjectInContext(_o, _ctx);
+        this.goProductManager.rendererForObjectInContext(_o, _ctx);
       if (renderer != null)
         return renderer;
     }
@@ -1389,10 +1389,10 @@ public class WOApplication extends NSObject
   }
 
   public GoClassRegistry joClassRegistry() {
-    return this.joClassRegistry;
+    return this.goClassRegistry;
   }
   public GoProductManager joProductManager() {
-    return this.joProductManager;
+    return this.goProductManager;
   }
 
 
