@@ -20,14 +20,22 @@
 */
 package org.getobjects.appserver.publisher;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
+import org.getobjects.appserver.publisher.annotations.DefaultAccess;
+import org.getobjects.appserver.publisher.annotations.DefaultRoles;
+import org.getobjects.appserver.publisher.annotations.Private;
+import org.getobjects.appserver.publisher.annotations.ProtectedBy;
+import org.getobjects.appserver.publisher.annotations.Public;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
@@ -165,10 +173,103 @@ public class GoClassRegistry extends NSObject {
     
     // TODO: check annotations for security and such
     
-    GoJavaClass clazz =
+    final GoJavaClass clazz =
       new GoJavaClass(_cls.getSimpleName(), _superClass, nameToMethod);
     
+    this.processClassAnnotations(clazz, _cls);;
     return clazz;
+  }
+  
+  protected void processClassAnnotations
+    (final GoJavaClass _goCls, final Class _cls)
+  {
+    String pb = null, access = null;
+    boolean isPrivate = false, isPublic = false;
+    String[] anonPerms = null, authPerms = null;
+    
+    // We could stop if all knows have been processed, but that situation
+    // doesn't actually happen.
+    for (final Annotation a: _cls.getAnnotations()) {
+      if (a instanceof ProtectedBy)
+        pb = ((ProtectedBy)a).value();
+      else if (a instanceof Private)
+        isPrivate = true;
+      else if (a instanceof Public)
+        isPublic = true;
+      else if (a instanceof DefaultAccess)
+        access = ((DefaultAccess)a).value();
+      else if (a instanceof DefaultRoles) {
+        anonPerms = ((DefaultRoles)a).anonymous();
+        authPerms = ((DefaultRoles)a).authenticated();
+      }
+    }
+    
+    /* object protections, only one can be set */
+  
+    if (pb != null || isPrivate || isPublic) {
+      if (isPrivate) {
+        if (pb != null || isPublic) {
+          log.error(
+              "declared Private on a class which already has a " +
+              "another protection (ProtectedBy or Public)");
+        }
+        _goCls.securityInfo().declareObjectPrivate();
+      }
+      else if (pb != null) {
+        if (isPublic) {
+          log.error("declared ProtectedBy on a class which already has a " +
+                    "another protection (Public)");
+        }
+        _goCls.securityInfo().declareObjectProtected(pb);;
+      }
+      else if (isPublic)
+        _goCls.securityInfo().declareObjectPublic();
+    }
+    
+    /* roles, multiple can be set */
+    
+    Map<String, ArrayList<String>> permToRoles = null;
+    if (anonPerms != null && anonPerms.length > 0) {
+      if (permToRoles == null)
+        permToRoles = new HashMap<String, ArrayList<String>>(4);
+      fillPermissionToRoleMap(permToRoles, GoRole.Anonymous, anonPerms);
+    }
+    if (authPerms != null && authPerms.length > 0) {
+      if (permToRoles == null)
+        permToRoles = new HashMap<String, ArrayList<String>>(4);
+      fillPermissionToRoleMap(permToRoles, GoRole.Authenticated, authPerms);
+    }
+    
+    if (permToRoles != null) {
+      final GoSecurityInfo si = _goCls.securityInfo();
+      for (final String perm: permToRoles.keySet()) {
+        final List<String> roles = permToRoles.get(perm);
+        si.declareRolesAsDefaultForPermission(
+            roles.toArray(new String[roles.size()]), perm);
+      }
+    }
+    
+    /* access */
+    
+    if (access != null) {
+      if (!access.equals("allow") && !access.equals("deny"))
+        log.error("Invalid default-access argument: " + access);
+      else
+        _goCls.securityInfo().setDefaultAccess(access);
+    }
+  }
+  private static void fillPermissionToRoleMap
+    (final Map<String, ArrayList<String>> permToRoles_,
+     final String _role, final String[] _perms)
+  {
+    for (final String perm: _perms) {
+      ArrayList<String> al = permToRoles_.get(perm);
+      if (al == null) {
+        al = new ArrayList<String>(4);
+        permToRoles_.put(perm, al);
+      }
+      al.add(_role);
+    }
   }
   
   public GoJavaMethod generateGoMethodFromJavaMethod
