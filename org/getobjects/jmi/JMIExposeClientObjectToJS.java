@@ -91,7 +91,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected void exposeMethod
-    (String _methodName, WOJavaScriptWriter _js, IGoContext _ctx)
+    (final String _methodName, final WOJavaScriptWriter _js, IGoContext _ctx)
   {
     if (_methodName == null || _methodName.length() == 0)
       return;
@@ -105,8 +105,8 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     _js.append("  };\n");
   }
   
-  protected String exposeJoClass
-    (GoClass _cls, WOJavaScriptWriter _js, IGoContext _ctx)
+  protected String exposeGoClass
+    (final GoClass _cls, final WOJavaScriptWriter _js, final IGoContext _ctx)
   {
     /*
      * TODO: plenty of things, just a prototype ;-)
@@ -117,13 +117,13 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     if (_cls == null)
       return null;
     
-    String myName = _cls.className();
+    final String myName = _cls.className();
     
     /* check superclass */
     
-    GoClass superClass = _cls.joSuperClass();
-    String  superName = this.shouldExposeClass(superClass)
-      ? exposeJoClass(superClass, _js, _ctx)
+    final GoClass superClass = _cls.goSuperClass();
+    final String  superName = this.shouldExposeClass(superClass)
+      ? exposeGoClass(superClass, _js, _ctx)
       : null;
     
     /* expose class */
@@ -132,7 +132,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     _js.appendIdentifier(myName);
     _js.append("() {\n");
     
-    String[] slots = _cls.slotNames();
+    final String[] slots = _cls.slotNames();
     if (slots != null) {
       for (String slot: slots) {
         Object method = _cls.valueForSlot(slot);
@@ -159,7 +159,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected void exposeClientObject
-    (Object _object, WOJavaScriptWriter _js, IGoContext _ctx)
+    (final Object _object, final WOJavaScriptWriter _js, final IGoContext _ctx)
   {
     if (_object == null) {
       _js.append("var clientObject = ");
@@ -176,7 +176,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     if (_ctx != null) {
       GoClass cls = _ctx.goClassRegistry().goClassForJavaObject(_object, _ctx);
       if (cls != null)
-        className = this.exposeJoClass(cls, _js, _ctx);
+        className = this.exposeGoClass(cls, _js, _ctx);
     }
     
     /* generate object */
@@ -243,11 +243,11 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
 
   @Override
   public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    Object clientObject = _ctx.clientObject();
+    final Object clientObject = _ctx.clientObject();
     if (clientObject == null)
       return;
     
-    WOJavaScriptWriter js = new WOJavaScriptWriter();
+    final WOJavaScriptWriter js = new WOJavaScriptWriter();
     
     /* add document information */
     
@@ -255,7 +255,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     
     /* add JavaScript to response */
     
-    String script = js.script();
+    final String script = js.script();
     if (script != null && script.length() > 0 && !_ctx.isRenderingDisabled()) {
       _r.appendBeginTag("script");
       _r.appendAttribute("type",     "text/javascript");

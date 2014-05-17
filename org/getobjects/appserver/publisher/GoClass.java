@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -41,16 +41,19 @@ import org.getobjects.foundation.UString;
 public class GoClass extends NSObject implements IGoObject {
   protected static final Log log = LogFactory.getLog("GoClass");
   
-  protected String   name;
-  protected GoClass  joSuperClass;
-  protected String[] slotNames;
-  protected Object[] slotValues;
-  protected boolean  isSealed;
+  protected String         name;
+  protected GoClass        goSuperClass;
+  protected String[]       slotNames;
+  protected Object[]       slotValues;
+  protected boolean        isSealed;
   protected GoSecurityInfo securityInfo; 
   
-  public GoClass(String _n, GoClass _superClass, Map<String, Object> _slots) {
+  public GoClass
+    (final String _n, final GoClass _superClass, 
+     final Map<String, Object> _slots)
+  {
     this.name         = _n;
-    this.joSuperClass = _superClass;
+    this.goSuperClass = _superClass;
     this.securityInfo = new GoSecurityInfo();
     
     if (_slots != null && _slots.size() > 0) {
@@ -58,7 +61,7 @@ public class GoClass extends NSObject implements IGoObject {
       this.slotValues = new Object[this.slotNames.length];
       
       int i = 0;
-      for (String slotName: _slots.keySet()) {
+      for (final String slotName: _slots.keySet()) {
         this.slotNames[i]  = slotName;
         this.slotValues[i] = _slots.get(slotName);
         i++;
@@ -70,8 +73,12 @@ public class GoClass extends NSObject implements IGoObject {
   
   /* accessors */
   
+  @Deprecated
   public GoClass joSuperClass() {
-    return this.joSuperClass;
+    return this.goSuperClass();
+  }
+  public GoClass goSuperClass() {
+    return this.goSuperClass;
   }
   
   public String className() {
@@ -96,7 +103,7 @@ public class GoClass extends NSObject implements IGoObject {
     if (this.slotNames != null) {
       for (int i = 0; i < this.slotNames.length; i++) {
         if (_name.equals(this.slotNames[i])) {
-          Object value = this.slotValues[i];
+          final Object value = this.slotValues[i];
           
           /* The registered slot is not the value to be exposed, but rather
            * a factory object which creates a context specific object.
@@ -114,8 +121,8 @@ public class GoClass extends NSObject implements IGoObject {
     
     /* check superclass */
     
-    if (this.joSuperClass != null)
-      return this.joSuperClass.lookupName(_object, _name, _ctx);
+    if (this.goSuperClass != null)
+      return this.goSuperClass.lookupName(_object, _name, _ctx);
     
     /* not found */
     return null;
@@ -136,8 +143,8 @@ public class GoClass extends NSObject implements IGoObject {
     
     /* check superclass */
     
-    if (_checkSuperClass && this.joSuperClass != null)
-      return this.joSuperClass.declaresName(_name, true /* check superclass */);
+    if (_checkSuperClass && this.goSuperClass != null)
+      return this.goSuperClass.declaresName(_name, true /* check superclass */);
     
     /* not found */
     return false;
@@ -226,7 +233,7 @@ public class GoClass extends NSObject implements IGoObject {
       _d.append(UString.componentsJoinedByString(this.slotNames, ","));
     }
     
-    if (this.joSuperClass != null) {
+    if (this.goSuperClass != null) {
       _d.append(" super=");
       
       boolean isFirst = true;

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -72,18 +72,33 @@ public class GoClassRegistry extends NSObject {
     
     if (_object instanceof NSKeyValueCoding) {
       /* we assume that all relevant classes inherit from NSObject */
-      Object oc = ((NSKeyValueCoding)_object).valueForKey("joClass");
+      Object oc = ((NSKeyValueCoding)_object).valueForKey("goClass");
+      if (oc == null) { // deprecated
+        oc = ((NSKeyValueCoding)_object).valueForKey("joClass");
+        if (oc != null)
+          log.warn("DEPRECATED: replace 'joClass' with 'goClass'");
+      }
       if (oc != null) {
         if (oc instanceof GoClass)
           return (GoClass)oc;
         
-        log.error("joClass property of object did not return a joClass: " + oc);
+        log.error("goClass property of object did not return a goClass: " + oc);
       }
     }
     
     return this.goClassForJavaClass(_object.getClass(), _ctx);
   }
 
+  /**
+   * Generates a new GoClass for an arbitrary Java class (and all its super
+   * classes) on the fly.
+   * This method handles the caching and the superclass traversal, the
+   * actual mapping is done in generateGoClassFromJavaClass().
+   * 
+   * @param _cls - Java Class to generate a GoClass for
+   * @param _ctx - a Go context or NULL
+   * @return new GoClass representing the given Java class within Go
+   */
   public GoClass goClassForJavaClass(final Class _cls, final IGoContext _ctx) {
     if (_cls == null)
       return null;
@@ -92,19 +107,19 @@ public class GoClassRegistry extends NSObject {
     // TODO: need to consider threading?! (multireader?) Possibly we want to
     //       load or create classes as runtime and not just in bootstrapping
     
-    GoClass joClass = this.nameToClass.get(_cls.getName());
-    if (joClass != null)
-      return joClass;
+    GoClass goClass = this.nameToClass.get(_cls.getName());
+    if (goClass != null)
+      return goClass;
     
     /* process superclass */
     
-    Class   superClass   = _cls.getSuperclass();
-    GoClass joSuperClass = this.goClassForJavaClass(superClass, _ctx);
+    final Class   superClass   = _cls.getSuperclass();
+    final GoClass goSuperClass = this.goClassForJavaClass(superClass, _ctx);
     
     /* process class */
     
-    joClass = this.generateGoClassFromJavaClass(_cls, joSuperClass, _ctx);
-    if (joClass == null) {
+    goClass = this.generateGoClassFromJavaClass(_cls, goSuperClass, _ctx);
+    if (goClass == null) {
       log.error("could not create GoClass from Java class: " + _cls);
       return null;
     }
@@ -112,10 +127,22 @@ public class GoClassRegistry extends NSObject {
     /* cache result */
     // THREAD
     
-    this.nameToClass.put(_cls.getName(), joClass);
-    return joClass;
+    this.nameToClass.put(_cls.getName(), goClass);
+    return goClass;
   }
   
+  /**
+   * The primitive to generate a new GoClass for an arbitrary Java class. It
+   * takes the GoClass of the superclass of the Java object.
+   * <p>
+   * Note: This is internal and does not cache, rather use 
+   * goClassForJavaClass(), which traverse superclasses and does the caching.
+   * <p>
+   * 
+   * @param _cls - Java Class to generate a GoClass for
+   * @param _ctx - a Go context or NULL
+   * @return new GoClass representing the given Java class within Go
+   */
   public GoJavaClass generateGoClassFromJavaClass
     (final Class _cls, final GoClass _superClass, final IGoContext _ctx)
   {
@@ -124,18 +151,24 @@ public class GoClassRegistry extends NSObject {
     
     /* collect mapped methods */
     
-    Map<String, Object> nameToMethod = new HashMap<String, Object>(32);
-    for (Method method: _cls.getDeclaredMethods()) {
-      GoJavaMethod joMethod = this.generateGoMethodFromJavaMethod(method, _ctx);
-      if (joMethod == null)
+    final Map<String, Object> nameToMethod = new HashMap<String, Object>(32);
+    for (final Method method: _cls.getDeclaredMethods()) {
+      final GoJavaMethod goMethod =
+          this.generateGoMethodFromJavaMethod(method, _ctx);
+      if (goMethod == null)
         continue; /* not moved */
       
-      nameToMethod.put(joMethod.name(), joMethod);
+      nameToMethod.put(goMethod.name(), goMethod);
     }
     
     /* construct class */
     
-    return new GoJavaClass(_cls.getSimpleName(), _superClass, nameToMethod);
+    // TODO: check annotations for security and such
+    
+    GoJavaClass clazz =
+      new GoJavaClass(_cls.getSimpleName(), _superClass, nameToMethod);
+    
+    return clazz;
   }
   
   public GoJavaMethod generateGoMethodFromJavaMethod

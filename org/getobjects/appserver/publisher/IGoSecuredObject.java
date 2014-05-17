@@ -357,7 +357,7 @@ public interface IGoSecuredObject {
         GoClass cls = _ctx.goClassRegistry().goClassForJavaObject(_self, _ctx);
         GoSecurityInfo sinfo = null;
 
-        for (GoClass pcls = cls; pcls != null; pcls = pcls.joSuperClass()) {
+        for (GoClass pcls = cls; pcls != null; pcls = pcls.goSuperClass()) {
           sinfo = pcls.securityInfo();
           if (sinfo != null && sinfo.hasDefaultRoleForPermission(_permission))
             break;
@@ -512,7 +512,7 @@ public interface IGoSecuredObject {
       
       /* first find security info */
       
-      for (GoClass pcls = cls; pcls != null; pcls = pcls.joSuperClass()) {
+      for (GoClass pcls = cls; pcls != null; pcls = pcls.goSuperClass()) {
         sinfo = pcls.securityInfo();
         
         if (log.isDebugEnabled()) {
@@ -609,7 +609,7 @@ public interface IGoSecuredObject {
       GoSecurityInfo sinfo = null;
       GoSecurityInfo sDefaultInfo = null;
       
-      for (GoClass pcls = cls; pcls != null; pcls = pcls.joSuperClass()) {
+      for (GoClass pcls = cls; pcls != null; pcls = pcls.goSuperClass()) {
         sinfo = pcls.securityInfo();
         if (sinfo != null) {
           if (sinfo.hasProtectionsForKey(_name))
