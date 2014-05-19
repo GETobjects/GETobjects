@@ -44,7 +44,7 @@ import org.getobjects.foundation.UObject;
  * WOComponent plus a template. The exact format of the template depends on the
  * respective template builder, usually the WOWrapperTemplateBuilder is used.
  * 
- * <h3>WOComponent vs WODynamicELement</h3>
+ * <h3>WOComponent vs WODynamicElement</h3>
  * Both, WOComponent and WODynamicElement, inherit from the WOElement
  * superclass. The major conceptual difference is that WOComponent's have own
  * per-transaction or per-session state while WODynamicElement's have *no* own
