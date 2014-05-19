@@ -75,7 +75,7 @@ public class WOPackageLinker {
    */
   public static WOResourceManager linkApplication(WOApplication _app) {
     WOPackageLinker linker =
-      new WOPackageLinker(_app.isCachingEnabled(), _app.joProductManager());
+      new WOPackageLinker(_app.isCachingEnabled(), _app.goProductManager());
 
     String projectDir = _app.projectDirectory();
     if (UObject.isEmpty(projectDir))
@@ -93,7 +93,7 @@ public class WOPackageLinker {
 
     /* finally register application package as a product */
 
-    GoProductManager pm = _app.joProductManager();
+    GoProductManager pm = _app.goProductManager();
     if (pm != null)
       pm.loadProduct("MAIN", _app.getClass().getPackage().getName());
 

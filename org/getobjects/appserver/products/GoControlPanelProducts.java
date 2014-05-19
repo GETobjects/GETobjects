@@ -50,7 +50,7 @@ public class GoControlPanelProducts extends NSObject implements IGoObject {
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     if (_ctx instanceof WOContext) {
-      GoProductManager pm = ((WOContext)_ctx).application().joProductManager();
+      GoProductManager pm = ((WOContext)_ctx).application().goProductManager();
       
       Object p = pm.lookupName(_name, _ctx, false /* never acquire here */);
       if (p == null) {

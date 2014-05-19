@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -27,8 +27,6 @@ import java.util.Map;
 import org.getobjects.foundation.NSObject;
 
 /**
- * WOQuerySession
- * <p>
  * This object represents objects which got unarchived from the form values,
  * eg in the query parameters of a string, eg:<pre>
  *   /myAction?dg_batchindex=2</pre>

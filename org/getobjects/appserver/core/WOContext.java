@@ -872,7 +872,7 @@ public class WOContext extends WOCoreContext
    */
   public GoClassRegistry goClassRegistry() {
     return this.application != null
-      ? this.application.joClassRegistry() : null;
+      ? this.application.goClassRegistry() : null;
   }
 
   public void _setGoTraversalPath(final GoTraversalPath _path) {

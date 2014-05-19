@@ -393,7 +393,7 @@ public class GoProductInfo extends NSObject
     if (_product == null)
       return;
     
-    final GoClassRegistry registry = _app.joClassRegistry();
+    final GoClassRegistry registry = _app.goClassRegistry();
     if (registry == null) {
       log.error("application has no class registry: " + _app);
       return;

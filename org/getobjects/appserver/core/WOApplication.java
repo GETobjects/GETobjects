@@ -40,17 +40,17 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.elements.WOHTMLDynamicElement;
 import org.getobjects.appserver.products.GoProductManager;
 import org.getobjects.appserver.products.WOPackageLinker;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoClassRegistry;
+import org.getobjects.appserver.publisher.GoDefaultRenderer;
+import org.getobjects.appserver.publisher.GoObjectRequestHandler;
+import org.getobjects.appserver.publisher.GoSecurityException;
 import org.getobjects.appserver.publisher.IGoAuthenticator;
 import org.getobjects.appserver.publisher.IGoCallable;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.appserver.publisher.IGoObjectRenderer;
 import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
-import org.getobjects.appserver.publisher.GoClass;
-import org.getobjects.appserver.publisher.GoClassRegistry;
-import org.getobjects.appserver.publisher.GoDefaultRenderer;
-import org.getobjects.appserver.publisher.GoObjectRequestHandler;
-import org.getobjects.appserver.publisher.GoSecurityException;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
@@ -58,19 +58,53 @@ import org.getobjects.foundation.NSSelector;
 import org.getobjects.foundation.UObject;
 
 /**
- * WOApplication
- * <p>
- * This is the main entry class which for Go web applications. You usually
+ * This is the main entry class for Go web applications. You usually
  * start writing a Go app by subclassing this class. It then provides all
  * the setup of the Go infrastructure (creation of session and resource
  * managers, handling of initial requests, etc etc)
+ * <p>
+ * The default name for the subclass is 'Application', alongside 'Context'
+ * for a WOContext subclass and 'Session' for the app specific WOSession
+ * subclass.
+ * <p>
+ * A typical thing one might want to setup in an Application subclass is a
+ * connection to the database.
+ * <p>
+ * When you host within Jetty, this is a typical main() function for a Go based
+ * web application:
+ * <pre>
+ * public static void main(String[] args) {
+ *   new WOJettyRunner(PackBack.class, args).run();
+ * }
+ * </pre>
+ * FIXME: document it way more.<br>
+ * FIXME: document how it works in a Servlet environment<br>
+ * FIXME: document how properties are located and loaded
+ * 
+ * <h3>Differences to WebObjects</h3>
+ * FIXME: document all the diffs ;-)
+ * 
+ * <h4>QuerySession</h4>
+ * In addition to Context and Session subclasses, Go has the concept of a
+ * 'QuerySession'. The baseclass is WOQuerySession and an application can
+ * subclass this.<br>
+ * FIXME: document more
+
+ * <h4>Zope like Object Publishing</h4>
+ * FIXME: document all this. Class registry, product manager, root object,
+ * renderer factory.
+ * <br>
+ * Request handler processing can be turned on and off.
+ * 
+ * <h4>pageWithName()</h4>
+ * In Go this supports component specific resource managers, not just the
+ * global one. The WOApplication pageWithName takes this into account, it
+ * is NOT the fallback root lookup (and thus can be used in all contexts).
+ * It first checks the active WOComponent for the resource manager.
  */
 public class WOApplication extends NSObject
   implements IGoObject, IGoObjectRendererFactory, INSExtraVariables
 {
-  // TODO: document me
-  // TODO: document how it works in a Servlet environment
-  // TODO: document how properties are located and loaded
   protected static final Log log     = LogFactory.getLog("WOApplication");
   protected static final Log pageLog = LogFactory.getLog("WOPages");
   protected static final Log profile = LogFactory.getLog("WOProfiling");
@@ -159,6 +193,15 @@ public class WOApplication extends NSObject
     this.registerRequestHandler(rh, this.componentRequestHandlerKey());
   }
 
+  /**
+   * Configures the WOContext, WOSession and WOQuerySession subclasses, if the
+   * application has such. This is based on the package the WOApplication
+   * subclass lives in.
+   * <p>
+   * Sample: if you have an app called org.packback.Packback, it'll
+   * automagically use org.packback.Context, org.packback.Session and
+   * org.packback.QuerySession as the respective subclasses if such exist.
+   */
   protected void setupDefaultClasses() {
     /* try to find a Context/Session in the application package */
     String pkgname = this.getClass().getName();
@@ -1354,7 +1397,7 @@ public class WOApplication extends NSObject
 
   /* GoClass */
 
-  public GoClass joClassInContext(final IGoContext _ctx) {
+  public GoClass goClassInContext(final IGoContext _ctx) {
     return _ctx.goClassRegistry().goClassForJavaObject(this, _ctx);
   }
 
@@ -1378,9 +1421,9 @@ public class WOApplication extends NSObject
 
     /* check class */
 
-    final GoClass joClass = this.joClassInContext(_ctx);
-    if (joClass != null) {
-      final Object o = joClass.lookupName(this, _name, _ctx);
+    final GoClass goClass = this.goClassInContext(_ctx);
+    if (goClass != null) {
+      final Object o = goClass.lookupName(this, _name, _ctx);
       if (o != null) return o;
     }
 
@@ -1388,10 +1431,10 @@ public class WOApplication extends NSObject
     return this.requestHandlerRegistry.get(_name);
   }
 
-  public GoClassRegistry joClassRegistry() {
+  public GoClassRegistry goClassRegistry() {
     return this.goClassRegistry;
   }
-  public GoProductManager joProductManager() {
+  public GoProductManager goProductManager() {
     return this.goProductManager;
   }
 
