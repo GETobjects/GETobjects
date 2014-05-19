@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -39,41 +39,120 @@ import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.UObject;
 
 /**
- * WOComponent
- * <p>
  * Subclasses of WOComponent are used to represent template based pages or
  * reusable components in Go. A component (usually) is a Java subclass of
  * WOComponent plus a template. The exact format of the template depends on the
  * respective template builder, usually the WOWrapperTemplateBuilder is used.
- * <p>
+ * 
+ * <h3>WOComponent vs WODynamicELement</h3>
  * Both, WOComponent and WODynamicElement, inherit from the WOElement
  * superclass. The major conceptual difference is that WOComponent's have own
  * per-transaction or per-session state while WODynamicElement's have *no* own
  * instance variable state but retrieve state using WOAssociations from the
  * active component.
- * <br>
+ * <p>
  * Plus WODynamicElements almost always directly render HTML/XML/xyz in Java
  * code while WOComponent's usually have an associated template. (both are not
  * exact requirements, a WOComponent can also directly render w/o a template and
  * a WODynamicElement could load a stateless sub-template).
+ * 
+ * <h3>Subcomponents</h3>
+ * FIXME: Explain better how subcomponents work.<br>
+ * Components can refer other components in the template, like:
+ * <pre>&lt;#ZideBox title="Hello" /&gt;</pre>
+ * This does two things: the template will get an WOChildComponentReference
+ * dynamic element which represents the component in the template hierarchy,
+ * AND upon instantiation the component will get an entry in its 'subcomponents'
+ * Map. Usually the subcomponent will start out as a WOComponentFault. Only
+ * if it is actually needed, a real WOComponent instance will be created.
+ * <p>
+ * Note: There are two hierarchies alongside each other: the stateless
+ * template hierarchy of WODynamicElements and the stateful component hierarchy.
+ * <p>
+ * Parameters like the 'title' in the example are synchronized when the control
+ * between the components goes back and forth (the values are pushed in and out
+ * via KVC).
+ * 
+ * <h3>Stateless Components</h3>
+ * FIXME: Don't quite remember how those work. (hh 2014)
+ * I think the idea is that a stateless component is like a WODynamicElement,
+ * with the difference, that you can use pageWithName and such to look them up
+ * and have a template associated with it.
+ * 
+ * <h3>Relationship to WOContext</h3>
+ * Unless it is a stateless component a component is always associated with a
+ * WOContext. The WOContext tracks which components are awake and such, and it
+ * tracks the current component activation chain (consider it the callstack
+ * of the components).
+ * 
+ * <h3>Differences to WebObjects</h3>
+ * 
+ * <h4>Initialization</h4>
+ * Apparently the initialization is a bit different? Something about
+ * default-constructor and initWithContext.<br>
+ * FIXME: check what exactly.
+ * 
+ * <h4>Go WOComponent's can be used as WODirectAction's</h4>
+ * In Go components can be directly used as direct actions. In traditional WO
+ * one usually has a direct action, which then instantiates a WOComponent,
+ * passes over rendering arguments and then returns it for rendering.
+ * <br>
+ * This can be reduced in Go. In Go you can directly invoke a component like
+ * a direct action, sample:
+ * <pre>
+ *   class Main extends WOComponent {
+ *     ...
+ *     public WOActionResults showAction() { ...
+ *   
+ *   Invoke via:
+ *     /MyApp/wa/Main/show?id=5
+ * </pre>
+ * All the rules of WODirectAction apply. Actions must be suffixed 'Action'
+ * and if none is specified, defaultAction is invoked.
+ * 
+ * <h4>Component specific WOResourceManager's</h4>
+ * In Go there is the concept of component-specific WOResourceManager's. WO
+ * only has a global one (Go falls back to this if there is no local one).
+ * <br>
+ * This is to support OFS and other hierarchical Go publishing setups. Example:
+ * <pre>
+ *   /MyApp/persons/person/index.wo
+ *   /MyApp/persons/index.wo
+ *   /MyApp/Frame.wo
+ * </pre>
+ * With the right resource manager the components can perform lookup of
+ * resources relative to the position of the source component.
+ * 
+ * <h4>Redirect and F()</h4>
+ * Go has the convenience redirectToLocation() method.<br>
+ * To retrieve form values one can use the F() methods, sample:
+ * <pre>
+ * /MyApp/wa/Persons/fetch?limit=50
+ * int fetchLimit = UObject.intValue(F("limit", 10));</pre>
+ * 
+ * <h3>Integration with the Zope-like Go publishing system</h3>
+ * FIXME: document more.
+ * <p>
+ * A WOComponent is an IGoObject, an IGoObjectRenderer and an
+ * IGoObjectRendererFactory.
+ * <p>
+ * FIXME: write about GoPageInvocation and how a WOComponent usually is not
+ * directly part of the traversal path.
+ * <p>
+ * The IGoObject implementation supports lookup of direct action methods (as
+ * Go methods). Plus lookup using the Go class.
+ * Sample: 'lookupName("show");' will give you a GoCallable 'showAction'.
+ * <p>
+ * Careful: If you invoke a page like this:
+ * <pre>/MyApp/wa/Main/show?id=5</pre>
+ * the Go method is 'wa', the WODirectActionRequestHandler.
+ * This is why permissions on the WOComponent's are not checked here, the
+ * component is not part of the Go lookup.
  */
 public class WOComponent extends WOElement
   implements WOActionResults, IGoObjectRendererFactory, IGoObjectRenderer,
              IGoObject, INSExtraVariables
 {
-  /*
-   * TODO: document
-   * - has a template (tree of WODynamicElement subclasses)
-   * - has subcomponents
-   * - is stateful (unless its isStateless?)
-   * - is bound to a context (unless its isStateless?)
-   * - different to WO:
-   *   - initialization (default constructor and initWithContext)
-   *   - component local resource manager
-   *   - redirect support
-   *   - can be used as a WODirectAction
-   */
-
   protected static final Log compLog = LogFactory.getLog("WOComponent");
   protected static final Log pageLog = LogFactory.getLog("WOPages");
 
@@ -185,12 +264,12 @@ public class WOComponent extends WOElement
    * @param _fieldName - name of a form field or query parameter
    * @return Object value of the field or null if it was not found
    */
-  public Object F(String _fieldName) {
+  public Object F(final String _fieldName) {
     if (_fieldName == null) return null;
 
-    WOContext ctx = this.context();
+    final WOContext ctx = this.context();
     if (ctx == null) return null;
-    WORequest rq = ctx.request();
+    final WORequest rq = ctx.request();
     if (rq == null) return null;
 
     return rq.formValueForKey(_fieldName);
@@ -204,8 +283,8 @@ public class WOComponent extends WOElement
    * @param _default   - the default value if the field is not present
    * @return Object value of the field or null if it was not found
    */
-  public Object F(String _fieldName, Object _default) {
-    Object v = F(_fieldName);
+  public Object F(final String _fieldName, final Object _default) {
+    final Object v = this.F(_fieldName);
     return UObject.isNotEmpty(v) ? v : _default;
   }
 
@@ -566,7 +645,7 @@ public class WOComponent extends WOElement
     return result;
   }
 
-  public WOComponent childComponentWithName(String _name) {
+  public WOComponent childComponentWithName(final String _name) {
     WOComponent child;
 
     if (_name == null || this.subcomponents == null)
@@ -828,7 +907,7 @@ public class WOComponent extends WOElement
    * @return { @link WOResponse } with a 302 response set to the absolute
    * URL derived from _url
    */
-  public WOActionResults redirectToLocation(String _url) {
+  public WOActionResults redirectToLocation(final String _url) {
     if (UObject.isEmpty(_url)) return null;
 
     return new WORedirect(_url, this.context());
@@ -992,14 +1071,14 @@ public class WOComponent extends WOElement
      */
 
     // TBD: would be better to fill the GoClass dynamically
-    Method m = NSJavaRuntime.NSMethodFromString
+    final Method m = NSJavaRuntime.NSMethodFromString
       (this.getClass(), _name + "Action", emptyClassArray, true /* deep */);
     if (m != null)
       return new GoActivePageActionInvocation(_name);
 
     /* try to find name in GoClass */
 
-    GoClass joClass = IGoObject.Utility.joClass(this, _ctx);
+    final GoClass joClass = IGoObject.Utility.joClass(this, _ctx);
     if (joClass != null)
       return joClass.lookupName(this, _name, _ctx);
 
@@ -1029,7 +1108,7 @@ public class WOComponent extends WOElement
    * @param _ctx    - the rendering context
    * @return null if everything went fine, an Exception otherwise
    */
-  public Exception renderObjectInContext(Object _object, WOContext _ctx) {
+  public Exception renderObjectInContext(final Object _object, WOContext _ctx) {
     /* This is not exactly perfect, but probably the option which makes most
      * sense.
      */
@@ -1037,7 +1116,7 @@ public class WOComponent extends WOElement
     return GoDefaultRenderer.sharedRenderer.renderComponent(this, _ctx);
   }
 
-  public void setRenderObject(Object _object) {
+  public void setRenderObject(final Object _object) {
     this.setObjectForKey(_object, "renderObject");
   }
   public Object renderObject() {
