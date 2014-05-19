@@ -56,17 +56,17 @@ public class GoSimpleJSONRenderer extends NSObject
   public boolean isJSONRequest(final WORequest _rq) {
     if (_rq == null)
       return false;
-
+    
     if (_rq.acceptsContentType("application/json", false /* no wildcard */))
       return true;
 
     final String fmt = _rq.stringFormValueForKey("format");
-    if (fmt != null && "json".equals(fmt))
+    if (fmt != null && ("json".equals(fmt) || "jsonp".equals(fmt)))
       return true;
 
     return false;
   }
-
+  
   public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
     /* enforce JSON */
     if (_object instanceof GoJSONResult)
@@ -97,6 +97,12 @@ public class GoSimpleJSONRenderer extends NSObject
     if (_object instanceof List)      return true;
     if (_object instanceof Map)       return true;
     if (_object instanceof Throwable) return true;
+    
+    final Class itemClazz = _object.getClass().getComponentType();
+    if (itemClazz != null) { /* an array */
+      // FIXME: check componenttype, refactor this section to be recursive
+      return true;
+    }
 
     log.warn("object type unsupported by this renderer: " + _object.getClass());
     return false;
@@ -108,12 +114,27 @@ public class GoSimpleJSONRenderer extends NSObject
     final StringBuilder json = new StringBuilder(4096);
     final Exception error = this.appendObjectToString(_object, json);
     if (error != null) return error;
+    
+    // check for JSONP
+    final WORequest rq = _ctx.request();
+    String cb = null;
+    if (rq != null) {
+      cb = rq.stringFormValueForKey("callback");
+      if (cb.length() == 0)
+        cb = null;
+    }
 
     final WOResponse r = _ctx.response();
     r.setContentEncoding("utf8");
-    r.setHeaderForKey("application/json; charset=utf-8", "content-type");
+    if (cb != null) // JSONP
+      r.setHeaderForKey("application/javascript; charset=utf-8","content-type");
+    else
+      r.setHeaderForKey("application/json; charset=utf-8", "content-type");
+    
     r.enableStreaming();
+    if (cb != null) r.appendContentString(cb + "(");
     r.appendContentString(json.toString());
+    if (cb != null) r.appendContentString(");");
     return null;
   }
 
