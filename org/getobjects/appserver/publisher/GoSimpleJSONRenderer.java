@@ -120,7 +120,7 @@ public class GoSimpleJSONRenderer extends NSObject
     String cb = null;
     if (rq != null) {
       cb = rq.stringFormValueForKey("callback");
-      if (cb.length() == 0)
+      if (cb == null || cb.length() == 0)
         cb = null;
     }
 
