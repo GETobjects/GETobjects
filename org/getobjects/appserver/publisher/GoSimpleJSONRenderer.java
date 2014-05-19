@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -31,6 +31,7 @@ import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
+import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UString;
 import org.getobjects.foundation.kvc.MissingPropertyException;
 
@@ -59,7 +60,7 @@ public class GoSimpleJSONRenderer extends NSObject
     if (_rq.acceptsContentType("application/json", false /* no wildcard */))
       return true;
 
-    String fmt = _rq.stringFormValueForKey("format");
+    final String fmt = _rq.stringFormValueForKey("format");
     if (fmt != null && "json".equals(fmt))
       return true;
 
@@ -73,7 +74,7 @@ public class GoSimpleJSONRenderer extends NSObject
 
     /* check whether the client accepts JSON */
 
-    WORequest rq = _ctx.request();
+    final WORequest rq = _ctx.request();
     if (rq == null) {
       log.warn("missing request in context: " + _ctx);
       return false;
@@ -103,12 +104,12 @@ public class GoSimpleJSONRenderer extends NSObject
 
   /* rendering */
 
-  public Exception renderObjectInContext(Object _object, WOContext _ctx) {
-    StringBuilder json = new StringBuilder(4096);
-    Exception error = this.appendObjectToString(_object, json);
+  public Exception renderObjectInContext(final Object _object, WOContext _ctx) {
+    final StringBuilder json = new StringBuilder(4096);
+    final Exception error = this.appendObjectToString(_object, json);
     if (error != null) return error;
 
-    WOResponse r = _ctx.response();
+    final WOResponse r = _ctx.response();
     r.setContentEncoding("utf8");
     r.setHeaderForKey("application/json; charset=utf-8", "content-type");
     r.enableStreaming();
@@ -165,6 +166,10 @@ public class GoSimpleJSONRenderer extends NSObject
     if (_object instanceof Throwable)
       return this.appendExceptionToString((Throwable)_object, _sb);
 
+    final Class itemClazz = _object.getClass().getComponentType();
+    if (itemClazz != null) /* an array */
+      return this.appendListToString(UList.asList(_object), _sb);
+    
     return this.appendCustomObjectToString(_object, _sb);
   }
 
@@ -210,7 +215,7 @@ public class GoSimpleJSONRenderer extends NSObject
 
     /* added messages */
 
-    String pm = _ex.getMessage();
+    final String pm = _ex.getMessage();
     String sm = _ex.getLocalizedMessage();
     if (pm == sm || (pm != null && sm != null && pm.equals(sm)))
       sm = null;
