@@ -269,8 +269,8 @@ public class GoSecurityInfo extends NSObject {
     if (this.defaultRolesForPermission == null)
       this.defaultRolesForPermission = new HashMap<String, String[]>(4);
       
-    String[] roles = new String[] { _role };
-    for (String permission: _ps)
+    final String[] roles = new String[] { _role };
+    for (final String permission: _ps)
       this.defaultRolesForPermission.put(permission, roles);
   }
   
@@ -324,12 +324,32 @@ public class GoSecurityInfo extends NSObject {
   
   protected static final String[] emptyStringArray = new String[0];
 
+  public boolean isEmpty() {
+    if (this.isObjectPrivate || this.isObjectPublic)
+      return false;
+    if (this.objectPermission != null)
+      return false;
+    
+    if (this.defaultAccess != null)
+      return false;
+    
+    if (this.privateNames != null || this.publicNames != null)
+      return false;
+    
+    if (this.defaultRolesForPermission != null) {
+      if (this.defaultRolesForPermission.size() > 0)
+        return false;
+    }
+    
+    return true;
+  }
   
   /* description */
   
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
+    final int startLen = _d.length();
     
     if (this.isObjectPrivate)
       _d.append(" private");
@@ -345,7 +365,7 @@ public class GoSecurityInfo extends NSObject {
       _d.append(" private=");
       _d.append(UString.componentsJoinedByString(this.privateNames,","));
     }
-    if (this.privateNames != null) {
+    if (this.publicNames != null) {
       _d.append(" public=");
       _d.append(UString.componentsJoinedByString(this.publicNames,","));
     }
@@ -362,5 +382,8 @@ public class GoSecurityInfo extends NSObject {
       }
       _d.append("}");
     }
+    
+    if (startLen == _d.length())
+      _d.append(" empty");
   }
 }

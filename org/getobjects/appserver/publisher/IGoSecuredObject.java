@@ -506,6 +506,10 @@ public interface IGoSecuredObject {
      */
     public static Exception validateObject(Object _self, IGoContext _ctx) {
       // TODO: in SOPE we also ask _self isPublicInContext:
+      final boolean debugOn = log.isDebugEnabled();
+
+      if (debugOn)
+        log.debug("validateObject: " + _self);
       
       GoClass cls = _ctx.goClassRegistry().goClassForJavaObject(_self, _ctx);
       GoSecurityInfo sinfo = null;
@@ -516,8 +520,10 @@ public interface IGoSecuredObject {
         sinfo = pcls.securityInfo();
         
         if (log.isDebugEnabled()) {
-          log.debug("CLASS: " + pcls);
-          log.debug("  CHECK: " + sinfo);
+          if (sinfo.isEmpty())
+            log.debug("  empty SI: " + pcls);
+          else
+            log.debug("  class " + pcls.className() + " SI:" + sinfo);
         }
         
         if (sinfo != null && sinfo.hasObjectProtections())
@@ -608,16 +614,21 @@ public interface IGoSecuredObject {
       final GoClass cls = reg.goClassForJavaObject(_self, _ctx);
       GoSecurityInfo sinfo = null;
       GoSecurityInfo sDefaultInfo = null;
-      
+
+      if (isInfoOn)
+        log.info("lookup protections for name '" + _name + "' ...");
       for (GoClass pcls = cls; pcls != null; pcls = pcls.goSuperClass()) {
         sinfo = pcls.securityInfo();
         if (sinfo != null) {
           if (sinfo.hasProtectionsForKey(_name))
             break;
           else if (isInfoOn) {
-            log.info("security info of class '" + pcls.className() + 
-                     "'\n  has no protections for name '" + _name +
-                     "'\n  info: " + sinfo);
+            if (sinfo.isEmpty())
+              log.info("  " + pcls.className() + " empty SI.");
+            else {
+              log.info("  " + pcls.className() + " no protections for key: " +
+                       sinfo);
+            }
           }
         }
         
@@ -636,6 +647,7 @@ public interface IGoSecuredObject {
         /* We found no key specific security info. Hence we use the default
          * access declaration which can be "allow".
          */
+        
         if (sDefaultInfo != null) { /* but we found a default access */
           if (isInfoOn)
             log.info("using default info for name " + _name + ": " +sDefaultInfo);
