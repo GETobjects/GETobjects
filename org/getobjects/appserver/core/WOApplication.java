@@ -51,7 +51,9 @@ import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.appserver.publisher.IGoObjectRenderer;
 import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
+import org.getobjects.appserver.publisher.IGoSecuredObject;
 import org.getobjects.foundation.INSExtraVariables;
+import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSSelector;
@@ -255,18 +257,65 @@ public class WOApplication extends NSObject
    * If the result of the GoLookup process was not a GoCallable (something which
    * can be Go-invoked), this method will get called to determine a default
    * callable.
-   * For example in Zope the default 'method' is usually a page called
-   * 'index_html'.
    * <p>
-   * Our default implementation returns 'null', that is, no default method. This
-   * will make the rendering process kick in.
+   * If the request is a GET or POST, this will look for a Go slot called
+   * 'default' (Zope uses index_html, and OFS also adds 'index').
+   * For all other requests (PUT, PROPFIND, etc), the default method name equals
+   * the HTTP verb.
+   * <p>
+   * Notably objects are not required to have default methods.
    *
    * @param _object - the result of the Go path lookup
    * @param _ctx    - the context of the whole operation
    * @return a default method object, or null if there is none
    */
   public IGoCallable lookupDefaultMethod(Object _object, final WOContext _ctx) {
-    return null;
+    String defaultMethodName = "default";
+    
+    if (_object == null)
+      return null;
+    
+    /* figure out default method name, we use Zope2 semantics */
+    
+    final WORequest rq = _ctx != null ? _ctx.request() : null;
+    if (rq != null) {
+      final String m = rq.method();
+      if (!"GET".equals(m) && !"POST".equals(m))
+        defaultMethodName = m; // use HTTP Verb as default name
+    }
+    
+    // TBD: Should default methods support acquisition? Maybe, other methods
+    //      are acquired too?
+    final Object o = 
+      IGoSecuredObject.Utility.lookupName(_object, defaultMethodName, _ctx,
+                                         false /* do not acquire? */);
+    if (o == null) {
+      if (log.isInfoEnabled()) {
+        log.info("did not find default method '" + defaultMethodName + "' in " +
+                 _object);
+      }
+      return null;
+    }
+    
+    if (o instanceof IGoCallable) {
+      if (log.isDebugEnabled())
+        log.debug("using default method " + o);
+      return (IGoCallable)o;
+    }
+    
+    if (o instanceof NSException) // runtime exceptions, no throw necessary
+      throw (NSException)o;
+    else if (o instanceof Exception) {
+      Exception e = (Exception)o;
+      log.error("Exception during default method lookup", e);
+      NSException ne = new NSException(e.getMessage());
+      throw ne;
+    }
+    else {
+      log.warn("Object returned as default method is not a callable: " + o);
+      // TBD: throw an exception or not?
+      return null;
+    }
   }
 
   /**

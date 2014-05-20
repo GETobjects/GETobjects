@@ -112,14 +112,14 @@ public class GoObjectRequestHandler extends WORequestHandler {
         /* The object returned by the Go lookup is a Callable object. So
          * lets invoke it!
          */
-        IGoCallable method = ((IGoCallable)result);
+        final IGoCallable method = ((IGoCallable)result);
         if (debugOn)
           log.debug("call: " + method + ", with: " + tpath.clientObject());
         result = method.callInContext(tpath.clientObject(), _ctx);
         if (debugOn) log.debug("  call result: " + result);
       }
       else {
-        /* We found the targetted method, but its not a callable object. We
+        /* We found the referenced object, but its not a callable object. We
          * then check for a default method (eg 'index' inside a folder) and
          * call that.
          * If a default method is missing too, the object is returned for
@@ -128,7 +128,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
          * TODO: Whether a default method is returned probably depends on
          *       the protocol?
          */
-        IGoCallable method =
+        final IGoCallable method =
           this.application.lookupDefaultMethod(result, _ctx);
 
         if (method != null) {
