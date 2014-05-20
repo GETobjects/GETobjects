@@ -248,15 +248,15 @@ public interface IGoSecuredObject {
         return ((IGoSecuredObject)_self).validatePermission(_permission, _ctx);
       
       return DefaultImplementation
-        .validatePermissionOnObject(_permission, _self, _ctx);
+        .validatePermissionOnObject(_self, _permission, _ctx);
     }
     /**
      * Checks whether the current user is allowed to access the given object in
      * the given context.
      * <p>
      * This works by retrieving the security info of the objects GoClass. If the
-     * object has no security info, access is rejected. That is access defaults to
-     * "&lt;private&gt;".
+     * object has no security info, access is rejected. That is access defaults
+     * to "&lt;private&gt;".
      * <p>
      * If an explicit permission is required to use objects of the GoClass
      * validatePermissionOnObject() will get called.
@@ -318,14 +318,14 @@ public interface IGoSecuredObject {
      * <p>
      * The method uses the <code>rolesForObjectInContext()</code> method of the
      * IGoUser object in the context to locate the roles the user has.
-     * 
-     * @param _permission - permission to check, eg 'View'
      * @param _self       - the object
+     * @param _permission - permission to check, eg 'View'
      * @param _ctx        - the context
+     * 
      * @return null if the user has access to the permission, else the Exception
      */
     public static Exception validatePermissionOnObject
-      (final String _permission, final Object _self, final IGoContext _ctx)
+      (final Object _self, final String _permission, final IGoContext _ctx)
     {
       // TBD: NO LOCAL ROLES PROCESSING YET
       final boolean isInfoOn = log.isInfoEnabled();

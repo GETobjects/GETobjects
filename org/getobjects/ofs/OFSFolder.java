@@ -626,7 +626,7 @@ public class OFSFolder extends OFSBaseObject
   }
   public Exception validatePermission(String _perm, final IGoContext _ctx) {
     return IGoSecuredObject.DefaultImplementation
-      .validatePermissionOnObject(_perm, this, _ctx);
+      .validatePermissionOnObject(this, _perm, _ctx);
   }
 
   protected IGoAuthenticator cachedAuthenticator;
