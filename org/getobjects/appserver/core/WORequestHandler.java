@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -29,8 +29,6 @@ import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.foundation.NSObject;
 
 /**
- * WORequestHandler
- * <p>
  * Abstract superclass for request handlers. Request handlers are objects which
  * decide what to do with a given request. That is, how to decode the URL and
  * how to map the URL to the controller objects.
@@ -83,8 +81,6 @@ public abstract class WORequestHandler extends NSObject
   }
 
   public WOResponse handleRequest(final WORequest _rq) {
-    // TODO: this is deprecated, we want to do everything with GoObject
-    //       lookups
     WOContext  ctx;
     WOResponse r = null;
     WOSession  session = null;
@@ -122,7 +118,7 @@ public abstract class WORequestHandler extends NSObject
         
           session = this.application.restoreSessionWithID(sessionId, ctx);
           if (session == null) {
-            WOActionResults ar =
+            final WOActionResults ar =
               this.application.handleSessionRestorationError(ctx);
             r = ar != null ? ar.generateResponse() : null;
             sessionId = null;
@@ -137,14 +133,14 @@ public abstract class WORequestHandler extends NSObject
             if (!this.application.refusesNewSessions()) {
               session = this.application.initializeSession(ctx);
               if (session == null) {
-                WOActionResults ar =
+                final WOActionResults ar =
                   this.application.handleSessionRestorationError(ctx);
                 r = ar != null ? ar.generateResponse() : null;
               }
             }
             else {
               // TODO: this already failed once? will it return null again?
-              WOActionResults ar =
+              final WOActionResults ar =
                 this.application.handleSessionRestorationError(ctx);
               r = ar != null ? ar.generateResponse() : null;
             }
@@ -161,19 +157,17 @@ public abstract class WORequestHandler extends NSObject
     
       /* run handler specific processing */
       
-      if (r == null) {
-    
+      if (r == null)
         r = this.handleRequest(_rq, ctx, session);
-      }
       
       /* save session */
       
       // TODO: store session cookies
       
       if (ctx.savePageRequired) {
-        WOComponent page = ctx.page();
+        final WOComponent page = ctx.page();
         if (page != null) {
-          WOSession sn = ctx.session();
+          final WOSession sn = ctx.session();
           if (sn != null)
             sn.savePage(page);
           else {
@@ -196,7 +190,7 @@ public abstract class WORequestHandler extends NSObject
       // TODO: call some handler method
       // TODO: ensure that session gets a sleep?
       if (debugOn) log.debug("  handler catched exception", e);
-      WOActionResults ar =
+      final WOActionResults ar =
         this.application.handleException(e, ctx);
       r = ar != null ? ar.generateResponse() : null;
     }

@@ -145,7 +145,7 @@ public class WOApplication extends NSObject
   public void init() {
     /* at the very beginning, load configuration */
     this.loadProperties();
-
+    
     this.pageCacheSize = 5;
     this.permanentPageCacheSize = 5;
 
@@ -319,13 +319,14 @@ public class WOApplication extends NSObject
   }
 
   /**
-   * This method does the GoStyle request processing. Its called by
-   * dispatchRequest() if requesthandler-processing is turned off. Otherwise
-   * the handleRequest() method of the respective request handler is called!
+   * This method does GoStyle request processing. It is not called by
+   * dispatchRequest (this calls handleRequest on the request handler).
+   * Only here for legacy reasons.
    *
    * @param _rq - the WORequest to dispatch
    * @return the resulting WOResponse
    */
+  @Deprecated
   public WOResponse handleRequest(final WORequest _rq) {
     return new GoObjectRequestHandler(this).handleRequest(_rq);
   }
@@ -360,7 +361,7 @@ public class WOApplication extends NSObject
 
     if (profile.isInfoEnabled())
       this.logRequestStart(_rq, rqId);
-
+    
     final WORequestHandler rh;
 
     if (this.useHandlerRequestDispatch()) {
