@@ -137,7 +137,7 @@ public class GoSecurityInfo extends NSObject {
     if (this.nameToPermission == null)
       this.nameToPermission = new HashMap<String, String>(16);
     
-    for (String name: _names) {
+    for (final String name: _names) {
       if (name == null || _perm == null)
         continue;
       
