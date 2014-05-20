@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -35,10 +35,10 @@ public class NSSelector extends NSObject {
   protected String  name;
   protected Class[] signature;
   
-  public NSSelector(String _name) {
+  public NSSelector(final String _name) {
     this(_name, emptySignature);
   }
-  public NSSelector(String _name, Class[] _signature) {
+  public NSSelector(final String _name, final Class[] _signature) {
     this.name      = _name;
     this.signature = _signature;
   }
@@ -55,6 +55,7 @@ public class NSSelector extends NSObject {
   
   /* Method lookup */
 
+  public static int anyMethod = -1;
   public Method methodWithoutSignatureOnClass(Class _targetClass, int _argc) {
     /* argc is -1 if any method with the given name should be selected */
     if (_targetClass == null || this.name == null)
@@ -62,7 +63,7 @@ public class NSSelector extends NSObject {
     
     for (Class cls = _targetClass; cls != null; cls = cls.getSuperclass()) {
       for (Method method: cls.getMethods()) {
-        if (_argc != -1 && method.getParameterTypes().length != _argc)
+        if (_argc != anyMethod && method.getParameterTypes().length != _argc)
           continue;
         
         if (this.name.equals(method.getName()))
@@ -165,7 +166,7 @@ public class NSSelector extends NSObject {
     
     /* lookup Method */
     
-    Method m = this.signature != null
+    final Method m = this.signature != null
       ? this.methodOnObject(_target)
       : this.methodWithoutSignatureOnClass(_target.getClass(), _args.length);
       
