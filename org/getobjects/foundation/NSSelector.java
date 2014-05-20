@@ -55,7 +55,7 @@ public class NSSelector extends NSObject {
   
   /* Method lookup */
 
-  public static int anyMethod = -1;
+  public static final int anyMethod = -1;
   public Method methodWithoutSignatureOnClass(Class _targetClass, int _argc) {
     /* argc is -1 if any method with the given name should be selected */
     if (_targetClass == null || this.name == null)
