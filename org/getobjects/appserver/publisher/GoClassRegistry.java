@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
 import org.getobjects.appserver.publisher.annotations.DefaultAccess;
 import org.getobjects.appserver.publisher.annotations.DefaultRoles;
+import org.getobjects.appserver.publisher.annotations.GoMethod;
 import org.getobjects.appserver.publisher.annotations.Private;
 import org.getobjects.appserver.publisher.annotations.ProtectedBy;
 import org.getobjects.appserver.publisher.annotations.Public;
@@ -162,7 +163,7 @@ public class GoClassRegistry extends NSObject {
     final Map<String, Object> nameToMethod = new HashMap<String, Object>(32);
     for (final Method method: _cls.getDeclaredMethods()) {
       final GoJavaMethod goMethod =
-          this.generateGoMethodFromJavaMethod(method, _ctx);
+        this.generateGoMethodFromJavaMethod(method, _ctx);
       if (goMethod == null)
         continue; /* not moved */
       
@@ -171,12 +172,11 @@ public class GoClassRegistry extends NSObject {
     
     /* construct class */
     
-    // TODO: check annotations for security and such
-    
     final GoJavaClass clazz =
       new GoJavaClass(_cls.getSimpleName(), _superClass, nameToMethod);
     
     this.processClassAnnotations(clazz, _cls);;
+
     return clazz;
   }
   
@@ -275,14 +275,46 @@ public class GoClassRegistry extends NSObject {
   public GoJavaMethod generateGoMethodFromJavaMethod
     (final Method _method, final IGoContext _ctx)
   {
-    // TODO: implement me
-    // TODO: check for xyzAction methods and auto-expose them
-    // TODO: check annotations
+    // TBD: expose methods which end in 'Action'?
+    if (_method == null)
+      return null;
+        
+    final GoMethod a = _method.getAnnotation(GoMethod.class);
+    if (a == null) // not exposing Java methods which are not annotaed
+      return null;
+
+    String slot = a.slot();
+    if (slot == null || slot.length() == 0)
+      slot = _method.getName();
     
-    // _method.isAnnotationPresent(CLASS);
-    // _method.getAnnotation(annotationClass);
+    /* security declarations */
     
-    return null;
+    final GoSecurityInfo si = null;
+    if (si != null) {
+      if (a.isPrivate()) {
+        si.declarePrivate(slot);
+        
+        if (a.protectedBy() != null || a.isPublic()) {
+          log.error(
+            "declared a method private which also has a " +
+            "another protection (ProtectedBy or Public): " + slot);
+        }
+      }
+      else if (a.protectedBy() != null) {
+        si.declareProtected(a.protectedBy(), slot);
+        if (a.isPublic()) {
+          log.error(
+              "declared a method protected which also has a " +
+              "another protection (Public): " + slot);
+        }
+      }
+      else if (a.isPublic())
+        si.declarePublic(slot);
+    }
+    
+    GoJavaMethod m = new GoJavaMethod(slot, _method);
+        
+    return m;
   }
   
   /* description */

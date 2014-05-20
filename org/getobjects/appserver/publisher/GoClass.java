@@ -56,19 +56,23 @@ public class GoClass extends NSObject implements IGoObject {
     this.goSuperClass = _superClass;
     this.securityInfo = new GoSecurityInfo();
     
-    if (_slots != null && _slots.size() > 0) {
-      this.slotNames  = new String[_slots.size()];
-      this.slotValues = new Object[this.slotNames.length];
-      
-      int i = 0;
-      for (final String slotName: _slots.keySet()) {
-        this.slotNames[i]  = slotName;
-        this.slotValues[i] = _slots.get(slotName);
-        i++;
-      }
-    }
-    
+    this._setAllSlots(_slots);;
     this.isSealed = false; /* allow categories to be attached */
+  }
+  
+  private void _setAllSlots(final Map<String, Object> _slots) {
+    if (_slots == null || _slots.size() == 0)
+      return;
+    
+    this.slotNames  = new String[_slots.size()];
+    this.slotValues = new Object[this.slotNames.length];
+    
+    int i = 0;
+    for (final String slotName: _slots.keySet()) {
+      this.slotNames[i]  = slotName;
+      this.slotValues[i] = _slots.get(slotName);
+      i++;
+    }
   }
   
   /* accessors */

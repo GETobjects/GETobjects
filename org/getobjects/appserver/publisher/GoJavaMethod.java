@@ -20,8 +20,12 @@
 */
 package org.getobjects.appserver.publisher;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.publisher.annotations.GoMethod;
 import org.getobjects.foundation.NSObject;
 
 /**
@@ -31,10 +35,24 @@ import org.getobjects.foundation.NSObject;
  */
 // * TODO: should we support multiple signatures?
 // * TODO: document
-public class GoJavaMethod extends NSObject implements IGoCallable {
+public class GoJavaMethod extends NSObject
+  implements IGoCallable, IGoSecuredObject
+{
+  protected static final Log log = LogFactory.getLog("GoClass");
+
+  protected String   name; // purely informational?
+  protected Method   method;
+  protected GoMethod methodInfo;
   
-  protected String name;
-  protected Method method;
+  public GoJavaMethod(final String _name, final Method _method) {
+    this.name   = _name;
+    this.method = _method;
+    
+    if (this.method == null)
+      log.error("Method object missing in GoJavaMethod named " + _name);
+    else
+      this.methodInfo = this.method.getAnnotation(GoMethod.class);
+  }
   
   /* accessors */
   
@@ -48,8 +66,33 @@ public class GoJavaMethod extends NSObject implements IGoCallable {
   /* GoCallable */
 
   public Object callInContext(final Object _object, final IGoContext _ctx) {
+    if (this.method == null)
+      return new GoInternalErrorException("GoJavaMethod has no method?");
+        
+    if (_object == null) // Objective-C semantics ;-)
+      return null;
+    
     // TODO: implement me
-    return null;
+    // TODO: implement parameter handling
+    
+    Object result = null;
+    try {
+      result = this.method.invoke(_object);
+    }
+    catch (IllegalArgumentException e) {
+      result = e;
+      log.error("Invalid argument on Java method on object: " + _object, e);
+    }
+    catch (IllegalAccessException e) {
+      result = e;
+      log.error("Cannot access Java method on object: " + _object, e);
+    }
+    catch (InvocationTargetException e) {
+      result = e;
+      log.error("Invocation target error on method with object: " + _object, e);
+    }
+    
+    return result;
   }
 
   public boolean isCallableInContext(final IGoContext _ctx) {
@@ -64,5 +107,36 @@ public class GoJavaMethod extends NSObject implements IGoCallable {
     
     if (this.name != null)
       _d.append(" name=" + this.name);
+  }
+  
+  /* secured object */
+
+  public Exception validateName(final String _name, final IGoContext _ctx) {
+    return IGoSecuredObject.DefaultImplementation
+             .validateNameOfObject(this, _name, _ctx);
+  }
+
+  public Exception validateObject(IGoContext _ctx) {
+    if (this.methodInfo == null)
+      return IGoSecuredObject.DefaultImplementation.validateObject(this, _ctx);
+    
+    if (this.methodInfo.isPrivate())
+      return new GoAccessDeniedException("attempt to access private object");
+    
+    if (this.methodInfo.protectedBy() != null)
+      return this.validatePermission(this.methodInfo.protectedBy(), _ctx);
+    
+    if (this.methodInfo.isPublic())
+      return null;
+
+    // no declaration, private
+    return new GoAccessDeniedException("attempt to access private object");
+  }
+  
+  public Exception validatePermission
+    (final String _permission, final IGoContext _ctx)
+  {
+    return IGoSecuredObject.DefaultImplementation
+             .validatePermissionOnObject(this, _permission, _ctx);
   }
 }
