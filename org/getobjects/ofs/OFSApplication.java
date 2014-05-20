@@ -325,19 +325,19 @@ public class OFSApplication extends WOApplication
         (_object, "index", _ctx, false /* do not acquire */);
       
       if (folderIndex instanceof IGoCallable) {
-        IGoCallable indexMethod = (IGoCallable)folderIndex;
+        final IGoCallable indexMethod = (IGoCallable)folderIndex;
         if (indexMethod.isCallableInContext(_ctx)) {
           // TBD: probably better to return a redirect
           return indexMethod;
         }
       }
-      else if (folderIndex instanceof Exception){
+      else if (folderIndex instanceof Exception) {
         log().warn("'index' document lookup returned an exception: " +
-            folderIndex);
+                   folderIndex);
       }
-      else if (folderIndex != null){
+      else if (folderIndex != null) {
         log().warn("folder contained an 'index' document, but its not a " +
-            "IGoCallable: " + folderIndex);
+                   "IGoCallable: " + folderIndex);
       }
       else
         log().warn("folder contained no 'index' document: " + _object);
