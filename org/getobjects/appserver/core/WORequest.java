@@ -177,22 +177,18 @@ public class WORequest extends WOMessage {
 
   /**
    * The URL of the request. This does NOT include query parameters!
+   * <p>
+   * This is overridden in the WOServletRequest subclass which can extract this
+   * information from the Servlet container.
+   * <p>
+   * Note: One cannot use the Origin header for this. Origin is the context
+   * FROM which the request got triggered, not the actual/new target.
+   * One could use the Host header, but this lacks the protocol (http/https).
    *
    * @return the URL of the request,
    * i.e. http://localhost:8181/HelloWorld/wr/a.gif
    */
   public String url() {
-    // If "origin" header is available, the exact URL can be constructed
-    String origin = this.headerForKey("origin");
-    if (UObject.isNotEmpty(origin)) {
-      return origin + this.uri();
-    }
-
-    // NOTE: extract URL from headers hinted by other adaptors?
-    // NOTE2: WOServletRequest is a subclass of WORequest and already knows
-    // how to find the proper URL information, hence it doesn't need to
-    // set any special headers!
-
     return null;
   }
 
