@@ -312,9 +312,10 @@ public class GoSimpleJSONRenderer extends NSObject
       if (isFirst) isFirst = false;
       else _sb.append(',');
 
-      if (!(key instanceof String))
+      if (!(key instanceof String)) {
         return new GoInternalErrorException("cannot render given object " +
                                             "as JSON");
+      }
       Exception error = this.appendObjectToString(key, _sb);
       if (error != null) return error;
 
@@ -331,7 +332,8 @@ public class GoSimpleJSONRenderer extends NSObject
     if (_obj instanceof Exception)
       return (Exception)_obj;
 
-    log.warn("cannot render object as JSON: " + _obj);
+    log.warn("cannot render object as JSON: " + _obj + 
+             " (" + _obj.getClass() + ")");
     return new GoInternalErrorException("cannot render given object as JSON");
   }
 }
