@@ -108,6 +108,12 @@ public class WOResponse extends WOMessage implements WOActionResults {
    * Remember that all HTTP headers must be set before you start the streaming
    * (including content-length and content-type!).
    * <p>
+   * CAREFUL: You might also need to set other headers on your own, including:
+   * <ul>
+   *   <li>the session cookie!
+   *   <li>anything CORS related!
+   * </ul>
+   * <p>
    * The method works by acquiring the Servlet OutputStream of the WORequest
    * associated with this response.
    * 

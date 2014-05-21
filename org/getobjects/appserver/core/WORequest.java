@@ -58,6 +58,7 @@ public class WORequest extends WOMessage {
   protected WEClientCapabilities cc;
 
   protected long startTimeStampInMS;
+  protected Map<String, List<String>> corsHeaders;
 
   /* construction */
 
@@ -98,7 +99,16 @@ public class WORequest extends WOMessage {
     long duration = new Date().getTime() - this.startTimeStampInMS;
     return duration / 1000.0;
   }
-
+  
+  /* CORS */
+  
+  public void _setCORSHeaders(final Map<String, List<String>> _cors) {
+    // yeah, this is quite hackish, but for now required to support streaming
+    if (this.corsHeaders != null)
+      log.warn("Overriding CORS headers, already set.");
+    this.corsHeaders = _cors;
+  }
+  
   /* URL processing */
 
   public String adaptorPrefix() {

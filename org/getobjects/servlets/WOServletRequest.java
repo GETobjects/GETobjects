@@ -572,6 +572,13 @@ public class WOServletRequest extends WORequest {
   public boolean prepareForStreaming(final WOResponse _r) {
     if (_r == null || this.sResponse == null)
       return false;
+    
+    // FIXME: this needs to do CORS, session cookies and such.
+    // temporary hack just for CORS:
+    if (this.corsHeaders != null) {
+      for (final String k: this.corsHeaders.keySet())
+        _r.setHeadersForKey(this.corsHeaders.get(k), k);
+    }
 
     WOServletAdaptor.prepareResponseHeader(_r, this.sResponse);
     return true;

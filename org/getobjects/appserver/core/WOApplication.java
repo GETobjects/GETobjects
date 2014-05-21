@@ -26,9 +26,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -57,7 +60,9 @@ import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSSelector;
+import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UObject;
+import org.getobjects.foundation.UString;
 
 /**
  * This is the main entry class for Go web applications. You usually
@@ -113,6 +118,7 @@ public class WOApplication extends NSObject
 
   protected AtomicInteger requestCounter      = new AtomicInteger(0);
   protected AtomicInteger activeDispatchCount = new AtomicInteger(0);
+  protected String[]      allowedOrigins      = null;
 
   protected WORequestHandler  defaultRequestHandler;
   protected Map<String,WORequestHandler> requestHandlerRegistry;
@@ -146,9 +152,22 @@ public class WOApplication extends NSObject
     /* at the very beginning, load configuration */
     this.loadProperties();
     
-    this.pageCacheSize = 5;
-    this.permanentPageCacheSize = 5;
-
+    /* add CORS origins */
+    String s = this.properties.getProperty("WOAllowOrigins");
+    if (UObject.isNotEmpty(s)) {
+      this.allowedOrigins =
+        UString.componentsSeparatedByString(s, ",", true, true);
+    }
+    
+    /* page caches */
+    
+    this.pageCacheSize = UObject.intValue(
+        this.properties.getProperty("WOPageCacheSize", "5"));
+    this.permanentPageCacheSize = UObject.intValue(
+        this.properties.getProperty("WOPermanentPageCacheSize", "5"));
+    
+    /* global objects */
+    
     this.goClassRegistry   = new GoClassRegistry(this);
     this.goProductManager  = new GoProductManager(this);
 
@@ -163,7 +182,7 @@ public class WOApplication extends NSObject
     this.sessionStore      = WOSessionStore.serverSessionStore();
     this.statisticsStore   = new WOStatisticsStore();
   }
-
+  
   /* Note: this is called by WOPackageLinker.linkApplication() */
   public void linkDefaultPackages(WOPackageLinker _linker) {
     _linker.linkFramework(WOHTMLDynamicElement.class.getPackage().getName());
@@ -363,36 +382,69 @@ public class WOApplication extends NSObject
       this.logRequestStart(_rq, rqId);
     
     final WORequestHandler rh;
-
-    if (this.useHandlerRequestDispatch()) {
-      /*
-       * This is the regular WO approach, derive a request handler from
-       * the URL and then pass the request on for processing to that handler.
-       */
-      rh = this.requestHandlerForRequest(_rq);
-    }
-    else {
-      /* This method does the GoStyle request processing. Its called by
-       * dispatchRequest() if requesthandler-processing is turned off.
-       * Otherwise the handleRequest() method of the respective request
-       * handler is called!
-       */
-      rh = new GoObjectRequestHandler(this);
-    }
-
-    if (rh == null) {
-      log.error("got no request handler for request: " + _rq);
-      r = null;
-    }
-    else {
-      try {
-        r = rh.handleRequest(_rq);
+    
+    /* CORS. This is not the perfect place to do this - the objects themselves
+     * should decide their origin policy. But we have to get started somehow ;-)
+     */
+    final String origin = _rq.headerForKey("origin");
+    Map<String, List<String>> corsHeaders = null;
+    if (origin != null && origin.length() > 0) {
+      corsHeaders = this.validateOriginOfRequest(origin, _rq);
+      if (corsHeaders == null) {
+        r = new WOResponse(_rq);
+        r.setStatus(403);
+        r.appendContentString("Origin is not permitted: " + origin);
       }
-      catch (Exception e) {
-        log.error("WOApplication catched exception", e);
+      else
+        _rq._setCORSHeaders(corsHeaders);
+    }
+    
+    if (r == null) {
+      /* select WORequestHandler to process the request */
+
+      if (this.useHandlerRequestDispatch()) {
+        /*
+         * This is the regular WO approach, derive a request handler from
+         * the URL and then pass the request on for processing to that handler.
+         */
+        rh = this.requestHandlerForRequest(_rq);
+      }
+      else {
+        /* This method does the GoStyle request processing. Its called by
+         * dispatchRequest() if requesthandler-processing is turned off.
+         * Otherwise the handleRequest() method of the respective request
+         * handler is called!
+         */
+        rh = new GoObjectRequestHandler(this);
+      }
+
+      if (rh == null) {
+        log.error("got no request handler for request: " + _rq);
         r = null;
       }
+      else {
+        try {
+          r = rh.handleRequest(_rq);
+        }
+        catch (Exception e) {
+          log.error("WOApplication catched exception", e);
+          r = null;
+        }
+      }
     }
+    
+    /* CORS, add headers to response */
+    
+    if (corsHeaders != null && r != null && corsHeaders.size() > 0) {
+      if (r.isStreaming()) // already sets the CORS headers
+        log.info("CORS: cannot add headers, response is streaming ...");
+      else {
+        for (final String key: corsHeaders.keySet())
+          r.setHeadersForKey(corsHeaders.get(key), key);
+      }
+    }
+    
+    /* finish up */
 
     if (!isCachingEnabled()) { /* help with debugging weak references */
       log.info("running full garbage collection (WOCachingEnabled is off)");
@@ -405,7 +457,91 @@ public class WOApplication extends NSObject
       this.logRequestEnd(_rq, rqId, r);
     return r;
   }
-
+  
+  /* CORS */
+  
+  public Map<String, List<String>> validateOriginOfRequest
+    (final String _origin, final WORequest _rq)
+  {
+    // TBD: check whether all this is OK
+    final String hACAO = "Access-Control-Allow-Origin";
+    Map<String, List<String>> headers;
+    boolean isOptions   = false;
+    String  rqBase  = _rq != null ? removePathFromURL(_rq.url()) : null;
+    String  oriBase = removePathFromURL(_origin);
+    
+    headers = new HashMap<String, List<String>>(4);
+    
+    if (_rq != null) {
+      final String m = _rq.method();
+      if (m != null && m.equals("OPTIONS"))
+        isOptions = true;
+    }
+    
+    if (isOptions) {
+      log.error("CORS for OPTIONS is not yet implemented.");
+      isOptions = false; // treat as non-OPTIONS
+    }
+    
+    if (!isOptions) {
+      if (oriBase != null) {
+        boolean didMatch = false;
+        if (oriBase.equalsIgnoreCase(rqBase)) // hm, ok, well ;-)
+          didMatch = true; // same origin, allow
+        else if (this.allowedOrigins != null) {
+          log.info("Validate origin: " + oriBase);
+          
+          /* now we need to match */
+          for (final String ao: this.allowedOrigins) {
+            if (ao == null || ao.length() == 0) continue;
+            if ("*".equals(ao)) {
+              didMatch = true;
+              break;
+            }
+            if (oriBase.equalsIgnoreCase(ao)) {
+              didMatch = true;
+              break;
+            }
+          }
+        }
+        
+        if (didMatch)
+          headers.put(hACAO, UList.create(oriBase));
+        else {
+          log.warn("Rejecting request from different origin: " + oriBase);
+          headers = null;
+        }
+      }
+      else if (rqBase != null)
+        headers.put(hACAO, UList.create(rqBase));
+    }
+    // else: implement me
+    
+    return headers;
+  }
+  private static final String removePathFromURL(final String _url) {
+    if (_url == null) return null;
+    if (_url.length()  == 0) return "";
+    try {
+      // yeah, not perfect
+      StringBuilder sb = new StringBuilder(32);
+      String s;
+      URL url = new URL(_url);
+      if (UObject.isNotEmpty((s = url.getProtocol()))) {
+        sb.append(s);
+        sb.append("://");
+      }
+      if (UObject.isNotEmpty((s = url.getAuthority())))
+        sb.append(s);
+      
+      return sb.toString();
+    }
+    catch (MalformedURLException e) {
+      log.warn("could not parse URL: " + _url);
+      return _url; // keep as-is
+    }
+  }
+  
   /* rendering results */
 
   public static final NSSelector selRendererForObjectInContext =
