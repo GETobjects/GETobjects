@@ -55,9 +55,9 @@ import org.getobjects.foundation.UMap;
  * EODatabaseDataSource works on top of an EOEditingContext. It has the biggest
  * overhead but provides features like object uniquing/registry. Eg if you need
  * to fetch a bunch of objects and then perform subsequent processing on them
- * (for example permission checks), its convenient because the context remembers
- * the fetched objects. This datasource returns EOEnterpriseObjects as specified
- * in the associated EOModel.
+ * (for example permission checks), it is convenient because the context
+ * remembers the fetched objects. This datasource returns EOEnterpriseObjects as
+ * specified in the associated EOModel.
  * <p>
  * EOActiveDataSource is similiar to EODatabaseDataSource, but it directly works
  * on a channel. It has a reasonably small overhead and still provides a good
