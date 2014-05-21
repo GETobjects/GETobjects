@@ -21,8 +21,12 @@
 package org.getobjects.appserver.publisher;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +54,13 @@ public class GoSimpleJSONRenderer extends NSObject
   implements IGoObjectRenderer
 {
   protected static final Log log = LogFactory.getLog("GoSimpleJSONRenderer");
+  
+  final DateFormat dateFormat;
+  
+  public GoSimpleJSONRenderer() {
+    this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));    
+  }
 
   /* control rendering */
 
@@ -97,6 +108,7 @@ public class GoSimpleJSONRenderer extends NSObject
     if (_object instanceof List)      return true;
     if (_object instanceof Map)       return true;
     if (_object instanceof Throwable) return true;
+    if (_object instanceof Date)      return true;
     
     final Class itemClazz = _object.getClass().getComponentType();
     if (itemClazz != null) { /* an array */
@@ -190,6 +202,9 @@ public class GoSimpleJSONRenderer extends NSObject
     final Class itemClazz = _object.getClass().getComponentType();
     if (itemClazz != null) /* an array */
       return this.appendListToString(UList.asList(_object), _sb);
+    
+    if (_object instanceof Date)
+      return this.appendDateToString((Date)_object, _sb);
     
     return this.appendCustomObjectToString(_object, _sb);
   }
@@ -325,6 +340,18 @@ public class GoSimpleJSONRenderer extends NSObject
     }
 
     _sb.append('}');
+    return null;
+  }
+  
+  public Exception appendDateToString(final Date _ts, StringBuilder _sb) {
+    if (_ts == null) {
+      _sb.append("null");
+      return null;
+    }
+
+    _sb.append('"');
+    _sb.append(this.dateFormat.format(_ts));
+    _sb.append('"');
     return null;
   }
 
