@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2008 Helge Hess <helge.hess@opengroupware.org>
+ * Copyright (C) 2007-2014 Helge Hess <helge.hess@opengroupware.org>
  *
  * This file is part of Go.
  *
@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * UList
- * <p>
  * List and array related utility functions.
  */
 @SuppressWarnings("unchecked")
@@ -39,6 +37,17 @@ public class UList extends NSObject {
 
   private UList() {} /* do not allow construction */
 
+  public static final <T> List<T> create(T... _values) {
+    int len = _values != null ? _values.length : 0;
+    if (len == 0)
+      return new ArrayList<T>(1); /* 0 makes the map choose a value? */
+    
+    ArrayList<T> l = new ArrayList<T>(len);
+    for (int i = 0; i < len; i++)
+      l.add(_values[i]);
+    
+    return l;
+  }
 
   /* searching in arrays */
 
