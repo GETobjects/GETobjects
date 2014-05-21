@@ -145,7 +145,9 @@ public class GoObjectRequestHandler extends WORequestHandler {
     /* now render the result */
 
     if (r == null) {
-      /* Note: the session cookie is added further down */
+      /* Note: the session cookie is added further down.
+       * FIXME: this can be an issue when streaming is on?!
+       */
       r = this.application.renderObjectInContext(result, _ctx);
       if (debugOn) log.debug("rendered object: " + result + ", as: " + r);
     }
@@ -262,13 +264,17 @@ public class GoObjectRequestHandler extends WORequestHandler {
 
         this.savePageWhenRequired(ctx);
 
+        // FIXME: this could be too late if WOResponse streaming is on.
         if (ctx.hasSession()) {
           /* Add session cookies when requested. If you want to add the cookies
            * in the renderer, turn cookie-storage off in the WOSession.
            */
           WOSession sn = ctx.session();
-          if (sn != null && sn.storesIDsInCookies())
+          if (sn != null && sn.storesIDsInCookies()) {
+            if (r != null && r.isStreaming())
+              log.warn("cannot add session-id cookie to streamed response!");
             sn.addSessionIDCookieToResponse(r, ctx);
+          }
         }
         else {
           WOSession.expireSessionCookieInResponse(_rq, r, ctx);

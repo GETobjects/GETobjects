@@ -66,11 +66,15 @@ public class GoJavaMethod extends NSObject
   /* GoCallable */
 
   public Object callInContext(final Object _object, final IGoContext _ctx) {
-    if (this.method == null)
+    if (this.method == null) {
+      log.error("GoJavaMethod has not Method: " + this);
       return new GoInternalErrorException("GoJavaMethod has no method?");
-        
-    if (_object == null) // Objective-C semantics ;-)
+    }
+    
+    if (_object == null) { // Objective-C semantics ;-)
+      log.info("calling GoMethod on null (noop): " + this);
       return null;
+    }
     
     // TODO: implement me
     // TODO: implement parameter handling
