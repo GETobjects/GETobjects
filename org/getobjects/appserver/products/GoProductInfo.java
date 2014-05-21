@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2014 Helge Hess
 
   This file is part of Go.
 
@@ -34,13 +34,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
 import org.getobjects.appserver.core.WOContext;
-import org.getobjects.appserver.publisher.IGoObjectRenderer;
-import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
 import org.getobjects.appserver.publisher.GoClass;
 import org.getobjects.appserver.publisher.GoClassRegistry;
 import org.getobjects.appserver.publisher.GoDirectActionInvocation;
 import org.getobjects.appserver.publisher.GoPageInvocation;
 import org.getobjects.appserver.publisher.GoSecurityInfo;
+import org.getobjects.appserver.publisher.IGoObjectRenderer;
+import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSPropertyListParser;
@@ -49,11 +49,72 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * GoProductInfo
- * <p>
  * This object is used to track products in the product manager w/o actually
  * being required to activate the product (that is, w/o loading it).
  * More or less the manifest information.
+ * <p>
+ * The product settings are contained in a file called 'product.plist', inside
+ * the package. Sample:
+ * <pre>
+ * {
+ *   factories = {
+ *   };
+ *   
+ *   renderers = {
+ *     org.getobjects.ofs.OFSResourceFileRenderer = {
+ *     };
+ *   };
+ * 
+ *   classes = {
+ *   
+ *     org.getobjects.ofs.OFSBaseObject = {
+ *       protectedBy   = "View";
+ *       defaultAccess = "allow";
+ *       
+ *       defaultRoles = {
+ *         "View"                    = "Anonymous";
+ *         "WebDAV Access"           = "Authenticated";
+ *         "Change Images and Files" = "Owner";
+ *       };
+ *       
+ *       slots = {
+ *       };
+ *      
+ *       methods = {
+ *       };
+ *     };
+ *     
+ *     org.getobjects.ofs.OFSFolder = {
+ *       superclass = "org.getobjects.ofs.OFSBaseObject";
+ *     
+ *       slots = {
+ *       };
+ *       
+ *       methods = {
+ *         "-manage_workspace" = {
+ *           protectedBy = "View Management Screens";
+ *           pageName    = "JMIManageFolder";
+ *         };
+ *       };
+ *       
+ *       slots = {
+ *         "-manage_addChildren" = { // this is like an ivar, an array plist
+ *           protectedBy = "View Management Screens";
+ *           value = (
+ *             { label  = "Folder";
+ *               action = "-manage_addProduct/jmi/folderAdd"; },
+ *             { label  = "Publisher Template";
+ *               action = "-manage_addProduct/jmi/templateAdd"; }
+ *           );
+ *         };
+ *       };
+ *     };
+ *   }
+ * }
+ * </pre>
+ * 
+ * The code is also prepared for an XML version of that, but that is not yet
+ * finished.
 */
 public class GoProductInfo extends NSObject
   implements IGoObjectRendererFactory
@@ -344,7 +405,7 @@ public class GoProductInfo extends NSObject
     final Map classes = (Map)pp.get("classes");
     if (classes != null) {
       for (Object k: classes.keySet())
-        loadClassSettings(registry, (String)k, (Map)classes.get(k));
+        this.loadClassSettings(registry, (String)k, (Map)classes.get(k));
     }
     
     /* categories */
@@ -352,24 +413,55 @@ public class GoProductInfo extends NSObject
     final Map categories = (Map)pp.get("categories");
     if (categories != null) {
       for (Object k: categories.keySet())
-        loadClassSettings(registry, (String)k, (Map)categories.get(k));
+        this.loadClassSettings(registry, (String)k, (Map)categories.get(k));
     }
     
     /* renderers */
     
     final Map rendererInfos = (Map)pp.get("renderers");
     if (rendererInfos != null) {
-      List<IGoObjectRenderer> loadingRenderers =
+      final List<IGoObjectRenderer> loadingRenderers =
         new ArrayList<IGoObjectRenderer>(4);
       for (Object k: rendererInfos.keySet()) {
         // TODO: do something with the renderer settings ... (priority etc)
         // TODO: use class loader
-        Class rcls = NSJavaRuntime.NSClassFromString(k.toString()); 
-        IGoObjectRenderer renderer =
-          (IGoObjectRenderer)NSJavaRuntime.NSAllocateObject(rcls);
+        String className = k.toString();
+        IGoObjectRenderer renderer = null;
+        Class rcls = null;
+        
+        /* try to load via class loader */
+        
+        if (this.classLoader != null) {
+          try {
+            rcls = this.classLoader.loadClass(className);
+          }
+          catch (ClassNotFoundException e) {
+            try {
+              rcls = this.classLoader.loadClass(this.fqn + "." + className);
+            }
+            catch (ClassNotFoundException e2) {
+              log.error("Could not load class of renderer: " + className, e2);
+            }
+          }
+        }
+        
+        /* use global loading mechanism */
+        
+        if (rcls == null) {
+          rcls = NSJavaRuntime.NSClassFromString(className);
+          if (rcls == null)
+            rcls = NSJavaRuntime.NSClassFromString(this.fqn + "." + className);
+        }
+        
+        /* instantiate and remember renderer */
+        
+        if (rcls != null)
+          renderer = (IGoObjectRenderer)NSJavaRuntime.NSAllocateObject(rcls);
         
         if (renderer != null)
           loadingRenderers.add(renderer);
+        else
+          log.error("Could not instantiate product renderer: " + k);
       }
       
       if (loadingRenderers.size() > 0) {
@@ -385,6 +477,7 @@ public class GoProductInfo extends NSObject
   
   public void loadProductXML(Document _doc, GoClassRegistry _registry) {
     // TBD: load product info from XML
+    log.fatal("XML config based products are not yet available ...");
   }
 
   public void loadProduct(Object _product, WOApplication _app) {
