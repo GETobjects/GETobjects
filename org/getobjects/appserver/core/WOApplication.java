@@ -26,8 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -60,9 +58,7 @@ import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSSelector;
-import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UObject;
-import org.getobjects.foundation.UString;
 
 /**
  * This is the main entry class for Go web applications. You usually
@@ -116,12 +112,10 @@ public class WOApplication extends NSObject
   protected static final Log pageLog = LogFactory.getLog("WOPages");
   protected static final Log profile = LogFactory.getLog("WOProfiling");
 
-  protected AtomicInteger requestCounter       = new AtomicInteger(0);
-  protected AtomicInteger activeDispatchCount  = new AtomicInteger(0);
+  protected AtomicInteger     requestCounter       = new AtomicInteger(0);
+  protected AtomicInteger     activeDispatchCount  = new AtomicInteger(0);
   
-  protected String[]      allowedOrigins       = null;
-  protected String[]      allowedOriginMethods = null;
-  protected String[]      allowedOriginHeaders = null;
+  protected WOCORSConfig      corsConfig;
 
   protected WORequestHandler  defaultRequestHandler;
   protected Map<String,WORequestHandler> requestHandlerRegistry;
@@ -152,21 +146,11 @@ public class WOApplication extends NSObject
   }
 
   public void init() {
-    String s;
-    
     /* at the very beginning, load configuration */
     this.loadProperties();
     
     /* add CORS origins */
-    s = this.properties.getProperty("WOAllowOrigins");
-    this.allowedOrigins =
-      UString.componentsSeparatedByString(s, ",", true, true);
-    s = this.properties.getProperty("WOAllowOriginMethods");
-    this.allowedOriginMethods =
-      UString.componentsSeparatedByString(s, ",", true, true);
-    s = this.properties.getProperty("WOAllowOriginHeaders");
-    this.allowedOriginHeaders =
-      UString.componentsSeparatedByString(s, ",", true, true);
+    this.corsConfig = new WOCORSConfig(this.properties);
     
     /* page caches */
     
@@ -485,82 +469,9 @@ public class WOApplication extends NSObject
   public Map<String, List<String>> validateOriginOfRequest
     (final String _origin, final WORequest _rq)
   {
-    // TBD: check whether all this is OK
-    final String hACAO = "Access-Control-Allow-Origin";
-    Map<String, List<String>> headers;
-    boolean isOptions   = false;
-    String  rqBase  = _rq != null ? removePathFromURL(_rq.url()) : null;
-    String  oriBase = removePathFromURL(_origin);
-    
-    headers = new HashMap<String, List<String>>(4);
-    
-    if (_rq != null) {
-      final String m = _rq.method();
-      if (m != null && m.equals("OPTIONS"))
-        isOptions = true;
-    }
-    
-    if (oriBase != null) {
-      boolean didMatch = false;
-      if (oriBase.equalsIgnoreCase(rqBase)) // hm, ok, well ;-)
-        didMatch = true; // same origin, allow
-      else if (this.allowedOrigins != null) {
-        log.info("Validate origin: " + oriBase);
-
-        /* now we need to match */
-        for (final String ao: this.allowedOrigins) {
-          if (ao == null || ao.length() == 0) continue;
-          if ("*".equals(ao)) {
-            didMatch = true;
-            break;
-          }
-          if (oriBase.equalsIgnoreCase(ao)) {
-            didMatch = true;
-            break;
-          }
-        }
-      }
-
-      if (didMatch)
-        headers.put(hACAO, UList.create(oriBase));
-      else {
-        log.warn("Rejecting request from different origin: " + oriBase);
-        headers = null;
-      }
-    }
-    else if (rqBase != null)
-      headers.put(hACAO, UList.create(rqBase));
-    
-    if (isOptions && headers != null) {
-      headers.put("Access-Control-Allow-Methods", UList.create(
-          UString.componentsJoinedByString(this.allowedOriginMethods, ", ")));
-      headers.put("Access-Control-Allow-Headers", UList.create(
-          UString.componentsJoinedByString(this.allowedOriginHeaders, ", ")));                  
-    }
-    
-    return headers;
-  }
-  private static final String removePathFromURL(final String _url) {
-    if (_url == null) return null;
-    if (_url.length()  == 0) return "";
-    try {
-      // yeah, not perfect
-      StringBuilder sb = new StringBuilder(32);
-      String s;
-      URL url = new URL(_url);
-      if (UObject.isNotEmpty((s = url.getProtocol()))) {
-        sb.append(s);
-        sb.append("://");
-      }
-      if (UObject.isNotEmpty((s = url.getAuthority())))
-        sb.append(s);
-      
-      return sb.toString();
-    }
-    catch (MalformedURLException e) {
-      log.warn("could not parse URL: " + _url);
-      return _url; // keep as-is
-    }
+    if (this.corsConfig != null)
+      return this.corsConfig.validateOriginOfRequest(_origin, _rq);
+    return null;
   }
   
   /* rendering results */
