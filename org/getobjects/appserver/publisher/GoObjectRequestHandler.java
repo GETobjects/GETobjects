@@ -58,6 +58,10 @@ public class GoObjectRequestHandler extends WORequestHandler {
   public WOResponse handleRequest(WORequest _rq, WOContext _ctx, WOSession _s) {
     WOResponse r = null;
     boolean    debugOn = log.isDebugEnabled();
+    boolean    isOptions = false;
+    
+    if (_rq != null && _rq.method() != null)
+      isOptions = _rq.method().equals("OPTIONS");
 
     /* now perform the GoObject path traversal */
 
@@ -102,6 +106,9 @@ public class GoObjectRequestHandler extends WORequestHandler {
     if (tpath != null && r == null) {
       result = tpath.resultObject();
 
+      // TBD: should we even call methods with OPTIONS? (except when it's
+      //      OPTIONS itself?)
+      
       if (result == null) {
         log.warn("object lookup returned no result: " + tpath);
         result = new GoNotFoundException("did not find object for path");
@@ -133,7 +140,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
 
         if (method != null) {
           if (debugOn)
-            log.debug("call: " + method + ", with: " + tpath.clientObject());
+            log.debug("call: " + method + ", with: " + tpath.clientObject());          
           result = method.callInContext(tpath.clientObject(), _ctx);
           if (debugOn) log.debug("  call result: " + result);
         }
@@ -148,8 +155,14 @@ public class GoObjectRequestHandler extends WORequestHandler {
       /* Note: the session cookie is added further down.
        * FIXME: this can be an issue when streaming is on?!
        */
-      r = this.application.renderObjectInContext(result, _ctx);
-      if (debugOn) log.debug("rendered object: " + result + ", as: " + r);
+      if (isOptions) {
+        log.info("OPTIONS request, not rendering result.");
+        r = this.application.optionsForObjectInContext(result, _ctx);
+      }
+      else {
+        r = this.application.renderObjectInContext(result, _ctx);
+        if (debugOn) log.debug("rendered object: " + result + ", as: " + r);
+      }
     }
 
     return r;

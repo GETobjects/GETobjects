@@ -116,9 +116,12 @@ public class WOApplication extends NSObject
   protected static final Log pageLog = LogFactory.getLog("WOPages");
   protected static final Log profile = LogFactory.getLog("WOProfiling");
 
-  protected AtomicInteger requestCounter      = new AtomicInteger(0);
-  protected AtomicInteger activeDispatchCount = new AtomicInteger(0);
-  protected String[]      allowedOrigins      = null;
+  protected AtomicInteger requestCounter       = new AtomicInteger(0);
+  protected AtomicInteger activeDispatchCount  = new AtomicInteger(0);
+  
+  protected String[]      allowedOrigins       = null;
+  protected String[]      allowedOriginMethods = null;
+  protected String[]      allowedOriginHeaders = null;
 
   protected WORequestHandler  defaultRequestHandler;
   protected Map<String,WORequestHandler> requestHandlerRegistry;
@@ -149,15 +152,21 @@ public class WOApplication extends NSObject
   }
 
   public void init() {
+    String s;
+    
     /* at the very beginning, load configuration */
     this.loadProperties();
     
     /* add CORS origins */
-    String s = this.properties.getProperty("WOAllowOrigins");
-    if (UObject.isNotEmpty(s)) {
-      this.allowedOrigins =
-        UString.componentsSeparatedByString(s, ",", true, true);
-    }
+    s = this.properties.getProperty("WOAllowOrigins");
+    this.allowedOrigins =
+      UString.componentsSeparatedByString(s, ",", true, true);
+    s = this.properties.getProperty("WOAllowOriginMethods");
+    this.allowedOriginMethods =
+      UString.componentsSeparatedByString(s, ",", true, true);
+    s = this.properties.getProperty("WOAllowOriginHeaders");
+    this.allowedOriginHeaders =
+      UString.componentsSeparatedByString(s, ",", true, true);
     
     /* page caches */
     
@@ -460,6 +469,19 @@ public class WOApplication extends NSObject
   
   /* CORS */
   
+  public WOResponse optionsForObjectInContext
+    (final Object _clientObject, final WOContext _ctx)
+  {
+    // FIXME: This might not be the right place. But calling 'renderObject'
+    //        also seems quite wrong.
+    //   TBD: Should this check whether the clientObject supports PUT and
+    //        such, and enables CORS, etc?
+    // Access-Control-Request-Headers: origin, x-requested-with
+    WOResponse r = new WOResponse(_ctx.request());
+    r.setStatus(200);
+    // FIXME: add all relevant headers
+    return r;
+  }
   public Map<String, List<String>> validateOriginOfRequest
     (final String _origin, final WORequest _rq)
   {
@@ -478,44 +500,43 @@ public class WOApplication extends NSObject
         isOptions = true;
     }
     
-    if (isOptions) {
-      log.error("CORS for OPTIONS is not yet implemented.");
-      isOptions = false; // treat as non-OPTIONS
-    }
-    
-    if (!isOptions) {
-      if (oriBase != null) {
-        boolean didMatch = false;
-        if (oriBase.equalsIgnoreCase(rqBase)) // hm, ok, well ;-)
-          didMatch = true; // same origin, allow
-        else if (this.allowedOrigins != null) {
-          log.info("Validate origin: " + oriBase);
-          
-          /* now we need to match */
-          for (final String ao: this.allowedOrigins) {
-            if (ao == null || ao.length() == 0) continue;
-            if ("*".equals(ao)) {
-              didMatch = true;
-              break;
-            }
-            if (oriBase.equalsIgnoreCase(ao)) {
-              didMatch = true;
-              break;
-            }
+    if (oriBase != null) {
+      boolean didMatch = false;
+      if (oriBase.equalsIgnoreCase(rqBase)) // hm, ok, well ;-)
+        didMatch = true; // same origin, allow
+      else if (this.allowedOrigins != null) {
+        log.info("Validate origin: " + oriBase);
+
+        /* now we need to match */
+        for (final String ao: this.allowedOrigins) {
+          if (ao == null || ao.length() == 0) continue;
+          if ("*".equals(ao)) {
+            didMatch = true;
+            break;
+          }
+          if (oriBase.equalsIgnoreCase(ao)) {
+            didMatch = true;
+            break;
           }
         }
-        
-        if (didMatch)
-          headers.put(hACAO, UList.create(oriBase));
-        else {
-          log.warn("Rejecting request from different origin: " + oriBase);
-          headers = null;
-        }
       }
-      else if (rqBase != null)
-        headers.put(hACAO, UList.create(rqBase));
+
+      if (didMatch)
+        headers.put(hACAO, UList.create(oriBase));
+      else {
+        log.warn("Rejecting request from different origin: " + oriBase);
+        headers = null;
+      }
     }
-    // else: implement me
+    else if (rqBase != null)
+      headers.put(hACAO, UList.create(rqBase));
+    
+    if (isOptions && headers != null) {
+      headers.put("Access-Control-Allow-Methods", UList.create(
+          UString.componentsJoinedByString(this.allowedOriginMethods, ", ")));
+      headers.put("Access-Control-Allow-Headers", UList.create(
+          UString.componentsJoinedByString(this.allowedOriginHeaders, ", ")));                  
+    }
     
     return headers;
   }
