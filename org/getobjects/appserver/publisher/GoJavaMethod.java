@@ -92,8 +92,9 @@ public class GoJavaMethod extends NSObject
       log.error("Cannot access Java method on object: " + _object, e);
     }
     catch (InvocationTargetException e) {
-      result = e;
-      log.error("Invocation target error on method with object: " + _object, e);
+      result = e.getCause();
+      log.error("Invocation target error on method with object: " + _object,
+                e.getCause());
     }
     
     return result;
