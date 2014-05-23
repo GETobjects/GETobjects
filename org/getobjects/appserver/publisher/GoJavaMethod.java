@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.publisher.annotations.GoMethod;
 import org.getobjects.foundation.NSObject;
 
@@ -64,7 +65,36 @@ public class GoJavaMethod extends NSObject
   }
   
   /* GoCallable */
-
+  
+  private static final Object[] emptyArgs = new Object[0];
+  public Object[] argumentsForMethodCallInContext
+    (final Object _object, final IGoContext _ctx)
+  {
+    Class<?>[] argTypes = this.method.getParameterTypes();
+    
+    // inspect methodInfo
+    
+    if (argTypes.length == 0)
+      return emptyArgs;
+    
+    final Object[] args = new Object[argTypes.length];
+    // FIXME: IMPLEMENT ME: consider a spec in methodInfo
+    for (int i = 0; i < argTypes.length; i++) {
+      Class<?> argType = argTypes[i];
+      
+      // FIXME: the arguments themselves can have annotations!
+      
+      if (argType.isAssignableFrom(IGoContext.class))
+        args[i] = _ctx;
+      else if (argType.isAssignableFrom(WOContext.class))
+        args[i] = _ctx;
+      else {
+        log.error("Cannot yet deal with this GoMethod argument: " + argType);
+      }
+    }    
+    return args;
+  }
+  
   public Object callInContext(final Object _object, final IGoContext _ctx) {
     if (this.method == null) {
       log.error("GoJavaMethod has not Method: " + this);
@@ -79,9 +109,11 @@ public class GoJavaMethod extends NSObject
     // TODO: implement me
     // TODO: implement parameter handling
     
+    Object[] args = this.argumentsForMethodCallInContext(_object, _ctx);
+    
     Object result = null;
     try {
-      result = this.method.invoke(_object);
+      result = this.method.invoke(_object, args);
     }
     catch (IllegalArgumentException e) {
       result = e;
