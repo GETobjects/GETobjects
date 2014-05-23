@@ -374,7 +374,6 @@ public class WOApplication extends NSObject
     if (profile.isInfoEnabled())
       this.logRequestStart(_rq, rqId);
     
-    final WORequestHandler rh;
     
     /* CORS. This is not the perfect place to do this - the objects themselves
      * should decide their origin policy. But we have to get started somehow ;-)
@@ -392,8 +391,22 @@ public class WOApplication extends NSObject
         _rq._setCORSHeaders(corsHeaders);
     }
     
+    
+    /* Catch OPTIONS, doesn't work with CORS and Authentication. Maybe that is
+     * the right thing to do anyways? Or should OPTIONS /missing return a 404?
+     */
+    if (_rq.method().equals("OPTIONS")) {
+      final WOContext tmpctx = new WOContext(this, _rq);
+      log.debug("Not using object publishing for OPTIONS ...");
+      r = this.optionsForObjectInContext(null, tmpctx);
+    }
+    
+    
+    /* and here comes the regular processing */
+    
     if (r == null) {
       /* select WORequestHandler to process the request */
+      final WORequestHandler rh;      
 
       if (this.useHandlerRequestDispatch()) {
         /*
