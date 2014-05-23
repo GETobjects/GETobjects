@@ -37,8 +37,8 @@ import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOFilterDataSource;
 import org.getobjects.eocontrol.EOKeyValueQualifier;
 import org.getobjects.eocontrol.EOQualifier;
-import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.eocontrol.EOQualifier.ComparisonOperation;
+import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
 
@@ -258,9 +258,6 @@ public class WODisplayGroup extends NSObject {
   
   /* fetching the count */
   
-  protected static String countPattern =
-    "%(select)s COUNT(*) FROM %(tables)s %(where)s";
-
   public int fetchCount() {
     // TODO: add some way to make this more clever
     if (!(this.dataSource instanceof EOAccessDataSource)) {
@@ -271,21 +268,12 @@ public class WODisplayGroup extends NSObject {
     
     /* Check whether the fetchspec already contains a SQL fetch hint */
     EOFetchSpecification fs = this.fetchSpecificationForFetch();
-    Map<String, Object> oldHints = fs.hints();
-    if (oldHints != null &&
-        (oldHints.containsKey("EOCustomQueryExpressionHintKey") ||
-         oldHints.containsKey("EOCustomQueryExpressionHintKeyBindPattern")))
-    {
-      /* do not break existing hints */
+    fs = fs.fetchSpecificationForCount();
+    if (fs == null) { // could not derive a count-spec
       this.fetch();
       List<Object> objs = this.allObjects();
       return objs != null ? objs.size() : 0;
     }
-    
-    fs.setHint("EOCustomQueryExpressionHintKey", countPattern);
-    fs.setFetchesRawRows(true);
-    // this does not work (yet):
-    // fs.setFetchAttributeNames(new String[] { "COUNT(*)" });
     
     EOFetchSpecification old = this.dataSource.fetchSpecification();
     this.dataSource.setFetchSpecification(fs);

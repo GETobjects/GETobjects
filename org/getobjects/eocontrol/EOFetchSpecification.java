@@ -24,6 +24,8 @@ package org.getobjects.eocontrol;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UMap;
@@ -38,6 +40,7 @@ import org.getobjects.foundation.UMap;
  * Raw SQL hint: EOCustomQueryExpressionHintKey
  */
 public class EOFetchSpecification extends NSObject implements Cloneable {
+  private static final Log log = LogFactory.getLog("EOControl");
 
   protected String             entityName;
   protected String[]           attributeNames;
@@ -360,6 +363,29 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
   public void disjoinQualifier(final String _fmt, final Object... _args) {
     EOQualifierParser parser = new EOQualifierParser(_fmt.toCharArray(), _args);
     this.disjoinQualifier(parser.parseQualifier());
+  }
+  
+  
+  /* Counts */
+  
+  protected static String countPattern = // Note: LIMIT 1
+      "%(select)s COUNT(*) FROM %(tables)s %(where)s LIMIT 1";
+  public EOFetchSpecification fetchSpecificationForCount() {
+    Map<String, Object> oldHints = this.hints();
+    if (oldHints != null &&
+        (oldHints.containsKey("EOCustomQueryExpressionHintKey") ||
+         oldHints.containsKey("EOCustomQueryExpressionHintKeyBindPattern")))
+    {
+      /* do not break existing hints */
+      log.error("fetchspec already has hints, can't apply a count hint: " +
+                this);
+      return null;
+    }
+    
+    EOFetchSpecification fs = this.copy();
+    fs.setHint("EOCustomQueryExpressionHintKey", countPattern);
+    fs.setFetchesRawRows(true);
+    return fs;
   }
   
   
