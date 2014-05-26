@@ -45,51 +45,51 @@ public class GoConfigKeys {
   
   /* sections */
 
-  public static final String Files          = "files";
-  public static final String FilesMatch     = "filesmatch";
-  public static final String Directory      = "directory";
-  public static final String DirectoryMatch = "directorymatch";
-  public static final String Location       = "location";
-  public static final String LocationMatch  = "locationmatch";
-  public static final String AliasMatchName = "aliasmatchname";
+  public static final String Files              = "files";
+  public static final String FilesMatch         = "filesmatch";
+  public static final String Directory          = "directory";
+  public static final String DirectoryMatch     = "directorymatch";
+  public static final String Location           = "location";
+  public static final String LocationMatch      = "locationmatch";
+  public static final String AliasMatchName     = "aliasmatchname";
   
   /* server configuration */
 
-  public static final String DocumentRoot   = "documentroot";
-  public static final String Options        = "options";
+  public static final String DocumentRoot       = "documentroot";
+  public static final String Options            = "options";
   
   /* authentication */
 
-  public static final String AuthType = "authtype";
-  public static final String AuthName = "authname";
+  public static final String AuthType           = "authtype";
+  public static final String AuthName           = "authname";
   
   /* authorization */
 
-  public static final String Require           = "require";
-  public static final String Require_ValidUser = "valid-user";
-  public static final String Require_User      = "user";
-  public static final String Require_Group     = "group";
-  public static final String Satisfy           = "satisfy";
-  public static final String Satisfy_Any       = "any";
-  public static final String Satisfy_All       = "all";
-  public static final String Allow             = "allow";
-  public static final String Deny              = "deny";
-  public static final String Order             = "order";
+  public static final String Require            = "require";
+  public static final String Require_ValidUser  = "valid-user";
+  public static final String Require_User       = "user";
+  public static final String Require_Group      = "group";
+  public static final String Satisfy            = "satisfy";
+  public static final String Satisfy_Any        = "any";
+  public static final String Satisfy_All        = "all";
+  public static final String Allow              = "allow";
+  public static final String Deny               = "deny";
+  public static final String Order              = "order";
   
   /* Go */
 
-  public static final String Bindings          = "bindings";
-  public static final String EODatabase        = "eodatabase";
-  public static final String EOEntity          = "eoentity";
-  public static final String EOQualifier       = "eoqualifier";
-  public static final String EOMergeQualifier  = "eomergequalifier";
-  public static final String EOSortOrdering    = "eosortordering";
+  public static final String Bindings           = "bindings";
+  public static final String EODatabase         = "eodatabase";
+  public static final String EOEntity           = "eoentity";
+  public static final String EOQualifier        = "eoqualifier";
+  public static final String EOMergeQualifier   = "eomergequalifier";
+  public static final String EOSortOrdering     = "eosortordering";
 
   
   public static class KeyMatchEntry extends NSObject {
     
-    protected Pattern pattern;
-    protected String  replacement;
+    protected final Pattern pattern;
+    protected final String  replacement;
     
     public KeyMatchEntry(final Pattern _pattern, final String  _replacement) {
       this.pattern     = _pattern;
