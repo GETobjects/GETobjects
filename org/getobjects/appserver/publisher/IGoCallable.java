@@ -40,6 +40,10 @@ package org.getobjects.appserver.publisher;
  * TBD: Should we introduce binding? Might be necessary to support different
  * invocation styles (XML-RPC vs Form vs WebDAV vs SOAP). Right now, it looks
  * like the callables have to deal with such differences.
+ * <p>
+ * Binding might also be necessary to provide a lookup context. Eg sub
+ * invocations of a method which got acquired from somewhere else,
+ * might use that context as the 'clientObject'? Not sure.
  */
 public interface IGoCallable {
 
