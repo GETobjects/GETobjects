@@ -282,6 +282,10 @@ public class WOApplication extends NSObject
    * @return a default method object, or null if there is none
    */
   public IGoCallable lookupDefaultMethod(Object _object, final WOContext _ctx) {
+    // TBD: SOPE also had a feature called 'redirect-to-default'. Eg if you
+    //      open /persons/, it might redirect you to /persons/index.
+    //      This can be useful to make relative URLs work right (Zope uses
+    //      the base-URL in HTML for this)
     String defaultMethodName = "default";
     
     if (_object == null)
