@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -22,15 +22,26 @@
 package org.getobjects.appserver.publisher;
 
 /**
- * IGoCallable
- * <p>
  * A IGoCallable is an object which can be called through the web or internally.
+ * <p>
+ * FIXME: document:
+ * <ul>
+ *   <li>special behaviour during lookup
+ *   <li>time of invocation
+ *   <li>use of isCallable
+ * </ul>
+ * <p>
+ * Note: Callables are a bit different to (simpler than) SOPE invocations.
+ * SOPE invocations are usually 'bound' to an object - similar to Python
+ * bound vs unbound methods.<br>
+ * The IGoCallable interface doesn't support this concept. Eg the GoJavaMethod
+ * only exists once for all invocations (and hence can't hold invocation
+ * specific state).<br>
+ * TBD: Should we introduce binding? Might be necessary to support different
+ * invocation styles (XML-RPC vs Form vs WebDAV vs SOAP). Right now, it looks
+ * like the callables have to deal with such differences.
  */
 public interface IGoCallable {
-//TBD: document
-//- special behaviour during lookup
-//- time of invocation
-//- use of isCallable
 
   public boolean isCallableInContext(IGoContext _ctx);
   public Object callInContext(Object _object, IGoContext _ctx);
