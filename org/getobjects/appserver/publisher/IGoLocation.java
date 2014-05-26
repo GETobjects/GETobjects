@@ -306,7 +306,7 @@ public interface IGoLocation {
     
     /* GoClass */
     
-    public GoClass joClassInContext(final IGoContext _ctx) {
+    public GoClass goClassInContext(final IGoContext _ctx) {
       return _ctx.goClassRegistry().goClassForJavaObject
         (this.wrappedObject, _ctx);
     }
@@ -314,7 +314,7 @@ public interface IGoLocation {
     public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
       /* lookup using GoClass */
       
-      final GoClass cls = this.joClassInContext(_ctx);
+      final GoClass cls = this.goClassInContext(_ctx);
       if (cls != null) {
         Object o = cls.lookupName(this, _name, _ctx);
         if (o != null) return o;
@@ -359,7 +359,7 @@ public interface IGoLocation {
     
     /* GoClass */
     
-    public GoClass joClassInContext(IGoContext _ctx) {
+    public GoClass goClassInContext(IGoContext _ctx) {
       return _ctx.goClassRegistry().goClassForJavaObject
         (this.wrappedObject, _ctx);
     }
@@ -367,7 +367,7 @@ public interface IGoLocation {
     public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
       /* lookup using GoClass */
       
-      final GoClass cls = this.joClassInContext(_ctx);
+      final GoClass cls = this.goClassInContext(_ctx);
       if (cls != null) {
         final Object o = cls.lookupName(this, _name, _ctx);
         if (o != null) return o;

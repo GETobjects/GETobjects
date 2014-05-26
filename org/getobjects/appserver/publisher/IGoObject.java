@@ -69,7 +69,7 @@ public interface IGoObject {
       return DefaultImplementation.lookupName(_self, _name, _ctx, _acquire);
     }
 
-    public static GoClass joClass(Object _self, IGoContext _ctx) {
+    public static GoClass goClass(Object _self, IGoContext _ctx) {
       if (_self == null)
         return null;
       
@@ -109,7 +109,7 @@ public interface IGoObject {
         return null;
       
       /* default behaviour is to reflect on the Java class */
-      GoClassRegistry classRegistry = _ctx.goClassRegistry();
+      final GoClassRegistry classRegistry = _ctx.goClassRegistry();
       if (classRegistry != null)
         return classRegistry.goClassForJavaObject(_self, _ctx);
 
@@ -128,7 +128,7 @@ public interface IGoObject {
       // TODO: maybe we do not want to map KVC to Go 'names'
       
       try {
-        Object v = NSKeyValueCoding.Utility.valueForKey(_self, _name);
+        final Object v = NSKeyValueCoding.Utility.valueForKey(_self, _name);
         if (v != null) return v;
       }
       catch (MissingPropertyException e) {
@@ -136,9 +136,9 @@ public interface IGoObject {
       
       /* try to find name in GoClass */
       
-      GoClass joClass = Utility.joClass(_self, _ctx);
-      if (joClass != null)
-        return joClass.lookupName(_self, _name, _ctx);
+      final GoClass goClass = Utility.goClass(_self, _ctx);
+      if (goClass != null)
+        return goClass.lookupName(_self, _name, _ctx);
       
       /* not found */
       return null;

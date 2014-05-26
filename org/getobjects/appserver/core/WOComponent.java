@@ -1078,9 +1078,9 @@ public class WOComponent extends WOElement
 
     /* try to find name in GoClass */
 
-    final GoClass joClass = IGoObject.Utility.joClass(this, _ctx);
-    if (joClass != null)
-      return joClass.lookupName(this, _name, _ctx);
+    final GoClass goClass = IGoObject.Utility.goClass(this, _ctx);
+    if (goClass != null)
+      return goClass.lookupName(this, _name, _ctx);
 
     /* not found */
     return null;

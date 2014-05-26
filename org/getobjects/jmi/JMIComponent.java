@@ -40,7 +40,7 @@ public abstract class JMIComponent extends WOComponent {
     Object co = this.clientObject();
     
     if (co instanceof OFSBaseObject)
-      return ((OFSBaseObject)co).joClassInContext(this.context());
+      return ((OFSBaseObject)co).goClassInContext(this.context());
     
     return NSKeyValueCoding.Utility.valueForKey(co, "joClass"); 
   }

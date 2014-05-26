@@ -374,7 +374,7 @@ public class OFSFolder extends OFSBaseObject
 
     /* lookup using GoClass */
 
-    final GoClass cls = this.joClassInContext(_ctx);
+    final GoClass cls = this.goClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
@@ -560,7 +560,7 @@ public class OFSFolder extends OFSBaseObject
     if (ci == null || !ci.hasKey(_name)) {
       // TBD: but what about GoClass methods?! We need to be able to customize
       //      the lookup of those
-      final GoClass cls = this.joClassInContext(_ctx);
+      final GoClass cls = this.goClassInContext(_ctx);
       if (cls != null) {
         Object o = cls.lookupName(this, _name, _ctx);
         if (o == null) return null; /* we do not provide the given name */

@@ -76,7 +76,7 @@ public class OFSComponentWrapper extends OFSFolder
     
     /* lookup using GoClass */
     
-    GoClass cls = this.joClassInContext(_ctx);
+    GoClass cls = this.goClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;

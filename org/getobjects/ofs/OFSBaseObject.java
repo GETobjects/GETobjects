@@ -248,7 +248,7 @@ public abstract class OFSBaseObject extends NSObject
 
   /* GoClass */
 
-  public GoClass joClassInContext(final IGoContext _ctx) {
+  public GoClass goClassInContext(final IGoContext _ctx) {
     if (_ctx == null) {
       log.warn("missing context to determine JoClass: " + this);
       return null;
@@ -266,7 +266,7 @@ public abstract class OFSBaseObject extends NSObject
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
     /* lookup using GoClass */
 
-    final GoClass cls = this.joClassInContext(_ctx);
+    final GoClass cls = this.goClassInContext(_ctx);
     if (cls != null) {
       Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
