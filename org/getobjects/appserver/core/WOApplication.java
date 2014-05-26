@@ -577,13 +577,18 @@ public class WOApplication extends NSObject
    * @return a WOResponse containing the rendered results
    */
   public WOResponse renderObjectInContext(Object _result, WOContext _ctx) {
-    if (_result == null) {
-      // TODO: add some customizable way to deal with this (to return some
-      //       custom error page)
-      final WOResponse r = _ctx.response();
-      r.setStatus(WOMessage.HTTP_STATUS_NOT_FOUND);
-      r.appendContentHTMLString("did not find requested path");
-      return r;
+    if (false) {
+      // this is non-sense, we might have already called a method and the result
+      // is a plain null.
+      // A 404 must be explicitly triggered by *lookup*.
+      if (_result == null) {
+        // TODO: add some customizable way to deal with this (to return some
+        //       custom error page)
+        final WOResponse r = _ctx.response();
+        r.setStatus(WOMessage.HTTP_STATUS_NOT_FOUND);
+        r.appendContentHTMLString("did not find requested path");
+        return r;
+      }
     }
 
     /* lookup renderer (by walking the traversal path) */
