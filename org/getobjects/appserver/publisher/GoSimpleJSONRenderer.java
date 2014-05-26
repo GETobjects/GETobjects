@@ -96,6 +96,9 @@ public class GoSimpleJSONRenderer extends NSObject
         log.info("request accepts no JSON: " + rq);
       return false;
     }
+    
+    if (_object instanceof GoException) // 404, 401 and such. Deliver as HTTP.
+      return false;
 
     /* Note: do *NOT* move up, first we need to check whether the client
      *       actually wants JSON!
