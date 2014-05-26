@@ -29,8 +29,8 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
-import org.getobjects.ofs.config.JoConfigKeys.KeyMatchEntry;
+import org.getobjects.ofs.config.GoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys.KeyMatchEntry;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -72,7 +72,7 @@ public class AliasMatchName extends NSObject implements IHtConfigEvaluation {
     }
     
     if (args.length == 1 && args[0].equalsIgnoreCase("none")) {
-      _cfg.remove(JoConfigKeys.AliasMatchName);
+      _cfg.remove(GoConfigKeys.AliasMatchName);
       return null; /* everything is fine */
     }
     
@@ -93,15 +93,15 @@ public class AliasMatchName extends NSObject implements IHtConfigEvaluation {
     /* get/prepare match array */
     
     List<KeyMatchEntry> entries = (List<KeyMatchEntry>)
-      _cfg.get(JoConfigKeys.AliasMatchName);
+      _cfg.get(GoConfigKeys.AliasMatchName);
     if (entries == null) {
       entries = new ArrayList<KeyMatchEntry>(4);
-      _cfg.put(JoConfigKeys.AliasMatchName, entries);
+      _cfg.put(GoConfigKeys.AliasMatchName, entries);
     }
     
     /* add match entry */
     
-    entries.add(new JoConfigKeys.KeyMatchEntry(p, args[1]));
+    entries.add(new GoConfigKeys.KeyMatchEntry(p, args[1]));
     
     return null; /* everything is fine */
   }

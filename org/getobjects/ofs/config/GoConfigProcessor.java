@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of Go.
 
@@ -36,10 +36,8 @@ import org.getobjects.foundation.UMap;
 import org.getobjects.foundation.UString;
 
 /**
- * JoConfigProcessor
- * <p>
  * This object can calculate a configuration object starting at a given
- * JoObject with a given configuration context (usually an object which contains
+ * GoObject with a given configuration context (usually an object which contains
  * the path, location etc of the subject to be configured).
  * <p>
  * The actual format of the configuration file is maintained by the 'config'
@@ -47,16 +45,16 @@ import org.getobjects.foundation.UString;
  * However, the <u>keys</u> of the configuration must follow a specific
  * naming scheme so that the config consuming object can make sense of it.
  * <p>
- * Also the JoConfigProcessor itself has special handling of a few config keys:
+ * Also the GoConfigProcessor itself has special handling of a few config keys:
  * <ul>
  *   <li>AllowOverride  - 'all', 'none' or array of allowed keys
  *   <li>AccessFileName - the name of subsequent config objects ('config')
  * </ul>
  */
-public class JoConfigProcessor extends NSObject {
+public class GoConfigProcessor extends NSObject {
   protected static final Log log = LogFactory.getLog("JoConfig");
   
-  public JoConfigProcessor() {
+  public GoConfigProcessor() {
   }
   
   /* build configuration */
@@ -70,7 +68,7 @@ public class JoConfigProcessor extends NSObject {
    * (Note: the config object does NOT get the current object in the queue, and
    * this object is not relevant for config processing).
    * The 'config' object is an object which conforms to the
-   * <code>IJoConfigurationProvider</code> interface, eg an
+   * <code>IGoConfigurationProvider</code> interface, eg an
    * <code>OFSHtAccessFile</code> object.
    * <p>
    * The name of the object-relative configfile can be set using the
@@ -83,7 +81,7 @@ public class JoConfigProcessor extends NSObject {
    * @return a Map containing the combined configuration
    */
   public Map<String, ?> buildConfiguration
-    (final Object _cursor, final JoConfigContext _lookupCtx)
+    (final Object _cursor, final GoConfigContext _lookupCtx)
   {
     final boolean isDebugOn = log.isDebugEnabled();
 
@@ -109,8 +107,8 @@ public class JoConfigProcessor extends NSObject {
       
       /* determine AccessFileName (in Go its an object id) */
       String[] accessFileNames =
-        config != null && config.containsKey(JoConfigKeys.AccessFileName)
-        ? (String[])config.get(JoConfigKeys.AccessFileName)
+        config != null && config.containsKey(GoConfigKeys.AccessFileName)
+        ? (String[])config.get(GoConfigKeys.AccessFileName)
         : new String[] { "config" };
       
       Object cfg = null; 
@@ -139,7 +137,7 @@ public class JoConfigProcessor extends NSObject {
           continue;
         }
 
-        if (!(cfg instanceof IJoConfigurationProvider)) {
+        if (!(cfg instanceof IGoConfigurationProvider)) {
           if (log.isInfoEnabled())
             log.info("config file is not an access provider: " + cfg);
           cfg = null;
@@ -153,7 +151,7 @@ public class JoConfigProcessor extends NSObject {
       
       /* OK, found a provider */
       
-      final IJoConfigurationProvider provider = (IJoConfigurationProvider)cfg;
+      final IGoConfigurationProvider provider = (IGoConfigurationProvider)cfg;
       if (isDebugOn) log.debug("    provider: " + provider);
       
       /* This loads the HtAccessFile and invokes the directives. Note that the
@@ -226,16 +224,16 @@ public class JoConfigProcessor extends NSObject {
     /* merge the two */
     
     boolean onlyAdd = false;
-    Object allowOverride = _base.get(JoConfigKeys.AllowOverride);
+    Object allowOverride = _base.get(GoConfigKeys.AllowOverride);
     Collection<String> allowOverrideCol = null;
     
     if (allowOverride instanceof String) {
       final String as = (String)allowOverride;
-      if (as.equalsIgnoreCase(JoConfigKeys.AllowOverride_None)) {
+      if (as.equalsIgnoreCase(GoConfigKeys.AllowOverride_None)) {
         onlyAdd = true;
         allowOverride = null;
       }
-      else if (as.equalsIgnoreCase(JoConfigKeys.AllowOverride_All)) {
+      else if (as.equalsIgnoreCase(GoConfigKeys.AllowOverride_All)) {
         allowOverride = null; /* no restrictions */
       }
       else {
@@ -304,13 +302,13 @@ public class JoConfigProcessor extends NSObject {
     if (_add  == null) return _base;
     if (_key  == null) return _add;
     
-    if (_key.equals(JoConfigKeys.Environment)) {
+    if (_key.equals(GoConfigKeys.Environment)) {
       /* Merge environment Maps */
       final Map<String, Object> mv = new HashMap((Map)_base);
       mv.putAll((Map)_add);
 
       /* UnsetEnv support */
-      Object[] keys = UMap.allKeysForValue(mv, JoConfigKeys.Environment_Remove);
+      Object[] keys = UMap.allKeysForValue(mv, GoConfigKeys.Environment_Remove);
       if (keys != null) {
         for (Object key: keys)
           mv.remove(key);

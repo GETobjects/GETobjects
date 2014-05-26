@@ -30,7 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -76,14 +76,14 @@ public class Require extends NSObject implements IHtConfigEvaluation {
     /* setup new Require Map */
     
     Map<String, Set<String>> requireMap = new HashMap<String, Set<String>>(4);
-    _cfg.put(JoConfigKeys.Require, requireMap);
+    _cfg.put(GoConfigKeys.Require, requireMap);
     
     /* determine key */
     
     final int argc = args.length;
     String key = args[0].toLowerCase();
     if (key.equals("valid-user")) {
-      requireMap.put(JoConfigKeys.Require_ValidUser, emptySet);
+      requireMap.put(GoConfigKeys.Require_ValidUser, emptySet);
       return null; /* we are done */
     }
     

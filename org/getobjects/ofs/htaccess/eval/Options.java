@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -58,7 +58,7 @@ public class Options extends NSObject implements IHtConfigEvaluation {
     String[] args = _directive.arguments();
     if (args == null || args.length == 0) args = allOpts;
     
-    Set<String> opts = (Set<String>)_cfg.get(JoConfigKeys.Options);
+    Set<String> opts = (Set<String>)_cfg.get(GoConfigKeys.Options);
     opts = opts != null ? new HashSet<String>(opts) : new HashSet<String>(4);
     
     /* Note: thats not exactly how Apache works, but fine for now ;-) */
@@ -78,7 +78,7 @@ public class Options extends NSObject implements IHtConfigEvaluation {
       opts.add(arg);
     }
     
-    _cfg.put(JoConfigKeys.Options, opts);
+    _cfg.put(GoConfigKeys.Options, opts);
     return null; /* everything is fine */
   }
 }

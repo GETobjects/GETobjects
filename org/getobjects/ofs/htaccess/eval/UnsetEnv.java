@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -56,14 +56,14 @@ public class UnsetEnv extends NSObject
      *       the *unmerged* config.
      */
     
-    Map env = (Map)_cfg.get(JoConfigKeys.Environment);
+    Map env = (Map)_cfg.get(GoConfigKeys.Environment);
     if (env == null) {
       env = new HashMap(16);
-      _cfg.put(JoConfigKeys.Environment, env);
+      _cfg.put(GoConfigKeys.Environment, env);
     }
 
     for (int i = 0; i < args.length; i++)
-      env.put(args[i], JoConfigKeys.Environment_Remove);
+      env.put(args[i], GoConfigKeys.Environment_Remove);
     
     return null; /* everything is fine */
   }

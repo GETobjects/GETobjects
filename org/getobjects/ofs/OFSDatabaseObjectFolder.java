@@ -27,7 +27,7 @@ import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.NSKeyValueHolder;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 
 /**
  * OFSDatabaseObjectFolder
@@ -82,7 +82,7 @@ public class OFSDatabaseObjectFolder extends OFSFolder
    * @return the name of the EOEntity to be used with this object.
    */
   public String entityName() {
-    Object o = this.config().get(JoConfigKeys.EOEntity);
+    Object o = this.config().get(GoConfigKeys.EOEntity);
     if (o instanceof String)
       return (String)o;
     else if (o instanceof EOEntity)
@@ -104,7 +104,7 @@ public class OFSDatabaseObjectFolder extends OFSFolder
    */
   public EOQualifier qualifier() {
     if (this.qualifier == null) {
-      Object o = this.config().get(JoConfigKeys.EOQualifier);
+      Object o = this.config().get(GoConfigKeys.EOQualifier);
       
       if (o instanceof EOQualifier)
         this.qualifier = (EOQualifier)o;

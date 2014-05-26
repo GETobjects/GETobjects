@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -53,7 +53,7 @@ public class ResetBindings extends NSObject
     (final HtConfigBuilder _builder, HtConfigDirective _directive,
      final Map<String, Object> _cfg, final Object _lookupCtx)
   {
-    _cfg.put(JoConfigKeys.Bindings, new HashMap(8));
+    _cfg.put(GoConfigKeys.Bindings, new HashMap(8));
     return null; /* everything is fine */
   }
 }

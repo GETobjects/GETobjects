@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -50,7 +50,7 @@ public class AccessFileName extends NSObject implements IHtConfigEvaluation {
      final Map<String, Object> _cfg, final Object _lookupCtx)
   {
     String[] args = _directive.arguments();
-    _cfg.put(JoConfigKeys.AccessFileName, args != null ? args : emptyArgs);
+    _cfg.put(GoConfigKeys.AccessFileName, args != null ? args : emptyArgs);
     return null; /* everything is fine */
   }
 }

@@ -30,7 +30,7 @@ import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.NSKeyValueHolder;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 
 /**
  * OFSDatabaseDataSourceFolder
@@ -151,7 +151,7 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
    * @return the name of the EOEntity to be used with this object.
    */
   public String entityName() {
-    Object o = this.config().get(JoConfigKeys.EOEntity);
+    Object o = this.config().get(GoConfigKeys.EOEntity);
     if (o instanceof String)
       return (String)o;
     else if (o instanceof EOEntity)
@@ -173,7 +173,7 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
    */
   public EOQualifier qualifier() {
     if (this.qualifier == null) {
-      Object o = this.config().get(JoConfigKeys.EOQualifier);
+      Object o = this.config().get(GoConfigKeys.EOQualifier);
       
       if (o instanceof EOQualifier)
         this.qualifier = (EOQualifier)o;
@@ -201,7 +201,7 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
    */
   public EOSortOrdering[] sortOrderings() {
     if (this.sortOrderings == null) {
-      Object o = this.config().get(JoConfigKeys.EOSortOrdering);
+      Object o = this.config().get(GoConfigKeys.EOSortOrdering);
 
       if (o instanceof EOSortOrdering[])
         this.sortOrderings = (EOSortOrdering[])o;

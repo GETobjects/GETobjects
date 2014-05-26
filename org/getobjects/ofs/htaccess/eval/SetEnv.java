@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -56,10 +56,10 @@ public class SetEnv extends NSObject
     
     /* ensure bindings dictionary */
     
-    Map env = (Map)_cfg.get(JoConfigKeys.Environment);
+    Map env = (Map)_cfg.get(GoConfigKeys.Environment);
     if (env == null) {
       env = new HashMap(16);
-      _cfg.put(JoConfigKeys.Environment, env);
+      _cfg.put(GoConfigKeys.Environment, env);
     }
     
     /* create association and put it into the bindings */

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of Go.
 
@@ -26,13 +26,11 @@ import java.util.regex.Pattern;
 import org.getobjects.foundation.NSObject;
 
 /**
- * JoConfigKeys
- * <p>
  * Those keys are set in the configuration context by the configuration files.
  * The keys imply standard semantics which can be implemented by OFS objects.
  */
-public class JoConfigKeys {
-  private JoConfigKeys() {} // do not instantiate
+public class GoConfigKeys {
+  private GoConfigKeys() {} // do not instantiate
   
   /* config processing */
 

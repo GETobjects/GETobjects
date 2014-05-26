@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of Go.
 
@@ -32,13 +32,11 @@ import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
 
 /**
- * JoConfigContext
- * <p>
  * A special context which is used when configuration objects are looked up.
  * This is necessary to distinguish regular lookups from config object look ups
  * (the former might be 'tweaked' by the configuration ...).
  */
-public class JoConfigContext extends NSObject
+public class GoConfigContext extends NSObject
   implements IGoContext, INSExtraVariables
 {
   /* extra attributes (used when KVC does not resolve to a key) */
@@ -46,10 +44,10 @@ public class JoConfigContext extends NSObject
   
   protected IGoContext context;
   
-  public JoConfigContext(final IGoContext _parentContext) {
+  public GoConfigContext(final IGoContext _parentContext) {
     this.context = _parentContext;
   }
-  public JoConfigContext(final IGoContext _parentContext, Object... _args) {
+  public GoConfigContext(final IGoContext _parentContext, Object... _args) {
     this(_parentContext);
     if (_args != null) {
       for (int i = 0; i + 1 < _args.length; i += 2)

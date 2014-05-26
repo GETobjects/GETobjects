@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2014 Helge Hess
 
   This file is part of Go.
 
@@ -18,26 +18,21 @@
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
 */
-package org.getobjects.ofs.config;
-
-import java.util.Map;
 
 /**
- * IJoConfigurationProvider
+ * <h3>htaccess.eval</h3>
  * <p>
- * This interface is implemented by objects which represent a configuration
- * file, eg OFSHtAccessFile.
+ * This package contains classes which execute HTAccess directives against a
+ * configuration dictionary.
+ * <p>
+ * Its not strictly Apache compatible, but longterm thats the goal.
+ *
+ * <h4>Satisfy</h4>
+ * <pre>
+ *   Require valid-user
+ *   Order allow,deny
+ *   Allow from 192.168.1
+ *   Satisfy Any</pre>
+ * Satisfy Any means that *either* the Require OR the Allow is valid
  */
-public interface IJoConfigurationProvider {
-
-  /**
-   * This method is used to ask the config object for a configuration specific
-   * to a given configuration context.
-   * 
-   * @param _cursor    - the object which is configured (eg an OFSFolder)
-   * @param _lookupCtx - the config context
-   * @return a Map containing the configuration for the _lookupCtx
-   */
-  public Map<String, ?> buildConfiguration
-    (Object _cursor, JoConfigContext _lookupCtx);
-}
+package org.getobjects.ofs.htaccess.eval;

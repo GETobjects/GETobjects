@@ -23,7 +23,7 @@ package org.getobjects.ofs.htaccess.eval;
 import java.util.Map;
 
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -52,17 +52,17 @@ public class AllowOverride extends NSObject implements IHtConfigEvaluation {
     String[] args = _directive.arguments();
     
     if (args == null || args.length == 0) {
-      _cfg.put(JoConfigKeys.AllowOverride, JoConfigKeys.AllowOverride_None);
+      _cfg.put(GoConfigKeys.AllowOverride, GoConfigKeys.AllowOverride_None);
       return null; /* everything is fine */
     }
 
     if (args.length == 1) {
       if (args[0].equalsIgnoreCase("All")) {
-        _cfg.put(JoConfigKeys.AllowOverride, JoConfigKeys.AllowOverride_All);
+        _cfg.put(GoConfigKeys.AllowOverride, GoConfigKeys.AllowOverride_All);
         return null; /* everything is fine */
       }
       if (args[0].equalsIgnoreCase("None")) {
-        _cfg.put(JoConfigKeys.AllowOverride, JoConfigKeys.AllowOverride_None);
+        _cfg.put(GoConfigKeys.AllowOverride, GoConfigKeys.AllowOverride_None);
         return null; /* everything is fine */
       }
     }
@@ -71,7 +71,7 @@ public class AllowOverride extends NSObject implements IHtConfigEvaluation {
     for (int i = args.length - 1; i >= 0; i--)
       loweredKeys[i] = args[i].toLowerCase();
     
-    _cfg.put(JoConfigKeys.AllowOverride, loweredKeys);
+    _cfg.put(GoConfigKeys.AllowOverride, loweredKeys);
     return null; /* everything is fine */
   }
 }

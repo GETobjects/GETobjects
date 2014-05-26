@@ -48,10 +48,10 @@ import org.getobjects.appserver.publisher.GoSessionAuthenticator;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
-import org.getobjects.ofs.config.JoConfigContext;
-import org.getobjects.ofs.config.JoConfigKeys;
-import org.getobjects.ofs.config.JoConfigProcessor;
-import org.getobjects.ofs.config.JoConfigKeys.KeyMatchEntry;
+import org.getobjects.ofs.config.GoConfigContext;
+import org.getobjects.ofs.config.GoConfigKeys;
+import org.getobjects.ofs.config.GoConfigProcessor;
+import org.getobjects.ofs.config.GoConfigKeys.KeyMatchEntry;
 import org.getobjects.ofs.fs.IOFSFileInfo;
 import org.getobjects.ofs.fs.IOFSFileManager;
 
@@ -385,7 +385,7 @@ public class OFSFolder extends OFSBaseObject
 
     final Map<String, ?>      cfg     = this.configurationInContext(_ctx);
     final List<KeyMatchEntry> aliases = (List<KeyMatchEntry>)(cfg != null
-      ? cfg.get(JoConfigKeys.AliasMatchName) : null);
+      ? cfg.get(GoConfigKeys.AliasMatchName) : null);
     if (aliases != null) { // TBD: bad, we grab AliasMatchEntry from htaccess
       if (debugOn) {
         log.debug("lookup '" + _name + "' process AliasMatchName: " +
@@ -464,20 +464,20 @@ public class OFSFolder extends OFSBaseObject
     Set<String> requiredRoles  = null;
     Set<String> requiredLogins = null;
     for (String requireType: _requirements.keySet()) {
-      if (requireType.equals(JoConfigKeys.Require_ValidUser)) {
+      if (requireType.equals(GoConfigKeys.Require_ValidUser)) {
         if (requiredRoles == null)
           requiredRoles = new HashSet<String>(4);
         requiredRoles.add(GoRole.Authenticated);
       }
-      else if (requireType.equals(JoConfigKeys.Require_Group)) {
+      else if (requireType.equals(GoConfigKeys.Require_Group)) {
         if (requiredRoles == null)
           requiredRoles = new HashSet<String>(4);
-        requiredRoles.addAll(_requirements.get(JoConfigKeys.Require_Group));
+        requiredRoles.addAll(_requirements.get(GoConfigKeys.Require_Group));
       }
-      else if (requireType.equals(JoConfigKeys.Require_User)) {
+      else if (requireType.equals(GoConfigKeys.Require_User)) {
         if (requiredLogins == null)
           requiredLogins = new HashSet<String>(4);
-        requiredLogins.addAll(_requirements.get(JoConfigKeys.Require_User));
+        requiredLogins.addAll(_requirements.get(GoConfigKeys.Require_User));
       }
       else
         log.warn("not processing requirement: " + requireType);
@@ -577,7 +577,7 @@ public class OFSFolder extends OFSBaseObject
 
     if (cfg != null) {
       final Exception error = this.validateRequirements(
-        (Map<String, Set<String>>)cfg.get(JoConfigKeys.Require), _ctx);
+        (Map<String, Set<String>>)cfg.get(GoConfigKeys.Require), _ctx);
       if (error != null) {
         if (authlog.isInfoEnabled())
           authlog.info("requirements failed", error);
@@ -609,7 +609,7 @@ public class OFSFolder extends OFSBaseObject
 
     if (cfg != null) {
       final Exception error = this.validateRequirements(
-        (Map<String, Set<String>>)cfg.get(JoConfigKeys.Require), _ctx);
+        (Map<String, Set<String>>)cfg.get(GoConfigKeys.Require), _ctx);
       if (error != null) {
         if (authlog.isInfoEnabled())
           authlog.info("requirements failed", error);
@@ -647,13 +647,13 @@ public class OFSFolder extends OFSBaseObject
     if (cfg == null)
       return null; /* no configuration at all */
 
-    String authType = (String)cfg.get(JoConfigKeys.AuthType);
+    String authType = (String)cfg.get(GoConfigKeys.AuthType);
     if (UObject.isEmpty(authType))
       return null; /* no AuthType configured */
 
     // TBD: move to some generic Config=>Authenticator factory object
 
-    String authName = (String)cfg.get(JoConfigKeys.AuthName);
+    String authName = (String)cfg.get(GoConfigKeys.AuthName);
 
     if ("Basic".equalsIgnoreCase(authType)) {
       Configuration jaasCfg = null; // TBD
@@ -708,12 +708,12 @@ public class OFSFolder extends OFSBaseObject
     if (this.ownConfig != null)
       return this.ownConfig == CACHE_MISS ? null : (Map)this.ownConfig;
 
-    if (_ctx instanceof JoConfigContext)
+    if (_ctx instanceof GoConfigContext)
       return null; /* this got called during a config-lookup */
 
     /* setup config context */
 
-    final JoConfigContext configContext = new JoConfigContext(_ctx,
+    final GoConfigContext configContext = new GoConfigContext(_ctx,
         "location", this.pathInContainer(),
         "path",     this.storagePath(),
         "filename", "",
@@ -721,7 +721,7 @@ public class OFSFolder extends OFSBaseObject
 
     /* apply config */
 
-    final JoConfigProcessor cpu = new JoConfigProcessor();
+    final GoConfigProcessor cpu = new GoConfigProcessor();
     final Object cfg = cpu.buildConfiguration(this, configContext);
 
     this.ownConfig = cfg != null ? cfg : CACHE_MISS;
@@ -751,7 +751,7 @@ public class OFSFolder extends OFSBaseObject
       if ((cfg = this.cacheNameToConfig.get(_name)) != null)
         return cfg == CACHE_MISS ? null : (Map)cfg;
     }
-    if (_ctx instanceof JoConfigContext)
+    if (_ctx instanceof GoConfigContext)
       return null; /* this got called during a config-lookup */
 
     /* setup config context */
@@ -760,7 +760,7 @@ public class OFSFolder extends OFSBaseObject
     String[] childPath = UString.addStringToStringArray(this.storagePath, objId);
     String[] childLoc  = UString.addStringToStringArray(this.pathInContainer(), _name);
 
-    JoConfigContext configContext = new JoConfigContext(_ctx,
+    GoConfigContext configContext = new GoConfigContext(_ctx,
         "location", childLoc,
         "path",     childPath,
         "filename", objId,
@@ -768,7 +768,7 @@ public class OFSFolder extends OFSBaseObject
 
     /* apply config */
 
-    final JoConfigProcessor cpu = new JoConfigProcessor();
+    final GoConfigProcessor cpu = new GoConfigProcessor();
     cfg = cpu.buildConfiguration(this, configContext);
 
     /* cache */

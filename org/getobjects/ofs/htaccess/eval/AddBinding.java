@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -75,10 +75,10 @@ public class AddBinding extends NSObject
     
     /* ensure bindings dictionary */
     
-    Map bindings = (Map)_cfg.get(JoConfigKeys.Bindings);
+    Map bindings = (Map)_cfg.get(GoConfigKeys.Bindings);
     if (bindings == null) {
       bindings = new HashMap(8);
-      _cfg.put(JoConfigKeys.Bindings, bindings);
+      _cfg.put(GoConfigKeys.Bindings, bindings);
     }
     
     /* create association and put it into the bindings */

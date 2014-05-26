@@ -23,7 +23,7 @@ package org.getobjects.ofs.htaccess.eval;
 import java.util.Map;
 
 import org.getobjects.foundation.NSObject;
-import org.getobjects.ofs.config.JoConfigKeys;
+import org.getobjects.ofs.config.GoConfigKeys;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigDirective;
 import org.getobjects.ofs.htaccess.IHtConfigEvaluation;
@@ -57,7 +57,7 @@ public class RemoveBinding extends NSObject
     if (args == null || args.length < 1)
       return null; /* nothing to be done */
 
-    Map bindings = (Map)_cfg.get(JoConfigKeys.Bindings);
+    Map bindings = (Map)_cfg.get(GoConfigKeys.Bindings);
     if (bindings == null)
       return null; /* nothing to be done */
     

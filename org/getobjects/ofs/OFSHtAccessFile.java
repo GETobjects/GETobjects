@@ -25,8 +25,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.UString;
-import org.getobjects.ofs.config.IJoConfigurationProvider;
-import org.getobjects.ofs.config.JoConfigContext;
+import org.getobjects.ofs.config.IGoConfigurationProvider;
+import org.getobjects.ofs.config.GoConfigContext;
 import org.getobjects.ofs.fs.IOFSFileInfo;
 import org.getobjects.ofs.htaccess.HtConfigBuilder;
 import org.getobjects.ofs.htaccess.HtConfigFile;
@@ -44,7 +44,7 @@ import org.getobjects.ofs.htaccess.IHtConfigContainer;
  * functionality is in the 'htaccess' subpackage.
  */
 public class OFSHtAccessFile extends OFSJavaObject
-  implements IJoConfigurationProvider
+  implements IGoConfigurationProvider
 {
   protected static final Log cfglog = LogFactory.getLog("GoConfig");
   
@@ -128,7 +128,7 @@ public class OFSHtAccessFile extends OFSJavaObject
    * @return a configuration, or null if no values were added
    */
   public Map<String, ?> buildConfiguration
-    (Object _cursor, JoConfigContext _lookupCtx)
+    (Object _cursor, GoConfigContext _lookupCtx)
   {
     IHtConfigContainer lCfgFile = this.configFile();
     if (lCfgFile == null) {
