@@ -33,9 +33,11 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UList;
+import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
 import org.getobjects.foundation.kvc.MissingPropertyException;
 
@@ -145,6 +147,17 @@ public class GoSimpleJSONRenderer extends NSObject
       r.setHeaderForKey("application/javascript; charset=utf-8","content-type");
     else
       r.setHeaderForKey("application/json; charset=utf-8", "content-type");
+    
+    /* Support httpStatus in NSException's, gives the exception a little
+     * control. */
+    if (_object instanceof NSException) {
+      int status = 
+          UObject.intValue(((NSException)_object).valueForKey("httpStatus"));
+      if (status >= 200 && status < 1000)
+        r.setStatus(status);
+      else
+        r.setStatus(500);
+    }
     
     r.enableStreaming();
     if (cb != null) r.appendContentString(cb + "(");
