@@ -287,6 +287,7 @@ public class WOApplication extends NSObject
     //      This can be useful to make relative URLs work right (Zope uses
     //      the base-URL in HTML for this)
     String defaultMethodName = "default";
+    boolean isPOST = false;
     
     if (_object == null)
       return null;
@@ -298,13 +299,23 @@ public class WOApplication extends NSObject
       final String m = rq.method();
       if (!"GET".equals(m) && !"POST".equals(m))
         defaultMethodName = m; // use HTTP Verb as default name
+      else if ("POST".equals(m))
+        isPOST = true;
     }
     
     // TBD: Should default methods support acquisition? Maybe, other methods
     //      are acquired too?
-    final Object o = 
-      IGoSecuredObject.Utility.lookupName(_object, defaultMethodName, _ctx,
-                                         false /* do not acquire? */);
+    Object o = null;
+
+    if (isPOST) {
+      // if POST exists, use it. Otherwise fallback to 'default'.
+      o = IGoSecuredObject.Utility.lookupName(_object, "POST", _ctx,
+                                              false /* do not acquire? */);
+    }
+    if (o == null) {
+      o = IGoSecuredObject.Utility.lookupName(_object, defaultMethodName, _ctx,
+                                              false /* do not acquire? */);
+    }
     if (o == null) {
       if (log.isInfoEnabled()) {
         log.info("did not find default method '" + defaultMethodName + "' in " +
