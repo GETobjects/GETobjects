@@ -421,8 +421,24 @@ public class WOServletAdaptor extends HttpServlet {
      */
     this.woService(_rq, _r);
   }
+  
+  @Override
+  protected void doPut
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
+    throws ServletException, IOException
+  {
+    this.woService(_rq, _r);
+  }
 
-  protected static String[] stdMethods = { "GET", "POST", "PUT", "DELETE" };
+  @Override
+  protected void doOptions
+    (final HttpServletRequest _rq, final HttpServletResponse _r)
+    throws ServletException, IOException
+  {
+    this.woService(_rq, _r);
+  }
+
+  protected static String[] stdMethods = { "GET", "POST", "PUT" };
 
   /**
    * This invokes the Servlet service() for GET/POST/PUT/DELETE to trigger
