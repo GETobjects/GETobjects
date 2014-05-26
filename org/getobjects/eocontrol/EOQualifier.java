@@ -172,6 +172,10 @@ public class EOQualifier extends EOExpression {
    * any other object accessible using KVC.
    * <p>
    * Note that qualifiers w/o bindings just return self.
+   * <p>
+   * The syntax for bindings in string qualifiers is $binding (e.g.
+   * lastname = $lastname). At runtime EOQualifierVariable objects represent
+   * such bindings.
    * 
    * @param _vals        - the object containing the bindings
    * @param _requiresAll - whether all bindings are required

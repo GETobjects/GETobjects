@@ -227,6 +227,16 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
   
   /* hint patterns */
   
+  /**
+   * FIXME: document me. This seems to return values for all hints which end in
+   * 'BindPattern'. The values are retrieved by applying the
+   * NSKeyValueStringFormatter with the given object.
+   * <p>
+   * This formatter does stuff like '%(lastname)s'.
+   * 
+   * @param _b
+   * @return
+   */
   public Map<String, Object> resolveHintBindPatterns(final Object _b) {
     if (this.hints == null)
       return null;
@@ -250,11 +260,24 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
   }
   
   /* operations */
-  
+
+  /**
+   * Return a copy of the fetch specification which has the qualifier bindings
+   * resolved against the given argument. Plus all xyzBindPattern hints.
+   * If the fetch spec has no bindings, the exisiting object is returned.
+   * <p>
+   * The syntax for bindings in string qualifiers is $binding (e.g.
+   * lastname = $lastname).
+   * <br>
+   * The syntax for bind-pattern hints is '%(binding)s'.
+   * 
+   * @param _b - KVC compatible object returning the values for the bindings
+   * @return a fetch specification which has the qualifier biindings resolved
+   */
   public EOFetchSpecification fetchSpecificationWithQualifierBindings
     (final Object _b)
   {
-    Map<String, Object> boundHints = this.resolveHintBindPatterns(_b);
+    final Map<String, Object> boundHints = this.resolveHintBindPatterns(_b);
     
     if (this.qualifier == null && boundHints == this.hints)
       return this;
@@ -271,7 +294,7 @@ public class EOFetchSpecification extends NSObject implements Cloneable {
         return this;
     }
     
-    EOFetchSpecification fs = new EOFetchSpecification(this);
+    final EOFetchSpecification fs = new EOFetchSpecification(this);
     fs.setQualifier(boundQualifier);
     fs.setHints(boundHints);
     return fs;
