@@ -29,9 +29,10 @@ import java.lang.annotation.Target;
 @Target( { ElementType.METHOD } )
 public @interface GoMethod {
 
-  String slot()        default ""; // can't use null?
-  String protectedBy() default "";
-  boolean isPublic()   default false;
-  boolean isPrivate()  default false;
+  String   slot()            default ""; // can't use null?
+  String   protectedBy()     default "";
+  boolean  isPublic()        default false;
+  boolean  isPrivate()       default false;
+  String[] keyedParameters() default {};
   
 }
