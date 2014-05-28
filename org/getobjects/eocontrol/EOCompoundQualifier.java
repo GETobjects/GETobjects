@@ -34,11 +34,11 @@ import java.util.Set;
 public abstract class EOCompoundQualifier extends EOQualifier {
   protected EOQualifier[] qualifiers = null;
   
-  public EOCompoundQualifier(final List<EOQualifier> _qs) {
+  protected EOCompoundQualifier(final List<EOQualifier> _qs) {
     this(_qs.toArray(new EOQualifier[0]));
   }
   
-  public EOCompoundQualifier(final EOQualifier... _qs) {
+  protected EOCompoundQualifier(final EOQualifier... _qs) {
     this.qualifiers = _qs;
   }
 
