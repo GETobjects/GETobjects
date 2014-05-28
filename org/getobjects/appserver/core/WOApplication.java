@@ -1243,6 +1243,14 @@ public class WOApplication extends NSObject
         }
       }
     }
+    else if (_e instanceof SecurityException) {
+      WOResponse r = _ctx.response();
+      if (r == null) r = new WOResponse(_ctx != null ? _ctx.request() : null);
+      r.setStatus(403);;
+
+      log.warn("Core Java security exception", _e);
+      return r;
+    }
 
     // TODO: improve exception page, eg include stacktrace
     _ctx.response().appendContentHTMLString("fail: " + _e.toString());
