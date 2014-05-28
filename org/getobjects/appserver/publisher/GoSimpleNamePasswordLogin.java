@@ -76,7 +76,7 @@ public class GoSimpleNamePasswordLogin extends NSObject {
     
     LoginContext lc = null;
     try {
-      lc = new LoginContext(_realm != null ? _realm : "JOPE",
+      lc = new LoginContext(_realm != null ? _realm : "Go",
           null, /* subject (create one if missing) */
           new NamePasswordCallbackHandler(_login, _pwd),
           this.jaasCfg);
