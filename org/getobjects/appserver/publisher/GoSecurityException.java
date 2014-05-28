@@ -20,6 +20,8 @@
 */
 package org.getobjects.appserver.publisher;
 
+import org.jfree.util.Log;
+
 /**
  * GoSecurityException
  */
@@ -33,10 +35,14 @@ public class GoSecurityException extends GoException {
   }
   public GoSecurityException(final String _reason) {
     super(_reason);
+    Log.warn("Creating security exception w/o authenticator: " + this);
   }
   public GoSecurityException(IGoAuthenticator _authenticator, String _reason) {
-    this(_reason);
+    super(_reason);
     this.authenticator = _authenticator;
+    
+    if (this.authenticator == null)
+      Log.warn("Creating security exception w null authenticator: " + this);
   }
   
   /* accessors */

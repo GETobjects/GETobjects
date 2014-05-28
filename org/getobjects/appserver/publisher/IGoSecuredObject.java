@@ -534,8 +534,13 @@ public interface IGoSecuredObject {
         log.error("attempt to access private object:\n" + 
                   "  object: " + _self + "\n" +
                   "  class:  " + cls);
-        return new GoAccessDeniedException
-          ("attempt to access private object: " + cls.className());
+        IGoAuthenticator auth = null;
+        if (_ctx != null) {
+          IGoUser user = _ctx.activeUser();
+          if (user != null) auth = user.authenticator();
+        }
+        return new GoAccessDeniedException(auth,
+          "attempt to access private object: " + cls.className());
       }
       
       /* check private/public */
