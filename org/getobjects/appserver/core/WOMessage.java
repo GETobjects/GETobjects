@@ -24,6 +24,7 @@ package org.getobjects.appserver.core;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,6 +52,7 @@ import org.getobjects.foundation.NSHtmlEntityTextCoder;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSTextCoder;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -360,14 +362,22 @@ public abstract class WOMessage extends NSObject
     if (this.domDocument != null)
       return this.domDocument;
 
-    DocumentBuilder db;
+    final DocumentBuilder db;
 
     if ((db = this.createDocumentBuilder()) == null)
       return null;
 
     try {
       // TODO: add support for streaming?
-      this.domDocument = db.parse(this.contentString());
+      final String s = this.contentString();
+      
+      // Sample: an empty PROPFIND is like a <propfind><all>
+      if (s != null && s.length() > 0) {
+        final StringReader sr = new StringReader(s);
+        final InputSource is  = new InputSource(sr);
+        this.domDocument = db.parse(is);
+      }
+      // TBD: should we create an empty DOM?
     }
     catch (SAXException e) {
       log.info("could not parse WOMessage content as DOM", e);
