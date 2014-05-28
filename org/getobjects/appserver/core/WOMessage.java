@@ -349,7 +349,13 @@ public abstract class WOMessage extends NSObject
 
   /* content DOM support */
 
-  static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+  static final DocumentBuilderFactory dbf;
+  static {
+    dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    dbf.setCoalescing(true); /* join adjacent texts */
+    dbf.setIgnoringComments(true);
+  }
   protected Document domDocument = null;
 
   /**
