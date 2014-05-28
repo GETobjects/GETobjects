@@ -20,12 +20,7 @@
 */
 package org.getobjects.jaas;
 
-import java.security.Principal;
-
 import org.getobjects.eoaccess.EODatabase;
-import org.getobjects.foundation.NSDisposable;
-import org.getobjects.foundation.NSObject;
-import org.getobjects.foundation.UObject;
 
 /**
  * EODatabasePrincipal
@@ -35,20 +30,15 @@ import org.getobjects.foundation.UObject;
  * result provided by the EODatabaseLoginModule (could be an EO object
  * representing the authenticated account).
  */
-public class EODatabasePrincipal extends NSObject
-  implements Principal, NSDisposable
-{
+public class EODatabasePrincipal extends GoDefaultPrincipal {
   
   protected EODatabase database;
-  protected String     name;
-  protected Object     loginResult;
   
   public EODatabasePrincipal
     (final EODatabase _db, final String _name, final Object _loginResult)
   {
+    super(_name, _loginResult);
     this.database    = _db;
-    this.name        = _name;
-    this.loginResult = _loginResult;
   }
 
   
@@ -58,26 +48,13 @@ public class EODatabasePrincipal extends NSObject
     return this.database;
   }
   
-  public String getName() {
-    return this.name;
-  }
-  
-  public Object loginResult() {
-    return this.loginResult;
-  }
-  
-  public boolean isValid() {
-    return this.name != null && UObject.boolValue(this.loginResult);
-  }
-  
   /* clear */
   
+  @Override
   public void dispose() {
-    this.name        = null;
-    this.database    = null;
-    this.loginResult = null;
+    this.database = null;
+    super.dispose();
   }
-
 
   /* compare */
   
@@ -107,26 +84,13 @@ public class EODatabasePrincipal extends NSObject
       ? ((EODatabasePrincipal)_other).isEqualToDatabasePrincipal(this)
       : false;
   }
-
-
-  @Override
-  public int hashCode() {
-    return this.name != null ? this.name.hashCode() : 0;
-  }
-
+  
   
   /* description */
   
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
-    if (this.name != null) {
-      _d.append(" name=");
-      _d.append(this.name);
-    }
-    else
-      _d.append(" no-name");
     
     if (this.database == null)
       _d.append(" no-db");
