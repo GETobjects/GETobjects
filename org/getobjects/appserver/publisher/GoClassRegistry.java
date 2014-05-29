@@ -289,7 +289,12 @@ public class GoClassRegistry extends NSObject {
     
     /* security declarations */
     
+    // FIXME: no actual hookup??? :-)
+    // this need sot have the security info of the class.
+    // the current implementation grabs the secinfo out of the annotation of
+    // the method, but this is not quite right.
     final GoSecurityInfo si = null;
+    
     if (si != null) {
       if (a.isPrivate()) {
         si.declarePrivate(slot);
@@ -313,7 +318,7 @@ public class GoClassRegistry extends NSObject {
     }
     
     GoJavaMethod m = new GoJavaMethod(slot, _method);
-        
+    
     return m;
   }
   

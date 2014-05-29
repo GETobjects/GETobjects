@@ -364,8 +364,17 @@ public interface IGoSecuredObject {
           sinfo = null;
         }
 
-        if (sinfo == null) {
-          log.warn("found no default roles for permission: " + _permission);
+        if (sinfo == null) {          
+          // TBD: This happens for GoJavaMethod's which don't usually declare
+          //      explicit per-method roles, thought they might carry a
+          //      'protectedBy'.
+          //      In this case, shouldn't they acquire the relevant security
+          //      info item?!
+          //      Hm, maybe not. Is this just the branch for the default
+          //      (product) permissions and local roles are dealt with 
+          //      elsewhere?
+          log.warn("found no default roles for permission: " + _permission +
+                   " object: " + _self);
           rolesHavingPermission = GoSecurityInfo.defaultViewRoles;
         }
         else {

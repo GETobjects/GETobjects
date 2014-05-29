@@ -50,7 +50,7 @@ public class GoJavaMethod extends NSObject
 
   protected String   name; // purely informational?
   protected Method   method;
-  protected GoMethod methodInfo;
+  protected GoMethod methodInfo; // annotation
   
   public GoJavaMethod(final String _name, final Method _method) {
     this.name   = _name;
@@ -290,6 +290,11 @@ public class GoJavaMethod extends NSObject
   }
 
   public Exception validateObject(IGoContext _ctx) {
+    // TBD: all this is probably not quite right. If a GoJavaMethod is declared
+    //      as protectedBy, this actually needs to go into the GoJavaClass
+    //      security info (it protects the slot).
+    //      The object could do an extra check in case it got passed around,
+    //      but this is really more like a class.validateName(self.name).
     if (this.methodInfo == null)
       return IGoSecuredObject.DefaultImplementation.validateObject(this, _ctx);
     
