@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -37,12 +37,32 @@ import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UObject;
 
 /**
- * Expose a Java method as a GoCallable.
+ * Expose a Java method as a GoCallable. That is, make a method accessible from
+ * the web.
  * <p>
- * NOT IMPLEMENTED YET
+ * This implementation is still in flux. It uses annotations to declare
+ * the security setup, named parameters, etc.
+ * <p>
+ * Sample:
+ * <pre>
+ * &#064;GoMethod(slot = "default", protectedBy="View", 
+ *           keyedParameters={ "limit", "idx", "sort", "filter", "filterop" })
+ * public Object defaultAction
+ *   (int limit, int idx, String s, String filter, String filterOp)</pre>
+ * Note: We considered parameter annotations as too verbose.<br>
+ * Note: You can still further annotate the GoClass in product.plist.
+ * 
+ * <p>
+ * Open points:
+ * <ul>
+ *   <li>Support operator overloading (might actually be good to support
+ *       multiple call styles). Harder than it looks - as the different
+ *       signatures might be in different points of the Java class hierarchy.
+ *   <li>Support Java 8 parameter name reflection (only included if files are
+ *       compiled with -parameters)
+ *   <li>Finish up ;-)
+ * </ul>
  */
-// * TODO: should we support multiple signatures?
-// * TODO: document
 public class GoJavaMethod extends NSObject
   implements IGoCallable, IGoSecuredObject
 {
@@ -87,6 +107,7 @@ public class GoJavaMethod extends NSObject
   public Object[] argumentsForMethodCallInContext
     (final Object _object, final IGoContext _ctx)
   {
+    // FIXME: support multiple Method objects in one GoJavaMethod annotation.
     // Nah, this isn't really nice yet
     final Class<?>[] argTypes = this.method.getParameterTypes();
     final int argCount = argTypes != null ? argTypes.length : 0;
@@ -123,8 +144,8 @@ public class GoJavaMethod extends NSObject
         continue;
       }
       
-      // TBD: the arguments themselves can have annotations!
-      // but they don't look very good - too long, eg:
+      // TBD: the arguments themselves could have annotations.
+      // But they don't look very good - too long, eg:
       // public Object login(@GoParam("login") String login, ...)
       // Instead we attach the keyed parameters to the method, like:
       // @GoMethod(keyedParameters={ "login", "password" });
@@ -273,21 +294,8 @@ public class GoJavaMethod extends NSObject
     return true;
   }
   
-  /* description */
-  
-  public void appendAttributesToDescription(final StringBuilder _d) {
-    super.appendAttributesToDescription(_d);
-    
-    if (this.name != null)
-      _d.append(" name=" + this.name);
-  }
   
   /* secured object */
-
-  public Exception validateName(final String _name, final IGoContext _ctx) {
-    return IGoSecuredObject.DefaultImplementation
-             .validateNameOfObject(this, _name, _ctx);
-  }
 
   public Exception validateObject(IGoContext _ctx) {
     // TBD: all this is probably not quite right. If a GoJavaMethod is declared
@@ -301,8 +309,18 @@ public class GoJavaMethod extends NSObject
     if (this.methodInfo.isPrivate())
       return new GoAccessDeniedException("attempt to access private object");
     
-    if (this.methodInfo.protectedBy() != null)
-      return this.validatePermission(this.methodInfo.protectedBy(), _ctx);
+    if (this.methodInfo.protectedBy() != null) {
+      // 1st: The protectedBy should have already been checked by the GoClass
+      //      validateName(). The caller can't get access to this object w/o
+      //      passing the GoJavaClass.
+      // But: The main reason why this doesn't work right is because permissions
+      //      are currently not acquired properly. Otherwise the default imp
+      //      would notice that the method has no, e.g. defaultRoles, and 
+      //      continue to ask GoJavaClass, and local-roles etc.
+      if (false) // disabled
+        return this.validatePermission(this.methodInfo.protectedBy(), _ctx);
+      return null; // all good
+    }
     
     if (this.methodInfo.isPublic())
       return null;
@@ -310,11 +328,32 @@ public class GoJavaMethod extends NSObject
     // no declaration, private
     return new GoAccessDeniedException("attempt to access private object");
   }
-  
+
   public Exception validatePermission
     (final String _permission, final IGoContext _ctx)
   {
     return IGoSecuredObject.DefaultImplementation
              .validatePermissionOnObject(this, _permission, _ctx);
+  }
+  
+  public Exception validateName(final String _name, final IGoContext _ctx) {
+    // For a GoMethod this would be called if something like a 'method
+    // inspector' is attached to the method.
+    // Consider a GoMI call like this:
+    //   /app/persons/123/view/index
+    // This could show information about the 'view' method of the person
+    // object.
+    return IGoSecuredObject.DefaultImplementation
+             .validateNameOfObject(this, _name, _ctx);
+  }
+  
+  
+  /* description */
+  
+  public void appendAttributesToDescription(final StringBuilder _d) {
+    super.appendAttributesToDescription(_d);
+    
+    if (this.name != null)
+      _d.append(" name=" + this.name);
   }
 }

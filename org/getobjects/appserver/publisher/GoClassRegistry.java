@@ -158,25 +158,27 @@ public class GoClassRegistry extends NSObject {
     if (_cls == null)
       return null;
     
+    /* construct class */
+    
+    final GoJavaClass clazz =
+      new GoJavaClass(_cls.getSimpleName(), _superClass);
+    
+    this.processClassAnnotations(clazz, _cls);;
+
     /* collect mapped methods */
     
     final Map<String, Object> nameToMethod = new HashMap<String, Object>(32);
     for (final Method method: _cls.getDeclaredMethods()) {
       final GoJavaMethod goMethod =
-        this.generateGoMethodFromJavaMethod(method, _ctx);
+        this.generateGoMethodFromJavaMethod(clazz, method, _ctx);
       if (goMethod == null)
         continue; /* not moved */
       
       nameToMethod.put(goMethod.name(), goMethod);
     }
     
-    /* construct class */
+    clazz._setAllSlots(nameToMethod);
     
-    final GoJavaClass clazz =
-      new GoJavaClass(_cls.getSimpleName(), _superClass, nameToMethod);
-    
-    this.processClassAnnotations(clazz, _cls);;
-
     return clazz;
   }
   
@@ -273,51 +275,53 @@ public class GoClassRegistry extends NSObject {
   }
   
   public GoJavaMethod generateGoMethodFromJavaMethod
-    (final Method _method, final IGoContext _ctx)
+    (final GoJavaClass _goCls, final Method _method, final IGoContext _ctx)
   {
     // TBD: expose methods which end in 'Action'?
     if (_method == null)
       return null;
         
-    final GoMethod a = _method.getAnnotation(GoMethod.class);
-    if (a == null) // not exposing Java methods which are not annotaed
+    final GoMethod methodAnnotation = _method.getAnnotation(GoMethod.class);
+    if (methodAnnotation == null) { 
+      // not exposing Java methods which are not annotated
+      // TBD: should we auto-expose objects ending in 'Action'?
       return null;
+    }
 
-    String slot = a.slot();
+    // If the annotation doesn't specify a slot, use the methodName
+    String slot = methodAnnotation.slot();
     if (slot == null || slot.length() == 0)
       slot = _method.getName();
     
     /* security declarations */
     
-    // FIXME: no actual hookup??? :-)
-    // this need sot have the security info of the class.
-    // the current implementation grabs the secinfo out of the annotation of
-    // the method, but this is not quite right.
-    final GoSecurityInfo si = null;
+    final GoSecurityInfo si = _goCls != null ? _goCls.securityInfo() : null;
     
     if (si != null) {
-      if (a.isPrivate()) {
+      if (methodAnnotation.isPrivate()) {
         si.declarePrivate(slot);
         
-        if (a.protectedBy() != null || a.isPublic()) {
+        if (methodAnnotation.protectedBy() != null || 
+            methodAnnotation.isPublic())
+        {
           log.error(
             "declared a method private which also has a " +
             "another protection (ProtectedBy or Public): " + slot);
         }
       }
-      else if (a.protectedBy() != null) {
-        si.declareProtected(a.protectedBy(), slot);
-        if (a.isPublic()) {
+      else if (methodAnnotation.protectedBy() != null) {
+        si.declareProtected(methodAnnotation.protectedBy(), slot);
+        if (methodAnnotation.isPublic()) {
           log.error(
               "declared a method protected which also has a " +
               "another protection (Public): " + slot);
         }
       }
-      else if (a.isPublic())
+      else if (methodAnnotation.isPublic())
         si.declarePublic(slot);
     }
     
-    GoJavaMethod m = new GoJavaMethod(slot, _method);
+    final GoJavaMethod m = new GoJavaMethod(slot, _method);
     
     return m;
   }

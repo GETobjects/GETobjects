@@ -60,7 +60,7 @@ public class GoClass extends NSObject implements IGoObject {
     this.isSealed = false; /* allow categories to be attached */
   }
   
-  private void _setAllSlots(final Map<String, Object> _slots) {
+  void _setAllSlots(final Map<String, Object> _slots) {
     if (_slots == null || _slots.size() == 0)
       return;
     

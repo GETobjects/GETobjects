@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-20214 Helge Hess
 
   This file is part of Go.
 
@@ -20,11 +20,13 @@
 */
 package org.getobjects.appserver.publisher;
 
-import java.util.Map;
-
+/**
+ * Represents a Java class in the Go class system. The slots should be all
+ * GoJavaMethod's.
+ */
 public class GoJavaClass extends GoClass {
 
-  public GoJavaClass(String _n, GoClass _super, Map<String, Object> _slots) {
-    super(_n, _super, _slots);
+  public GoJavaClass(String _n, GoClass _super) {
+    super(_n, _super, null /* no slots yet */);
   }
 }
