@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2006-2008 Helge Hess
+ * Copyright (C) 2006-2014 Helge Hess
  *
- * This file is part of SOPE/J.
+ * This file is part of GETobjects.
  *
- * SOPE/J is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free
+ * GETobjects is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2, or (at your option) any later version.
  *
- * SOPE/J is distributed in the hope that it will be useful, but WITHOUT ANY
+ * GETobjects is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
@@ -16,7 +16,6 @@
  * along with SOPE/J; see the file COPYING. If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
 package org.getobjects.jetty;
 
 import java.io.File;
@@ -38,9 +37,23 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.resource.Resource;
 
 /**
- * WOJettyRunner
+ * Configures and starts a Jetty HTTP server for executing a WOApplication
+ * in a Servlet environment.
  * <p>
- * Configures and starts a Jetty HTTP server for Servlet execution.
+ * Sample: Create a main method in your WOApplication subclass like this:
+ * <pre>
+ * public static void main(String[] args) {
+ *   new WOJettyRunner(TestDAV.class, args).run();
+ * }
+ * </pre>
+ * After this your WOApplication will be reachable under /TestDAV/.
+ * <p>
+ * Supported properties:
+ * <ul>
+ *   <li>WOAppName (if the name differs from the WOApplication subclass name)
+ *   <li>WOAppClass (FQN)
+ *   <li>WOPort (defaults to 8181)
+ * </ul>
  */
 public class WOJettyRunner extends Object {
 
@@ -83,7 +96,28 @@ public class WOJettyRunner extends Object {
     this.initWithProperties(properties);
   }
 
-  public void initWithProperties(Properties _properties) {
+  /**
+   * This prepares and configures the Jetty server. It sets up the Servlet
+   * context and configuration to point to the WOServletAdaptor class.
+   * <p>
+   * Flow:
+   * <ol>
+   *   <li>a jetty.Server object is setup with a port
+   *   <li>a servlet.Context object is attached to the server with the appname
+   *   <li>a ServletHolder objects is created as a factory for WOServletAdaptor
+   *       and holds all the 'init parameters' (properties)
+   *   <li>the ServletHolder is added to the servlet.Context (as / which is
+   *       /AppName/ with the prefix of the Context itself)
+   * </ol>
+   * Note: no WO objects are instantiated at this point.
+   * <p>
+   * Finally the app can have a public 'www' directory with static resources
+   * (either as a 'www' subpackage, or pointed to by WOProjectDirectory, or
+   * in the current directory).<br>
+   * All files/dirs within that are publically exposed in the Jetty root (NOT
+   * below the app entry point, e.g.: /images/banner.gif).
+   */
+  public void initWithProperties(final Properties _properties) {
     String appClassName = _properties.getProperty("WOAppClass");
     String appName      = _properties.getProperty("WOAppName");
 
@@ -101,7 +135,7 @@ public class WOJettyRunner extends Object {
       shortAppName = appClass.getSimpleName();
 
     /* Map 'www' directory inside the application package */
-    URL rsrcBase = appClass.getResource("www");
+    final URL rsrcBase = appClass.getResource("www");
 
     this.log.debug("setting up Jetty ...");
 
@@ -114,7 +148,7 @@ public class WOJettyRunner extends Object {
      *
      * Note that we map the whole context to the appname!
      */
-    Context root = new Context(this.server, "/" + shortAppName,
+    final Context root = new Context(this.server, "/" + shortAppName,
         Context.NO_SESSIONS | Context.NO_SECURITY);
 
 
@@ -129,12 +163,12 @@ public class WOJettyRunner extends Object {
     servletHolder.setInitParameter("WOAppClass", appClass.getName());
 
     for (Object pName : _properties.keySet()) {
-      String value = _properties.getProperty((String)pName);
+      final String value = _properties.getProperty((String)pName);
       servletHolder.setInitParameter((String)pName, value);
     }
 
     this.prepareServletHolder(root, servletHolder, shortAppName);
-
+    
     /* This makes the Servlet being initialize on startup (instead of first
      * request).
      */
@@ -148,14 +182,14 @@ public class WOJettyRunner extends Object {
 
     /* add resource handler (directly expose 'www' directory to Jetty) */
 
-    this.addResourceHandler(root, rsrcBase, _properties);
+    this.addResourceHandler(rsrcBase, _properties);
 
     /* done */
 
     this.log.debug("finished setting up Servlets.");
     this.applicationURL = "http://localhost:" + port + "/" + shortAppName;
     this.log.info("Application URL is " + this.applicationURL);
-
+    
     this.autoOpenInBrowser = UObject.boolValue(_properties.getProperty(
         "WOAutoOpenInBrowser", "false"));
   }
@@ -172,24 +206,36 @@ public class WOJettyRunner extends Object {
     (Context _root, ServletHolder _holder, String _appName)
   {
   }
-
+  
   /**
-   * This adds the 'www' directory of the application package as a resource
-   * directory.
-   *
-   * @param _root       - the Jetty root Context
-   * @param _appWww     - the URL to the public directory
-   * @param _properties - properties passed to this runner during launch
+   * Builds a Jetty Resource object. This is used to stream static application
+   * content, like images or CSS files. Such don't need to go through the
+   * WOApplication request handling mechanism but can just be streamed off the
+   * disk by Jetty.
+   * <p>
+   * Lookup sequence:
+   * <ol>
+   *   <li>Look for the WOProjectDirectory property. If this contains a 'www'
+   *       subdirectory, use it as the static resource path.
+   *   <li>Look for a 'www' directory in the current directory.
+   *   <li>Use the contents of the 'www' package relative to the WOApplication
+   *       subclass (e.g. for org.alwaysrightinstitute.AwesomeApp this would
+   *       be org.alwaysrightinstitute.www)
+   * </ol>
+   * 
+   * @param _appWww - URL object into the Java package system (FS or jar)
+   * @param _properties - properties configured for the WO Servlet
+   * @return Resource object for the static resources, or null if there is none
    */
-  protected void addResourceHandler(final Context _root, final URL _appWww,
-      final Properties _properties)
+  protected Resource lookupBaseResource
+    (final URL _appWww, final Properties _properties)
   {
     Resource baseResource = null;
 
     if (_properties != null) {
-      String projDir = _properties.getProperty("WOProjectDirectory");
+      final String projDir = _properties.getProperty("WOProjectDirectory");
       if (UObject.isNotEmpty(projDir)) {
-        File projectDir = new File(projDir, "www");
+        final File projectDir = new File(projDir, "www");
         if (projectDir.exists()) {
           try {
             baseResource = Resource.newResource(projectDir.getAbsolutePath());
@@ -210,7 +256,7 @@ public class WOJettyRunner extends Object {
         catch (Exception e) {}
       }
     }
-
+    
     if (baseResource == null && _appWww != null) {
       /* Map 'www' directory inside the application package */
       try {
@@ -219,6 +265,26 @@ public class WOJettyRunner extends Object {
       }
       catch (Exception e) {}
     }
+    
+    return baseResource;
+  }
+
+  /**
+   * This adds the 'www' directory of the application as a Jetty static resource
+   * directory. This is used to stream static application
+   * content, like images or CSS files. Such don't need to go through the
+   * WOApplication request handling mechanism but can just be streamed off the
+   * disk by Jetty.
+   * <p>
+   * See lookupBaseResource() on how this directory is located.
+   *
+   * @param _appWww     - the URL to the directory with the Java packages
+   * @param _properties - properties passed to this runner during launch
+   */
+  protected void addResourceHandler
+    (final URL _appWww, final Properties _properties)
+  {
+    Resource baseResource = this.lookupBaseResource(_appWww, _properties);
 
     if (baseResource != null) {
       ResourceHandler rh = new ResourceHandler();
