@@ -25,9 +25,6 @@ import java.util.HashMap;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 
-import org.getobjects.appserver.publisher.GoHTTPAuthenticator;
-import org.getobjects.testdav.auth.TestJaasLoginModule;
-
 /**
  * Very simple in-memory JAAS config object, which just takes the name of a
  * single JAAS LoginModule (e.g. a GoDefaultLoginModule subclass).
