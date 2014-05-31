@@ -235,15 +235,14 @@ public class NSObject extends Object
   }
   
   /**
-   * NSObject overrides toString() to ensure a consistent output format for
-   * arbitrary objects.
+   * This provides a consistent output format for arbitrary objects.
    * <br>
    * Subclasses should not override this method but
    * appendAttributesToDescription().
    * 
    * @see appendAttributesToDescription()
    */
-  public String toString() {
+  public String description() {
     StringBuilder sb = new StringBuilder(256);
     
     sb.append("<");
@@ -254,5 +253,19 @@ public class NSObject extends Object
     this.appendAttributesToDescription(sb);
     sb.append(">");
     return sb.toString();
+  }
+  
+  /**
+   * NSObject overrides toString() to ensure a consistent output format for
+   * arbitrary objects.
+   * <br>
+   * Subclasses should not override this method but
+   * appendAttributesToDescription().
+   * 
+   * @see appendAttributesToDescription()
+   */
+  @Override
+  public String toString() {
+    return this.description();
   }
 }
