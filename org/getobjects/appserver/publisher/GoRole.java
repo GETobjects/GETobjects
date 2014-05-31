@@ -34,6 +34,7 @@ import org.getobjects.foundation.NSObject;
  * </u>
  */
 public class GoRole extends NSObject {
+  private GoRole() {} // do not instantiate
 
   public static final String Manager       = "Manager";
   public static final String Anonymous     = "Anonymous";

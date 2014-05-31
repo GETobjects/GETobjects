@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2007 Helge Hess
+  Copyright (C) 2006-2014 Helge Hess
 
   This file is part of Go.
 
@@ -27,10 +27,22 @@ import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.kvc.MissingPropertyException;
 
 /**
- * IGoObject
- * <p>
  * A GoObject is an object which exposes named child objects to the web. Per
  * default all KVC are exposed, so be careful and properly setup permissions.
+ * <p>
+ * A Java class implementing this interface often only wants to override some
+ * keys and still provide other actions&keys using the GoJavaClass reflection.
+ * Hook into the default mechanism via the IGoObject.DefaultImplementation
+ * functions.<br>
+ * Sample:
+ * <pre>
+ * public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
+ *   if (_name.equals("awesome"))
+ *     return new Awesome();
+ *     
+ *   return IGoObject.DefaultImplementation
+ *            .lookupName(this, _name, _ctx, _acquire);
+ * }</pre>
  */
 public interface IGoObject {
 
@@ -89,7 +101,7 @@ public interface IGoObject {
       
       /* no specific handlers, use default implementation */
       
-      return DefaultImplementation.joClass(_self, _ctx);
+      return DefaultImplementation.goClass(_self, _ctx);
     }
 
   }
@@ -101,7 +113,7 @@ public interface IGoObject {
    */
   public static class DefaultImplementation {
     
-    public static GoClass joClass(Object _self, IGoContext _ctx) {
+    public static GoClass goClass(Object _self, IGoContext _ctx) {
       if (_self == null)
         return null;
       

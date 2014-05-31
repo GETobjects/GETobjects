@@ -735,6 +735,17 @@ public abstract class WOMessage extends NSObject
     }
     return this.appendContentString(" />");
   }
+  
+  /**
+   * Commonly used like:
+   * <code>response.appendBeginTagClose(context.closeAllElements())</code>.
+   * <p>
+   * This method appends this string: <code>" /&gt;"</code> if _doClose
+   * is true, otherwise it adds <code>"&gt;"</code>.
+   *
+   * @param _doClose - whether or not the tag should be closed
+   * @return an Exception if the writing failed, null if everything was fine.
+   */
   public Exception appendBeginTagClose(final boolean _doClose) {
     return _doClose
       ? this.appendContentString(" />")
@@ -953,6 +964,7 @@ public abstract class WOMessage extends NSObject
 
 
   /* HTTP status constants */
+  // FIXME: should those be in WOResponse?
 
   public static final int HTTP_STATUS_OK                  = 200;
   public static final int HTTP_STATUS_CREATED             = 201;
