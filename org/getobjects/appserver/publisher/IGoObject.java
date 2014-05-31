@@ -81,26 +81,17 @@ public interface IGoObject {
       return DefaultImplementation.lookupName(_self, _name, _ctx, _acquire);
     }
 
+    /**
+     * Retrieves the 'goClass' of an object. The actual lookup is done by the
+     * class registry which is attached to the context object.
+     * <p>
+     * Objects can have a dynamic goClass by implementing the 'goClass' KVC key.
+     * 
+     * @param _self - object for which the caller wants to retrieve the goClass
+     * @param _ctx - the active Go context
+     * @return a GoClass, or null if none could be determined
+     */
     public static GoClass goClass(Object _self, IGoContext _ctx) {
-      if (_self == null)
-        return null;
-      
-      /* try to discover joClass using KVC */
-      
-      try {
-        Object oc = NSKeyValueCoding.Utility.valueForKey(_self, "joClass");
-        if (oc != null) {
-          if (oc instanceof GoClass)
-            return (GoClass)oc;
-        
-          log.error("joClass property of object did not return a joClass: " + oc);
-        }
-      }
-      catch (MissingPropertyException e) {
-      }
-      
-      /* no specific handlers, use default implementation */
-      
       return DefaultImplementation.goClass(_self, _ctx);
     }
 
@@ -113,19 +104,35 @@ public interface IGoObject {
    */
   public static class DefaultImplementation {
     
-    public static GoClass goClass(Object _self, IGoContext _ctx) {
+    /**
+     * Retrieves the 'goClass' of an object. The actual lookup is done by the
+     * class registry which is attached to the context object.
+     * <p>
+     * Objects can have a dynamic goClass by implementing the 'goClass' KVC key.
+     * 
+     * @param _self - object for which the caller wants to retrieve the goClass
+     * @param _ctx - the active Go context
+     * @return a GoClass, or null if none could be determined
+     */
+    public static GoClass goClass(Object _self, final IGoContext _ctx) {
       if (_self == null)
         return null;
       
-      if (_ctx == null)
+      if (_ctx == null) {
+        final Log log = LogFactory.getLog("GoClassRegistry");
+        log.warn("Didn't get a context, can't lookup GoClass: " + _self);
         return null;
+      }
       
       /* default behaviour is to reflect on the Java class */
       final GoClassRegistry classRegistry = _ctx.goClassRegistry();
       if (classRegistry != null)
         return classRegistry.goClassForJavaObject(_self, _ctx);
-
-      /* no context found */
+      
+      /* didn't find a class */
+      final Log log = LogFactory.getLog("GoClassRegistry");
+      log.warn("Context doesn't provide a class registry, " +
+               "can't lookup goClass for object: " + _self + " ctx " + _ctx);
       return null;
     }
     

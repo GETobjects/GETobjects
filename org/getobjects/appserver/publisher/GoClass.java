@@ -28,8 +28,6 @@ import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
 
 /**
- * GoClass
- * <p>
  * A GoClass represents a set of names as well as declared security info.
  * <p>
  * It can map to a Java class, but it doesn't need to. Eg it could be a folder
@@ -41,8 +39,8 @@ import org.getobjects.foundation.UString;
 public class GoClass extends NSObject implements IGoObject {
   protected static final Log log = LogFactory.getLog("GoClass");
   
-  protected String         name;
-  protected GoClass        goSuperClass;
+  protected final String   name;
+  protected final GoClass  goSuperClass;
   protected String[]       slotNames;
   protected Object[]       slotValues;
   protected boolean        isSealed;
@@ -77,10 +75,6 @@ public class GoClass extends NSObject implements IGoObject {
   
   /* accessors */
   
-  @Deprecated
-  public GoClass joSuperClass() {
-    return this.goSuperClass();
-  }
   public GoClass goSuperClass() {
     return this.goSuperClass;
   }
@@ -217,7 +211,7 @@ public class GoClass extends NSObject implements IGoObject {
     return null;
   }
   
-  public GoClass joClass() {
+  public GoClass goClass() {
     return null; /* the metaclass of a GoClass, not sure whether we need it */
   }
 
@@ -241,7 +235,7 @@ public class GoClass extends NSObject implements IGoObject {
       _d.append(" super=");
       
       boolean isFirst = true;
-      for (GoClass c = this.joSuperClass(); c != null; c = c.joSuperClass()) {
+      for (GoClass c = this.goSuperClass(); c != null; c = c.goSuperClass()) {
         if (isFirst) isFirst = false;
         else _d.append(',');
         

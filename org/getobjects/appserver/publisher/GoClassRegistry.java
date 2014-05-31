@@ -67,9 +67,9 @@ public class GoClassRegistry extends NSObject {
   /* exposing Java classes as So classes */
   
   /**
-   * First attempts to retrieve the GoClass by evaluating the 'joClass'
-   * KVC key. If that doesn't return anything, we call joClassForJavaClass()
-   * with the objects class.
+   * First attempts to retrieve the GoClass by evaluating the 'goClass'
+   * KVC key. If that doesn't return anything, we call goClassForJavaClass()
+   * with the object's class.
    * 
    * @param _object - Object to get the GoClass for
    * @param _ctx    - context in which the object is active
