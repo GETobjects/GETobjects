@@ -178,14 +178,15 @@ public abstract class XMLNS {
   
   /* CalDAV */
 
-  public static final String CALDAV = "urn:ietf:params:xml:ns:caldav";
+  public static final String CALDAV   = "urn:ietf:params:xml:ns:caldav";
   
   /* Apple CalServer */
   
   public static final String AppleCalServer =
     "http://apple.com/ns/calendarserver/";
-
+  
   public static final String AppleCalApp = "com.apple.ical:";
+  public static final String AppleICal   = "http://apple.com/ns/ical/";
   
   /* Adobe */
   
