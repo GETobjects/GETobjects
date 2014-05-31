@@ -1,0 +1,11 @@
+{
+  renderers = {
+    "objects.DAVRenderer" = ();
+  };
+
+  factories = {
+  };
+  
+  classes = {
+  };
+}
