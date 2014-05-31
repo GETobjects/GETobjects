@@ -74,6 +74,23 @@ public class WOResponse extends WOMessage implements WOActionResults {
     return this.status;
   }
   
+  public String statusString() {
+    return WOResponse.stringForStatus(this.status());
+  }
+  public static String stringForStatus(final int _code) {
+    switch (_code) { // FIXME: complete and correct
+      case 200: return "OK";
+      case 201: return "Created";
+      case 204: return "No Content";
+      case 401: return "Authentication Required";
+      case 403: return "Forbidden";
+      case 404: return "Not Found";
+      case 500: return "Server Error";
+      case 501: return "Not Implemented";
+      default:  return "Status " + _code;
+    }
+  }
+  
   public WORequest request() {
     return this.request;
   }
