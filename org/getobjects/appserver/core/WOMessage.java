@@ -103,12 +103,18 @@ public abstract class WOMessage extends NSObject
                    byte[] _contents, Map _userInfo)
   {
     this.httpVersion     = _httpVersion;
-    this.headers         = _headers;
     this.contents        = _contents;
     this.userInfo        = _userInfo;
     this.contentEncoding = WOMessage.defaultEncoding();
     this.contentCoder    = NSHtmlEntityTextCoder.sharedCoder;
     this.attributeCoder  = NSHtmlAttributeEntityTextCoder.sharedCoder;
+    
+    if (_headers != null) {
+      // TBD: what's better, lowercase everything or use a TreeMap?
+      this.headers = new HashMap<String, List<String>>(_headers.size());
+      for (final String key: _headers.keySet())
+        this.headers.put(key.toLowerCase(), _headers.get(key));
+    }
   }
 
   /* destructor */
@@ -175,7 +181,7 @@ public abstract class WOMessage extends NSObject
     if (this.headers == null)
       this.headers = new HashMap<String, List<String>>(16);
 
-    this.headers.put(_key, new ArrayList<String>(_v));
+    this.headers.put(_key.toLowerCase(), new ArrayList<String>(_v));
   }
 
   /**
@@ -209,7 +215,7 @@ public abstract class WOMessage extends NSObject
   public void removeHeadersForKey(final String _key) {
     if (_key == null) return;
     if (this.headers == null) return;
-    this.headers.remove(_key);
+    this.headers.remove(_key.toLowerCase());
   }
 
   /**
@@ -221,7 +227,7 @@ public abstract class WOMessage extends NSObject
   public List<String> headersForKey(final String _key) {
     if (_key == null || this.headers == null) /* we never return null */
       return new ArrayList<String>(0);
-    List<String> v = this.headers.get(_key);
+    final List<String> v = this.headers.get(_key.toLowerCase());
     if (v == null) /* we never return null */
       return new ArrayList<String>(0);
     return v;
@@ -234,14 +240,14 @@ public abstract class WOMessage extends NSObject
   }
 
   public void setHeaderForKey(final String _v, final String _key) {
-    List<String> lheaders;
+    final List<String> lheaders;
     if (_v == null)
       lheaders = null;
     else {
       lheaders = new ArrayList<String>(1);
       lheaders.add(_v);
     }
-    this.setHeadersForKey(lheaders, _key);
+    this.setHeadersForKey(lheaders, _key.toLowerCase());
   }
   public String headerForKey(final String _key) {
     final List<String> lheaders = this.headersForKey(_key);
