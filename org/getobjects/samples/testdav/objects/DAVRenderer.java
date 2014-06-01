@@ -1,8 +1,12 @@
 package org.getobjects.samples.testdav.objects;
 
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WORequest;
@@ -10,7 +14,9 @@ import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.publisher.GoDefaultRenderer;
 import org.getobjects.foundation.NSURL;
 import org.getobjects.foundation.NSXmlEntityTextCoder;
+import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UObject;
+import org.getobjects.foundation.UString;
 import org.getobjects.foundation.XMLNS;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -20,6 +26,17 @@ public class DAVRenderer extends GoDefaultRenderer {
   
   private final static boolean doIndent = true;
   private final static boolean doStream = false;
+  
+  protected static DateFormat httpDateFmt;
+  
+  static {
+    // Sun, 01 Jun 2014 17:15:52 UTC
+    httpDateFmt = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+    httpDateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));   
+  }
+  
+  public DAVRenderer() {
+  }
 
   @Override
   public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
@@ -74,6 +91,10 @@ public class DAVRenderer extends GoDefaultRenderer {
       _r.appendContentHTMLString((String)value);
     else if (value instanceof Number)
       _r.appendContentString(value.toString());
+    else if (value instanceof Date) {
+      // Sun, 06 Nov 1994 08:49:37 GMT
+      _r.appendContentHTMLString(httpDateFmt.format((Date)value));
+    }
     else if (value instanceof URL || value instanceof NSURL) {
       if (ns.equals(XMLNS.WEBDAV))
         _r.appendBeginTag("href");
@@ -243,6 +264,12 @@ public class DAVRenderer extends GoDefaultRenderer {
     r.setContentEncoding("utf-8");
     r.setTextCoder(NSXmlEntityTextCoder.sharedCoder,
                    NSXmlEntityTextCoder.sharedCoder);
+    
+    final Object davOpts = _ctx.application().valueForKey("davOptions");
+    if (UObject.isNotEmpty(davOpts)) {
+      r.setHeaderForKey(
+          UString.componentsJoinedByString(UList.asList(davOpts), ", "), "DAV");
+    }
     
     if (doStream)
       r.enableStreaming(); // start streaming, headers will be written

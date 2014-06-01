@@ -1,5 +1,6 @@
 package org.getobjects.samples.testdav.controllers;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -114,6 +115,12 @@ public class DAVObject extends NSObject {
   public Object davContentType() {
     return null;
   }
+  public Object davContentLength() {
+    return 0;
+  }
+  public Object davLastModified() {
+    return new Date(); // always changes for our Fake server ;-)
+  }
   
   public Object valueForPropertyInContext(String _propName, WOContext _ctx) {
     // FIXME: all this should be more automagic and beautiful
@@ -127,6 +134,10 @@ public class DAVObject extends NSObject {
       return this.davETag();
     if (_propName.equals("{DAV:}getcontenttype"))
       return this.davContentType();
+    if (_propName.equals("{DAV:}getcontentlength"))
+      return this.davContentLength();
+    if (_propName.equals("{DAV:}getlastmodified"))
+      return this.davLastModified();
     
     if (_propName.equals("{DAV:}displayname"))
       return this.davDisplayName();
