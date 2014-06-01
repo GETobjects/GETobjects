@@ -260,6 +260,7 @@ public class DAVRenderer extends GoDefaultRenderer {
 
     /* prepare response object for streamed XML output */
     final WOResponse r = _ctx.response();
+    r.setStatus(207);
     r.setHeaderForKey("text/xml; charset=utf-8", "content-type");
     r.setContentEncoding("utf-8");
     r.setTextCoder(NSXmlEntityTextCoder.sharedCoder,
