@@ -24,7 +24,7 @@ public class DAVCalendarEvent extends DAVCalendarItem {
   }
 
   @Override
-  public Object calendarData() {
+  public String calendarData() {
     DateFormat     icsDateFmt = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
     final Date     now = new Date();
     final TimeZone tz  = TimeZone.getTimeZone("UTC");

@@ -1,6 +1,9 @@
 package org.getobjects.samples.testdav.controllers;
 
 import org.getobjects.appserver.core.WOContext;
+import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.appserver.publisher.GoPermission;
+import org.getobjects.appserver.publisher.annotations.GoMethod;
 
 public abstract class DAVCalendarItem extends DAVObject {
   
@@ -23,7 +26,7 @@ public abstract class DAVCalendarItem extends DAVObject {
     return "\"NeverEndingStory" + etagCounter + "\"";
   }
   
-  abstract Object calendarData();
+  abstract String calendarData();
   
   static final String CRLF = "\r\n";
   static final String propCalData =
@@ -35,5 +38,18 @@ public abstract class DAVCalendarItem extends DAVObject {
       return this.calendarData();
      
     return super.valueForPropertyInContext(_propName, _ctx);
+  }
+  
+  /* Go methods */
+  
+  @GoMethod(slot = "default", protectedBy=GoPermission.WebDAVAccess)
+  public Object doGET(WOContext _ctx) {
+    String calData = this.calendarData();
+    
+    final WOResponse r = _ctx.response();
+    r.setHeaderForKey(this.davContentType().toString(), "Content-Type");
+    r.setHeaderForKey(this.davETag().toString(),        "ETag");
+    r.appendContentString(calData);    
+    return r;
   }
 }

@@ -175,7 +175,7 @@ public class DAVObject extends NSObject {
   /* Go Actions */
   
   @GoMethod(slot = "PROPPATCH", protectedBy=GoPermission.WebDAVAccess)
-  public Object DoPropPatch(WOContext _ctx) {
+  public Object doPropPatch(WOContext _ctx) {
     /* Sample:
      * <A:propertyupdate xmlns:A="DAV:" xmlns:D="http://apple.com/ns/ical/">
      * <A:set><A:prop>
