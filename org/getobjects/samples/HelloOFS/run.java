@@ -2,6 +2,7 @@ package org.getobjects.samples.HelloOFS;
 
 import java.util.Properties;
 
+import org.getobjects.appserver.publisher.GoObjectRequestHandler;
 import org.getobjects.jetty.WOJettyRunner;
 import org.getobjects.ofs.OFSApplication;
 
@@ -19,6 +20,10 @@ public class run extends WOJettyRunner {
     properties.put("WOAppName", "");
     
     runner.initWithProperties(properties);
+    
+    // FIXME: Not sure what exactly we need to fix in GoObjectRequestHandler
+    GoObjectRequestHandler.isAcquisitionEnabled = true;
+    
     runner.run();
   }
 }

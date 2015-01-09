@@ -54,7 +54,8 @@ Files ending in .html are loaded as WOComponent templates, not raw HTML files
 (the extension is mapped to OFSComponentFile).
 
 To deliver a raw HTML file w/o any processing, use '.rawhtml' as the extension
-(mapped to OFSHtmlFile which is an OFSResourceFile).
+(mapped to OFSHtmlFile which is an OFSResourceFile). Again, you can still access
+such as 'xyz.html' on the web!
 
 
 ****Hierarchies
@@ -77,6 +78,8 @@ In case it isn't obvious, you can also additional folders at the top. Like
 FIXME: The GoObjectRequestHandler currently disables acquisition?!
 Eg in our example the 'index' should also be inherited by the 'css' and 'images'
 folders, but that does not work.
+
+NOTE: There is a hack in run.java to enable acquisition.
 
 
 ****Configuration

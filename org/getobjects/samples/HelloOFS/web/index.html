@@ -4,17 +4,8 @@
   Hello World!
 </p>
 
-<#if value="$context.clientObject.isFolderish">
-  <p>ClientObject is a folder!</p>
-  
-  <ul class="small">
-    <!-- Careful, you don't want to do this in a real app! It includes
-         the templates -->
-    <#for list="$context.clientObject.objectIds" item="$item">
-      <li><#a href="$item"><wo:get value="$item" /></#a></li>
-    </#for>
-  </ul>
-</#if>
+<!-- Lookup 'DirectoryBrowser' object in OFS, and embed the component found -->
+<#DirectoryBrowser/>
 
 <!-- Lookup 'ContextInfo' object in OFS, and embed the component found -->
 <#ContextInfo/>
