@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav.controllers;
+package org.getobjects.samples.HelloDAV.controllers;
 
 import java.util.Collection;
 import java.util.Date;
@@ -13,7 +13,7 @@ import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UMap;
 import org.getobjects.foundation.UString;
 import org.getobjects.foundation.XMLNS;
-import org.getobjects.samples.testdav.objects.DAVMultiStatus;
+import org.getobjects.samples.HelloDAV.objects.DAVMultiStatus;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

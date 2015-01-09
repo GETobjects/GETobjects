@@ -72,5 +72,5 @@
  * 
  * @author helge
  */
-package org.getobjects.samples.testdav;
+package org.getobjects.samples.HelloDAV;
 

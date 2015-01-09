@@ -3,4 +3,4 @@
  * 
  * @author helge
  */
-package org.getobjects.samples.testdav.objects;
+package org.getobjects.samples.HelloDAV.objects;

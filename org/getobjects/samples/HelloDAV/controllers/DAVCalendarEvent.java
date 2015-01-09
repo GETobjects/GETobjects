@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav.controllers;
+package org.getobjects.samples.HelloDAV.controllers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

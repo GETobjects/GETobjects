@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav;
+package org.getobjects.samples.HelloDAV;
 
 import org.getobjects.jaas.GoDefaultLoginModule;
 

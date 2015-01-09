@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav.objects;
+package org.getobjects.samples.HelloDAV.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;

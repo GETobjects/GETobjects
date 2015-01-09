@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav.controllers;
+package org.getobjects.samples.HelloDAV.controllers;
 
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOResponse;

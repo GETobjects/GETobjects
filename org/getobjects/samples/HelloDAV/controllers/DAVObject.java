@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav.controllers;
+package org.getobjects.samples.HelloDAV.controllers;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -25,8 +25,8 @@ import org.getobjects.foundation.NSURL;
 import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UString;
 import org.getobjects.foundation.XMLNS;
-import org.getobjects.samples.testdav.objects.DAVMultiStatus;
-import org.getobjects.samples.testdav.objects.DAVResponse;
+import org.getobjects.samples.HelloDAV.objects.DAVMultiStatus;
+import org.getobjects.samples.HelloDAV.objects.DAVResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav.controllers;
+package org.getobjects.samples.HelloDAV.controllers;
 
 import java.util.Collection;
 
@@ -12,8 +12,8 @@ import org.getobjects.appserver.publisher.annotations.DefaultAccess;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.XMLNS;
-import org.getobjects.samples.testdav.objects.DAVMultiStatus;
-import org.getobjects.samples.testdav.objects.DAVResponse;
+import org.getobjects.samples.HelloDAV.objects.DAVMultiStatus;
+import org.getobjects.samples.HelloDAV.objects.DAVResponse;
 
 @DefaultAccess("allow")
 public class DAVCollection extends DAVObject implements IGoObject {

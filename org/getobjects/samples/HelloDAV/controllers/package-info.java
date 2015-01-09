@@ -7,4 +7,4 @@
  * 
  * @author helge
  */
-package org.getobjects.samples.testdav.controllers;
+package org.getobjects.samples.HelloDAV.controllers;

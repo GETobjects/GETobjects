@@ -1,4 +1,4 @@
-package org.getobjects.samples.testdav;
+package org.getobjects.samples.HelloDAV;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,8 +20,8 @@ import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UString;
 import org.getobjects.jaas.GoSingleModuleConfig;
 import org.getobjects.jetty.WOJettyRunner;
-import org.getobjects.samples.testdav.controllers.DAVPrincipalsCollection;
-import org.getobjects.samples.testdav.controllers.DAVRoot;
+import org.getobjects.samples.HelloDAV.controllers.DAVPrincipalsCollection;
+import org.getobjects.samples.HelloDAV.controllers.DAVRoot;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
