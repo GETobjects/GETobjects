@@ -1,0 +1,13 @@
+<!-- Small helper component which renders a bit of status info about the
+     context object. Good for debugging -->
+<table border="0" class="small">
+  <tr><td>Context:</td>     <td><#get value="$context"              /></td></tr>
+  <tr><td>Component:</td>   <td><#get value="$self"                 /></td></tr>
+  <tr><td>Page:</td>        <td><#get value="$context.page"         /></td></tr>
+  <tr><td>ClientObject:</td><td><#get value="$context.clientObject" /></td></tr>
+  <tr><td>User:</td>        <td><#get value="$context.activeUser"   /></td></tr>
+  <tr><td>Session:</td>     <td><#get value="$existingSession"      /></td></tr>
+  <tr><td>Locale:</td>      <td><#get value="$context.locale"       /></td></tr>
+  <tr><td>Timezone:</td>
+      <td><#get value="$context.timezone.displayName" /></td></tr>
+</table>

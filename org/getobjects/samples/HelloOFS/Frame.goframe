@@ -1,0 +1,17 @@
+<wo:html>
+  <!-- This component is automatically wrapped around content components by
+       OFSApplication. -->
+  <head>
+    <title>HelloOFS</title>
+    <link href="/images/ari-48.ico" rel="shortcut icon" />
+    <link href="css/site.css"       rel="stylesheet" type="text/css" />
+  </head>
+  
+  <body>
+    <!-- This embeds the WOComponent which got looked up. -->
+    <#WOComponentContent />
+    
+    <!-- You can also embed other components of course, e.g.: -->
+    <!-- #ContextInfo / -->
+  </body>
+</wo:html>
