@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Hello World! `date`" >/tmp/OUTTTTTT
+echo "<b>Hello World!</b> - date is `date`"
+

@@ -24,9 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOApplication;
 import org.getobjects.appserver.core.WOContext;
-import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.GoInternalErrorException;
 import org.getobjects.appserver.publisher.GoTraversalPath;
+import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.foundation.NSJavaRuntime;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
@@ -280,6 +280,10 @@ public class OFSRestorationFactory extends NSObject {
         if (_ext.equals("jpeg")) return OFSImageFile.class;
 
         if (_ext.equals("make")) return OFSPlainTextFile.class;
+        break;
+        
+      case 5:
+        if (_ext.equals("shell")) return OFSShellAction.class;
         break;
         
       case 7:
