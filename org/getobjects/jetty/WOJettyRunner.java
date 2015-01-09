@@ -284,7 +284,7 @@ public class WOJettyRunner extends Object {
   protected void addResourceHandler
     (final URL _appWww, final Properties _properties)
   {
-    Resource baseResource = this.lookupBaseResource(_appWww, _properties);
+    final Resource baseResource = this.lookupBaseResource(_appWww, _properties);
 
     if (baseResource != null) {
       ResourceHandler rh = new ResourceHandler();
@@ -297,8 +297,8 @@ public class WOJettyRunner extends Object {
 
   /* Helpers */
 
-  protected Properties getPropertiesFromArguments(String[] _args) {
-    Properties properties = new Properties();
+  protected Properties getPropertiesFromArguments(final String[] _args) {
+    final Properties properties = new Properties();
 
     /* provide some defaults */
 
@@ -309,9 +309,9 @@ public class WOJettyRunner extends Object {
     for (String arg: _args) {
       if (arg.startsWith("-D") && arg.length() > 2)
         arg = arg.substring(2);
-      int idx = arg.indexOf("=");
+      final int idx = arg.indexOf("=");
       if (idx != -1) {
-        String value = arg.substring(idx + 1);
+        final String value = arg.substring(idx + 1);
         arg = arg.substring(0, idx);
         properties.put(arg, value);
       }
@@ -323,8 +323,8 @@ public class WOJettyRunner extends Object {
   }
 
   public void logSystemProperties() {
-    Properties props = System.getProperties();
-    for (Object k: props.keySet()) {
+    final Properties props = System.getProperties();
+    for (final Object k: props.keySet()) {
       System.err.println(k + ": " + props.getProperty((String)k));
     }
   }
@@ -337,7 +337,7 @@ public class WOJettyRunner extends Object {
     if (!this.autoOpenInBrowser) return;
     try {
       this.log.debug("Opening " + this.applicationURL() +
-          " in browser application");
+                     " in browser application");
 
       Runtime.getRuntime().exec("open " + this.applicationURL());
     }
@@ -358,14 +358,14 @@ public class WOJettyRunner extends Object {
 
       /* execution continues in a Jetty thread ...*/
     }
-    catch (BindException be) {
+    catch (final BindException be) {
       this.log.error("Could not bind to socket", be);
 
       System.out.flush();
       System.err.println("WOJettyRunner: exit(1).");
       System.exit(1);
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       this.log.error("Uncaught exception at top level", e);
     }
   }

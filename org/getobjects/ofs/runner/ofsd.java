@@ -35,6 +35,7 @@ import org.mortbay.jetty.servlet.ServletHandler;
  * A runner for OFS based applications.
  * <p>
  * TODO: serve 'www' directory using a Jetty handler.
+ * TODO: shouldn't this use WOJettyRunner somehow?
  */
 public class ofsd extends OFSApplication {
   public static String rootPath;
@@ -51,11 +52,11 @@ public class ofsd extends OFSApplication {
     runWithArguments(args, ofsd.class.getName());
   }
 
-  public static void runWithArguments(String[] args, String _appName) {
+  public static void runWithArguments(final String[] args, String _appName) {
     /* parse properties */
 
     int port = 10011;
-    for (String arg: args) {
+    for (final String arg: args) {
       if (arg.startsWith("-Droot="))
         rootPath = arg.substring(7);
       else if (arg.startsWith("-DWOPort="))
