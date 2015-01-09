@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2008 Helge Hess
+ * Copyright (C) 2007-2015 Helge Hess
  *
  * This file is part of Go.
  *
@@ -406,7 +406,8 @@ public class OFSComponentWrapper extends OFSFolder
   /* acting as a renderer (a template) */
   
   public boolean isFrameComponent() {
-    return this.pathExtension().equals("joframe");
+    final String pe = this.pathExtension();
+    return pe != null && (pe.equals("goframe") || pe.equals("joframe"));
   }
   
   public boolean canRenderObjectInContext(Object _object, final WOContext _ctx){

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2015 Helge Hess
 
   This file is part of Go.
 
@@ -57,7 +57,7 @@ public class OFSRestorationFactory extends NSObject {
    * @param _ctx - the Context to perform the lookup in
    */
   public static OFSRestorationFactory restorationFactoryInContext
-    (IGoContext _ctx)
+    (final IGoContext _ctx)
   {
     if (_ctx == null) {
       log.error("got no ctx to lookup restoration factory!");
@@ -68,7 +68,7 @@ public class OFSRestorationFactory extends NSObject {
     
     /* first ask the lookup path */
     
-    GoTraversalPath tpath = _ctx != null ? _ctx.goTraversalPath() : null;
+    final GoTraversalPath tpath = _ctx != null ? _ctx.goTraversalPath() : null;
     if (tpath != null) {
       Object[] objPath = tpath.objectTraversalPath();
       int len = objPath != null ? objPath.length : 0;
@@ -115,7 +115,7 @@ public class OFSRestorationFactory extends NSObject {
    * The default implementation just checks whether the object exists.
    */
   public boolean canRestoreObjectFromFileInContext
-    (IOFSFileManager _fm, IOFSFileInfo _file, IGoContext _ctx)
+    (final IOFSFileManager _fm, final IOFSFileInfo _file, final IGoContext _ctx)
   {
     // TBD: should this ask the IOFSFileManager whether the _file exists?
     return _file != null ? _file.exists() : false;
@@ -138,8 +138,8 @@ public class OFSRestorationFactory extends NSObject {
    * @return a freshly created object or an Exception/null on errors
    */
   public Object restoreObjectFromFileInContext
-    (Object _container, IOFSFileManager _fm, IOFSFileInfo _file,
-     IGoContext _ctx)
+    (Object _container, final IOFSFileManager _fm, final IOFSFileInfo _file,
+     final IGoContext _ctx)
   {
     if (_file == null || !_file.exists()) {
       log().error("got passed an invalid OFSFileInfo object: " + _file);
@@ -150,7 +150,7 @@ public class OFSRestorationFactory extends NSObject {
     
     /* lookup object class */
     
-    Class objectClass = this.ofsClassForFileInContext(_fm, _file, _ctx);
+    final Class objectClass = this.ofsClassForFileInContext(_fm, _file, _ctx);
     if (objectClass == null) {
       log().info("found no class for given file: " + _file);
       return null;
@@ -161,8 +161,8 @@ public class OFSRestorationFactory extends NSObject {
      */
     // TBD: might be confusing for users? But its Zope style index_html ...
     
-    String filename  = _file.getName();
-    int    dotIdx    = filename == null ? -1 : filename.indexOf('.');
+    final String filename  = _file.getName();
+    final int    dotIdx    = filename == null ? -1 : filename.indexOf('.');
     String objectId  = dotIdx != -1 ? filename.substring(0, dotIdx) : filename;
     
     if (objectId == null && log().isInfoEnabled())
@@ -213,15 +213,15 @@ public class OFSRestorationFactory extends NSObject {
    * @return a controller Class or null if none could be found
    */
   public Class ofsClassForFileInContext
-    (IOFSFileManager _fm, IOFSFileInfo _file, IGoContext _ctx)
+    (final IOFSFileManager _fm, final IOFSFileInfo _file, final IGoContext _ctx)
   {
     if (_file == null)
       return null;
     
     /* process filename */
 
-    String filename  = _file.getName();
-    String extension = _file.pathExtension();
+    final String filename  = _file.getName();
+    final String extension = _file.pathExtension();
     
     /* lookup a class for the given extension */
     
@@ -242,7 +242,7 @@ public class OFSRestorationFactory extends NSObject {
   }
   
   public Class ofsClassForExtensionInContext(String _ext, IGoContext _ctx) {
-    int len = _ext != null ? _ext.length() : 0;
+    final int len = _ext != null ? _ext.length() : 0;
     if (len == 0) return null;
 
     // TBD: fix this crap and introduce a proper registry (product.plist
@@ -284,6 +284,7 @@ public class OFSRestorationFactory extends NSObject {
         
       case 7:
         if (_ext.equals("rawhtml")) return OFSHtmlFile.class;
+        if (_ext.equals("goframe")) return OFSComponentFile.class;
         if (_ext.equals("joframe")) return OFSComponentFile.class;
         break;
         
@@ -308,7 +309,7 @@ public class OFSRestorationFactory extends NSObject {
    * @return a class to be used for the given extension
    */
   public Class ofsClassForDirectoryExtensionInContext
-    (String _ext, IGoContext _ctx)
+    (final String _ext, final IGoContext _ctx)
   {
     if (_ext == null)
       return null;
@@ -319,6 +320,8 @@ public class OFSRestorationFactory extends NSObject {
     if ("wo".equals(_ext))
       return OFSComponentWrapper.class;
     
+    if ("goframe".equals(_ext))
+      return OFSComponentWrapper.class;
     if ("joframe".equals(_ext))
       return OFSComponentWrapper.class;
     
@@ -331,7 +334,7 @@ public class OFSRestorationFactory extends NSObject {
     return null;
   }
   
-  public Class ofsClassForFileNameInContext(String _fn, IGoContext _ctx) {
+  public Class ofsClassForFileNameInContext(String _fn, final IGoContext _ctx) {
     return null;
   }
   
