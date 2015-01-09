@@ -64,10 +64,10 @@ public class OFSComponentFile extends OFSJavaObject
   /* IGoCallable */
 
   public Object callInContext(Object _object, IGoContext _ctx) {
-    WOContext wctx = (WOContext)_ctx;
+    final WOContext wctx = (WOContext)_ctx;
 
     // this will just trigger the defaultAction, which returns the component
-    Object jr = WODirectActionRequestHandler.primaryCallComponentAction
+    final Object jr = WODirectActionRequestHandler.primaryCallComponentAction
       (this.nameInContainer, "default", wctx);
 
     return this.postProcessCallResult(_object, jr, _ctx);
