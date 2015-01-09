@@ -393,12 +393,12 @@ public class OFSFolder extends OFSBaseObject
         log.debug("  in: " + this);
       }
 
-      for (KeyMatchEntry entry: aliases) {
+      for (final KeyMatchEntry entry: aliases) {
         final String newName = entry.match(_name);
         if (newName != null && !newName.equals(_name)) {
           if (debugOn)
             log.debug("  match, rewrite '" + _name + "' to '" + newName + "'");
-          Object o = this.lookupName(newName, _ctx, _acquire);
+          final Object o = this.lookupName(newName, _ctx, _acquire);
 
           if (o instanceof OFSBaseObject) {
             /* push *old* name as the (virtual) location of the replacement */
