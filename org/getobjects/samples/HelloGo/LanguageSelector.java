@@ -7,12 +7,12 @@ import org.getobjects.foundation.NSObject;
 
 public class LanguageSelector extends NSObject implements IGoObject {
 
-  public static String           supportedLCs[] = { "en", "de" };
-  public static LanguageSelector singleton      = new LanguageSelector();
+  public static final String           supportedLCs[] = { "en", "de" };
+  public static final LanguageSelector singleton      = new LanguageSelector();
 
-  public static String bestLanguageCodeForRequest(WORequest _r) {
-    for (String lang : _r.browserLanguages()) {
-      for (String supLang : supportedLCs) {
+  public static String bestLanguageCodeForRequest(final WORequest _r) {
+    for (final String lang : _r.browserLanguages()) {
+      for (final String supLang : supportedLCs) {
         if (lang.equals(supLang)) {
           return lang;
         }
@@ -28,7 +28,7 @@ public class LanguageSelector extends NSObject implements IGoObject {
   }
 
   public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
-    for (String lang : supportedLCs) {
+    for (final String lang : supportedLCs) {
       if (lang.equals(_name)) {
         ((Context)_ctx).setLanguage(_name);
         /* TODO: find a better solution */
