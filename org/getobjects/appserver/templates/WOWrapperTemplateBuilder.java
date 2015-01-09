@@ -51,16 +51,16 @@ import org.getobjects.foundation.UString;
  *
  * <h4>Supported binding prefixes</h4>
  * <pre>
- *   const  - WOValueAssociation
- *   jo     - GoPathAssociation
- *   label  - WOLabelAssociation
- *   ognl   - WOOgnlAssociation
- *   plist  - parse value as plist, then create a WOValueAssociation
- *   q      - WOQualifierAssociation (evaluate the given qualifier)
- *   regex  - WORegExAssociation
- *   rsrc   - WOResourceURLAssociation (lookup URL for a given resource name)
- *   var    - WOKeyPathAssociation
- *   varpat - WOKeyPathPatternAssociation</pre>
+ *   const   - WOValueAssociation
+ *   go(/jo) - GoPathAssociation
+ *   label   - WOLabelAssociation
+ *   ognl    - WOOgnlAssociation
+ *   plist   - parse value as plist, then create a WOValueAssociation
+ *   q       - WOQualifierAssociation (evaluate the given qualifier)
+ *   regex   - WORegExAssociation
+ *   rsrc    - WOResourceURLAssociation (lookup URL for a given resource name)
+ *   var     - WOKeyPathAssociation
+ *   varpat  - WOKeyPathPatternAssociation</pre>
  *
  * <h4>Shortcuts</h4>
  * <pre>
