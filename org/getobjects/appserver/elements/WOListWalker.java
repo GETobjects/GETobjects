@@ -266,7 +266,7 @@ public abstract class WOListWalker extends NSObject {
     if (o instanceof Boolean) {
       if (((Boolean)o).booleanValue()) {
         if (lList == oList) lList = new ArrayList(lList); // copy
-        Collections.sort(lList, (Comparator)o);
+        Collections.sort(lList);
       }
       return lList;
     }
