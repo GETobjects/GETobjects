@@ -322,7 +322,7 @@ public class OFSApplication extends WOApplication
   public IGoCallable lookupDefaultMethod(Object _object, final WOContext _ctx) {
     if (_object instanceof OFSFolder) {
       final Object folderIndex = IGoSecuredObject.Utility.lookupName
-        (_object, "index", _ctx, false /* do not acquire */);
+        (_object, "index", _ctx, true /* DO acquire */);
       
       if (folderIndex instanceof IGoCallable) {
         final IGoCallable indexMethod = (IGoCallable)folderIndex;
