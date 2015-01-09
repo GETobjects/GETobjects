@@ -1,5 +1,8 @@
 <#if value="$context.clientObject.isFolderish">
-  <p>ClientObject is a folder: <#get value="$context.clientObject" /></p>
+<div class="dbg">
+  <span class="small">
+    ClientObject is a folder: <#get value="$context.clientObject" />
+  </span>
   
   <ul class="small">
     <!-- Careful, you don't want to do this in a real app! It includes
@@ -8,8 +11,17 @@
     <#put cn="$context.clientObject.container.nameInContainer"/>
     <#li if="$cn"><a href="..">.. (<#get value="$cn"/>)</a></#li>
     
+    
+    <!-- this is hackish due to web-root vs OFS-root -->
+    
+    <#put varpat:linkPrefix="%(context.clientObject.nameInContainer)s/" 
+          if="$cn" />
+    <#put linkPrefix=""  ifnot="$cn" />
+    
     <#for list="$context.clientObject.objectIds" item="$item" plist:sort="YES">
-      <li><#a href="$item"><wo:get value="$item" /></#a></li>
+      <li><#a varpat:href="%(linkPrefix)s%(item)s"
+              ><#get value="$item" /></#a></li>
     </#for>
   </ul>
+</div>
 </#if>

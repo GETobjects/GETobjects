@@ -1,3 +1,4 @@
+<div class="dbg">
 <!-- Small helper component which renders a bit of status info about the
      context object. Good for debugging -->
 <table border="0" class="small">
@@ -11,3 +12,4 @@
   <tr><td>Timezone:</td>
       <td><#get value="$context.timezone.displayName" /></td></tr>
 </table>
+</div>

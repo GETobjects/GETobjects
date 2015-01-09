@@ -5,3 +5,13 @@ body, td {
 .small {
   font-size: 0.7em;
 }
+
+.dbg {
+  border: 1px solid gray;
+  padding: 0.5em;
+  margin:  0.5em;
+}
+
+.dbg table td {
+  padding: 0.3em 0em 0.3em 0em;
+}
