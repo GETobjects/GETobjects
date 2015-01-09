@@ -287,7 +287,7 @@ public class NSPropertyListParser extends NSObject {
 
   /* char classification */
 
-  protected boolean _isBreakChar(char _c) {
+  protected boolean _isBreakChar(final char _c) {
     switch (_c) {
       case ' ': case '\t': case '\n': case '\r':
       case '=':  case ';':  case ',':
@@ -299,6 +299,12 @@ public class NSPropertyListParser extends NSObject {
       default:
         return false;
     }
+  }
+  protected boolean _isBreakCharAt(final int cpos) {
+    if (this.idx + cpos >= this.len) // break on EOF
+      return true;
+    
+    return _isBreakChar(this.buffer[this.idx + cpos]);
   }
 
   protected boolean _isIdChar(char _c) {
@@ -788,9 +794,9 @@ public class NSPropertyListParser extends NSObject {
     return new Double(_digitPath);
   }
 
-  protected static boolean _ucIsEqual(char[] _buf, int _pos, String _s) {
-    int len = _s.length();
-    if (_buf.length <= _pos + len)
+  protected static boolean _ucIsEqual(final char[] _buf, int _pos, String _s) {
+    final int len = _s.length();
+    if (_buf.length < (_pos + len))
       return false;
     for (int i = 0; i < len; i++) {
       if (_buf[_pos + i] != _s.charAt(i))
@@ -873,38 +879,37 @@ public class NSPropertyListParser extends NSObject {
           if (c == 'Y' || c == 'N' || c == 't' || c == 'f' || c == 'n') {
             // Note: we do not allow a space behind a const, eg '= true ;'
             /* parse YES and NO, true and false */
-            if (_ucIsEqual(this.buffer, this.idx, "YES") &&
-                _isBreakChar(this.buffer[this.idx + 3])) {
+            if (_ucIsEqual(this.buffer, this.idx, "YES") && _isBreakCharAt(3)) {
               result = Boolean.TRUE;
               valueProperty = true;
               this.idx += 3;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "NO") &&
-                     _isBreakChar(this.buffer[this.idx + 2])) {
+                     _isBreakCharAt(2)) {
               result = Boolean.FALSE;
               valueProperty = true;
               this.idx += 2;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "true") &&
-                     _isBreakChar(this.buffer[this.idx + 4])) {
+                     _isBreakCharAt(4)) {
               result = Boolean.TRUE;
               valueProperty = true;
               this.idx += 4;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "false") &&
-                     _isBreakChar(this.buffer[this.idx + 5])) {
+                     _isBreakCharAt(5)) {
               result = Boolean.FALSE;
               valueProperty = true;
               this.idx += 5;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "null") &&
-                _isBreakChar(this.buffer[this.idx + 4])) {
+                _isBreakCharAt(4)) {
               result = null;
               valueProperty = true;
               this.idx += 4;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "nil") &&
-                     _isBreakChar(this.buffer[this.idx + 3])) {
+                     _isBreakCharAt(3)) {
               result = null;
               valueProperty = true;
               this.idx += 3;
