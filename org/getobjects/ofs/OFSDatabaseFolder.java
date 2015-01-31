@@ -95,8 +95,16 @@ public class OFSDatabaseFolder extends OFSFolder
     if (this.adaptor != null)
       return this.adaptor;
     
-    this.adaptor = EOAdaptor.adaptorWithURL(url, this.adaptorProperties(),
-                                            this.storedModel());
+    final EOModel    model = this.storedModel();
+    final Properties props = this.adaptorProperties();
+    
+    this.adaptor = EOAdaptor.adaptorWithURL(url, props, model);
+    
+    if (model == null && this.beautifyModel()) {
+      final EOModel fetchedModel = this.adaptor.model();
+      if (fetchedModel != null)
+        fetchedModel.beautifyNames();
+    }
     
     urlToAdaptor.putIfAbsent(url, this.adaptor);
     this.adaptor = urlToAdaptor.get(url);
@@ -106,6 +114,11 @@ public class OFSDatabaseFolder extends OFSFolder
   
   
   /* implement me for more flexibility */
+  
+  public boolean beautifyModel() {
+    // FIXME: should be an option
+    return true;
+  }
   
   public EOModel storedModel() {
     // FIXME: support model. cache model in fileManager?
