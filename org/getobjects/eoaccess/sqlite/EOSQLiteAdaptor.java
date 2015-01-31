@@ -1,10 +1,11 @@
 package org.getobjects.eoaccess.sqlite;
 
+import java.sql.Connection;
 import java.util.Properties;
 
 import org.getobjects.eoaccess.EOAdaptor;
+import org.getobjects.eoaccess.EOAdaptorChannel;
 import org.getobjects.eoaccess.EOModel;
-import org.getobjects.eoaccess.mysql.EOMySQLExpression;
 
 public class EOSQLiteAdaptor extends EOAdaptor {
 
@@ -24,6 +25,14 @@ public class EOSQLiteAdaptor extends EOAdaptor {
     catch (Exception e) {
       return false;
     }
+  }
+
+    /* adaptor specific objects */
+
+  @Override
+  protected EOAdaptorChannel primaryCreateChannelForConnection(Connection _c) {
+    /* can be overridden by subclasses to provide specific channels */
+    return new EOSQLiteChannel(this, _c);
   }
 
   /* SQL expressions */
