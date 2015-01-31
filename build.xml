@@ -463,6 +463,9 @@
       <zipfileset src="${libs}/postgresql-8.3-603.jdbc3.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
+      <zipfileset src="${libs}/sqlite-jdbc-3.8.6.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
 
       <!-- copy license readmes -->
       <fileset file="${libs}/Apache-LICENSE.txt" />

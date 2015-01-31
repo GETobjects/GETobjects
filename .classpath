@@ -20,5 +20,6 @@
 	<classpathentry exported="true" kind="lib" path="ThirdParty/jetty-6.1.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="ThirdParty/jetty-util-6.1.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="ThirdParty/jfreechart-1.0.12.jar"/>
+	<classpathentry exported="true" kind="lib" path="ThirdParty/sqlite-jdbc-3.8.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
