@@ -26,8 +26,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.eoaccess.EOAdaptor;
+import org.getobjects.eoaccess.EOModel;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.NSKeyValueHolder;
@@ -61,7 +65,8 @@ public class OFSDatabaseFolder extends OFSFolder
   
   /* bindings */
   public EOObjectTrackingContext objectContext;
-  public String dburl;
+  public EOAdaptor adaptor;
+  public String    dburl;
   
 
   /* accessors */
@@ -72,7 +77,47 @@ public class OFSDatabaseFolder extends OFSFolder
   public IGoContext context() {
     return this.goctx;
   }
-
+  
+  /* adaptor */
+  
+  static ConcurrentHashMap<String, EOAdaptor> urlToAdaptor =
+      new ConcurrentHashMap<String, EOAdaptor>(4);
+  
+  public EOAdaptor adaptor() {
+    if (this.adaptor != null)
+      return this.adaptor;
+    
+    final String url = this.adaptorURL();
+    if (url == null)
+      return null;
+    
+    this.adaptor = urlToAdaptor.get(url);
+    if (this.adaptor != null)
+      return this.adaptor;
+    
+    this.adaptor = EOAdaptor.adaptorWithURL(url, this.adaptorProperties(),
+                                            this.storedModel());
+    
+    urlToAdaptor.putIfAbsent(url, this.adaptor);
+    this.adaptor = urlToAdaptor.get(url);
+    
+    return this.adaptor;
+  }
+  
+  
+  /* implement me for more flexibility */
+  
+  public EOModel storedModel() {
+    // FIXME: support model. cache model in fileManager?
+    return null;
+  }
+  public Properties adaptorProperties() {
+    // FIXME: support via .htaccess
+    // this is stuff like EOAdaptorMaxPoolSize (default: 64)
+    return null;
+  }
+  
+  
   /* derived */
 
   public Map<String, Object> config() {
