@@ -1,0 +1,24 @@
+<wo:put co="$context.clientObject" />
+
+<table class="kv">
+  <tr><td>ClientObject:</td>
+      <td><wo:get value="$co" /></td></tr>
+  <tr><td>URL:</td>
+      <td><wo:get value="$co.adaptorURL" /></td></tr>
+  <tr><td>Adaptor:</td>
+      <td><wo:get value="$co.adaptor" /></td></tr>
+  <tr><td>Database:</td>
+      <td><wo:get value="$co.database" /></td></tr>
+  <tr><td>Context:</td>
+      <td><wo:get value="$co.objectContext" /></td></tr>
+  <tr>
+    <td>Entities:</td>
+    <td>
+      <ul>
+        <wo:for list="$co.adaptor.model.entityNames" item="$item">
+          <li><wo:str value="$item" /></li>
+        </wo:for>
+      </ul>
+    </td>
+  </tr>
+</table>

@@ -1,0 +1,19 @@
+<h3>DB DataSource Folder</h3>
+
+<wo:put co="$context.clientObject" />
+
+<form action="#">
+  <table border="1">
+    <wo:for list="$co.dataSource.fetchObjects" item="$item">
+      <tr>
+        <td><wo:checkbox varpat:idname="prebook%(item.id)i"
+                         value="1" checked="$item.completed" /></td>
+
+        <td><wo:get value="$item.name" /></td>
+      </tr>
+    </wo:for>
+  </table>
+</form>
+
+<wo:DirectoryBrowser />
+<wo:DBFolderInfo     />

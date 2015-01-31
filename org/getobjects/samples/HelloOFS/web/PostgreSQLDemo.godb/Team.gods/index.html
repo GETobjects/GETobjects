@@ -1,0 +1,15 @@
+<h3>DB DataSource Folder</h3>
+
+<wo:put co="$context.clientObject" />
+
+<table border="1">
+  <wo:for list="$co.dataSource.fetchObjects" item="$item">
+    <tr>
+      <td><wo:get value="$item.companyId" /></td>
+      <td><wo:get ognl:value="item.objectForKey('description')" /></td>
+    </tr>
+  </wo:for>
+</table>
+
+<wo:DirectoryBrowser />
+<wo:DBFolderInfo     />

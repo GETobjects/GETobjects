@@ -1,0 +1,51 @@
+<wo:put co="$context.clientObject" />
+<table class="kv">
+  <tr>
+    <td>ClientObject:</td>
+    <td><wo:get value="$co" /></td>
+  </tr>
+  <tr>
+    <td>EntityName:</td>
+    <td><wo:get value="$co.entityName" /></td>
+  </tr>
+  <tr>
+    <td>Entity:</td>
+    <td><wo:get value="$co.entity.name" />
+         (external: <wo:get value="$co.entity.externalName" />)</td>
+  </tr>
+  <tr>
+    <td>Context:</td>
+    <td><wo:get value="$co.editingContext" /></td>
+  </tr>
+  <tr>
+    <td>DataSource:</td>
+    <td><wo:get value="$co.dataSource" /></td>
+  </tr>
+  <tr>
+    <td>Adaptor:</td>
+    <td><wo:get value="$co.adaptor" /></td>
+  </tr>
+  <tr>
+    <td>Attributes:</td>
+    <td>
+      <table class="kv">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Column</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <wo:for list="$co.entity.attributes" item="$item">
+            <tr>
+              <td><wo:str value="$item.name" /></td>
+              <td><wo:str value="$item.columnName" /></td>
+              <td><wo:str value="$item.externalType" /></td>
+            </tr>
+          </wo:for>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</table>
