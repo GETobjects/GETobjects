@@ -324,16 +324,15 @@ public class OFSRestorationFactory extends NSObject {
     if ("wo".equals(_ext))
       return OFSComponentWrapper.class;
     
-    if ("goframe".equals(_ext))
-      return OFSComponentWrapper.class;
-    if ("joframe".equals(_ext))
+    if ("goframe".equals(_ext) || "joframe".equals(_ext))
       return OFSComponentWrapper.class;
     
-    if ("jods".equals(_ext))
+    if ("godo".equals(_ext) || "jodo".equals(_ext))
+      return OFSDatabaseObjectFolder.class;
+    
+    if ("gods".equals(_ext) || "jods".equals(_ext))
       return OFSDatabaseDataSourceFolder.class;
     
-    if ("jodo".equals(_ext))
-      return OFSDatabaseObjectFolder.class;    
     
     return null;
   }
