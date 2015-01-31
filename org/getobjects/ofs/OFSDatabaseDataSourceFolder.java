@@ -52,10 +52,10 @@ import org.getobjects.ofs.config.GoConfigKeys;
  * a component to execute a query.
  * <p>
  * Sample:<pre>
- *   /persons.jods
+ *   /persons.gods
  *     .htaccess
  *     index.wo/
- *     item.jodo/
+ *     item.godo/
  *       view.wo/</pre>
  * .htaccess:<pre>
  *    AuthType      WOSession
@@ -96,7 +96,7 @@ import org.getobjects.ofs.config.GoConfigKeys;
  * There is no '42' object in the OFS tree below. The AliasMatch tell OFS that
  * the '42' needs to be replaced with 'item' when the OFS object is restored.
  * <br />
- * So OFS loads the item.jodo - an OFSDatabaseObjectFolder, which is similar
+ * So OFS loads the item.godo - an OFSDatabaseObjectFolder, which is similar
  * to OFSDatabaseDataSourceFolder (intended to represent a single object).
  * The *name* of the folder in the lookup path will still be '42'. This fact is
  * used in the LocationMatch. The resulting qualifier is 'id = "42"'
