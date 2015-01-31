@@ -20,16 +20,11 @@
 */
 package org.getobjects.ofs;
 
-import java.util.Map;
-
-import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
-import org.getobjects.foundation.NSKeyValueCodingAdditions;
-import org.getobjects.foundation.NSKeyValueHolder;
 import org.getobjects.ofs.config.GoConfigKeys;
 
 /**
@@ -106,12 +101,9 @@ import org.getobjects.ofs.config.GoConfigKeys;
  * <p>
  * @see OFSDatabaseObjectFolder
  */
-public class OFSDatabaseDataSourceFolder extends OFSFolder
+public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase
   implements IOFSContextObject
-{
-
-  protected IGoContext goctx;
-  
+{  
   /* result */
   protected EODataSource ds;
   
@@ -121,27 +113,10 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
   public EOQualifier      qualifier;     // derived from config, cached
   public EOSortOrdering[] sortOrderings; // derived from config, cache
   
+  /* OFS object lookup */
   
-  /* IOFSContextObject (an object which depends on its lookup path) */
-
-  public void _setContext(final IGoContext _ctx) {
-    this.goctx = _ctx;
-  }
-  public IGoContext context() {
-    return this.goctx;
-  }
-  
-  
-  /* derived */
-  
-  public Map<String, Object> config() {
-    return this.configurationInContext(this.goctx);
-  }
-  public NSKeyValueCodingAdditions evaluationContext() {
-    return new NSKeyValueHolder(
-        "configObject", this,
-        "config",       this.config(),
-        "context",      this.goctx);
+  @Override public OFSDatabaseDataSourceFolder goDataSource() {
+    return this;
   }
   
   /**

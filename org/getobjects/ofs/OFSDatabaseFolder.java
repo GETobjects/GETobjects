@@ -29,9 +29,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eoaccess.EOAdaptor;
+import org.getobjects.eoaccess.EODatabase;
+import org.getobjects.eoaccess.EODatabaseContext;
 import org.getobjects.eoaccess.EOModel;
+import org.getobjects.eocontrol.EOEditingContext;
+import org.getobjects.eocontrol.EOObjectStore;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
 import org.getobjects.foundation.NSKeyValueHolder;
@@ -56,36 +59,63 @@ import org.getobjects.ofs.fs.IOFSFileInfo;
  * .htaccess:<pre>
  *    EOAdaptorURL jdbc:postgresql://127.0.0.1/OGo?user=OGo&password=OGo</pre>
  */
-public class OFSDatabaseFolder extends OFSFolder
-  implements IOFSContextObject
-{
+public class OFSDatabaseFolder extends OFSDatabaseFolderBase {
   // FIXME: not finished, work in progress!
-  
-  protected IGoContext goctx;
   
   /* bindings */
   public EOObjectTrackingContext objectContext;
-  public EOAdaptor adaptor;
-  public String    dburl;
+  public EOAdaptor  adaptor;
+  public EODatabase database;
+  public String     dburl;
   
+  /* OFS object lookup */
+  
+  @Override public OFSDatabaseFolder goDatabase() {
+    return this;
+  }
 
-  /* accessors */
+  /* database */
   
-  public void _setContext(final IGoContext _ctx) {
-    this.goctx = _ctx;
-  }
-  public IGoContext context() {
-    return this.goctx;
+  @Override public EODatabase database() {
+    if (this.database != null)
+      return this.database;
+    
+    if (this.objectContext != null) {
+      EOObjectStore rs = this.objectContext.rootObjectStore();
+      if (rs != null) {
+        if (rs instanceof EODatabaseContext) {
+          this.database = ((EODatabaseContext)rs).database();
+          return this.database();
+        }
+      }
+      
+      log.warn("Object has an object-context, but can't determine DB!");
+    }
+    
+    return (this.database = new EODatabase(this.adaptor(), null));
   }
   
-  /* adaptor */
+  @Override public EOObjectTrackingContext objectContext() {
+    if (this.objectContext != null)
+      return this.objectContext;
+    
+    final EODatabase        db  = this.database();
+    final EODatabaseContext dbc = new EODatabaseContext(db);
+    
+    return (this.objectContext = new EOEditingContext(dbc));
+  }
+    
+  
+  /* adaptor with cache */
   
   static ConcurrentHashMap<String, EOAdaptor> urlToAdaptor =
       new ConcurrentHashMap<String, EOAdaptor>(4);
   
-  public EOAdaptor adaptor() {
+  @Override public EOAdaptor adaptor() {
     if (this.adaptor != null)
       return this.adaptor;
+    if (this.database != null)
+      return (this.adaptor = this.database.adaptor());
     
     final String url = this.adaptorURL();
     if (url == null)

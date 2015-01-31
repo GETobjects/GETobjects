@@ -20,13 +20,8 @@
 */
 package org.getobjects.ofs;
 
-import java.util.Map;
-
-import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EOQualifier;
-import org.getobjects.foundation.NSKeyValueCodingAdditions;
-import org.getobjects.foundation.NSKeyValueHolder;
 import org.getobjects.ofs.config.GoConfigKeys;
 
 /**
@@ -38,41 +33,18 @@ import org.getobjects.ofs.config.GoConfigKeys;
  * <p>
  * @see OFSDatabaseDataSourceFolder
  */
-public class OFSDatabaseObjectFolder extends OFSFolder
-  implements IOFSContextObject
-{
-
-  protected IGoContext  goctx;
+public class OFSDatabaseObjectFolder extends OFSDatabaseFolderBase {
 
   protected EOQualifier qualifier;
   protected Object      object; // TBD: who assigns this?
   
   /* accessors */
   
-  public void _setContext(final IGoContext _ctx) {
-    this.goctx = _ctx;
-  }
-  public IGoContext context() {
-    return this.goctx;
-  }
-
   public Object object() {
     return this.object;
   }
   public boolean isLoaded() {
     return this.object != null;
-  }
-  
-  /* derived */
-
-  public Map<String, Object> config() {
-    return this.configurationInContext(this.context());
-  }
-  public NSKeyValueCodingAdditions evaluationContext() {
-    return new NSKeyValueHolder(
-        "configObject", this,
-        "config",       this.config(),
-        "context",      this.goctx);
   }
   
   /**
@@ -87,6 +59,10 @@ public class OFSDatabaseObjectFolder extends OFSFolder
       return (String)o;
     else if (o instanceof EOEntity)
       return ((EOEntity)o).name();
+    
+    // FIXME: lookup entity name by containment 
+    //        (lookup OFSDatabaseDataSourceFolder)
+    
     return null;
   }
   
