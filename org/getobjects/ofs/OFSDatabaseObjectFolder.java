@@ -20,6 +20,7 @@
 */
 package org.getobjects.ofs;
 
+import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.ofs.config.GoConfigKeys;
@@ -45,6 +46,13 @@ public class OFSDatabaseObjectFolder extends OFSDatabaseFolderBase {
   }
   public boolean isLoaded() {
     return this.object != null;
+  }
+  
+  /* OFS objects */
+  
+  public OFSDatabaseDataSourceFolder goDataSource() {
+    return (OFSDatabaseDataSourceFolder)IGoLocation.Utility
+               .locateObjectOfClass(this, OFSDatabaseDataSourceFolder.class);
   }
   
   /**

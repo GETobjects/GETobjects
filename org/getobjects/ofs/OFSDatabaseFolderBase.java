@@ -26,6 +26,7 @@ import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.eoaccess.EOAdaptor;
 import org.getobjects.eoaccess.EODatabase;
+import org.getobjects.eoaccess.EOModel;
 import org.getobjects.eocontrol.EOEditingContext;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
@@ -47,31 +48,43 @@ public abstract class OFSDatabaseFolderBase extends OFSFolder
     return (OFSDatabaseFolder)IGoLocation.Utility
                .locateObjectOfClass(this, OFSDatabaseFolder.class);
   }
-  public OFSDatabaseDataSourceFolder goDataSource() {
-    return (OFSDatabaseDataSourceFolder)IGoLocation.Utility
-               .locateObjectOfClass(this, OFSDatabaseDataSourceFolder.class);
-  }
   
   
   /* EOAccess objects */
   
   public EODatabase database() {
-    OFSDatabaseFolder gdb = this.goDatabase();
+    final OFSDatabaseFolder gdb = this.goDatabase();
     return gdb != null ? gdb.database() : null;
   }
   public EOAdaptor adaptor() {
-    OFSDatabaseFolder gdb = this.goDatabase();
+    final OFSDatabaseFolder gdb = this.goDatabase();
     return gdb != null ? gdb.adaptor() : null;
   }
   public EOObjectTrackingContext objectContext() {
-    OFSDatabaseFolder gdb = this.goDatabase();
+    final OFSDatabaseFolder gdb = this.goDatabase();
     return gdb != null ? gdb.objectContext() : null;
   }
   
   public EOEditingContext editingContext() { // just for casting convenience
-    EOObjectTrackingContext oc = this.objectContext();
+    final EOObjectTrackingContext oc = this.objectContext();
     if (oc instanceof EOEditingContext)
       return (EOEditingContext)oc;
+    return null;
+  }
+  
+  public EOModel model() {
+    final OFSDatabaseFolder gdb = this.goDatabase();
+    if (gdb == null)
+      return null;
+    
+    final EODatabase db = gdb.database();
+    if (db != null)
+      return db.model();
+    
+    final EOAdaptor ad = gdb.adaptor();
+    if (ad != null)
+      return ad.model();
+    
     return null;
   }
   

@@ -21,6 +21,7 @@
 package org.getobjects.ofs;
 
 import org.getobjects.eoaccess.EOEntity;
+import org.getobjects.eoaccess.EOModel;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.eocontrol.EOQualifier;
@@ -115,7 +116,7 @@ public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase
   
   /* OFS object lookup */
   
-  @Override public OFSDatabaseDataSourceFolder goDataSource() {
+  public OFSDatabaseDataSourceFolder goDataSource() {
     return this;
   }
   
@@ -196,10 +197,28 @@ public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase
   }
   
   public EOEntity entity() {
-    if (this.entity == null) {
-      // TBD: lookup in current database?
-      log.debug("attempt to lookup entity!");
+    if (this.entity != null)
+      return this.entity;
+    
+    final String entityName = this.entityName();
+    if (entityName == null) {
+      log.warn("Database folder has no entity name: " + this);
+      return null;
     }
+    
+    final EOModel model = this.model();
+    if (model == null) {
+      log.warn("Found no model to resolve entity in folder: " + this);
+      return null;
+    }
+    
+    this.entity = model.entityNamed(entityName);
+    if (this.entity == null) {
+      log.warn("Did not find entity " + entityName + " of folder: " + this +
+               " in model: " + model);
+      return null;
+    }
+    
     return this.entity;
   }
   
