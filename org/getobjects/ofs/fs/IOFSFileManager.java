@@ -29,6 +29,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Abstract interface for a store which can hold OFS objects. Usually just a
  * regular filesystem object.
+ * <p>
+ * The caches are file based caches. E.g. if you have an OFS object representing
+ * an XML file. You only want to reload the file if it actually changed, you
+ * can use the caching methods.
+ * <br>
+ * Like:
+ * <pre>
+ * this.fileManager.cacheObject("XMLCache", this.fileInfo(), parsedXML);</pre>
  */
 public interface IOFSFileManager {
   
