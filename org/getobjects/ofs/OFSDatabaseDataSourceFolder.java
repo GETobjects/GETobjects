@@ -156,7 +156,8 @@ public class OFSDatabaseDataSourceFolder extends OFSFolder
       return (String)o;
     else if (o instanceof EOEntity)
       return ((EOEntity)o).name();
-    return null;
+    
+    return this.nameInContainer;
   }
   
   /**
