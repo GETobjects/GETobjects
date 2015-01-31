@@ -333,6 +333,8 @@ public class OFSRestorationFactory extends NSObject {
     if ("gods".equals(_ext) || "jods".equals(_ext))
       return OFSDatabaseDataSourceFolder.class;
     
+    if ("godb".equals(_ext))
+      return OFSDatabaseFolder.class;
     
     return null;
   }

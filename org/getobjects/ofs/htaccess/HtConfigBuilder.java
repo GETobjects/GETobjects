@@ -103,6 +103,7 @@ public class HtConfigBuilder extends NSObject {
     defDirectiveToEval.put("resetbindings",   new ResetBindings());
     defDirectiveToEval.put("removebinding",   new RemoveBinding());
     
+    defDirectiveToEval.put("eoadaptorurl",    skv);
     defDirectiveToEval.put("eoentity",        skv);
     defDirectiveToEval.put("eodatabase",      skv);
     defDirectiveToEval.put("eoqualifier",       new SetEOQualifier());

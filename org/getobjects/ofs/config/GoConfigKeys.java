@@ -84,6 +84,7 @@ public class GoConfigKeys {
   public static final String EOQualifier        = "eoqualifier";
   public static final String EOMergeQualifier   = "eomergequalifier";
   public static final String EOSortOrdering     = "eosortordering";
+  public static final String EOAdaptorURL       = "eoadaptorurl";
 
   
   public static class KeyMatchEntry extends NSObject {
