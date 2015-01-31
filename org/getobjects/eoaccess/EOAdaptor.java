@@ -40,6 +40,7 @@ import org.getobjects.eoaccess.derby.EODerbyAdaptor;
 import org.getobjects.eoaccess.frontbase.EOFrontbaseAdaptor;
 import org.getobjects.eoaccess.mysql.EOMySQLAdaptor;
 import org.getobjects.eoaccess.postgresql.EOPostgreSQLAdaptor;
+import org.getobjects.eoaccess.sqlite.EOSQLiteAdaptor;
 import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
@@ -130,6 +131,8 @@ public class EOAdaptor extends NSObject implements NSDisposable {
       adaptor = new EODerbyAdaptor(_url, _p, _model);
     else if (_url.toLowerCase().startsWith("jdbc:frontbase"))
       adaptor = new EOFrontbaseAdaptor(_url, _p, _model);
+    else if (_url.toLowerCase().startsWith("jdbc:sqlite"))
+      adaptor = new EOSQLiteAdaptor(_url, _p, _model);
     else {
       log.warn("no specific adaptor for url: " + _url);
       adaptor = new EOAdaptor(_url, null, _model);
@@ -692,7 +695,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   /**
    * Locates the EOAdaptorChannel which wraps the given connection. This works
    * by scanning the checkedOutChannels ivar.
-   * 
+   *
    * @param _c - the JDBC Connection object to check
    * @return the EOAdaptorChannel which manages the Connection, or null
    */
@@ -713,7 +716,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * age of the channel exceeds the 'maxChannelAgeInSeconds'.
    * <p>
    * IMPORTANT: must run in a synchronized section.
-   * 
+   *
    * @param _channel - the EOAdaptorChannel
    * @return true if the channel should be reused, false otherwise
    */
@@ -794,14 +797,14 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   /**
    * Translates the EOFetchSpecification into a SQL query and evaluates it
    * using a channel.
-   * 
+   *
    * @param _fs - the EOFetchSpecification to perform
    * @return null on error, or a List containing the raw fetch results
    */
   public List<Map<String, Object>> performSQL(final EOFetchSpecification _fs) {
     if (_fs == null)
       return null;
-    
+
     final EOSQLExpression e = this.expressionFactory().createExpression(null);
     e.prepareSelectExpressionWithAttributes(null, _fs.locksObjects(), _fs);
 
@@ -823,7 +826,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     this.releaseChannel(channel);
     return result;
   }
-  
+
 
   /**
    * Creates a pattern EOFetchSpecification (EOCustomQueryExpressionHintKey)
@@ -842,7 +845,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * Examples:<pre>
    *   ad.performSQL("SELECT * FROM accounts %(where)s",
    *     "q", "name LIKE $query", "query", F("q"));
-   *   
+   *
    *   this.results = this.application.db.adaptor().performSQL(
    *     "SELECT DISTINCT function FROM employment" +
    *     " %(where)s ORDER BY function ASC %(limit)s",
@@ -855,7 +858,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * <p>
    * Note: be careful wrt SQL injection! (parameters are good, building query
    * strings using + is bad!)
-   * 
+   *
    * <p>
    * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
    * @param _args   - args and bindings in a varargs array
@@ -866,7 +869,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   {
     return performSQL(buildVarArgsFetchSpec(_sqlpat, _args));
   }
-  
+
   /**
    * Creates a pattern EOFetchSpecification (EOCustomQueryExpressionHintKey).
    * <p>
@@ -885,7 +888,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * <p>
    * Note: be careful wrt SQL injection! (parameters are good, building query
    * strings using + is bad!)
-   * 
+   *
    * <p>
    * @param _sqlpat - the SQL pattern, see EOSQLExpression for possible patterns
    * @param _args   - args and bindings in a varargs array
@@ -901,9 +904,9 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     Number           limit    = null;
     Number           offset   = null;
     Object o;
-    
+
     final Map<String, Object> args = UMap.createArgs(_args);
-    
+
     if ((o = args.remove("qualifier")) == null)
       o = args.remove("q"); /// allow 'q' and 'qualifier'
     if (o instanceof String)
@@ -922,15 +925,15 @@ public class EOAdaptor extends NSObject implements NSDisposable {
 
     if ((o = args.remove("distinct")) != null)
       distinct = UObject.boolValue(o);
-    
+
     if ((o = args.remove("offset")) != null)
       offset = UObject.intValue(o);
     if ((o = args.remove("limit")) != null)
       limit = UObject.intValue(o);
-    
+
     if (q != null && args.size() > 0)
       q = q.qualifierWithBindings(args, false /* do not require all */);
-    
+
     EOFetchSpecification fs = new EOFetchSpecification();
     fs.setQualifier(q);
     fs.setSortOrderings(sos);
@@ -943,7 +946,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
       fs.setHint(EOSQLExpression.EOCustomQueryExpressionHintKey, _sqlpat);
     return fs;
   }
-  
+
   /**
    * This is a quick&dirty method to perform updates in the database. It
    * acquires a channel from the pool, runs the SQL and gives back the channel.
@@ -982,7 +985,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   /**
    * Convenience method which fetches exactly one record. Example:<pre>
    *   Map record = adaptor.fetchRecord("persons", "company_id", 10000);</pre>
-   * 
+   *
    * @param _table - name of table, eg 'persons'
    * @param _field - column to check, usually the primary key (eg 'id')
    * @param _value - value of the column
@@ -1017,7 +1020,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   /**
    * Generates SQL to fetch a single record, example:<pre>
    *   SELECT * FROM persons WHERE id = 10</pre>
-   * 
+   *
    * @param _table - name of table, eg 'persons'
    * @param _field - column to check, usually the primary key (eg 'id')
    * @param _value - value of the column
@@ -1081,7 +1084,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
     return true;
   }
 
-  
+
   /* quoting SQL expressions */
   // TODO: maybe we want to move that to an own per-adaptor object?
 
@@ -1093,7 +1096,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * <p>
    * Example:<pre>
    *   CREATE TABLE "Hello World" ( "my primary key" INT );</pre>
-   * 
+   *
    * Most databases use double quotes (") as the quote. MySQL uses a backtick.
    * Also remember that quoted identifiers are resolved in a case sensitive
    * way with PostgreSQL (but unquoted are case insensitive!).
@@ -1160,7 +1163,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
   public EOSchemaGeneration synchronizationFactory() {
     return new EOSynchronizationFactory(this);
   }
-  
+
 
   /* model support */
 
@@ -1193,7 +1196,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
    * Returns or builds the EOModel associated with the EOAdaptor. If the model
    * is not yet set, or if the model is a pattern model, the database schema
    * is fetched and applied.
-   * 
+   *
    * @return the EOModel set in the adaptor
    */
   public EOModel model() {
