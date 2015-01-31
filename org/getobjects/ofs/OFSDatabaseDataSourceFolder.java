@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2008-2014 Helge Hess <helge.hess@opengroupware.org>
+  Copyright (C) 2008-2015 Helge Hess <helge.hess@opengroupware.org>
 
   This file is part of GETobjects (Go).
 
@@ -20,9 +20,14 @@
 */
 package org.getobjects.ofs;
 
+import org.getobjects.eoaccess.EOActiveDataSource;
+import org.getobjects.eoaccess.EOAdaptor;
+import org.getobjects.eoaccess.EOAdaptorDataSource;
+import org.getobjects.eoaccess.EODatabaseDataSource;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eoaccess.EOModel;
 import org.getobjects.eocontrol.EODataSource;
+import org.getobjects.eocontrol.EOFetchSpecification;
 import org.getobjects.eocontrol.EOObjectTrackingContext;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
@@ -33,31 +38,24 @@ import org.getobjects.ofs.config.GoConfigKeys;
  * <p>
  * Wraps an EODataSource (not yet, really).
  * <p>
- * Usually mapped to .jods suffix by the OFS factory.
- * <p>
- * NOTE: Can't actually execute queries, yet.
- *       All those ivars are unused AFAIK:<br/>
- *       <ul>
- *         <li>EOEntity</li>
- *         <li>EOObjectTrackingContext</li>
- *         <li>EODataSource</li>
- *       </ul>
- *       This object can't acquire a DB connection or a model, yet.
+ * Usually mapped to .gods suffix by the OFS factory.
  * <p>      
  * It can however be used to store configuration information and help
  * a component to execute a query.
  * <p>
  * Sample:<pre>
- *   /persons.gods
- *     .htaccess
- *     index.wo/
- *     item.godo/
- *       view.wo/</pre>
+ *   /OGo.godb
+ *     persons.gods
+ *       .htaccess
+ *       index.wo/
+ *       item.godo/
+ *         view.wo/</pre>
  * .htaccess:<pre>
  *    AuthType      WOSession
  *    AuthName      "YoYo"
  *    AuthLoginURL  /yoyo/index
  *    
+ *    EOAdaptorURL jdbc:postgresql://127.0.0.1/OGo?user=OGo&password=OGo
  *    EOEntity    Persons
  *    EOQualifier "type IS NULL OR (type != 'NSA')"
  *
@@ -83,8 +81,7 @@ import org.getobjects.ofs.config.GoConfigKeys;
  *      );
  *      return null; // and render this.results in the template.
  *   }</pre>
- * Note that the database connection itself is provided via the context,
- * e.g. could be setup in the main Application object.
+ * Note that the database connection itself is provided via the context.
  * <p>
  * About that AliasMatchName/&lt;LocationMatch&gt;. This comes into action when
  * the user navigates below the folder, like:<pre>
@@ -102,14 +99,11 @@ import org.getobjects.ofs.config.GoConfigKeys;
  * <p>
  * @see OFSDatabaseObjectFolder
  */
-public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase
-  implements IOFSContextObject
-{  
+public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase {  
   /* result */
   protected EODataSource ds;
   
   /* bindings */
-  public EOObjectTrackingContext objectContext;
   public EOEntity         entity;        // derived from config
   public EOQualifier      qualifier;     // derived from config, cached
   public EOSortOrdering[] sortOrderings; // derived from config, cache
@@ -119,6 +113,62 @@ public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase
   public OFSDatabaseDataSourceFolder goDataSource() {
     return this;
   }
+  
+  /* datasource */
+  
+  public EODataSource dataSource() {
+    if (this.ds != null)
+      return this.ds;
+    
+    this.ds = this.buildDataSource();
+    
+    /* configure datasource */
+    
+    final EOQualifier      q   = this.qualifier();
+    final EOSortOrdering[] sos = this.sortOrderings();
+    if (q != null || sos != null) {
+      final EOFetchSpecification fs = 
+          new EOFetchSpecification(this.entityName(), q, sos);
+      this.ds.setFetchSpecification(fs);
+    }
+    
+    /* all done. */
+    return this.ds;
+  }
+  
+  protected EODataSource buildDataSource() {
+    // TBD: I guess it would be cool to do this via reflection and allow
+    //      arbitrary datasource classes.
+    EODataSource lDS;
+    final String dstype = this.dataSourceType();
+    final String ename = this.entityName();
+    if (ename == null || ename.length() < 1) {
+      log.warn("Cannot create datasource, missing entity name: " + this);
+      return null;
+    }
+    
+    if (dstype.equals("database")) {
+      final EOObjectTrackingContext oc = this.objectContext();
+      lDS = new EODatabaseDataSource(oc, ename);
+    }
+    else if (dstype.equals("adaptor")) {
+      final EOAdaptor ad = this.adaptor();
+      lDS = new EOAdaptorDataSource(ad, this.entity());
+    }
+    else {
+      // else default to 'active'
+      lDS = new EOActiveDataSource(this.database(), ename);
+    }
+    
+    return lDS;
+  }
+  
+  public String dataSourceType() {
+    // FIXME: make configurable
+    return "active"; // adaptor, database
+  }
+  
+  /* config settings */
   
   /**
    * Returns the eoaccess/eocontrol database entity name which is configured
@@ -234,8 +284,6 @@ public class OFSDatabaseDataSourceFolder extends OFSDatabaseFolderBase
       _d.append(this.ds);
     }
     else {
-      if (this.objectContext != null)
-        _d.append(" oc=" + this.objectContext);
       if (this.entity != null)
         _d.append(" entity=" + this.entity);
     }

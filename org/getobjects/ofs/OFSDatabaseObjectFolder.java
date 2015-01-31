@@ -22,6 +22,7 @@ package org.getobjects.ofs;
 
 import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.eoaccess.EOEntity;
+import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.ofs.config.GoConfigKeys;
 
@@ -53,6 +54,17 @@ public class OFSDatabaseObjectFolder extends OFSDatabaseFolderBase {
   public OFSDatabaseDataSourceFolder goDataSource() {
     return (OFSDatabaseDataSourceFolder)IGoLocation.Utility
                .locateObjectOfClass(this, OFSDatabaseDataSourceFolder.class);
+  }
+  
+  /* datasource */
+  
+  public EODataSource dataSource() {
+    OFSDatabaseDataSourceFolder goDS = this.goDataSource();
+    if (goDS == null) {
+      log.warn("Cannot retrieve datasource, didn't find a gods folder: "+this);
+      return null;
+    }
+    return goDS.dataSource();
   }
   
   /**
