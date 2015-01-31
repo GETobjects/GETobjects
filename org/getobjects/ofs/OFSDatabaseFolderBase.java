@@ -20,6 +20,7 @@
 */
 package org.getobjects.ofs;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.getobjects.appserver.publisher.IGoContext;
@@ -99,8 +100,10 @@ public abstract class OFSDatabaseFolderBase extends OFSFolder
   
   /* derived */
   
+  static final Map<String, Object> emptyConfig = new HashMap<String, Object>(0);
   public Map<String, Object> config() {
-    return this.configurationInContext(this.goctx);
+    final Map<String, Object> cfg = this.configurationInContext(this.goctx);
+    return cfg != null ? cfg : emptyConfig;
   }
   public NSKeyValueCodingAdditions evaluationContext() {
     return new NSKeyValueHolder(
