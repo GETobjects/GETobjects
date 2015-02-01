@@ -27,15 +27,17 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.publisher.GoActivePageActionInvocation;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoDefaultRenderer;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoObject;
 import org.getobjects.appserver.publisher.IGoObjectRenderer;
 import org.getobjects.appserver.publisher.IGoObjectRendererFactory;
-import org.getobjects.appserver.publisher.GoActivePageActionInvocation;
-import org.getobjects.appserver.publisher.GoClass;
-import org.getobjects.appserver.publisher.GoDefaultRenderer;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSJavaRuntime;
+import org.getobjects.foundation.NSKeyValueCoding;
+import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UObject;
 
 /**
@@ -286,6 +288,31 @@ public class WOComponent extends WOElement
   public Object F(final String _fieldName, final Object _default) {
     final Object v = this.F(_fieldName);
     return UObject.isNotEmpty(v) ? v : _default;
+  }
+  
+  static class FormValueTrampoline extends NSObject {
+    final WORequest rq;
+    
+    FormValueTrampoline(final WORequest _rq) {
+      this.rq = _rq;
+    }
+    public Object valueForKey(final String _key) {
+      return this.rq != null ? this.rq.formValueForKey(_key) : null;
+    }
+  }
+  /**
+   * Dirty convenience hack to return the value of a form parameter.
+   * Sample:<pre>
+   * &lt;wo:get value="$F.limit" /&gt;</pre>
+   *
+   * @return Object value of the field or null if it was not found
+   */
+  public NSKeyValueCoding F() {
+    final WOContext ctx = this.context();
+    if (ctx == null) return null;
+    final WORequest rq = ctx.request();
+    if (rq == null) return null;
+    return new FormValueTrampoline(rq);
   }
 
 

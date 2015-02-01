@@ -7,7 +7,7 @@
     dg="$dg" ds="$co.dataSource"
     filter="description LIKE $pattern"
     sort="-description"
-    ognl:pattern="context.request.formValues.q[0]"
+    pattern="$F.q"
     />
 
 <table border="1">
