@@ -13,10 +13,14 @@ import org.getobjects.ofs.OFSApplication;
  */
 public class run extends WOJettyRunner {
 
+  // Note: this is only required to enable the package linking via golink.txt
+  public static class HelloOFS extends OFSApplication {
+  }
+
   public static void main(final String[] _args) {
     final run runner = new run();
     final Properties properties = runner.getPropertiesFromArguments(_args);
-    properties.put("WOAppClass", OFSApplication.class.getName());
+    properties.put("WOAppClass", HelloOFS.class.getName());
     properties.put("WOAppName", "");
     
     runner.initWithProperties(properties);
