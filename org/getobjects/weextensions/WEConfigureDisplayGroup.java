@@ -34,6 +34,8 @@ import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOQualifier;
 import org.getobjects.eocontrol.EOSortOrdering;
+import org.getobjects.foundation.NSKeyValueCoding;
+import org.getobjects.foundation.NSObject;
 
 /**
  * WEConfigureDisplayGroup
@@ -91,6 +93,31 @@ public class WEConfigureDisplayGroup extends WODynamicElement {
   
   /* display group */
   
+  static class BindingTrampoline extends NSObject {
+    String[]        keys;
+    WOAssociation[] values;
+    Object          cursor;
+    
+    BindingTrampoline(String[] _keys, WOAssociation[] _values, Object _cursor) {
+      this.keys   = _keys;
+      this.values = _values;
+      this.cursor = _cursor;
+    }
+    public Object valueForKey(String _key) {
+      if (this.keys != null) {
+        for (int i = 0, len = this.keys.length; i < len; i++) {
+          if (_key.equals(this.keys[i]))
+            return this.values[i].valueInComponent(this.cursor);
+        }
+      }
+      
+      if (this.cursor != null)
+        return NSKeyValueCoding.Utility.valueForKey(this.cursor, _key);
+      
+      return null;
+    }
+  }
+  
   protected void configureDisplayGroupInContext(final WOContext _ctx) {
     final Object cursor = _ctx.cursor();
     
@@ -117,8 +144,12 @@ public class WEConfigureDisplayGroup extends WODynamicElement {
     EOQualifier q = this.qualifierInContext(_ctx);
     if (q != null) {
       /* resolve bindings against the component */
-      if (q != null)
-        q = q.qualifierWithBindings(_ctx.cursor(), false /* not all required */);
+      if (q != null && q.hasUnresolvedBindings()) {
+        q = q.qualifierWithBindings(
+            new BindingTrampoline(this.extraKeys, this.extraValues, cursor),
+            false /* not all required */
+        );
+      }
       if (q != null)
         lDG.setQualifier(q);
     }
