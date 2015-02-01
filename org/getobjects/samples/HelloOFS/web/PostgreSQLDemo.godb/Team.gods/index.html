@@ -2,8 +2,15 @@
 
 <wo:put co="$context.clientObject" />
 
+
+<wo:WEConfigureDisplayGroup
+    dg="$dg" ds="$co.dataSource"
+    filter="description LIKE 'AK*'"
+    sort="-description"
+    />
+
 <table border="1">
-  <wo:for list="$co.dataSource.fetchObjects" item="$item">
+  <wo:for list="$dg.displayedObjects" item="$item">
     <tr>
       <td><wo:get value="$item.companyId" /></td>
       <td><wo:get ognl:value="item.objectForKey('description')" /></td>
