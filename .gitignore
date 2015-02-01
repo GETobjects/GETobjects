@@ -1,0 +1,8 @@
+bin
+ant-obj
+.idea
+.ant.properties
+*.iml
+*.eml
+ThirdParty
+*.diff
