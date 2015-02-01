@@ -82,9 +82,51 @@ folders, but that does not work.
 NOTE: There is a hack in run.java to enable acquisition.
 
 
+****Reusable Components
+
+Similar to the Frame which is automagically wrapped around html pages, the
+html pages (which are just WOComponents) can embed other components explicitly.
+
+ContextInfo.goframe, DBInfo.goframe and DBFolderInfo.goframe are examples of
+such reusable components. They can be embedded by any component/page in the
+hierarchy below by a simple:
+
+  <#DBInfo />
+
+Those become regular WOComponent's, so you can use all features of those. Which
+includes bi-directional parameters (like <#DBInfo color=green/>) or embedded
+content (like <#DBInfo>Some Content</#DBInfo>).
+
+
+****Database Access
+
+The demo also includes demos on how to connect to a database using Go's
+EOAccess framework. The key filesystem objects here are:
+
+  .godb - Go database, to configure DB connection parameters/model
+  .gods - Go data source, represents a table.
+  .godo - Go database object, a single object (like /persons/12345/)
+
+Via the config subsystem those objects can be further configured. Eg you can
+explicitly set the EOEntity (table) of a datasource via the EOEntity directive.
+Or you can apply default qualifiers and sort orderings via the EOQualifier
+directive. 
+In the example the config subsystem is only used to configure the JDBC URL of
+the PostgreSQL adaptor. The SQLite example works w/o any configuration (just by
+following fallback conventions).
+
+
 ****Configuration
 
-Configuration of OFS controllers can be done using config.htaccess files. Not
-used in this demo.
+Configuration of OFS controllers can be done using config.htaccess files. Only
+used for JDBC in this demo:
 
-TBD.
+  config.htaccess
+  EOAdaptorURL jdbc:postgresql://127.0.0.1/OGo?user=OGo&password=OGo
+
+The configuration system works just like Apache .htaccess files and supports
+many of the Apache directives (eg LocationMatch, AliasMatch, etc).
+
+Note: You cannot name the files just .htaccess because that would lead to an
+      empty OFS name (remember, OFS always splits the filename into name and
+      extension)
