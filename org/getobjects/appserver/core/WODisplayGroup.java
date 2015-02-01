@@ -1122,6 +1122,9 @@ public class WODisplayGroup extends NSObject {
       this.setQualifier(q);
       if (isDebugOn) log.debug("  qualifier: " + q);
     }
+    else {
+      q = this.qualifier();
+    }
 
     Map<String, Object> bindings = this.queryBindings();
     if (bindings != null && bindings.size() == 0) bindings = null;
