@@ -5,8 +5,9 @@
 
 <wo:WEConfigureDisplayGroup
     dg="$dg" ds="$co.dataSource"
-    filter="description LIKE 'AK*'"
+    filter="description LIKE $pattern"
     sort="-description"
+    ognl:pattern="context.request.formValues.q[0]"
     />
 
 <table border="1">
