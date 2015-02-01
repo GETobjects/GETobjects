@@ -212,18 +212,18 @@ public class WODisplayGroup extends NSObject {
   
   /* datasource */
   
-  public void setDataSource(EODataSource _ds) {
+  public void setDataSource(final EODataSource _ds) {
     if (this.dataSource == _ds)
       return;
     
     if (this.dataSource != null) {
-      // unregister with old editing context
+      // TODO: unregister with old editing context
     }
     
     this.dataSource = _ds;
     
     if (this.dataSource != null) {
-      // register with new editing context
+      // TODO: register with new editing context
     }
     
     /* reset state */
