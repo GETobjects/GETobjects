@@ -2,9 +2,22 @@
 
 <wo:put co="$context.clientObject" />
 
+<wo:put filter="completed  = 1" q:if="F.q = 'done'"    />
+<wo:put filter="completed != 1" q:if="F.q = 'pending'" />
+
+<a href="?">all</a> |
+<a href="?q=done">Done</a> |
+<a href="?q=pending">Pending</a>
+
+<wo:WEConfigureDisplayGroup
+    dg="$dg" ds="$co.dataSource"
+    filter="$filter"
+    sort="completed,name"
+    />
+
 <form action="#">
   <table border="1">
-    <wo:for list="$co.dataSource.fetchObjects" item="$item">
+    <wo:for list="$dg.displayedObjects" item="$item">
       <tr>
         <td><wo:checkbox varpat:idname="prebook%(item.id)i"
                          value="1" checked="$item.completed" /></td>
