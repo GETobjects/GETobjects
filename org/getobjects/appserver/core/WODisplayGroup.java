@@ -1146,8 +1146,8 @@ public class WODisplayGroup extends NSObject {
           fs.setSortOrderings(this.sortOrderings);
         }
         else {
-          fs = new EOFetchSpecification();
-          fs.setSortOrderings(this.sortOrderings);
+          fs = new EOFetchSpecification(dbds.entity().name(), null,
+                                        this.sortOrderings);
         }
         
         dbds.setFetchSpecification(fs);
