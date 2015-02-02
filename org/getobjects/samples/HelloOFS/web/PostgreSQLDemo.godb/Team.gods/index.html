@@ -2,13 +2,15 @@
 
 <wo:put co="$context.clientObject" />
 
+<wo:form-value q="$pattern" />
 
 <wo:WEConfigureDisplayGroup
     dg="$dg" ds="$co.dataSource"
     filter="description LIKE $pattern"
-    sort="-description"
-    pattern="$F.q"
-    />
+    sort="-description" />
+    
+<a href="?">All</a> | <a href="?q=AK*">AK*</a>
+<hr />
 
 <table border="1">
   <wo:for list="$dg.displayedObjects" item="$item">

@@ -6,6 +6,7 @@
   get        = WOString;
   put        = WOCopyValue;
   submit     = WOSubmitButton;
+  form-value = WOFormValue;
 
     /* list of HTML tags (which can be made dynamic with a # in front */
   html       = WOGenericContainer;

@@ -1,0 +1,14 @@
+<?xml version="1.0"?> 
+
+<wo class="WOFormValue"
+    superclass="WODynamicElement"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <name value="WOFormValue" ns="http://www.opengroupware.org/go"/>
+
+  <binding name="name"/>
+  <binding name="value"/>
+
+  <bindings class="WOFormatter"/>
+  <binding name="trim" defaults="YES/NO"/>
+</wo>
