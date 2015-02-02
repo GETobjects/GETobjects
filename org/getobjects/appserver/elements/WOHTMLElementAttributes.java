@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2008 Helge Hess
+  Copyright (C) 2007-2015 Helge Hess
 
   This file is part of Go.
 
@@ -56,6 +56,12 @@ import org.getobjects.foundation.UString;
  * &lt;div style="color: red; display: none;"&gt;</pre>
  * A very common usecase is dynamically adding classes, eg:<pre>
  * &lt;wo:li .selected="$isSelectedPage"&gt;Customers&lt;/wo:li&gt;</pre>
+ * <p>
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOHTMLElementAttributes extends WODynamicElement {
   protected static final Log log = LogFactory.getLog("WOHTMLElementAttributes");

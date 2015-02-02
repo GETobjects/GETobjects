@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2015 Helge Hess
 
   This file is part of Go.
 
@@ -68,6 +68,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   readValue  [in]  - object (different value for generation)
  *   writeValue [out] - object (different value for takeValues)
  *   disabled   [in]  - boolean</pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOCheckBox extends WOInput {
   // TBD: should we support a label? (<label for=id>label</label>)

@@ -34,6 +34,12 @@ import org.getobjects.appserver.core.WOResponse;
  *   placeholder   [in] - string
  *   autosaveName  [in] - string
  *   resultCount   [in] - int
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOSearchField extends WOTextField {
 

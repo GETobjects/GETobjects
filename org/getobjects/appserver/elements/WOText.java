@@ -52,6 +52,12 @@ import org.getobjects.appserver.core.WOResponse;
  * Bindings:<pre>
  *   rows     [in] - int
  *   cols     [in] - int</pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOText extends WOInput {
   

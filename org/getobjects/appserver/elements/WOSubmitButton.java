@@ -52,6 +52,12 @@ import org.getobjects.appserver.core.WOResponse;
  * Bindings:<pre>
  *   action   [in] - action
  *   pageName [in] - string</pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOSubmitButton extends WOInput {
   

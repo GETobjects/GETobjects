@@ -56,6 +56,12 @@ import org.getobjects.appserver.core.WOResponse;
  * <p>
  * Note: the 'value' binding contains the raw, adaptor specific value. For
  *       example Apache Commons FileUpload FileItem object.
+ * <p>
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOFileUpload extends WOInput {
   // TBD: document more

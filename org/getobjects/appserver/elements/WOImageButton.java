@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2015 Helge Hess
 
   This file is part of Go.
 
@@ -67,6 +67,12 @@ import org.getobjects.appserver.elements.links.WOLinkGenerator;
  *   queryDictionary  [in] - Map&lt;String,String&gt;
  *   ?wosid           [in] - boolean (constant!)
  *   - all bindings starting with a ? are stored as query parameters.</pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOImageButton extends WOInput {
   

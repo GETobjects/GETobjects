@@ -45,6 +45,11 @@ import org.getobjects.appserver.core.WORequest;
  *   writeValue [out] - object (different value for takeValues)
  *   disabled   [in]  - boolean
  *   idname     [in]  - string   - set id and name bindings in one step</pre>
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public abstract class WOInput extends WOHTMLDynamicElement {
   protected static final Log log = LogFactory.getLog("WOForms");

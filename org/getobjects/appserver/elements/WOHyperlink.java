@@ -72,6 +72,12 @@ import org.getobjects.appserver.elements.links.WOLinkGenerator;
  *   disabled             [in] - boolean (only render content, not the anker)
  *   disableOnMissingLink [in] - boolean</pre>
  * </pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOHyperlink extends WOHTMLDynamicElement {
   // TODO: somehow make that a cluster similiar to SOPE

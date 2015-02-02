@@ -68,10 +68,12 @@ import org.getobjects.foundation.UObject;
  *   queryDictionary    [in] - Map&lt;String,Object&gt;
  *   ?wosid             [in] - boolean (constant!)
  *   - all bindings starting with a ? are stored as query parameters.</pre>
- * Extra Bindings:<pre>
- *   - !bindings are added to 'style'
- *   - .bindings are added to 'class' if they resolve to true
- * </pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOForm extends WOHTMLDynamicElement {
   protected static Log log = LogFactory.getLog("WOForms");

@@ -76,6 +76,12 @@ import org.getobjects.foundation.UString;
  *     +style = "context.page.name = 'Scheduler'";
  *     style  = "current"; // only applied if isCurrent is true
  *   }</pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 // TODO: maybe this doesn't make a lot of sense, but we need some mechanism
 //       to switch CSS classes based on some condition ;-)

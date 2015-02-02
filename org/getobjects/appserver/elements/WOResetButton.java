@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2015 Helge Hess
 
   This file is part of Go.
 
@@ -28,6 +28,34 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOResponse;
 
+/**
+ * WOResetButton
+ * <p>
+ * Create HTML form reset button (input type=reset).
+ * <p>
+ * Sample:<pre>
+ *   Firstname: WOResetButton {
+ *     name  = "reset";
+ *     value = "Reset";
+ *   }</pre>
+ * 
+ * Renders:<pre>
+ *   &lt;input type="reset" name="reset" value="Reset" /&gt;</pre>
+ * <p>
+ * Bindings (WOInput):<pre>
+ *   id         [in]  - string
+ *   name       [in]  - string
+ *   value      [io]  - object
+ *   readValue  [in]  - object (different value for generation)
+ *   writeValue [out] - object (different value for takeValues)
+ *   disabled   [in]  - boolean</pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
+ */
 public class WOResetButton extends WOInput {
 
   public WOResetButton

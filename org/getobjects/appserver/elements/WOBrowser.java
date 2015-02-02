@@ -75,6 +75,12 @@ import org.getobjects.foundation.UObject;
  *   escapeHTML        [in]  - boolean
  *   itemGroup
  * </pre>
+ * 
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOBrowser extends WOPopUpButton {
   

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2015 Helge Hess
 
   This file is part of Go.
 
@@ -50,7 +50,8 @@ import org.getobjects.appserver.core.WOErrorReport.WOErrorItem;
  *   value          [io]  - object
  *   readValue      [in]  - object (different value for generation)
  *   writeValue     [out] - object (different value for takeValues)
- *   disabled       [in]  - boolean</pre>
+ *   disabled       [in]  - boolean
+ *   idname         [in]  - string   - set id and name bindings in one step</pre>
  * Bindings (WOTextField):<pre>
  *   readonly       [in]  - boolean
  *   size           [in]  - int
@@ -67,6 +68,11 @@ import org.getobjects.appserver.core.WOErrorReport.WOErrorItem;
  *   formatterClass [in]  - Class or class name of a formatter to use
  *   formatter      [in]  - java.text.Format used to format the value or the
  *                          format for the formatterClass</pre>
+ * Bindings (WOHTMLElementAttributes):<pre>
+ *   style  [in]  - 'style' parameter
+ *   class  [in]  - 'class' parameter
+ *   !key   [in]  - 'style' parameters (eg &lt;input style="color:red;"&gt;)
+ *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOTextField extends WOInput {
   
