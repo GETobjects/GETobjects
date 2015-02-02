@@ -5,6 +5,7 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOBrowser" ns="http://www.opengroupware.org/go"/>
+  <name value="browser"   ns="http://www.opengroupware.org/go"/>
 
   <binding name="multiple" defaults="YES/NO"/>
   <binding name="size" />

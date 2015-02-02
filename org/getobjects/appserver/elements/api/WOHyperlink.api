@@ -5,6 +5,7 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOHyperlink" ns="http://www.opengroupware.org/go"/>
+  <name value="hyperlink"   ns="http://www.opengroupware.org/go"/>
 
   <bindings class="WOLinkGenerator"/>
   <binding name="string" />

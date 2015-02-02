@@ -5,10 +5,11 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOFormValue" ns="http://www.opengroupware.org/go"/>
+  <name value="form-value"  ns="http://www.opengroupware.org/go"/>
 
+  <bindings class="WOFormatter"/>
   <binding name="name"/>
   <binding name="value"/>
 
-  <bindings class="WOFormatter"/>
   <binding name="trim" defaults="YES/NO"/>
 </wo>

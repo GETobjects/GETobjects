@@ -5,6 +5,7 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOSearchField" ns="http://www.opengroupware.org/go"/>
+  <name value="searchfield"   ns="http://www.opengroupware.org/go"/>
 
   <binding name="isIncremental" defaults="YES/NO"/>
   <binding name="placeholder" />

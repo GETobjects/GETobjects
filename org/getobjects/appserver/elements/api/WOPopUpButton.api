@@ -5,6 +5,7 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOPopUpButton" ns="http://www.opengroupware.org/go"/>
+  <name value="popup" ns="http://www.opengroupware.org/go"/>
 
   <binding name="list" required="YES"/>
   <binding name="item" settable="YES"/>

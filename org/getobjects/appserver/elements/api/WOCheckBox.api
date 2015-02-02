@@ -5,6 +5,8 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOCheckBox" ns="http://www.opengroupware.org/go"/>
+  <name value="checkbox"   ns="http://www.opengroupware.org/go"/>
+
   <binding name="selection" settable="YES"/>
   <binding name="checked" settable="YES" defaults="YES/NO"/>
   <binding name="safeGuard" defaults="YES/NO"/>

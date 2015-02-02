@@ -5,6 +5,7 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOForm" ns="http://www.opengroupware.org/go"/>
+  <name value="form"   ns="http://www.opengroupware.org/go"/>
 
   <bindings class="WOLinkGenerator"/>
   <binding name="target"/>

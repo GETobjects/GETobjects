@@ -5,4 +5,5 @@
     xmlns="http://www.opengroupware.org/go/api"
 >
   <name value="WOResetButton" ns="http://www.opengroupware.org/go"/>
+  <name value="reset" ns="http://www.opengroupware.org/go"/>
 </wo>

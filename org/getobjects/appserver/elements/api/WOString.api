@@ -6,6 +6,7 @@
 >
   <name value="WOString" ns="http://www.opengroupware.org/go"/>
   <name value="get"      ns="http://www.opengroupware.org/go"/>
+  <name value="str"      ns="http://www.opengroupware.org/go"/>
   <name value="string"   ns="http://www.skyrix.com/od/binding"/>
 
   <bindings class="WOFormatter"/>
