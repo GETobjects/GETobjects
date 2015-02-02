@@ -5,10 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.getobjects.eoaccess.EOAdaptor;
-import org.getobjects.eoaccess.EOAdaptorChannel;
-import org.getobjects.eoaccess.EOAttribute;
-import org.getobjects.eoaccess.EOEntity;
+import org.getobjects.eoaccess.*;
 
 /**
  * EOSQLiteChannel
@@ -24,29 +21,31 @@ public class EOSQLiteChannel extends EOAdaptorChannel  {
   /* reflection */
 
   @Override
-  public String[] describeTableNames() { return describeTableNames(null /* all tables */); }
+  public String[] describeTableNames() {
+    return describeTableNames(null /* all tables */);
+  }
 
   @Override
   public EOEntity describeEntityWithTableName(final String _tableName) {
     if (_tableName == null) return null;
 
     final List<Map<String,Object>> columnInfos =
-        this._fetchSQLiteColumnsOfTable(_tableName);
+        this._fetchColumnsOfTable(_tableName);
 
     if (columnInfos == null) /* error */
       return null;
 
     EOAttribute[] attributes = this.attributesFromColumnInfos(columnInfos);
 
-    return new EOEntity
-        (this.entityNameForTableName(_tableName),
-         _tableName, false /* not a pattern */, null /* schema */,
-         null /* classname */, null /* datasource classname */,
-         attributes,
-         this.primaryKeyNamesFromColumnInfos(columnInfos, attributes),
-         null /* relationships, TODO: derive them */,
-         null /* fetch specifications */,
-         null /* adaptor operations */);
+    return new EOEntity(
+        this.entityNameForTableName(_tableName),
+        _tableName, false /* not a pattern */, null /* schema */,
+        null /* classname */, null /* datasource classname */,
+        attributes,
+        this.primaryKeyNamesFromColumnInfos(columnInfos, attributes),
+        this.relationshipsForTableName(_tableName, attributes),
+        null /* fetch specifications */,
+        null /* adaptor operations */);
   }
 
     /* attributes */
@@ -91,29 +90,65 @@ public class EOSQLiteChannel extends EOAdaptorChannel  {
       }
       exttype = exttype.toUpperCase();
 
-      /* Note: we loose the 'Extra' field (TODO: what is it for?) */
-      attributes[i] = new EOAttribute
-          (this.attributeNameForColumnName(colname),
-           colname, false, /* no pat */
-           exttype,
-           null, // TODO: autoincrement
-           "1".equals(colinfo.get("notnull")),
-           width,
-           null /* readformat  */,
-           null /* writeformat */,
-           colinfo.get("dflt_value"),
-           null,
-           null,
-           null);
+      attributes[i] = new EOAttribute(
+          this.attributeNameForColumnName(colname),
+          colname, false, /* no pat */
+          exttype,
+          null, // TODO: autoincrement
+          "1".equals(colinfo.get("notnull")),
+          width,
+          null /* readformat  */,
+          null /* writeformat */,
+          colinfo.get("dflt_value"),
+          null,
+          null,
+          null);
     }
 
     return attributes;
   }
 
+  /* Relationships */
+
+  protected EORelationship[] relationshipsForTableName
+      (final String _tableName, final EOAttribute[] _attributes)
+  {
+    if (_attributes == null || _attributes.length == 0) return null;
+
+    final List<Map<String, Object>> fkInfos =
+        this._fetchForeignKeysOfTable(_tableName);
+    if (fkInfos == null || fkInfos.size() == 0)
+      return null;
+
+    final EORelationship[] relships = new EORelationship[fkInfos.size()];
+    for (int i = 0; i < fkInfos.size(); i++) {
+      final Map<String, Object> fkInfo = fkInfos.get(i);
+      final String table = (String)fkInfo.get("table");
+      final String from  = (String)fkInfo.get("from");
+      final String to    = (String)fkInfo.get("to");
+
+      // TBD: is this properly beautified later on?
+      final String name = "to_" + table;
+
+      // TBD: how to deal with name collisions? Are these _really_ toMany,
+      // or rather incorrectly named? Should the names take the joins into
+      // account?
+      final EORelationship r = new EORelationship(
+          name,
+          true /* not always correct, but doesn't hamper functionality */,
+          null /* srcEntity, resolved later */,
+          table,
+          new EOJoin[]{ new EOJoin(from, to) });
+      relships[i] = r;
+    }
+    return relships;
+  }
+
     /* SQLite reflection */
 
   public String[] describeTableNames(final String _like) {
-    // TBD: iterate on all returned describeDatabaseNames (via dbname.sqlite_master)
+    // TBD: iterate on all returned describeDatabaseNames
+    // (via dbname.sqlite_master)
     // ATTACH DATABASE 'DatabaseName' As 'Alias-Name';
     String sql = "SELECT name from sqlite_master WHERE type = 'table'";
     if (_like != null)
@@ -135,7 +170,7 @@ public class EOSQLiteChannel extends EOAdaptorChannel  {
     return dbNames.toArray(new String[dbNames.size()]);
   }
 
-  public List<Map<String,Object>> _fetchSQLiteColumnsOfTable(String _table) {
+  public List<Map<String,Object>> _fetchColumnsOfTable(String _table) {
     // keys: cid, name, type, notnull, dflt_value, pk
     final List<Map<String, Object>> records =
         this.performSQL("pragma table_info(" + _table + ")");
@@ -144,4 +179,10 @@ public class EOSQLiteChannel extends EOAdaptorChannel  {
     return records;
   }
 
+  public List<Map<String,Object>> _fetchForeignKeysOfTable(String _table) {
+    // keys: id, seq, table, from, to, on_update, on_delete, match
+    final String sql = "pragma foreign_key_list(" + _table + ")";
+    final List<Map<String, Object>> records = this.performSQL(sql);
+    return records;
+  }
 }
