@@ -49,11 +49,10 @@ public class NSXMLPropertyListParser extends NSObject  {
 
   /**
    * http://www.apple.com/DTDs/PropertyList-1.0.dtd
-   *
    */
-
-    static final String propertyList10DTDString = ""
-      + "<!ENTITY % plistObject \"(array | data | date | dict | real | integer | string | true | false )\" >"
+  static final String propertyList10DTDString = ""
+      + "<!ENTITY % plistObject \"(array | data | date | dict | real | integer"
+      + " | string | true | false )\" >"
       + "<!ELEMENT plist %plistObject;>"
       + "<!ATTLIST plist version CDATA \"1.0\" >"
       + "<!ELEMENT array (%plistObject;)*>"
@@ -66,7 +65,9 @@ public class NSXMLPropertyListParser extends NSObject  {
       + "<!ELEMENT false EMPTY>"
       + "<!ELEMENT real (#PCDATA)>";
 
-  public static enum Tag { PLIST, ARRAY, DICT, KEY, STRING, DATA, DATE, TRUE, FALSE, REAL, INTEGER }
+  public static enum Tag {
+    PLIST, ARRAY, DICT, KEY, STRING, DATA, DATE, TRUE, FALSE, REAL, INTEGER
+  }
 
   class NSXMLPlistHandler extends DefaultHandler {
 
@@ -77,40 +78,18 @@ public class NSXMLPropertyListParser extends NSObject  {
     protected DateFormat fixedTZFormat;
     protected DateFormat freeTZFormat;
 
-    protected Tag tagForTagName(String name) {
-      if (name == "plist") {
-        return Tag.PLIST;
-      }
-      else if (name == "array") {
-        return Tag.ARRAY;
-      }
-      else if (name == "dict") {
-        return Tag.DICT;
-      }
-      else if (name == "key") {
-        return Tag.KEY;
-      }
-      else if (name == "string") {
-        return Tag.STRING;
-      }
-      else if (name == "data") {
-        return Tag.DATA;
-      }
-      else if (name == "date") {
-        return Tag.DATE;
-      }
-      else if (name == "true") {
-        return Tag.TRUE;
-      }
-      else if (name == "false") {
-        return Tag.FALSE;
-      }
-      else if (name == "real") {
-        return Tag.REAL;
-      }
-      else if (name == "integer") {
-        return Tag.INTEGER;
-      }
+    protected Tag tagForTagName(final String name) {
+      if (name == "plist")   return Tag.PLIST;
+      if (name == "array")   return Tag.ARRAY;
+      if (name == "dict")    return Tag.DICT;
+      if (name == "key")     return Tag.KEY;
+      if (name == "string")  return Tag.STRING;
+      if (name == "data")    return Tag.DATA;
+      if (name == "date")    return Tag.DATE;
+      if (name == "true")    return Tag.TRUE;
+      if (name == "false")   return Tag.FALSE;
+      if (name == "real")    return Tag.REAL;
+      if (name == "integer") return Tag.INTEGER;
       return null;
     }
 
@@ -125,9 +104,9 @@ public class NSXMLPropertyListParser extends NSObject  {
     }
 
     public Object popObject() {
-      int count = this.objectStack.size();
+      final int count = this.objectStack.size();
       if (count == 0) return null;
-      Object obj = this.objectStack.get(count - 1);
+      final Object obj = this.objectStack.get(count - 1);
       this.objectStack.remove(count - 1);
       return obj;
     }
@@ -148,8 +127,9 @@ public class NSXMLPropertyListParser extends NSObject  {
     }
 
     @Override
-    public void startElement(String uri, String localName, String name,
-        Attributes attributes) throws SAXException
+    public void startElement
+      (final String uri, final String localName, String name,
+       final Attributes attributes) throws SAXException
     {
       name            = name.intern();
       this.currentTag = tagForTagName(name);
@@ -172,7 +152,7 @@ public class NSXMLPropertyListParser extends NSObject  {
 
     @Override
     public void endElement(String uri, String localName, String name)
-        throws SAXException
+      throws SAXException
     {
       if (name.equals("plist")) return;
 
@@ -188,16 +168,14 @@ public class NSXMLPropertyListParser extends NSObject  {
         while (this.objectStack.get(i) != Tag.ARRAY)
           i--;
 
-        if ((last - i) > 0)
-        {
+        if ((last - i) > 0) {
           List<Object> values = this.objectStack.subList(i + 1, last + 1);
           a = new ArrayList<Object>(values);
         }
-        else {
+        else
           a = new ArrayList<Object>();
-        }
 
-        int stopAt = i - 1;
+        final int stopAt = i - 1;
 
         // diminish obsolete entries
         for (i = last; i > stopAt; i--)
@@ -217,9 +195,8 @@ public class NSXMLPropertyListParser extends NSObject  {
 
         int stopAt = i - 1;
 
-        if ((last - i) == 1) {
+        if ((last - i) == 1)
           d = new HashMap<Object,Object>();
-        }
         else {
           d = new HashMap<Object,Object>((last - i) / 2);
           // set values and keys
@@ -271,20 +248,17 @@ public class NSXMLPropertyListParser extends NSObject  {
           this.objectStack.remove(i);
         }
 
-        if (tag == Tag.STRING || tag == Tag.KEY) {
+        if (tag == Tag.STRING || tag == Tag.KEY)
           pushObject(s);
-        }
-        else if (tag == Tag.INTEGER) {
+        else if (tag == Tag.INTEGER)
           pushObject(Long.parseLong(s));
-        }
-        else if (tag == Tag.REAL) {
+        else if (tag == Tag.REAL)
           pushObject(Double.parseDouble(s));
-        }
         else if (tag == Tag.DATE) {
           DateFormat fmt;
 
           if (s.length() == 20 && s.endsWith("Z")) {
-            StringBuffer sb = new StringBuffer(s);
+            final StringBuffer sb = new StringBuffer(s);
             sb.setCharAt(10, ' '); // replace "T"
             sb.deleteCharAt(sb.length() - 1); // remove trailing "Z"
             s = sb.toString();
@@ -295,7 +269,7 @@ public class NSXMLPropertyListParser extends NSObject  {
           }
 
           try {
-            Object obj = fmt.parseObject(s);
+            final Object obj = fmt.parseObject(s);
             pushObject(obj);
           }
           catch (ParseException e) {
@@ -309,20 +283,21 @@ public class NSXMLPropertyListParser extends NSObject  {
     }
 
     @Override
-    public void characters(char[] ch, int start, int length)
-        throws SAXException
+    public void characters(final char[] ch, final int start, final int length)
+      throws SAXException
     {
       pushObject(new String(ch, start, length));
     }
 
     @Override
-    public InputSource resolveEntity(String publicId, String systemId)
-        throws IOException, SAXException
+    public InputSource resolveEntity(final String publicId, final String sysId)
+      throws IOException, SAXException
     {
-      if (systemId.equals("http://www.apple.com/DTDs/PropertyList-1.0.dtd")) {
-        return new InputSource(getClass().getResourceAsStream("PropertyList-1.0.dtd"));
+      if (sysId.equals("http://www.apple.com/DTDs/PropertyList-1.0.dtd")) {
+        return new InputSource(
+                     getClass().getResourceAsStream("PropertyList-1.0.dtd"));
       }
-      log.error("resolve: " + publicId + ", " + systemId);
+      log.error("resolve: " + publicId + ", " + sysId);
       return null;
     }
   }
@@ -332,17 +307,18 @@ public class NSXMLPropertyListParser extends NSObject  {
     if (_in == null)
       return null;
 
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    final SAXParserFactory factory = SAXParserFactory.newInstance();
 
     try {
-      NSXMLPlistHandler handler = new NSXMLPlistHandler();
-      XMLReader         reader  = factory.newSAXParser().getXMLReader();
-      InputSource       input   = new InputSource(_in);
+      final NSXMLPlistHandler handler = new NSXMLPlistHandler();
+      final XMLReader         reader  = factory.newSAXParser().getXMLReader();
+      final InputSource       input   = new InputSource(_in);
       reader.setContentHandler(handler);
       reader.setEntityResolver(handler);
       try {
         reader.setFeature("http://xml.org/sax/features/validation", false);
-        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        reader.setFeature(
+            "http://xml.org/sax/features/external-parameter-entities", false);
       }
       catch (Exception e) {
         log.error("Couldn't turn validation off: " + e);
@@ -373,7 +349,7 @@ public class NSXMLPropertyListParser extends NSObject  {
    * @param _url - the URL to parse from
    * @return a plist object, or null on error
    */
-  public Object parse(URL _url) {
+  public Object parse(final URL _url) {
     if (_url == null)
       return null;
 
