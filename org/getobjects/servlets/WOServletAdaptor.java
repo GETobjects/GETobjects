@@ -378,8 +378,12 @@ public class WOServletAdaptor extends HttpServlet {
     final Properties  properties = new Properties();
     Enumeration parameterNamesEnum = _cfg.getInitParameterNames();
     while (parameterNamesEnum.hasMoreElements()) {
-      String name = (String)parameterNamesEnum.nextElement();
-      properties.put(name, _cfg.getInitParameter(name));
+      final String name  = (String)parameterNamesEnum.nextElement();
+      final String value = _cfg.getInitParameter(name);
+      if (name != null && value != null)
+        properties.put(name, value);
+      else if (value == null)
+        log.error("Got no value for init parameter: " + name);
     }
 
     /* The ServletContext may override the previous init parameters.
