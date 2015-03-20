@@ -150,7 +150,8 @@ public class EOSQLiteChannel extends EOAdaptorChannel  {
     // TBD: iterate on all returned describeDatabaseNames
     // (via dbname.sqlite_master)
     // ATTACH DATABASE 'DatabaseName' As 'Alias-Name';
-    String sql = "SELECT name from sqlite_master WHERE type = 'table'";
+    String sql =
+        "SELECT name FROM sqlite_master WHERE type IN ('table', 'view')";
     if (_like != null)
       sql += " AND name LIKE '" + _like + "'"; // TODO: escape?
     return this.fetchSingleStringRows(sql, null);
