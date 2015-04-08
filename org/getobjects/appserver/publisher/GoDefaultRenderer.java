@@ -175,7 +175,7 @@ public class GoDefaultRenderer extends NSObject implements IGoObjectRenderer {
       }
       httpStatus = WOMessage.HTTP_STATUS_INTERNAL_ERROR;
     }
-    if (httpStatus == 500)
+    if (httpStatus == WOMessage.HTTP_STATUS_INTERNAL_ERROR)
       log.warn("delivering internal error exception", _exception);
     
     /* render exception */
