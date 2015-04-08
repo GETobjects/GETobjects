@@ -566,11 +566,13 @@ public class WOComponent extends WOElement
    * @return true if the value could be set, false otherwise (eg no setter)
    */
   public boolean setValueForBinding(Object _value, String _name) {
-    IWOAssociation binding = this.wocBindings.get(_name);
+    if (this.wocBindings == null)
+      return false;
+    final IWOAssociation binding = this.wocBindings.get(_name);
     if (binding == null)
       return false;
 
-    WOComponent lParent = this.parent();
+    final WOComponent lParent = this.parent();
     if (!binding.isValueSettableInComponent(lParent))
       return false;
 
