@@ -159,6 +159,11 @@ public class GoObjectRequestHandler extends WORequestHandler {
         log.info("OPTIONS request, not rendering result.");
         r = this.application.optionsForObjectInContext(result, _ctx);
       }
+      else if (result instanceof Throwable) {
+        WOActionResults ar =
+          this.application.handleException(tpath.lastException(), _ctx);
+        r = ar != null ? ar.generateResponse() : null;
+      }
       else {
         r = this.application.renderObjectInContext(result, _ctx);
         if (debugOn) log.debug("rendered object: " + result + ", as: " + r);

@@ -1251,7 +1251,12 @@ public class WOApplication extends NSObject
       log.warn("Core Java security exception", _e);
       return r;
     }
-
+   
+    if (true) { // new behavior for testing
+      final WOResponse r = this.renderObjectInContext(_e, _ctx);
+      return r;
+    }
+    
     // TODO: improve exception page, eg include stacktrace
     _ctx.response().appendContentHTMLString("fail: " + _e.toString());
     _e.printStackTrace();
