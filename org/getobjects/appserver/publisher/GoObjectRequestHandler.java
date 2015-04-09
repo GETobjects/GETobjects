@@ -161,7 +161,7 @@ public class GoObjectRequestHandler extends WORequestHandler {
       }
       else if (result instanceof Throwable) {
         WOActionResults ar =
-          this.application.handleException(tpath.lastException(), _ctx);
+          this.application.handleException((Throwable)result, _ctx);
         r = ar != null ? ar.generateResponse() : null;
       }
       else {
