@@ -97,7 +97,15 @@ public interface NSKeyValueCoding {
           // TBD: inline conversion?
           _value = UObject.boolValue(_value) ? Boolean.TRUE : Boolean.FALSE;
         }
-        
+        else if (_value instanceof String) {
+          /* special string to number type conversion */
+          if (type == Integer.TYPE) {
+            _value = UObject.intValue(_value);
+          }
+          else if (type == Long.TYPE) {
+            _value = UObject.longValue(_value);
+          }
+        }
         accessor.set(_o, _key, _value);
       }
       catch (MissingPropertyException e) {
