@@ -129,6 +129,6 @@ public class OFSResourceFileRenderer extends NSObject
       }
     }
     
-    return r.lastException(); /* WOResponse might have catched an issue */
+    return r.lastException(); /* WOResponse might have caught an issue */
   }
 }

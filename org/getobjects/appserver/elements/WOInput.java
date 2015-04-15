@@ -152,7 +152,7 @@ public abstract class WOInput extends WOHTMLDynamicElement {
    * 
    * @param _formName  - name of the form field
    * @param _formValue - value transmitted by the browser
-   * @param _e         - the exception which was catched (ParseException)
+   * @param _e         - the exception which was caught (ParseException)
    * @param _ctx       - the WOContext
    * @return true if the caller should stop processing
    */

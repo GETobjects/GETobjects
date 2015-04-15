@@ -238,7 +238,7 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
    * Executes a SQL update expression, eg an INSERT, UPDATE or DELETE.
    * 
    * If the operation fails, the method returns -1 and sets the lastException
-   * to the catched error.
+   * to the caught error.
    * 
    * @param _s - the formatted SQL expression
    * @return the number of affected records, or -1 if something failed

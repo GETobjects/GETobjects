@@ -189,7 +189,7 @@ public abstract class WORequestHandler extends NSObject
     catch (Exception e) {
       // TODO: call some handler method
       // TODO: ensure that session gets a sleep?
-      if (debugOn) log.debug("  handler catched exception", e);
+      if (debugOn) log.debug("  handler caught exception", e);
       final WOActionResults ar =
         this.application.handleException(e, ctx);
       r = ar != null ? ar.generateResponse() : null;

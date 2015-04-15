@@ -739,7 +739,7 @@ public class EOAdaptor extends NSObject implements NSDisposable {
         return false;
     }
     catch (SQLException e) {
-      log.debug("catched exception while checking close status", e);
+      log.debug("caught exception while checking close status", e);
       return false;
     }
 
