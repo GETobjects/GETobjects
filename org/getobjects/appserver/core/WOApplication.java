@@ -448,7 +448,7 @@ public class WOApplication extends NSObject
           r = rh.handleRequest(_rq);
         }
         catch (Exception e) {
-          log.error("WOApplication catched exception", e);
+          log.error("WOApplication caught exception", e);
           r = null;
         }
       }
