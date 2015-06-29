@@ -21,6 +21,7 @@
 
 package org.getobjects.foundation;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -591,9 +592,59 @@ public class NSPropertyListParser extends NSObject {
   }
 
   protected byte[] _parseData() {
-    // TODO: implement me
-    this.log.error("data plist parsing not implemented!");
-    return null;
+    /* skip comments and spaces */
+    if (!this._skipComments()) {
+      /* EOF reached during comment-skipping */
+      this.addException("did not find a data block (expected '<')");
+      return null;
+    }
+
+    char next = this.buffer[this.idx];
+    if (next != '<') { /* it's not a data block */
+      this.addException("did not find a data block (expected '<')");
+      return null;
+    }
+    ByteArrayOutputStream data = new ByteArrayOutputStream();
+
+    this.idx++;  /* skip start marker */
+    boolean isLowNibble = false;
+    byte value = 0x00;
+
+    /* loop until stop marker */
+    while (this.buffer[this.idx] != '>') {
+      next = this.buffer[this.idx];
+      if (next != ' ') {
+        int nibbleValue = _valueOfHexChar(next);
+        if (nibbleValue == -1) {
+          this.addException("unexpected character '" + next + "' in data!");
+          return null;
+        }
+        if (!isLowNibble) {
+          value = (byte) ((nibbleValue << 4) & 0xF0);
+        }
+        else {
+          value |= (byte) (nibbleValue);
+          data.write(value);
+        }
+        isLowNibble = !isLowNibble; /* toggle */
+      }
+      else if (isLowNibble) {
+        this.addException("malformed data entry!");
+        return null;
+      }
+      this.idx++;
+      if (this.idx == this.len) { /* unexpected EOF */
+        this.addException("data block not closed (expected '>')");
+        return null;
+      }
+    }
+    if (isLowNibble) {
+      this.addException("malformed data entry!");
+      return null;
+    }
+    // skip stop marker
+    this.idx++;
+    return data.toByteArray();
   }
 
   protected Object parseDictionaryKey() {

@@ -78,8 +78,9 @@ public class NSPropertyListGenerator extends NSObject {
     if (_object instanceof List)
       return this.appendList((List)_object, _sb, _indent);
     
-    // TBD: byte array
-    
+    if (_object instanceof byte[])
+      return this.appendData((byte[])_object, _sb, _indent);
+
     return this.appendString(_object.toString(), _sb, _indent);
   }
   
@@ -265,7 +266,25 @@ public class NSPropertyListGenerator extends NSObject {
     
     return true;
   }
-  
+
+  protected static final char[] _hexChars = {
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+  };
+  public boolean appendData(byte[] _d, StringBuilder _sb, int _indent) {
+    _sb.append('<');
+    final int lastIdx = (_d.length - 1);
+    for (int i = 0; i < _d.length; i++) {
+      byte value = _d[i];
+      _sb.append(_hexChars[(int)(value >> 4) & 0x0F]);
+      _sb.append(_hexChars[(int)(value & 0x0F)]);
+      if (((i + 1) % 4 == 0) && (i != lastIdx))
+        _sb.append(' ');
+    }
+    _sb.append('>');
+    return true;
+  }
+
   /* utility */
   
   protected void appendIndent(StringBuilder _sb, int _indent) {
