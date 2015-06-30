@@ -1,5 +1,6 @@
 /*
-  Copyright (C) 2006-2008 Helge Hess
+  Copyright (C) 2006-2015 Helge Hess
+  Copyright (C) 2015      Marcus Mueller
 
   This file is part of Go.
 
@@ -49,12 +50,12 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * The parser returns those objects as values:
  * <ul>
- *   <li>String (quoted like "Hello World" or unquoted like "Hello")
- *   <li>List   (eg: "( Hello, World, 15 )")
- *   <li>Map    (eg: "{ lastname = Duck; firstname = Donald; age = 100; }")
- *   <li>Number (eg: 100.00, -100.10)
+ *   <li>String  (quoted like "Hello World" or unquoted like "Hello")
+ *   <li>List    (eg: "( Hello, World, 15 )")
+ *   <li>Map     (eg: "{ lastname = Duck; firstname = Donald; age = 100; }")
+ *   <li>Number  (eg: 100.00, -100.10)
  *   <li>Boolean (true,false,YES,NO)
- *   <li>byte[] (TBD)
+ *   <li>byte[]  (eg: &lt;0fbd777 1c2735ae&gt;)
  * </ul>
  *
  * <h4>Error Handling</h4>
@@ -103,7 +104,7 @@ public class NSPropertyListParser extends NSObject {
   public Object parse() {
     if (this.isDebugOn) this.log.debug("start parsing ...");
 
-    Object o = this._parseProperty();
+    final Object o = this._parseProperty();
     this.resetTransient(); /* cleanup unnecessary state */
 
     if (this.isDebugOn) {
@@ -124,7 +125,7 @@ public class NSPropertyListParser extends NSObject {
    * @param _s - a String to be parsed as a plist
    * @return the parsed property list object
    */
-  public Object parse(String _s) {
+  public Object parse(final String _s) {
     this.setString(_s);
     return this.parse();
   }
@@ -134,7 +135,7 @@ public class NSPropertyListParser extends NSObject {
    * @param _buf - a char array to be parsed as a plist
    * @return the parsed property list object
    */
-  public Object parse(char[] _buf) {
+  public Object parse(final char[] _buf) {
     this.setCharBuffer(_buf);
     return this.parse();
   }
@@ -146,7 +147,7 @@ public class NSPropertyListParser extends NSObject {
    * @param _buf - a byte array to be parsed as a plist
    * @return the parsed property list object
    */
-  public Object parse(byte[] _buf) {
+  public Object parse(final byte[] _buf) {
     if (_buf == null)
       return null;
 
@@ -168,7 +169,7 @@ public class NSPropertyListParser extends NSObject {
    * @param _in - the InputStream to read from
    * @return the parsed property list object
    */
-  public Object parse(InputStream _in) {
+  public Object parse(final InputStream _in) {
     if (_in == null)
       return null;
 
@@ -186,7 +187,7 @@ public class NSPropertyListParser extends NSObject {
    * @param _url - the URL to parse from
    * @return a plist object, or null on error
    */
-  public Object parse(URL _url) {
+  public Object parse(final URL _url) {
     if (_url == null)
       return null;
 
@@ -224,20 +225,20 @@ public class NSPropertyListParser extends NSObject {
    * @param _resourceName - name of the resource
    * @return a plist object, or null on error
    */
-  public static Object parse(Class _baseClass, String _resourceName) {
+  public static Object parse(final Class _baseClass, String _resourceName) {
     if (_baseClass == null || _resourceName == null)
       return null;
 
     if (_resourceName.lastIndexOf('.') == -1) _resourceName += ".plist";
-    URL url = _baseClass.getResource(_resourceName);
+    final URL url = _baseClass.getResource(_resourceName);
     if (url == null) {
       plistLog.error("did not find resource in class " + _baseClass + " : " +
                       _resourceName);
       return null;
     }
 
-    NSPropertyListParser parser = new NSPropertyListParser();
-    Object plist = parser.parse(url);
+    final NSPropertyListParser parser = new NSPropertyListParser();
+    final Object plist = parser.parse(url);
 
     if (plist == null) {
       plistLog.error("could not load plist resource: " + url,
@@ -249,7 +250,7 @@ public class NSPropertyListParser extends NSObject {
 
   /* setting input */
 
-  public void setCharBuffer(char[] _buffer) {
+  public void setCharBuffer(final char[] _buffer) {
     this.reset();
     this.buffer        = _buffer;
     this.idx           = 0;
@@ -257,7 +258,7 @@ public class NSPropertyListParser extends NSObject {
     this.lastException = null;
   }
 
-  public void setString(String _str) {
+  public void setString(final String _str) {
     this.setCharBuffer(_str.toCharArray());
   }
 
@@ -308,11 +309,11 @@ public class NSPropertyListParser extends NSObject {
     return _isBreakChar(this.buffer[this.idx + cpos]);
   }
 
-  protected boolean _isIdChar(char _c) {
+  protected boolean _isIdChar(final char _c) {
     return (this._isBreakChar(_c) && (_c != '.')) ? false : true;
   }
 
-  protected static int _valueOfHexChar(char _c) {
+  protected static int _valueOfHexChar(final char _c) {
     switch (_c) {
       case '0': case '1': case '2': case '3': case '4':
       case '5': case '6': case '7': case '8': case '9':
@@ -330,7 +331,7 @@ public class NSPropertyListParser extends NSObject {
         return -1;
     }
   }
-  protected static boolean _isHexDigit(char _c) {
+  protected static boolean _isHexDigit(final char _c) {
     switch (_c) {
       case '0': case '1': case '2': case '3': case '4':
       case '5': case '6': case '7': case '8': case '9':
@@ -473,34 +474,32 @@ public class NSPropertyListParser extends NSObject {
    * @return the parsed String, eg "person.address.street"
    */
   protected String _parseKeyPath() {
-    String component = null;
-
     if (!this._skipComments()) {
       /* EOF reached during comment-skipping */
       this.addException("did not find an keypath (expected id)");
       return null;
     }
 
-    component = this._parseIdentifier();
-    if (component == null) {
+    final String firstComponent = this._parseIdentifier();
+    if (firstComponent == null) {
       this.addException("did not find an keypath (expected id)");
       return null;
     }
 
     /* single id-keypath */
     if (this.idx >= this.len) // EOF
-      return component;
+      return firstComponent;
     if (this.buffer[this.idx] != '.')
-      return component;
+      return firstComponent;
 
     StringBuilder keypath = new StringBuilder(64);
-    keypath.append(component);
+    keypath.append(firstComponent);
 
-    while ((this.buffer[this.idx] == '.') && (component != null)) {
+    while (this.buffer[this.idx] == '.') {
       this.idx += 1; /* skip '.' */
       keypath.append('.');
 
-      component = this._parseIdentifier();
+      final String component = this._parseIdentifier();
       if (component == null) {
         this.addException("expected component after '.' in keypath!");
         break; // TODO: should we return null?
@@ -527,7 +526,7 @@ public class NSPropertyListParser extends NSObject {
       return null;
     }
 
-    char quoteChar = this.buffer[this.idx];
+    final char quoteChar = this.buffer[this.idx];
     if (quoteChar != '"' && quoteChar != '\'') { /* it's not a quoted string */
       this.addException("did not find a quoted string (expected '\"')");
       return null;
@@ -568,7 +567,7 @@ public class NSPropertyListParser extends NSObject {
       return "";
 
     if (containsEscaped) {
-      char buf[] = new char[ilen];
+      final char buf[] = new char[ilen];
       int  i, j;
 
       for (i = 0, j = 0; i < ilen; i++, j++) {
@@ -599,22 +598,22 @@ public class NSPropertyListParser extends NSObject {
       return null;
     }
 
-    char next = this.buffer[this.idx];
-    if (next != '<') { /* it's not a data block */
+    if (this.buffer[this.idx] != '<') { /* it's not a data block */
       this.addException("did not find a data block (expected '<')");
       return null;
     }
-    ByteArrayOutputStream data = new ByteArrayOutputStream();
+    
+    final ByteArrayOutputStream data = new ByteArrayOutputStream();
 
     this.idx++;  /* skip start marker */
     boolean isLowNibble = false;
-    byte value = 0x00;
+    byte    value       = 0x00;
 
     /* loop until stop marker */
     while (this.buffer[this.idx] != '>') {
-      next = this.buffer[this.idx];
+      final char next = this.buffer[this.idx];
       if (next != ' ') {
-        int nibbleValue = _valueOfHexChar(next);
+        final int nibbleValue = _valueOfHexChar(next);
         if (nibbleValue == -1) {
           this.addException("unexpected character '" + next + "' in data!");
           return null;
@@ -632,16 +631,19 @@ public class NSPropertyListParser extends NSObject {
         this.addException("malformed data entry!");
         return null;
       }
+      
       this.idx++;
       if (this.idx == this.len) { /* unexpected EOF */
         this.addException("data block not closed (expected '>')");
         return null;
       }
     }
+    
     if (isLowNibble) {
       this.addException("malformed data entry!");
       return null;
     }
+    
     // skip stop marker
     this.idx++;
     return data.toByteArray();
@@ -688,7 +690,7 @@ public class NSPropertyListParser extends NSObject {
       return new HashMap<Object, Object>(0); // TODO: add an empty-map obj?
     }
 
-    Map<Object, Object> result = new HashMap<Object, Object>(16);
+    final Map<Object, Object> result = new HashMap<Object, Object>(16);
     boolean didFail = false;
 
     do {
@@ -704,7 +706,7 @@ public class NSPropertyListParser extends NSObject {
       }
 
       /* read key property or identifier */
-      Object key = this.parseDictionaryKey();
+      final Object key = this.parseDictionaryKey();
       if (key == null) { /* syntax error */
         if (this.lastException == null)
           this.addException("got nil-key in dictionary ..");
@@ -732,7 +734,7 @@ public class NSPropertyListParser extends NSObject {
       }
 
       /* read value property */
-      Object value = this._parseProperty();
+      final Object value = this._parseProperty();
       if (this.lastException != null) {
         didFail = true;
         break;
@@ -791,7 +793,7 @@ public class NSPropertyListParser extends NSObject {
     List<Object> result = new ArrayList<Object>(16);
 
     do {
-      Object element = this._parseProperty();
+      final Object element = this._parseProperty();
       if (element == null) {
         this.addException("expected element in array at: " + this.idx);
         result = null;
@@ -834,7 +836,7 @@ public class NSPropertyListParser extends NSObject {
     return result;
   }
 
-  protected static Number _parseDigitPath(String _digitPath) {
+  protected static Number _parseDigitPath(final String _digitPath) {
     // TODO: weird function name?
     if (_digitPath == null)
       return null;
@@ -892,7 +894,7 @@ public class NSPropertyListParser extends NSObject {
     if (!this._skipComments())
       return null; /* EOF */
 
-    char c = this.buffer[this.idx];
+    final char c = this.buffer[this.idx];
     switch (c) {
       case '"': /* quoted string */
       case '\'': /* quoted string */
@@ -913,7 +915,7 @@ public class NSPropertyListParser extends NSObject {
 
       default:
         if (Character.isDigit(c) || (c == '-')) {
-          String digitPath = this._parseKeyPath(); // TODO: why is this?
+          final String digitPath = this._parseKeyPath(); // TODO: why is this?
 
           try {
             result = _parseDigitPath(digitPath);
@@ -931,37 +933,37 @@ public class NSPropertyListParser extends NSObject {
             // Note: we do not allow a space behind a const, eg '= true ;'
             /* parse YES and NO, true and false */
             if (_ucIsEqual(this.buffer, this.idx, "YES") && _isBreakCharAt(3)) {
-              result = Boolean.TRUE;
+              result        = Boolean.TRUE;
               valueProperty = true;
               this.idx += 3;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "NO") &&
                      _isBreakCharAt(2)) {
-              result = Boolean.FALSE;
+              result        = Boolean.FALSE;
               valueProperty = true;
               this.idx += 2;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "true") &&
                      _isBreakCharAt(4)) {
-              result = Boolean.TRUE;
+              result        = Boolean.TRUE;
               valueProperty = true;
               this.idx += 4;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "false") &&
                      _isBreakCharAt(5)) {
-              result = Boolean.FALSE;
+              result        = Boolean.FALSE;
               valueProperty = true;
               this.idx += 5;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "null") &&
                 _isBreakCharAt(4)) {
-              result = null;
+              result        = null;
               valueProperty = true;
               this.idx += 4;
             }
             else if (_ucIsEqual(this.buffer, this.idx, "nil") &&
                      _isBreakCharAt(3)) {
-              result = null;
+              result        = null;
               valueProperty = true;
               this.idx += 3;
             }
