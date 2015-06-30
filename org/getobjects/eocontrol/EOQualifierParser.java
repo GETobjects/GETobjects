@@ -601,7 +601,7 @@ public class EOQualifierParser extends NSObject {
     }
     
     int len = i - this.idx;
-    /* Note: len==0 cannot happen, catched above */
+    /* Note: len==0 cannot happen, caught above */
     
     String id = new String(this.string, this.idx, len);
     
@@ -857,7 +857,7 @@ public class EOQualifierParser extends NSObject {
     }
     
     int len = i - this.idx;
-    /* Note: len==0 cannot happen, catched above */
+    /* Note: len==0 cannot happen, caught above */
     
     final String numstr = new String(this.string, this.idx, len);
     this.idx += len; /* consume */
