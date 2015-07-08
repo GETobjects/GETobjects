@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007 Helge Hess
+  Copyright (C) 2007-2015 Helge Hess
 
   This file is part of Go.
 
@@ -39,11 +39,11 @@ public class WORedirect extends WOComponent {
   protected int    timeout; /* for meta refresh */
   protected String url;
 
-  public WORedirect(String _url) {
+  public WORedirect(final String _url) {
     super();
     this.setUrl(_url);
   }
-  public WORedirect(String _url, WOContext _ctx) {
+  public WORedirect(final String _url, final WOContext _ctx) {
     super();
     this.initWithContext(_ctx); // kinda hackish
     this.setUrl(_url); /* needs context, thus last place */
@@ -68,18 +68,18 @@ public class WORedirect extends WOComponent {
 
     if (_url.indexOf("://") < 0) {
       /* a relative url without a scheme, needs to be turned into proper URL */
-      WOContext ctx   = this.context();
+      final WOContext ctx   = this.context();
       if (ctx != null) {
-        WORequest rq    = ctx.request();
-        String    rqUrl = rq.url();
+        final WORequest rq    = ctx.request();
+        String          rqUrl = rq.url();
 
         if (rqUrl == null) {
           this.log().warn("request doesn't provide info about URL, falling " +
                           "back to URIs which isn't proper according to RFCs!");
           rqUrl = rq.uri();
         }
-        URI base  = URI.create(rqUrl);
-        URI redir = URI.create(_url);
+        final URI base  = URI.create(rqUrl);
+        final URI redir = URI.create(_url);
         _url      = base.resolve(redir).toASCIIString();
       }
     }
@@ -113,12 +113,12 @@ public class WORedirect extends WOComponent {
    */
   @Override
   public WOResponse generateResponse() {
-    String location = this.url();
+    final String location = this.url();
     if (location == null || location.length() == 0) {
       return null; // TBD: we could also redirect to the componentActionURL()?
     }
 
-    WOContext  ctx = this.context();
+    final WOContext  ctx = this.context();
     WOResponse r;
 
     r = ctx != null ? ctx.response() : new WOResponse();
@@ -138,8 +138,8 @@ public class WORedirect extends WOComponent {
   }
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    String location = this.url();
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    final String location = this.url();
     if (location == null || location.length() == 0) {
       log().warn("WORedirect has no URL assigned.");
       return;
@@ -175,10 +175,10 @@ public class WORedirect extends WOComponent {
     //      a JavaScript if the element is used in a specific page section
   }
 
-  public void appendMetaRefreshToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendMetaRefreshToResponse(WOResponse _r, final WOContext _ctx) {
     // <meta http-equiv="refresh" content="5; URL=http://de.selfhtml.org/">
 
-    StringBuilder content = new StringBuilder(128);
+    final StringBuilder content = new StringBuilder(128);
     content.append(this.timeout());
     content.append("; URL=");
     content.append(this.url());
@@ -191,11 +191,11 @@ public class WORedirect extends WOComponent {
   /* request processing */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     /* we handle no requests, we have no template */
   }
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     /* we handle no requests, we have no template */
     return null;
   }

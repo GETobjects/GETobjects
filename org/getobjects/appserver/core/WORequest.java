@@ -240,7 +240,7 @@ public class WORequest extends WOMessage {
    * @return the preferred content type (eg image/jpeg) or null
    */
   public String preferredContentType() {
-    List<String> accept =
+    final List<String> accept =
       this.parseMultiValueHeader("accept", true /* process quality */);
 
     if (accept == null || accept.size() == 0)
@@ -269,7 +269,7 @@ public class WORequest extends WOMessage {
    * @return true if the _type is in the set of browser accepted content types
    */
   public boolean acceptsContentType(String _type, boolean _matchWildcard) {
-    List<String> accept =
+    final List<String> accept =
       this.parseMultiValueHeader("accept", true /* process quality */);
 
     if (accept == null) {
@@ -285,7 +285,7 @@ public class WORequest extends WOMessage {
         if (ctype.equals("*/*"))
           return true;
 
-        int idx = ctype.indexOf('/');
+        final int idx = ctype.indexOf('/');
         ctype = ctype.substring(0, idx + 1);
         if (_type.startsWith(ctype)) /* eg image/* matches image.gif */
           return true;
@@ -298,7 +298,7 @@ public class WORequest extends WOMessage {
   /* parsing headers */
 
   protected List<String> parseMultiValueHeader
-    (String _name, boolean _processQuality)
+    (final String _name, final boolean _processQuality)
   {
     // TBD: implement quality sorting
     List<String> values = this.headersForKey(_name);
