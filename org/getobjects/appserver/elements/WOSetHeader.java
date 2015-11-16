@@ -21,6 +21,8 @@
 
 package org.getobjects.appserver.elements;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 import org.getobjects.appserver.core.WOAssociation;
@@ -92,11 +94,24 @@ public class WOSetHeader extends WODynamicElement {
 
     String k = null, v = null;
     if (this.header != null) k = this.header.stringValueInComponent(cursor);
-    if (this.value  != null) v = this.value.stringValueInComponent(cursor);
-    
     if (k == null)
       return;
-    
+
+    if (this.value != null) {
+      Object ov = this.value.valueInComponent(cursor);
+
+      if (ov != null) {
+        if (ov instanceof String)
+          v = (String)ov;
+        else if (ov instanceof Date)
+          v = WOMessage.httpFormatDate((Date)ov);
+        else if (ov instanceof GregorianCalendar)
+          v = WOMessage.httpFormatDate((GregorianCalendar)ov);
+        else
+          v = ov.toString();
+      }
+    }
+
     /* determine target object */
     
     WOMessage lObject;
