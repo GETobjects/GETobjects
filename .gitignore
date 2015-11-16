@@ -4,5 +4,4 @@ ant-obj
 .ant.properties
 *.iml
 *.eml
-ThirdParty
 *.diff

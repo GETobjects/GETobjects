@@ -1,0 +1,4 @@
+[submodule "ThirdParty"]
+	path = ThirdParty
+	url = git@mulle-kybernetik.com:getobjects-thirdparty
+	branch = master
