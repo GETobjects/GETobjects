@@ -33,18 +33,19 @@ public class OFSResourceFile extends OFSBaseObject {
   public static final String[] extToMIME = {
     "html",       "text/html",
     "xhtml",      "application/xhtml+xml",
-    
+
     "txt",        "text/plain",
     "css",        "text/css",
     "js",         "text/javascript",
     "make",       "text/x-makefile",
     "pl",         "text/x-perl",
-    
+
     "gif",        "image/gif",
     "ico",        "image/x-icon",
     "jpg",        "image/jpeg",
     "png",        "image/png",
-    
+    "svg",        "image/svg+xml",
+
     "pdf",        "application/pdf",
     "sh",         "application/x-sh",
     "sed",        "application/x-sed",
@@ -52,7 +53,7 @@ public class OFSResourceFile extends OFSBaseObject {
     "zip",        "application/zip",
     "xul",        "application/vnd.mozilla.xul+xml",
     "csv",        "application/csv",
-    
+
     "xtmpl",      "skyrix/xtmpl",
     "sfm",        "skyrix/form",
   };
