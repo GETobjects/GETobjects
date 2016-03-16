@@ -74,12 +74,12 @@ public abstract class EODataSource extends NSObject {
     return this.iteratorToList(this.iteratorForObjects());
   }
   
-  protected List iteratorToList(Iterator _iterator) {
+  protected List iteratorToList(final Iterator _iterator) {
     if (_iterator == null)
       return null;
     
     try {
-      List<Object> results = new ArrayList<Object>(16);
+      final List<Object> results = new ArrayList<Object>(16);
       while (_iterator.hasNext())
         results.add(_iterator.next());
       
@@ -132,7 +132,7 @@ public abstract class EODataSource extends NSObject {
   /* description */
   
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
     
     if (this.fetchSpecification != null)

@@ -96,7 +96,7 @@ public class WORequest extends WOMessage {
    * @return a double containing the seconds since start
    */
   public double requestDurationSinceStart() {
-    long duration = new Date().getTime() - this.startTimeStampInMS;
+    final long duration = new Date().getTime() - this.startTimeStampInMS;
     return duration / 1000.0;
   }
   
@@ -129,15 +129,15 @@ public class WORequest extends WOMessage {
 
     /* cut off adaptor prefix */
 
-    String p = this.adaptorPrefix();
+    final String p = this.adaptorPrefix();
     if (p != null && p.length() > 0) {
       if (luri.startsWith(p))
         luri = luri.substring(p.length());
     }
 
-    String[] urlParts  = luri.split("/");
-    int      charsConsumed = 0;
-    int      partCount = urlParts.length;
+    final String[] urlParts  = luri.split("/");
+    final int      partCount = urlParts.length;
+    int charsConsumed = 0;
     if (partCount > 1) {
       this.appName  = urlParts[1];
       charsConsumed += this.appName.length();
@@ -305,12 +305,12 @@ public class WORequest extends WOMessage {
     if (values        == null) return null;
     if (values.size() == 0)    return values;
 
-    List<String> svals = new ArrayList<String>(4);
-    for (String value: values) {
-      String[] parts = value.split(",");
+    final List<String> svals = new ArrayList<String>(4);
+    for (final String value: values) {
+      final String[] parts = value.split(",");
       for (int i = 0; i < parts.length; i++) {
-        String s   = parts[i];
-        int    idx = s.lastIndexOf(';');
+        String    s   = parts[i];
+        final int idx = s.lastIndexOf(';');
 
         if (idx != -1) {
           //String q = s.substring(idx + 1).trim();
@@ -319,9 +319,8 @@ public class WORequest extends WOMessage {
         else
           s = s.trim();
 
-        if (s.length() > 0) {
+        if (s.length() > 0)
           svals.add(s);
-        }
       }
     }
     return svals;
@@ -336,7 +335,7 @@ public class WORequest extends WOMessage {
    * <p>
    * The default implementation just returns true.
    */
-  public boolean prepareForStreaming(WOResponse _r) {
+  public boolean prepareForStreaming(final WOResponse _r) {
     /* TODO: I don't like this being attached to the request .. */
     /* This is overridden by subclasses which provide streaming */
     return true;
@@ -394,7 +393,7 @@ public class WORequest extends WOMessage {
 
   /* form values */
 
-  public void setDefaultFormValueEncoding(String _encoding) {
+  public void setDefaultFormValueEncoding(final String _encoding) {
     this.defaultFormValueEncoding = _encoding;
   }
   public String defaultFormValueEncoding() {
@@ -402,14 +401,14 @@ public class WORequest extends WOMessage {
   }
 
   public boolean isMultipartFormData() {
-    String ct = this.headerForKey("content-type");
+    final String ct = this.headerForKey("content-type");
     if (ct == null) return false;
     return ct.toLowerCase().startsWith("multipart/form-data");
   }
 
-  public Object formValueForKey(String _key) {
+  public Object formValueForKey(final String _key) {
     // TODO: this does not work yet for POST!
-    Object[] values;
+    final Object[] values;
 
     if ((values = this.formValuesForKey(_key)) == null)
       return null;
@@ -419,8 +418,8 @@ public class WORequest extends WOMessage {
 
     return values[0];
   }
-  public String stringFormValueForKey(String _key) {
-    Object ov;
+  public String stringFormValueForKey(final String _key) {
+    final Object ov;
 
     if ((ov = this.formValueForKey(_key)) == null)
       return null;
@@ -431,11 +430,11 @@ public class WORequest extends WOMessage {
     return ov.toString();
   }
 
-  public Object[] formValuesForKey(String _key) {
+  public Object[] formValuesForKey(final String _key) {
     if (this.formValues == null) /* we never return null */
       return new Object[0];
 
-    Object[] vals = this.formValues.get(_key);
+    final Object[] vals = this.formValues.get(_key);
     return ((vals == null) ? new Object[0] : vals);
   }
 
@@ -471,7 +470,7 @@ public class WORequest extends WOMessage {
   public Map<String,List<Object>> formValuesAsListMap() {
     Map<String,List<Object>> fv = new HashMap<String,List<Object>>(16);
     if (this.formValues != null) {
-      for (String fn: this.formValues.keySet())
+      for (final String fn: this.formValues.keySet())
         fv.put(fn, Arrays.asList(this.formValues.get(fn)));
     }
     return fv;
@@ -485,9 +484,9 @@ public class WORequest extends WOMessage {
 
   /* cookie values */
 
-  public Collection<String> cookieValuesForKey(String _key) {
-    Collection<String> values = new ArrayList<String>(4);
-    for (WOCookie c: this.cookies()) {
+  public Collection<String> cookieValuesForKey(final String _key) {
+    final Collection<String> values = new ArrayList<String>(4);
+    for (final WOCookie c: this.cookies()) {
       if (!_key.equals(c.name()))
         continue;
       values.add(c.value());
@@ -495,8 +494,8 @@ public class WORequest extends WOMessage {
     return values;
   }
 
-  public String cookieValueForKey(String _key) {
-    for (WOCookie c: this.cookies()) {
+  public String cookieValueForKey(final String _key) {
+    for (final WOCookie c: this.cookies()) {
       if (_key.equals(c.name()))
         return c.value();
     }
@@ -504,12 +503,12 @@ public class WORequest extends WOMessage {
   }
 
   public Map<String,Collection<String>> cookieValues() {
-    Map<String,Collection<String>> values =
+    final Map<String,Collection<String>> values =
       new HashMap<String,Collection<String>>(4);
 
-    for (WOCookie c: this.cookies()) {
-      Collection<String> vals;
-      String k = c.name();
+    for (final WOCookie c: this.cookies()) {
+      final Collection<String> vals;
+      final String k = c.name();
 
       if (values.containsKey(k))
         vals = values.get(k);
@@ -622,12 +621,12 @@ public class WORequest extends WOMessage {
      * Note: form value conversions like :int are processed when the Servlet
      *       form values are being processed.
      */
-    String[] formKeys = this.formValueKeys();
+    final String[] formKeys = this.formValueKeys();
     if (formKeys == null)
       return null;
 
-    for (String formValueKey: formKeys) {
-      int l = formValueKey.length();
+    for (final String formValueKey: formKeys) {
+      final int l = formValueKey.length();
       if (l < 7) continue;
 
       if (l >= 7 && formValueKey.endsWith(":action")) {
@@ -647,7 +646,7 @@ public class WORequest extends WOMessage {
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder d) {
+  public void appendAttributesToDescription(final StringBuilder d) {
     super.appendAttributesToDescription(d);
 
     if (this.method != null)

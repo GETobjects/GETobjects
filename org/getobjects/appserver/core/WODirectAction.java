@@ -43,7 +43,7 @@ public class WODirectAction extends WOAction {
   static Class[]  emptyClassArray  = new Class[0];
   static Object[] emptyObjectArray = new Object[0];
   
-  public WODirectAction(WOContext _ctx) {
+  public WODirectAction(final WOContext _ctx) {
     super(_ctx);
   }
   
@@ -56,7 +56,7 @@ public class WODirectAction extends WOAction {
    * @param _name - the name of the action to invoke
    * @return the result, eg a WOComponent or WOResponse
    */
-  public Object performActionNamed(String _name) {
+  public Object performActionNamed(final String _name) {
     return WODirectAction.performActionNamed(this, _name, this.context());
   }
   
@@ -77,12 +77,12 @@ public class WODirectAction extends WOAction {
    * @return the result, eg a WOComponent or WOResponse
    */
   public static Object performActionNamed
-    (Object _o, String _name, WOContext _ctx)
+    (final Object _o, final String _name, final WOContext _ctx)
   {
     if (_o == null || _name == null)
       return null;
     
-    Method m = NSJavaRuntime.NSMethodFromString
+    final Method m = NSJavaRuntime.NSMethodFromString
       (_o.getClass() , _name + "Action", emptyClassArray);
     
     if (m == null) {
@@ -127,13 +127,13 @@ public class WODirectAction extends WOAction {
    * Iterates over the given keys and invokes takeValueForKey for each key,
    * using a similiar named form values as the value.
    */
-  public void takeFormValueArraysForKeyArray(String[] _keys) {
-    WORequest r = this.request();
+  public void takeFormValueArraysForKeyArray(final String[] _keys) {
+    final WORequest r = this.request();
 
-    for (String k: _keys)
+    for (final String k: _keys)
       this.takeValueForKey(r.formValuesForKey(k), k);
   }
-  public void takeFormValueArraysForKeyArray(Collection<String> _keys) {
+  public void takeFormValueArraysForKeyArray(final Collection<String> _keys) {
     this.takeFormValueArraysForKeyArray((String[])_keys.toArray());
   }
 }

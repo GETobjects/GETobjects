@@ -55,7 +55,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   /* tests */
   
   @Test public void testSimpleLookup() {
-    GoTraversalPath path = 
+    final GoTraversalPath path = 
       new GoTraversalPath( new String[] { "level1" }, testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
     
@@ -70,7 +70,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   }
   
   @Test public void testEmptyTraversalPath() {
-    GoTraversalPath path =
+    final GoTraversalPath path =
       new GoTraversalPath( new String[0], testTree, this.context );
     assertNotNull("got no traversal path object for empty path", path);
     
@@ -85,7 +85,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   }
   
   @Test public void testNullRoot() {
-    GoTraversalPath path = 
+    final GoTraversalPath path = 
       new GoTraversalPath( new String[] { "level1" }, null, this.context );
     assertNotNull("got no traversal path object for path", path);
     
@@ -98,7 +98,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   }
    
   @Test public void testMethodLookup() {
-    GoTraversalPath path = 
+    final GoTraversalPath path = 
       new GoTraversalPath( new String[] { "level1", "level2", "method" },
                            testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
@@ -114,7 +114,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   }
 
   @Test public void testMethodLookupWithPathInfo() {
-    GoTraversalPath path = 
+    final GoTraversalPath path = 
       new GoTraversalPath( new String[] {
                              "level1", "level2", "method", "1", "2"
                            },
@@ -141,7 +141,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   }
   
   @Test public void testLookupMissing() {
-    GoTraversalPath path = 
+    final GoTraversalPath path = 
       new GoTraversalPath( new String[] { "missinglink.html" },
                            testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
@@ -161,7 +161,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
     private String name;
     private Object child;
     
-    public MyJoObject(String _name, Object _child) {
+    public MyJoObject(final String _name, final Object _child) {
       this.name  = _name;
       this.child = _child;
     }
@@ -176,7 +176,7 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
 
   private static class MyJoMethod implements IGoCallable {
 
-    public Object callInContext(Object _object, IGoContext _ctx) {
+    public Object callInContext(final Object _object, final IGoContext _ctx) {
       return this;
     }
 

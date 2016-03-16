@@ -98,7 +98,7 @@ public class WOContext extends WOCoreContext
 
   /* construct */
 
-  public WOContext(WOApplication _app, WORequest _rq) {
+  public WOContext(final WOApplication _app, final WORequest _rq) {
     super(_app, _rq);
 
     this.hasNewSession       = false;
@@ -130,7 +130,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _languages - a List of language IDs (eg ['de', 'en'])
    */
-  public void setLanguages(List<String> _languages) {
+  public void setLanguages(final List<String> _languages) {
     this.languages = _languages;
     this.setLocale(null); /* reset locale, so you must set it afterwards! */
   }
@@ -162,7 +162,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _locale - the Locale object
    */
-  public void setLocale(Locale _locale) {
+  public void setLocale(final Locale _locale) {
     this.locale = _locale;
   }
 
@@ -196,9 +196,9 @@ public class WOContext extends WOCoreContext
   public Locale deriveLocale() {
     /* first check for an explicit LC request parameter */
     if (this.request != null) {
-      String lc = this.request.stringFormValueForKey("LC");
+      final String lc = this.request.stringFormValueForKey("LC");
       if (lc != null && lc.length() > 0) {
-        Locale l = new Locale(lc);
+        final Locale l = new Locale(lc);
         if (l != null) return l;
       }
 
@@ -208,7 +208,7 @@ public class WOContext extends WOCoreContext
 
     /* next check whether the session has a locale assigned */
     if (this.hasSession()) {
-      Locale l = (Locale)this.session().valueForKey("locale");
+      final Locale l = (Locale)this.session().valueForKey("locale");
       if (l != null) return l;
     }
 
@@ -216,7 +216,7 @@ public class WOContext extends WOCoreContext
     return WOResourceManager.localeForLanguages(this.languages());
   }
 
-  public void setTimeZone(TimeZone _tz) {
+  public void setTimeZone(final TimeZone _tz) {
     this.timezone = _tz;
   }
   /**
@@ -250,7 +250,7 @@ public class WOContext extends WOCoreContext
   public TimeZone deriveTimeZone() {
     /* first check for an explicit LC request parameter */
     if (this.request != null) {
-      String tzname = this.request.stringFormValueForKey("TZ");
+      final String tzname = this.request.stringFormValueForKey("TZ");
       if (tzname != null && tzname.length() > 0) {
         TimeZone tz = TimeZone.getTimeZone(tzname);
         if (tz != null) return tz;
@@ -259,7 +259,7 @@ public class WOContext extends WOCoreContext
 
     /* next check whether the session has a locale assigned */
     if (this.hasSession()) {
-      TimeZone tz = (TimeZone)this.session().valueForKey("timezone");
+      final TimeZone tz = (TimeZone)this.session().valueForKey("timezone");
       if (tz != null) return tz;
     }
 
@@ -269,7 +269,7 @@ public class WOContext extends WOCoreContext
 
   /* fragments */
 
-  public void setFragmentID(String _fragmentID) {
+  public void setFragmentID(final String _fragmentID) {
     this.fragmentID = _fragmentID;
   }
   public String fragmentID() {
@@ -324,7 +324,7 @@ public class WOContext extends WOCoreContext
     this.errorReport = _report;
   }
   public WOErrorReport popErrorReport() {
-    WOErrorReport old = this.errorReport;
+    final WOErrorReport old = this.errorReport;
     if (old != null)
       this.errorReport = old.parentReport();
     else
@@ -431,7 +431,7 @@ public class WOContext extends WOCoreContext
 
     /* find component and compare it with the given one */
 
-    WOComponent component = (this.stackPos < this.componentStack.length)
+    final WOComponent component = (this.stackPos < this.componentStack.length)
       ? this.componentStack[this.stackPos] : null;
     if (_component != null && component != _component) {
       compStackLog.error("component leave mismatch: " +
@@ -467,7 +467,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _component - the WOComponent to be registered as awake.
    */
-  public void _addAwakeComponent(WOComponent _component) {
+  public void _addAwakeComponent(final WOComponent _component) {
     if (_component == null)
       return;
 
@@ -483,7 +483,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _component - the WOComponent
    */
-  public void _awakeComponent(WOComponent _component) {
+  public void _awakeComponent(final WOComponent _component) {
     if (_component == null)
       return;
     if (this.awakeComponents.contains(_component)) /* already awake? */
@@ -522,7 +522,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _flag - a flag denoting whether the form is entered or left
    */
-  public void setIsInForm(boolean _flag) {
+  public void setIsInForm(final boolean _flag) {
     if (this.isInForm && _flag)
       log.warn("form is already active.");
 
@@ -550,7 +550,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _element - the WOElement for the action (usually an WOInput object)
    */
-  public void addActiveFormElement(WOElement _element) {
+  public void addActiveFormElement(final WOElement _element) {
     if (this.activeFormElement != null) {
       formLog.error("active form element already set: " + _element);
       return;
@@ -580,7 +580,7 @@ public class WOContext extends WOCoreContext
   /**
    * Pseudo public, be very careful when calling this.
    */
-  public void _setElementID(String _eid) {
+  public void _setElementID(final String _eid) {
     this.elementID.setLength(0);
     this.elementID.append(_eid);
   }
@@ -602,12 +602,12 @@ public class WOContext extends WOCoreContext
     return this.elementID.toString();
   }
 
-  public void appendElementIDComponent(String _id) {
+  public void appendElementIDComponent(final String _id) {
     if (this.elementID.length() > 0)
       this.elementID.append('.');
     this.elementID.append(_id);
   }
-  public void appendElementIDComponent(int _id) {
+  public void appendElementIDComponent(final int _id) {
     if (this.elementID.length() > 0)
       this.elementID.append('.');
     this.elementID.append(_id);
@@ -665,7 +665,7 @@ public class WOContext extends WOCoreContext
     this.elementID.setLength(0);
   }
 
-  public void setRequestSenderID(String _id) {
+  public void setRequestSenderID(final String _id) {
     this.reqElementID = _id;
   }
   public String senderID() {
@@ -697,7 +697,7 @@ public class WOContext extends WOCoreContext
    * @return a set of key/value pairs to be included in the parameters of a URL
    */
   public Map<String, Object> allQuerySessionValues() {
-    WOQuerySession qs = this.querySession();
+    final WOQuerySession qs = this.querySession();
     return qs != null ? qs.allQuerySessionValues() : null;
   }
 
@@ -715,7 +715,7 @@ public class WOContext extends WOCoreContext
     (String _requestHandlerKey, String _requestHandlerPath, String _queryString)
   {
     // TODO: complete me
-    StringBuilder sb = new StringBuilder(256);
+    final StringBuilder sb = new StringBuilder(256);
 
     if (this.request != null) {
       String an;
@@ -756,7 +756,7 @@ public class WOContext extends WOCoreContext
    * @return a String with the component action URL
    */
   public String componentActionURL() {
-    WOSession sn;
+    final WOSession sn;
 
     if ((sn = this.session()) == null) {
       log.error("could no return action URL due to missing session");
@@ -796,11 +796,11 @@ public class WOContext extends WOCoreContext
     // TBD: is this correct? This means that the URLs embedded in the HTML
     //      page are encoded in the same charset like the page. Browsers might
     //      behave differently (and we should document the behaviour here)
-    WOMessage r = this.response();
+    final WOMessage r = this.response();
     String charset = r != null ? r.contentEncoding() : null;
     if (charset == null) charset = WOMessage.defaultURLEncoding();
 
-    String qs = UMap.stringForQueryDictionary(_queryDict, charset);
+    final String qs = UMap.stringForQueryDictionary(_queryDict, charset);
 
     return this.urlWithRequestHandlerKey(
         this.application.directActionRequestHandlerKey(), /* rq handler key */
@@ -929,11 +929,11 @@ public class WOContext extends WOCoreContext
     if (this.clientObjectURL != null)
       return this.clientObjectURL;
     
-    String[] path = this.goTraversalPath.pathToClientObject();
+    final String[] path = this.goTraversalPath.pathToClientObject();
     if (path == null)
       return null;
     
-    StringBuilder sb = new StringBuilder(path.length * 16 + 32);
+    final StringBuilder sb = new StringBuilder(path.length * 16 + 32);
     
     if (path.length == 0)
       return this.urlWithRequestHandlerKey(null, "/", null);

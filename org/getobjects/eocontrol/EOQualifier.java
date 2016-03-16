@@ -100,7 +100,7 @@ public class EOQualifier extends EOExpression {
     if (size == 0) return null;
     
     final EOQualifier[] qs = new EOQualifier[size];
-    for (Object key: _values.keySet()) {
+    for (final Object key: _values.keySet()) {
       size--;
       qs[size] = new EOKeyValueQualifier((String)key, _values.get(key));
     }
@@ -127,7 +127,7 @@ public class EOQualifier extends EOExpression {
     if (size == 0) return null;
     
     final EOQualifier[] qs = new EOQualifier[size];
-    for (Object key: _values.keySet()) {
+    for (final Object key: _values.keySet()) {
       size--;
       qs[size] = new EOKeyValueQualifier((String)key, _values.get(key));
     }
@@ -197,7 +197,7 @@ public class EOQualifier extends EOExpression {
    * @param _keysAndValues - the bindings as key/value pairs
    * @return an EOQualifier with the bindings resolved
    */
-  public EOQualifier qualifierWithBindings(Object... _keysAndValues) {
+  public EOQualifier qualifierWithBindings(final Object... _keysAndValues) {
     return this.qualifierWithBindings(
         new NSKeyValueHolder(_keysAndValues), true /* requires all */);
   }
@@ -223,7 +223,7 @@ public class EOQualifier extends EOExpression {
     
     final EOQualifierEvaluation eval = (EOQualifierEvaluation)this;
     final ArrayList<Object> result = new ArrayList<Object>(_in.size());
-    for (Object item: _in) {
+    for (final Object item: _in) {
       if (eval.evaluateWithObject(item))
         result.add(item);
     }
@@ -340,8 +340,8 @@ public class EOQualifier extends EOExpression {
     }
     
     if (len == 2) {
-      char c0 = _s.charAt(0);
-      char c1 = _s.charAt(1);
+      final char c0 = _s.charAt(0);
+      final char c1 = _s.charAt(1);
       
       if (c0 == '!' && c1 == '=')
         return ComparisonOperation.NOT_EQUAL_TO;

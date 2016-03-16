@@ -52,21 +52,21 @@ public class TWODParser implements WODParserHandler {
   /* tests */
   
   @Test public void testParseEmptyWOStringWithoutColon() {
-    Object result = this.parser.parse("A: WOString {}");
+    final Object result = this.parser.parse("A: WOString {}");
     assertNotNull("got no map, expected  dict", result);
     assertTrue   ("result is not a Map",        result instanceof Map);
     
-    Map entries = (Map)result;
+    final Map entries = (Map)result;
     assertFalse  ("result is an empty Map", entries.isEmpty());
     assertNotNull("no info stored for name 'A'", entries.get("A"));
   }
   
   @Test public void testParseOGNLOneEntry() {
-    Object result = this.parser.parse("A: WOString {\n  value = ~name;}"); 
+    final Object result = this.parser.parse("A: WOString {\n  value = ~name;}"); 
     assertNotNull("got no map, expected dict", result);
     assertTrue   ("result is not a Map",       result instanceof Map);
     
-    Map entries = (Map)result;
+    final Map entries = (Map)result;
     assertFalse  ("result is an empty Map", entries.isEmpty());
     assertNotNull("no info stored for name 'A'", entries.get("A"));
   }
@@ -79,7 +79,7 @@ public class TWODParser implements WODParserHandler {
     assertNotNull("got no map, expected dict", result);
     assertTrue   ("result is not a Map",       result instanceof Map);
     
-    Map entries = (Map)result;
+    final Map entries = (Map)result;
     assertFalse  ("result is an empty Map", entries.isEmpty());
     assertNotNull("no info stored for name 'A'", entries.get("A"));
   }
@@ -89,7 +89,7 @@ public class TWODParser implements WODParserHandler {
     assertNotNull("got no map, expected dict", result);
     assertTrue   ("result is not a Map",       result instanceof Map);
     
-    Map entries = (Map)result;
+    final Map entries = (Map)result;
     assertFalse  ("result is an empty Map", entries.isEmpty());
     assertNotNull("no info stored for name 'A'", entries.get("A"));
   }
@@ -100,11 +100,11 @@ public class TWODParser implements WODParserHandler {
     return true;
   }
   public void failedParsingDeclarationData
-    (WODParser _p, char[] _data, Exception _error)
+    (final WODParser _p, final char[] _data, final Exception _error)
   {
   }
   public void finishedParsingDeclarationData
-    (WODParser _p, char[] _data, Map _decls)
+    (final WODParser _p, final char[] _data, final Map _decls)
   {
   }
 
@@ -117,7 +117,7 @@ public class TWODParser implements WODParserHandler {
   }
 
   public Object makeDefinitionForComponentNamed
-    (WODParser _p, String _n, Map _entry, String _name)
+    (final WODParser _p, String _n, final Map _entry, final String _name)
   {
     return new Object[] { _n, _name, _entry };
   }

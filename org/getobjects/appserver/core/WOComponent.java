@@ -251,7 +251,7 @@ public class WOComponent extends WOElement
 
     /* a package component (class is named 'Component') */
     s = this.getClass().getPackage().getName();
-    int idx = s.lastIndexOf('.');
+    final int idx = s.lastIndexOf('.');
     return s.substring(idx + 1);
   }
 
@@ -498,7 +498,7 @@ public class WOComponent extends WOElement
    * @param _parent - the parent component to copy values from
    */
   public void syncFromParent(WOComponent _parent) { /* SOPE method */
-    boolean isDebug = compLog.isDebugEnabled();
+    final boolean isDebug = compLog.isDebugEnabled();
 
     if (this.wocBindings == null) {
       if (isDebug) compLog.debug("nothing to sync from parent ...");
@@ -529,7 +529,7 @@ public class WOComponent extends WOElement
    * @param _parent - the parent component to copy values to
    */
   public void syncToParent(WOComponent _parent) { /* SOPE method */
-    boolean isDebug = compLog.isDebugEnabled();
+    final boolean isDebug = compLog.isDebugEnabled();
 
     if (this.wocBindings == null) {
       if (isDebug) compLog.debug("nothing to sync to parent ...");
@@ -596,7 +596,7 @@ public class WOComponent extends WOElement
    * @return the value of the binding in the parent component
    */
   public Object valueForBinding(String _name) {
-    IWOAssociation binding = this.wocBindings.get(_name);
+    final IWOAssociation binding = this.wocBindings.get(_name);
     if (binding == null)
       return null;
 
@@ -624,7 +624,7 @@ public class WOComponent extends WOElement
     return this.hasBinding(_name);
   }
   public boolean canSetValueForBinding(String _name) {
-    IWOAssociation binding = this.wocBindings.get(_name);
+    final IWOAssociation binding = this.wocBindings.get(_name);
     if (binding == null)
       return false;
 
@@ -638,7 +638,7 @@ public class WOComponent extends WOElement
     if (this.wocBindings == null)
       return null;
 
-    String[] k = this.wocBindings.keySet().toArray(new String[0]);
+    final String[] k = this.wocBindings.keySet().toArray(new String[0]);
     return k;
   }
 
@@ -662,10 +662,10 @@ public class WOComponent extends WOElement
    * @return the result of the called method
    */
   public Object performParentAction(String _name) {
-    WOContext   ctx     = this.context();
-    WOElement   content = ctx.componentContent();
-    WOComponent parent  = ctx.parentComponent();
-    Object      result  = null;
+    final WOContext   ctx     = this.context();
+    final WOElement   content = ctx.componentContent();
+    final WOComponent parent  = ctx.parentComponent();
+    Object result = null;
 
     ctx.leaveComponent(this);
     result = parent.valueForKey(_name);
@@ -826,7 +826,7 @@ public class WOComponent extends WOElement
    * @return a WOElement to be used as the template
    */
   public WOElement templateWithName(String _name) {
-    WOResourceManager rm;
+    final WOResourceManager rm;
 
     if ((rm = this.resourceManager()) == null) {
       compLog.warn("missing resourcemanager to lookup template: " + _name);
@@ -836,7 +836,7 @@ public class WOComponent extends WOElement
     /* Note: this fails if the component was created by using a qualified name,
      *       eg 'account.HomePage'
      */
-    WOContext wctx = this.context();
+    final WOContext wctx = this.context();
     return rm.templateWithName(_name, wctx != null ? wctx.languages():null, rm);
   }
 
@@ -854,7 +854,7 @@ public class WOComponent extends WOElement
     pageLog.debug("pageWithName: " + _name);
 
     // TODO: SOPE uses the WOResourceManager directly
-    WOApplication app = this.application();
+    final WOApplication app = this.application();
     if (app == null) {
       pageLog.error("component has no application, cannot lookup page: "+_name);
       return null;
@@ -874,8 +874,8 @@ public class WOComponent extends WOElement
   public WOResponse generateResponse() {
     compLog.debug("generate response ...");
 
-    WOContext  ctx = this.context(); // TBD: better create a new context?!
-    WORequest  rq  = ctx != null ? ctx.request() : null;
+    final WOContext  ctx = this.context(); // TBD: better create a new context?!
+    final WORequest  rq  = ctx != null ? ctx.request() : null;
     WOResponse r;
 
     ctx.setPage(this);
@@ -977,7 +977,7 @@ public class WOComponent extends WOElement
     if (!this.isAwake)
       compLog.error("component is not awake!");
 
-    WOElement lTemplate = this.template();
+    final WOElement lTemplate = this.template();
     if (lTemplate != null)
       lTemplate.takeValuesFromRequest(_rq, _ctx);
     else
@@ -994,7 +994,7 @@ public class WOComponent extends WOElement
     if (!this.isAwake)
       compLog.error("component is not awake!");
 
-    WOElement lTemplate = this.template();
+    final WOElement lTemplate = this.template();
     if (lTemplate != null)
       result = lTemplate.invokeAction(_rq, _ctx);
     else
@@ -1011,7 +1011,7 @@ public class WOComponent extends WOElement
     if (!this.isAwake)
       compLog.error("component is not awake!");
 
-    WOElement lTemplate = this.template();
+    final WOElement lTemplate = this.template();
     if (lTemplate != null)
       lTemplate.appendToResponse(_r, _ctx);
     else
@@ -1030,7 +1030,7 @@ public class WOComponent extends WOElement
     if (!this.isAwake)
       compLog.error("component is not awake!");
 
-    WOElement lTemplate = this.template();
+    final WOElement lTemplate = this.template();
     if (lTemplate != null)
       _walker.processTemplate(this, lTemplate, _ctx);
     else
@@ -1048,7 +1048,7 @@ public class WOComponent extends WOElement
   // TODO: threading? No problem in components?!
   protected Map<String,Object> extraAttributes = null;
 
-  public void setObjectForKey(Object _value, String _key) {
+  public void setObjectForKey(final Object _value, final String _key) {
     if (_value == null) {
       this.removeObjectForKey(_key);
       return;
@@ -1060,14 +1060,14 @@ public class WOComponent extends WOElement
     this.extraAttributes.put(_key, _value);
   }
 
-  public void removeObjectForKey(String _key) {
+  public void removeObjectForKey(final String _key) {
     if (this.extraAttributes == null)
       return;
 
     this.extraAttributes.remove(_key);
   }
 
-  public Object objectForKey(String _key) {
+  public Object objectForKey(final String _key) {
     if (_key == null || this.extraAttributes == null)
       return null;
 
@@ -1156,7 +1156,7 @@ public class WOComponent extends WOElement
   /* KVC */
 
   @Override
-  public void takeValueForKey(Object _value, String _key) {
+  public void takeValueForKey(final Object _value, final String _key) {
     if (this.extraAttributes != null) {
       // I guess this is for performance, it would be triggered anyways?
       // (handleTakeValueForUnboundKey() would be called)
@@ -1169,11 +1169,11 @@ public class WOComponent extends WOElement
     super.takeValueForKey(_value, _key);
   }
   @Override
-  public Object valueForKey(String _key) {
+  public Object valueForKey(final String _key) {
     if (this.extraAttributes != null) {
       // I guess this is for performance, it would be triggered anyways?
       // (handleQueryWithUnboundKey() would be called)
-      Object v = this.extraAttributes.get(_key);
+      final Object v = this.extraAttributes.get(_key);
       if (v != null)
         return v;
     }
@@ -1182,11 +1182,11 @@ public class WOComponent extends WOElement
   }
 
   @Override
-  public void handleTakeValueForUnboundKey(Object _value, String _key) {
+  public void handleTakeValueForUnboundKey(Object _value, final String _key) {
     this.setObjectForKey(_value, _key);
   }
   @Override
-  public Object handleQueryWithUnboundKey(String _key) {
+  public Object handleQueryWithUnboundKey(final String _key) {
     return this.objectForKey(_key);
   }
 

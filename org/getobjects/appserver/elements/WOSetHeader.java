@@ -85,8 +85,8 @@ public class WOSetHeader extends WODynamicElement {
   /* responder */
   
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
-    Object cursor = _ctx.cursor();
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
+    final Object cursor = _ctx.cursor();
     
     boolean doAdd = false;
     if (this.addToExisting != null)
@@ -98,7 +98,7 @@ public class WOSetHeader extends WODynamicElement {
       return;
 
     if (this.value != null) {
-      Object ov = this.value.valueInComponent(cursor);
+      final Object ov = this.value.valueInComponent(cursor);
 
       if (ov != null) {
         if (ov instanceof String)
@@ -116,9 +116,9 @@ public class WOSetHeader extends WODynamicElement {
     
     WOMessage lObject;
     if (this.object != null) {
-      Object llObject = this.object.valueInComponent(cursor);
+      final Object llObject = this.object.valueInComponent(cursor);
       if (llObject instanceof String) {
-        String s = (String)llObject;
+        final String s = (String)llObject;
         
         if (s.equals("response"))
           lObject = _ctx.response();

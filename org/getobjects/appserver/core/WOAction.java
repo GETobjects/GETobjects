@@ -34,7 +34,7 @@ public abstract class WOAction extends NSObject {
 
   protected WOContext context;
   
-  public WOAction(WOContext _ctx) {
+  public WOAction(final WOContext _ctx) {
     this.context = _ctx;
   }
   
@@ -59,7 +59,7 @@ public abstract class WOAction extends NSObject {
 
   /* pages */
   
-  public WOComponent pageWithName(String _pageName) {
+  public WOComponent pageWithName(final String _pageName) {
     return this.context.application().pageWithName(_pageName, this.context);
   }
   
@@ -69,7 +69,7 @@ public abstract class WOAction extends NSObject {
   
   /* description */
   
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     if (this.context != null)
       _d.append(" ctx=" + this.context.contextID());
   }
