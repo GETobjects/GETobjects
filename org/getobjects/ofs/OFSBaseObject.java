@@ -71,7 +71,7 @@ public abstract class OFSBaseObject extends NSObject
    * @param _container - the parent of this controller in the lookup hierarchy
    * @param _name      - the name of this object in the lookup hierarchy
    */
-  public void setLocation(Object _container, String _name) {
+  public void setLocation(final Object _container, final String _name) {
     this.container       = _container;
     this.nameInContainer = _name;
 
@@ -115,7 +115,7 @@ public abstract class OFSBaseObject extends NSObject
   public String stringPathInContainer() {
     // TODO: not recommended to use this to avoid escaping issues
     // TODO: fix escaping of '/'
-    String[] p = this.pathInContainer();
+    final String[] p = this.pathInContainer();
     if (p        == null) return null;
     if (p.length == 0)    return "/";
     return "/" + UString.componentsJoinedByString(this.pathInContainer(), "/");
@@ -179,7 +179,7 @@ public abstract class OFSBaseObject extends NSObject
    * @return a fileinfo object or null if the storage path could not be resolved
    */
   public IOFSFileInfo fileInfo() {
-    IOFSFileInfo[] fileInfos = this.fileInfos();
+    final IOFSFileInfo[] fileInfos = this.fileInfos();
     return fileInfos != null && fileInfos.length > 0 ? fileInfos[0] : null;
   }
 
@@ -209,7 +209,7 @@ public abstract class OFSBaseObject extends NSObject
    * @return a Date representing the timestamp
    */
   public Date lastModified() {
-    IOFSFileInfo info = this.fileInfo();
+    final IOFSFileInfo info = this.fileInfo();
     return info != null ? new Date(info.lastModified()) : null;
   }
 
@@ -222,13 +222,13 @@ public abstract class OFSBaseObject extends NSObject
    */
   public long size() {
     /* Note: this is actually "storageSize", rendering result could be diff */
-    IOFSFileInfo info = this.fileInfo();
+    final IOFSFileInfo info = this.fileInfo();
     return info != null ? info.length() : null;
   }
 
   public String pathExtension() {
     /* Note: this is the path extension in the store */
-    IOFSFileInfo info = this.fileInfo();
+    final IOFSFileInfo info = this.fileInfo();
     return info != null ? info.pathExtension() : null;
   }
 
@@ -306,10 +306,10 @@ public abstract class OFSBaseObject extends NSObject
    */
   public byte[] content() {
     // TODO: move to Foundation (NSReadStreamAsByteArray() or sth like this)
-    long size = this.size();
+    final long size = this.size();
     if (size == 0) return new byte[0]; /* empty file */
 
-    InputStream in = this.openStream();
+    final InputStream in = this.openStream();
     if (in == null) return null;
 
     if (size > contentLoadSizeLimit || size > Integer.MAX_VALUE) {
@@ -322,7 +322,7 @@ public abstract class OFSBaseObject extends NSObject
     byte[] contents = null;
     try {
       contents = new byte[(int)size /* we check the limit above */];
-      byte[] buffer = new byte[4096];
+      final byte[] buffer = new byte[4096];
       int gotlen, pos = 0;
 
       while ((gotlen = in.read(buffer)) != -1) {
@@ -360,8 +360,8 @@ public abstract class OFSBaseObject extends NSObject
     }
 
     if (_content instanceof String) {
-      String enc = this.contentEncoding();
-      String s   = (String)_content;
+      final String enc = this.contentEncoding();
+      final String s   = (String)_content;
 
       try {
         _content = enc != null ? s.getBytes(enc) : s.getBytes();
@@ -387,10 +387,10 @@ public abstract class OFSBaseObject extends NSObject
     return null;
   }
   public String contentAsString() {
-    String enc = this.contentEncoding();
+    final String enc = this.contentEncoding();
 
     // TODO: directly read string from stream using a Reader
-    byte[] contents = this.content();
+    final byte[] contents = this.content();
     if (contents == null)
       return null;
 
