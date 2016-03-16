@@ -789,8 +789,8 @@ public class WOHTMLParser extends NSObject implements WOTemplateParser {
     if (this.buffer[this.idx] != '<') /* check whether it is a tag */
       return false;
 
-    if (this.buffer[this.idx + 1] != '!' &&
-        this.buffer[this.idx + 2] != '-' &&
+    if (this.buffer[this.idx + 1] != '!' ||
+        this.buffer[this.idx + 2] != '-' ||
         this.buffer[this.idx + 3] != '-')
       return false;
     return true;
