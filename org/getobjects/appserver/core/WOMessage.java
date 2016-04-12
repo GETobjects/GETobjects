@@ -447,7 +447,9 @@ public abstract class WOMessage extends NSObject
   }
 
   public void setContent(final byte[] _contents) {
-    if (!(this.outputStream instanceof ByteArrayOutputStream)) {
+    if ((this.outputStream != null) &&
+        !(this.outputStream instanceof ByteArrayOutputStream))
+    {
       /* was a real stream */
       throw new NSException("Cannot set content of streamed WOMessage!");
     }
@@ -469,6 +471,10 @@ public abstract class WOMessage extends NSObject
           .getBytes(this.contentEncoding());
 
         try {
+          if (this.outputStream == null) {
+            this.outputStream = new ByteArrayOutputStream
+              (this.contents != null ? this.contents.length : 1024);
+          }
           this.outputStream.write(a, 0 /* start-idx */, a.length);
           this.stringBuffer.setLength(0);
           return null; /* means: no error */
@@ -542,6 +548,10 @@ public abstract class WOMessage extends NSObject
     if (this.stringBuffer != null) this.flushStringBuffer();
 
     try {
+      if (this.outputStream == null) {
+        this.outputStream = new ByteArrayOutputStream
+          (this.contents != null ? this.contents.length : 1024);
+      }
       this.outputStream.write
         (_data, 0 /* start-idx */, _len < 0 ? _data.length : _len);
       return null; /* means: no error */
