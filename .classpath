@@ -21,5 +21,9 @@
 	<classpathentry exported="true" kind="lib" path="ThirdParty/jetty-util-6.1.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="ThirdParty/jfreechart-1.0.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="ThirdParty/sqlite-jdbc-3.8.6.jar"/>
+	<classpathentry kind="lib" path="ThirdParty/jetty-client-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="ThirdParty/jetty-util-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="ThirdParty/jetty-http-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="ThirdParty/jetty-io-9.2.15.v20160210.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

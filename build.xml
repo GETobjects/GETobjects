@@ -47,8 +47,8 @@
   <!-- global compile options -->
   <property name="compile.debug"     value="off" />
   <property name="compile.listfiles" value="false" />
-  <property name="compile.source"    value="1.6" />
-  <property name="compile.target"    value="1.6" />
+  <property name="compile.source"    value="1.7" />
+  <property name="compile.target"    value="1.7" />
   <presetdef name="javac">
     <javac includeantruntime="false"
            encoding="utf-8"
@@ -437,6 +437,19 @@
         <patternset refid="strip.manifest" />
       </zipfileset>
       <zipfileset src="${libs}/jetty-util-6.1.14.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+    	<!-- new Jetty for WOHTTPConnection -->
+      <zipfileset src="${libs}/jetty-client-9.2.15.v20160210.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/jetty-http-9.2.15.v20160210.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/jetty-io-9.2.15.v20160210.jar">
+        <patternset refid="strip.manifest" />
+      </zipfileset>
+      <zipfileset src="${libs}/jetty-util-9.2.15.v20160210.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Database adaptors
