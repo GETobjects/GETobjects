@@ -255,10 +255,13 @@ public class WOHTTPConnection extends NSObject {
       // save request for response
       this.request = _rq;
       this.contentResponse = rq.send();
+      if (this.contentResponse == null)
+        return false;
       return true;
     }
     catch (Exception e) {
-      log.error("sendRequest() failed: " + e);
+      log.error("sendRequest() for '" + this.url + 
+                "' [" + _rq.uri() + "] failed: " + e);
       return false;
     }
   }
@@ -290,7 +293,8 @@ public class WOHTTPConnection extends NSObject {
     }
     catch (Exception e) {
       r.setStatus(WOMessage.HTTP_STATUS_INTERNAL_ERROR);
-      log.error("readResponse() failed: " + e);
+      log.error("readResponse() for '" + this.url +
+                "' [" + this.request.uri() + "] failed: " + e);
     }
     this.contentResponse = null;
     return r;
