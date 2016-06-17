@@ -22,6 +22,9 @@ package org.getobjects.appserver.core;
 
 import java.net.URI;
 
+import org.getobjects.appserver.publisher.IGoCallable;
+import org.getobjects.appserver.publisher.IGoContext;
+
 /**
  * WORedirect
  * <p>
@@ -32,7 +35,7 @@ import java.net.URI;
  * Note: this only inherits from WOComponent for legacy reasons, no real
  * point in that?!
  */
-public class WORedirect extends WOComponent {
+public class WORedirect extends WOComponent implements IGoCallable {
   // TODO: support parameters, direct actions etc etc (WOLinkGenerator?)
 
   protected int    status = WOMessage.HTTP_STATUS_FOUND;
@@ -198,5 +201,15 @@ public class WORedirect extends WOComponent {
   public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     /* we handle no requests, we have no template */
     return null;
+  }
+
+
+  /* IGoCallable */
+
+  public boolean isCallableInContext(IGoContext _ctx) {
+    return true;
+  }
+  public Object callInContext(Object _object, IGoContext _ctx) {
+    return this;
   }
 }
