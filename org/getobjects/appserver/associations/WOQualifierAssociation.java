@@ -85,7 +85,8 @@ public class WOQualifierAssociation extends WOAssociation {
   
   @Override
   public boolean booleanValueInComponent(final Object _cursor) {
-    return ((EOQualifierEvaluation)this.qualifier).evaluateWithObject(_cursor);
+    EOQualifier q = this.qualifier.qualifierWithBindings(_cursor, true);
+    return ((EOQualifierEvaluation)q).evaluateWithObject(_cursor);
   }
   
   @Override
