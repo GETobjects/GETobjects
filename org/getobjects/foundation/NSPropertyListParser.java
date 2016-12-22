@@ -555,7 +555,7 @@ public class NSPropertyListParser extends NSObject {
 
     if (pos == this.len) { /* syntax error, quote not closed */
       this.idx = pos;
-      this.addException("quoted string not closed (expected '\"')");
+      this.addException("quoted string not closed (expected '" + quoteChar + "')");
       return null;
     }
 
@@ -728,7 +728,7 @@ public class NSPropertyListParser extends NSObject {
       }
       this.idx += 1; /* skip '=' */
       if (!this._skipComments()) {
-        this.addException("expected value after key '=' in dictionary");
+        this.addException("expected value after '=' in dictionary");
         didFail = true;
         break; /* unexpected EOF */
       }
@@ -765,7 +765,7 @@ public class NSPropertyListParser extends NSObject {
 
   protected List<Object> _parseArray() {
     if (this.isDebugOn)
-      this.log.debug("_parseAry(): pos=" + this.idx + ", len=" + this.len);
+      this.log.debug("_parseArray(): pos=" + this.idx + ", len=" + this.len);
 
     if (!this._skipComments()) {
       /* EOF reached during comment-skipping */
