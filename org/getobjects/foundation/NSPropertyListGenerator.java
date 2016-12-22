@@ -276,8 +276,8 @@ public class NSPropertyListGenerator extends NSObject {
     final int lastIdx = (_d.length - 1);
     for (int i = 0; i < _d.length; i++) {
       byte value = _d[i];
-      _sb.append(_hexChars[(int)(value >> 4) & 0x0F]);
-      _sb.append(_hexChars[(int)(value & 0x0F)]);
+      _sb.append(_hexChars[(value >> 4) & 0x0F]);
+      _sb.append(_hexChars[value & 0x0F]);
       if (((i + 1) % 4 == 0) && (i != lastIdx))
         _sb.append(' ');
     }
