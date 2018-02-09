@@ -170,7 +170,6 @@ public class GoSimpleJSONRenderer extends NSObject
 
   public static final String[] JSEscapeList = {
     "\\", "\\\\",
-    "'", "\\'",
     "\"", "\\\"",
     "\n", "\\n",
     "\b", "\\b",
