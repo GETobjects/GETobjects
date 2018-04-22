@@ -55,6 +55,32 @@ public class WORedirect extends WOComponent implements IGoCallable {
     super();
   }
 
+  /* helper */
+  
+  protected String getProtocolFromRequest(WORequest _rq) {
+
+    // see: https://tools.ietf.org/html/rfc7239
+    String forwarded = _rq.headerForKey("Forwarded");
+    if (forwarded != null) {
+      forwarded = forwarded.toLowerCase();
+      
+      String[] opts = forwarded.split(";");
+
+      for (int i = 0; i < opts.length; i++) {
+        String opt = opts[i].trim();
+        if (opt.startsWith("proto=") && opt.length() > 6)
+          return opt.substring(6);
+      }
+    }
+
+    // see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
+    String proto = _rq.headerForKey("X-Forwarded-Proto");
+    if (proto == null)
+      proto = _rq.headerForKey("X-Forwarded-Protocol");
+    return proto;
+  }
+
+
   /* accessors */
 
   /**
@@ -71,7 +97,7 @@ public class WORedirect extends WOComponent implements IGoCallable {
 
     if (_url.indexOf("://") < 0) {
       /* a relative url without a scheme, needs to be turned into proper URL */
-      final WOContext ctx   = this.context();
+      final WOContext ctx = this.context();
       if (ctx != null) {
         final WORequest rq    = ctx.request();
         String          rqUrl = rq.url();
@@ -80,6 +106,19 @@ public class WORedirect extends WOComponent implements IGoCallable {
           this.log().warn("request doesn't provide info about URL, falling " +
                           "back to URIs which isn't proper according to RFCs!");
           rqUrl = rq.uri();
+        }
+        else {
+          final String proto = getProtocolFromRequest(rq);
+          if (proto != null) {
+            int idx = rqUrl.indexOf("://");
+            if (idx != -1) {
+              final String urlProto = rqUrl.substring(0, idx);
+              if (!urlProto.equals(proto)) {
+                if (rqUrl.length() > (idx + 3))
+                  rqUrl = proto + "://" + rqUrl.substring(idx + 3);
+              }
+            }
+          }
         }
         final URI base  = URI.create(rqUrl);
         final URI redir = URI.create(_url);
