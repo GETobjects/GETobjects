@@ -268,6 +268,7 @@ public class EOEntity extends NSObject
     int attrCount = this.attributes    != null ? this.attributes.length    : 0;
     int relCount  = this.relationships != null ? this.relationships.length : 0;
     
+    // FIXME: Threading?
     this.classPropertyNames = new String[attrCount + relCount];
     if (attrCount > 0) {
       for (int i = 0; i < attrCount; i++) {
