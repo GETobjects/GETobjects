@@ -102,6 +102,6 @@ public class WOSearchField extends WOTextField {
     this.appendAssocToDescription(_d, "incremental", this.incremental);
     this.appendAssocToDescription(_d, "placeholder", this.placeholder);
     this.appendAssocToDescription(_d, "autosave",    this.autosave);
-    this.appendAssocToDescription(_d, "results",     this.incremental);
+    this.appendAssocToDescription(_d, "results",     this.results);
   }
 }

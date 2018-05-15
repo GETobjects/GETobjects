@@ -101,6 +101,7 @@ public abstract class WOLinkGenerator extends WOElement {
     if (_assocs.containsKey("actionClass"))      return true;
     if (_assocs.containsKey("pageName"))         return true;
     if (_assocs.containsKey("action"))           return true;
+    if (_assocs.containsKey("@action"))          return true;
     return false;
   }
   

@@ -90,6 +90,7 @@ public class WOTextField extends WOInput {
     this.readonly  = grabAssociation(_assocs, "readonly");
     this.size      = grabAssociation(_assocs, "size");
     this.trim      = grabAssociation(_assocs, "trim");
+    this.errorItem = grabAssociation(_assocs, "errorItem");
     this.formatter = WOFormatter.formatterForAssociations(_assocs);
   }
 
