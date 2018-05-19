@@ -102,6 +102,7 @@ public class WOCompoundElement extends WODynamicElement {
     for (WOElement element: this.children) {
       if (!_walker.processTemplate(this, element, _ctx))
         break;
+      _ctx.incrementLastElementIDComponent();
     }
     
     _ctx.deleteLastElementIDComponent();
