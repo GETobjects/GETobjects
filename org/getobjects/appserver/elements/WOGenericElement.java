@@ -193,7 +193,7 @@ public class WOGenericElement extends WOHTMLDynamicElement {
           condition = this.extraAttributePlusConditions.get(k);
         if (condition == null && this.extraAttributeMinusConditions != null) {
           condition = this.extraAttributeMinusConditions.get(k);
-          isPositive = false;
+          if (condition != null) isPositive = false;
         }
         
         /* check whether the condition is true */
