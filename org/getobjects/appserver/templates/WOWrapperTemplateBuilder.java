@@ -75,9 +75,9 @@ import org.getobjects.foundation.UString;
  * 
  * <h4>Element Wrapper Attributes</h4>
  * <pre>
- *   &ltwo:tag ... if="condition"&gt;    - WOConditional
- *   &ltwo:tag ... ifnot="condition"&gt; - WOConditional
- *   &ltwo:tag ... foreach="list"&gt;    - WORepetition
+ *   &lt;wo:tag ... if="condition"&gt;    - WOConditional
+ *   &lt;wo:tag ... ifnot="condition"&gt; - WOConditional
+ *   &lt;wo:tag ... foreach="list"&gt;    - WORepetition
  * </pre>
  *
  * <h4>WOHTMLParser vs WOWrapperTemplateBuilder</h4>

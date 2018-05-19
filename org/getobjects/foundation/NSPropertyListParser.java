@@ -38,13 +38,12 @@ import org.apache.commons.logging.LogFactory;
 /**
  * NSPropertyListParser
  * <p>
- * This class implements a parser for the old-style property list format. You
- * would not usually invoke it directly, but rather use the
+ * This class implements a parser for the old-style property list format. 
+ * You would not usually invoke it directly, but rather use the
  * {@link NSPropertyListSerialization} utility function class, eg:
  * <pre>
  *   Map person = NSPropertyListSerialization.dictionaryForString
  *     ("{ lastname = Duck; firstname = Donald; }");</pre>
- * </pre>
  *
  * <h4>Property Values</h4>
  * <p>
@@ -52,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
  * <ul>
  *   <li>String  (quoted like "Hello World" or unquoted like "Hello")
  *   <li>List    (eg: "( Hello, World, 15 )")
- *   <li>Map     (eg: "{ lastname = Duck; firstname = Donald; age = 100; }")
+ *   <li>Map     (eg: "{ lastname = Duck; age = 100; }")
  *   <li>Number  (eg: 100.00, -100.10)
  *   <li>Boolean (true,false,YES,NO)
  *   <li>byte[]  (eg: &lt;0fbd777 1c2735ae&gt;)
@@ -69,10 +68,11 @@ import org.apache.commons.logging.LogFactory;
  * process.
  */
 public class NSPropertyListParser extends NSObject {
-  // Note: this is a straight port of the ObjC parser and therefore somewhat
-  //       clumsy
+  // Note: this is a straight port of the ObjC parser and therefore 
+  //       somewhat clumsy
 
-  protected static Log plistLog = LogFactory.getLog("NSPropertyListParser");
+  protected static Log plistLog = 
+                         LogFactory.getLog("NSPropertyListParser");
   protected Log log; /* redefined by WODParser */
 
   protected NSPropertyListSyntaxException lastException;
@@ -85,8 +85,8 @@ public class NSPropertyListParser extends NSObject {
    * Whether or not to parse dictionary keys as value objects,
    * or as identifiers. Example:<pre>
    *   { 10 = Hello; 11 = World;</pre>
-   * With value keys enabled, 10 and 11 will be parsed a Number objects. If not,
-   * they are parsed as String keys.
+   * With value keys enabled, 10 and 11 will be parsed a Number objects. 
+   * If not, they are parsed as String keys.
    */
   protected boolean useValueKeys;
 
@@ -117,7 +117,7 @@ public class NSPropertyListParser extends NSObject {
     return o;
   }
 
-  /* some convenience methods (use NSPropertyListSerialization instead!) */
+  /* some convenience methods (use NSPropertyListSerialization!) */
 
   /**
    * Parses the given String as a property list.
@@ -141,8 +141,8 @@ public class NSPropertyListParser extends NSObject {
   }
 
   /**
-   * Parses the given byte array as a property list. This defaults to the UTF-8
-   * charset for decoding the byte buffer.
+   * Parses the given byte array as a property list. This defaults to the
+   * UTF-8 charset for decoding the byte buffer.
    *
    * @param _buf - a byte array to be parsed as a plist
    * @return the parsed property list object
@@ -181,8 +181,8 @@ public class NSPropertyListParser extends NSObject {
   };
 
   /**
-   * This method calls getContent() on the given URL and parses the result as
-   * a property list.
+   * This method calls getContent() on the given URL and parses the result
+   * as a property list.
    *
    * @param _url - the URL to parse from
    * @return a plist object, or null on error
@@ -211,7 +211,8 @@ public class NSPropertyListParser extends NSObject {
     if (o instanceof InputStream) // TODO: check charset header?
       return this.parse((InputStream)o);
 
-    this.log.error("don't know how to deal with URL content: " + o.getClass());
+    this.log.error("don't know how to deal with URL content: " + 
+                   o.getClass());
     return null;
   }
 
@@ -225,15 +226,16 @@ public class NSPropertyListParser extends NSObject {
    * @param _resourceName - name of the resource
    * @return a plist object, or null on error
    */
-  public static Object parse(final Class _baseClass, String _resourceName) {
+  public static Object parse(final Class _baseClass, String _resourceName)
+  {
     if (_baseClass == null || _resourceName == null)
       return null;
 
     if (_resourceName.lastIndexOf('.') == -1) _resourceName += ".plist";
     final URL url = _baseClass.getResource(_resourceName);
     if (url == null) {
-      plistLog.error("did not find resource in class " + _baseClass + " : " +
-                      _resourceName);
+      plistLog.error("did not find resource in class " + _baseClass +
+                     " : " + _resourceName);
       return null;
     }
 
@@ -448,7 +450,8 @@ public class NSPropertyListParser extends NSObject {
         s = ": " + s;
       }
 
-      this.addException("did not find an id (expected 'a-zA-Z0-0') at pos " +
+      this.addException(
+          "did not find an id (expected 'a-zA-Z0-0') at pos " +
           this.idx + s);
       return null;
     }
@@ -458,18 +461,20 @@ public class NSPropertyListParser extends NSObject {
   }
 
   /**
-   * This is called by _parseProperty if the property could not be identified
-   * as a primitive value (eg a Number or quoted String). Example:<pre>
+   * This is called by _parseProperty if the property could not be 
+   * identified as a primitive value (eg a Number or quoted String). 
+   * Example:<pre>
    *   person.address.street</pre>
    * But <em>NOT</em>:<pre>
    *   "person.address.street"</pre>
    *
    * <p>
-   * The method parses a set of identifiers (using _parseIdentifier()) which
-   * is separated by a dot.
+   * The method parses a set of identifiers (using _parseIdentifier()) 
+   * which is separated by a dot.
    *
    * <p>
-   * Its also called by the WOD parsers _parseAssociationProperty() method.
+   * Its also called by the WOD parsers _parseAssociationProperty() 
+   * method.
    *
    * @return the parsed String, eg "person.address.street"
    */
@@ -527,7 +532,8 @@ public class NSPropertyListParser extends NSObject {
     }
 
     final char quoteChar = this.buffer[this.idx];
-    if (quoteChar != '"' && quoteChar != '\'') { /* it's not a quoted string */
+    if (quoteChar != '"' && quoteChar != '\'') {
+      /* it's not a quoted string */
       this.addException("did not find a quoted string (expected '\"')");
       return null;
     }
@@ -555,7 +561,8 @@ public class NSPropertyListParser extends NSObject {
 
     if (pos == this.len) { /* syntax error, quote not closed */
       this.idx = pos;
-      this.addException("quoted string not closed (expected '" + quoteChar + "')");
+      this.addException("quoted string not closed (expected '" + 
+                        quoteChar + "')");
       return null;
     }
 
@@ -615,7 +622,7 @@ public class NSPropertyListParser extends NSObject {
       if (next != ' ') {
         final int nibbleValue = _valueOfHexChar(next);
         if (nibbleValue == -1) {
-          this.addException("unexpected character '" + next + "' in data!");
+          this.addException("unexpected character '"+next+"' in data!");
           return null;
         }
         if (!isLowNibble) {
@@ -664,7 +671,7 @@ public class NSPropertyListParser extends NSObject {
 
   protected Map<Object,Object> _parseDict() {
     if (this.isDebugOn)
-      this.log.debug("_parseDict(): pos=" + this.idx + ", len=" + this.len);
+      this.log.debug("_parseDict(): pos=" + this.idx + ", len="+this.len);
 
     /* skip comments and spaces */
     if (!this._skipComments()) {
@@ -687,7 +694,7 @@ public class NSPropertyListParser extends NSObject {
 
     if (this.buffer[this.idx] == '}') { /* an empty dictionary */
       this.idx += 1; /* skip the '}' */
-      return new HashMap<Object, Object>(0); // TODO: add an empty-map obj?
+      return new HashMap<Object, Object>(0); // TODO: add an emptymap obj?
     }
 
     final Map<Object, Object> result = new HashMap<Object, Object>(16);
@@ -722,7 +729,8 @@ public class NSPropertyListParser extends NSObject {
       }
       /* now we need a '=' assignment */
       if (this.buffer[this.idx] != '=') {
-        this.addException("expected '=' after key '" + key + "' in dictionary");
+        this.addException("expected '=' after key '" + key +
+                          "' in dictionary");
         didFail = true;
         break;
       }
@@ -750,7 +758,7 @@ public class NSPropertyListParser extends NSObject {
       }
       if (this.buffer[this.idx] == ';')
         this.idx += 1; /* skip ';' */
-      else { /* no ';' at end of pair, only allowed at end of dictionary */
+      else { /* no ; at end of pair, only allowed at end of dictionary */
         if (this.buffer[this.idx] != '}') { /* dictionary wasn't closed */
           this.addException("key-value pair without ';' at the end");
           didFail = true;
@@ -765,7 +773,7 @@ public class NSPropertyListParser extends NSObject {
 
   protected List<Object> _parseArray() {
     if (this.isDebugOn)
-      this.log.debug("_parseArray(): pos=" + this.idx + ", len=" + this.len);
+      this.log.debug("_parseArray(): pos=" + this.idx +", len="+this.len);
 
     if (!this._skipComments()) {
       /* EOF reached during comment-skipping */
@@ -773,7 +781,7 @@ public class NSPropertyListParser extends NSObject {
       return null;
     }
 
-    if (this.buffer[this.idx] != '(') { /* it's not an array that follows */
+    if (this.buffer[this.idx] != '(') { /* it's not an array */
       this.addException("did not find array (expected '(')");
       return null;
     }
@@ -826,7 +834,8 @@ public class NSPropertyListParser extends NSObject {
         break;
       }
 
-      if (this.buffer[this.idx] == ')') { /* closed array, like this '(1,2,)' */
+      if (this.buffer[this.idx] == ')') { 
+        /* closed array, like this '(1,2,)' */
         this.idx += 1; /* skip ')' */
         break;
       }
@@ -847,7 +856,9 @@ public class NSPropertyListParser extends NSObject {
     return new Double(_digitPath);
   }
 
-  protected static boolean _ucIsEqual(final char[] _buf, int _pos, String _s) {
+  protected static boolean _ucIsEqual(final char[] _buf, int _pos,
+                                      String _s) 
+  {
     final int len = _s.length();
     if (_buf.length < (_pos + len))
       return false;
@@ -859,8 +870,8 @@ public class NSPropertyListParser extends NSObject {
   }
 
   /**
-   * Parse an arbitary property value. This is called by the top-level, its
-   * called for array elements and for dictionary values.
+   * Parse an arbitary property value. This is called by the top-level,
+   * it is called for array elements and for dictionary values.
    * Its called for dictionary keys if <code>useValueKeys</code> is true.
    * <p>
    * The method first skips comments and then checks the first char of the
@@ -870,10 +881,12 @@ public class NSPropertyListParser extends NSObject {
    *   <li>'{' will trigger _parseDict()
    *   <li>'(' will trigger _parseArray()
    *   <li>'&lt;' will trigger _parseData()
-   *   <li>if it starts with a digit or '-', attempt to parse it as a number
+   *   <li>if it starts with a digit or '-', attempt to parse it as a 
+   *       number
    *     (but could be a String like 001.html). If the parsing succeeds
    *     (no NumberFormatException), a Number will be returned
-   *   <li>"YES", "NO", "true", "false" - will be returned as Boolean objects
+   *   <li>"YES", "NO", "true", "false" - will be returned as Boolean 
+   *       objects
    *   <li>"null", "nil" - will be returned as Java null
    *   <li>all other Strings will trigger _parseKeyPath()
    * </ul>
@@ -882,9 +895,9 @@ public class NSPropertyListParser extends NSObject {
    */
   protected Object _parseProperty() {
     /*
-     * TODO: I think this one needs a bit of work. Its derived from the wod
-     *       parser and contains stuff which we don't really need. Eg that
-     *       valueProperty thing (we always parse values?).
+     * TODO: I think this one needs a bit of work. Its derived from the
+     *       wod parser and contains stuff which we don't really need.
+     *       Eg that valueProperty thing (we always parse values?).
      */
     boolean valueProperty = true;
     Object  result = null;
@@ -915,7 +928,8 @@ public class NSPropertyListParser extends NSObject {
 
       default:
         if (Character.isDigit(c) || (c == '-')) {
-          final String digitPath = this._parseKeyPath(); // TODO: why is this?
+          final String digitPath = this._parseKeyPath();
+            // TODO: why is this?
 
           try {
             result = _parseDigitPath(digitPath);
@@ -932,7 +946,8 @@ public class NSPropertyListParser extends NSObject {
           if (c == 'Y' || c == 'N' || c == 't' || c == 'f' || c == 'n') {
             // Note: we do not allow a space behind a const, eg '= true ;'
             /* parse YES and NO, true and false */
-            if (_ucIsEqual(this.buffer, this.idx, "YES") && _isBreakCharAt(3)) {
+            if (_ucIsEqual(this.buffer, this.idx, "YES") && 
+                _isBreakCharAt(3)) {
               result        = Boolean.TRUE;
               valueProperty = true;
               this.idx += 3;
@@ -969,7 +984,8 @@ public class NSPropertyListParser extends NSObject {
             }
           }
 
-          if (!valueProperty) /* this means: did not match a constant yet */
+          if (!valueProperty)
+            /* this means: did not match a constant yet */
             // TODO: should be renamed "parseUnquotedString"? This is a
             //       leftover from the .wod parser
             result = this._parseKeyPath();

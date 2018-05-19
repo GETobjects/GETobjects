@@ -99,7 +99,7 @@ public class WOStylesheet extends WOHTMLDynamicElement {
   public void appendStyleTagToResponse(WOResponse _r, WOContext _ctx) {
     Object cursor = _ctx.cursor();
     
-    /* open scripttag */
+    /* open style tag */
 
     _r.appendBeginTag("style");
     _r.appendAttribute("type", "text/css");
@@ -119,7 +119,7 @@ public class WOStylesheet extends WOHTMLDynamicElement {
     
     /* tag content */
     
-    /* scriptFile first, because its usually some kind of library(s) */
+    /* cssFile first, because its usually some kind of library(s) */
     if (this.cssFile != null) {
       Object v = this.cssFile.valueInComponent(cursor);
       
@@ -168,7 +168,7 @@ public class WOStylesheet extends WOHTMLDynamicElement {
       }
     }
     
-    /* close script tag */
+    /* close style tag */
     
     if (this.template != null)
       this.template.appendToResponse(_r, _ctx);
