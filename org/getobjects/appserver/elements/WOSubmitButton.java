@@ -115,13 +115,11 @@ public class WOSubmitButton extends WOInput {
         return null;
     }
 
-    String oldId = null;
     String lid = _ctx.elementID();
     Object v = this.eid != null ? this.eid.valueInComponent(cursor) : null;
     if (v instanceof Boolean) /* in this mode we just expose the ID in HTML */
       ;
     else if (v != null) {
-      oldId = lid;
       lid = v.toString();
     }
 
@@ -149,9 +147,6 @@ public class WOSubmitButton extends WOInput {
     }
     else
       result = null;
-    
-    if (oldId != null)
-      _ctx._setElementID(oldId);
     
     return result;
   }
