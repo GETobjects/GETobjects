@@ -56,6 +56,7 @@ import org.getobjects.appserver.core.WOResponse;
  *   value     [in] - byte array?</pre>
  */
 public class WOBody extends WOHTMLDynamicElement {
+  // FIXME: rewrite to use WOLinkGenerator
 
   protected WOAssociation filename;
   protected WOAssociation framework;

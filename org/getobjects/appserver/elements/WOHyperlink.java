@@ -212,8 +212,7 @@ public class WOHyperlink extends WOHTMLDynamicElement {
       else
         log.error("no action configured for link invocation");
     }
-    
-    if (!isActive) {
+    else {
       if (this.template != null)
         return this.template.invokeAction(_rq, _ctx);
     }

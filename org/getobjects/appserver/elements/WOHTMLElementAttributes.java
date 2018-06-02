@@ -205,6 +205,8 @@ public class WOHTMLElementAttributes extends WODynamicElement {
          */
         continue;
       }
+
+      // FIXME: I think the 'remove' is b0rked? It would need to add up?
       
       /* this is to detect bugs */
       boolean isOk;

@@ -223,9 +223,9 @@ public abstract class WOAssociation extends NSObject
   }
 
   /**
-   * Create an WOAssociation object for the given namespace prefix. This is
-   * called when the parser encounters element attributes in the HTML file,
-   * its not called from the WOD parse.
+   * Create an WOAssociation object for the given namespace prefix. This
+   * is called when the parser encounters element attributes in the HTML
+   * file, it is not called from the WOD parser.
    * <p>
    * Prefixes:
    * <ul>

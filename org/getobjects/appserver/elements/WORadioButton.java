@@ -203,7 +203,7 @@ public class WORadioButton extends WOInput {
     }
     else {
       /* if the button isn't handled by the page but by some DirectAction or
-       * other script, its not an error not to have those bindings
+       * other script, it is not an error not to have those bindings
        */
       log.info("no selection or checked binding set for radio button");
     }
