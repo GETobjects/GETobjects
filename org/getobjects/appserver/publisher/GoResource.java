@@ -80,6 +80,10 @@ public class GoResource extends WOElement implements IGoObject {
       mimeType = "image/jpeg";
     else if (ext.equals("html"))
       mimeType = "text/html";
+    else if (ext.equals("woff"))
+      mimeType = "font/woff";
+    else if (ext.equals("woff2"))
+      mimeType = "font/woff2";
     else
       log.error("MIME type unknown for extension '" + ext + "': " + _path);
 
