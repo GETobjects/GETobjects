@@ -85,6 +85,7 @@ public class NSKeyValueStringFormatter extends NSObject {
      *   <li>an Integer is parsed as an index, eg %(2)s => array[2]
      * </ul>
      */
+    @Override
     public Object valueForKey(final String _key) {
       Object value = null;
 
@@ -125,6 +126,7 @@ public class NSKeyValueStringFormatter extends NSObject {
         this.object = _object;
     }
 
+    @Override
     public Object valueForKey(String _key) {
       if (_key == null) {
         log.error("missing keypath for %(key)s style format!");
