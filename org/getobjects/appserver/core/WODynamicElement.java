@@ -17,13 +17,14 @@
   License along with Go; see the file COPYING.  If not, write to the
   Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
   02111-1307, USA.
-*/
+ */
 package org.getobjects.appserver.core;
 
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.associations.WOValueAssociation;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 
 /**
@@ -33,7 +34,7 @@ import org.getobjects.foundation.NSKeyValueStringFormatter;
  * template. Subclasses MUST NOT store any processing state in instance
  * variables because they can be accessed concurrently by multiple threads and
  * even by one thread.
- * 
+ *
  * <h4>Extra Bindings</h4>
  * <p>
  * This element also tracks 'extra bindings'. Those are bindings which where
@@ -54,60 +55,70 @@ import org.getobjects.foundation.NSKeyValueStringFormatter;
 public abstract class WODynamicElement extends WOElement {
   // TBD: pregenerate HTML for constant extra attributes (otherTagString?)
   protected static final Log delog = LogFactory.getLog("WODynamicElement");
-  
+
   protected WOAssociation   otherTagString;
   protected String[]        extraKeys;
   protected WOAssociation[] extraValues;
 
   public WODynamicElement
-    (String _name, Map<String,WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String,WOAssociation> _assocs, final WOElement _template)
   {
   }
-  
+
   /* helpers */
-  
+
   public static WOAssociation grabAssociation
-    (final Map<String,WOAssociation> _assocs, final String _name)
+    (final Map<String, WOAssociation> _assocs, final String _name)
+  {
+    return grabAssociation(_assocs, _name, null);
+  }
+
+  public static WOAssociation grabAssociation
+    (final Map<String, WOAssociation> _assocs, final String _name,
+     final Object _defaultValue)
   {
     if (_assocs == null)
       return null;
-    
+
     final WOAssociation assoc = _assocs.get(_name);
-    if (assoc == null)
-      return null;
-    
+    if (assoc == null) {
+      if (_defaultValue == null)
+        return null;
+      return new WOValueAssociation(_defaultValue);
+    }
+
     _assocs.remove(_name);
     return assoc;
   }
-  
+
   /* accessors */
-  
+
   public Log log() {
     return delog;
   }
-  
+
   /**
    * Usually called by the WOWrapperTemplateBuilder to apply bindings which
    * did not get grabbed in the constructor of the element.
-   * 
+   *
    * @param _attrs - the bindings map (often empty)
    */
   public void setExtraAttributes(final Map<String, WOAssociation> _attrs) {
     if (delog.isDebugEnabled())
       delog.debug("setting extra attributes: " + _attrs);
-    
+
     this.extraKeys   = null;
     this.extraValues = null;
-    
+
     this.otherTagString = grabAssociation(_attrs, "otherTagString");
-    
+
     int extraCount;
     if (_attrs != null && (extraCount = _attrs.size()) > 0) {
       this.extraKeys   = new String[extraCount];
       this.extraValues = new WOAssociation[extraCount];
-      
+
       int i = 0;
-      for (String key: _attrs.keySet()) {
+      for (final String key: _attrs.keySet()) {
         this.extraKeys[i]   = key;
         if ((this.extraValues[i] = _attrs.get(key)) == null)
           delog.warn("missing association for extra binding: " + key);
@@ -115,41 +126,41 @@ public abstract class WODynamicElement extends WOElement {
       }
     }
   }
-  
-  
+
+
   /* response */
-  
+
   /**
    * Calls the broader appendExtraAttributesToResponse() with the cursor()
    * of the context as the pattern object.
-   * 
+   *
    * @param _response - the WOResponse
    * @param _ctx      - the WOContext
    */
   public void appendExtraAttributesToResponse
-    (final WOResponse _response, final WOContext _ctx)
+  (final WOResponse _response, final WOContext _ctx)
   {
     if (this.extraKeys == null)
       return;
-    
+
     this.appendExtraAttributesToResponse(_response, _ctx, null /* patobject */);
   }
-  
+
   /**
    * The method walks over all 'extraKeys'. If the key starts with a '%'
    * sign, the value of the key is treated as pattern for the
    * NSKeyValueStringFormatter.format() function.
-   * 
+   *
    * @param _r - the WOResponse
    * @param _c - the WOContext
    * @param _patObject - the pattern object, usually the active WOComponent
    */
   public void appendExtraAttributesToResponse
-    (final WOResponse _r, final WOContext _c, Object _patObject)
+  (final WOResponse _r, final WOContext _c, Object _patObject)
   {
     if (this.extraKeys == null)
       return;
-    
+
     /* we could probably improve the speed of the pattern processor ... */
     final Object cursor = _c != null ? _c.cursor() : null;
     if (_patObject == null) _patObject = cursor;
@@ -157,7 +168,7 @@ public abstract class WODynamicElement extends WOElement {
       String v = this.extraValues[i].stringValueInComponent(cursor);
       if (v == null)
         continue;
-      
+
       // TBD: I don't think this makes a lot of sense? Either the whole value is
       //      always a pattern or not? (better not?!)
       if (this.extraKeys[i].charAt(0) == '%') {
@@ -168,25 +179,25 @@ public abstract class WODynamicElement extends WOElement {
         _r.appendAttribute(this.extraKeys[i], v);
     }
   }
-  
-  
+
+
   /* description */
-  
+
   /**
    * Utility function to add WOAssociation ivar info to a description string.
    * Example:<pre>
    *   this.appendAssocToDescription(_d, "id", this.idBinding);</pre>
-   * 
+   *
    * @param _d    - the String to add the description to
    * @param _name - name of the binding
    * @param _a    - WOAssociation object used as the binding value
    */
   public static void appendBindingToDescription
-    (final StringBuilder _d, final String _name, final WOAssociation _a)
+  (final StringBuilder _d, final String _name, final WOAssociation _a)
   {
     if (_a == null)
       return;
-    
+
     _d.append(' ');
     _d.append(_name);
     _d.append('=');
@@ -196,11 +207,11 @@ public abstract class WODynamicElement extends WOElement {
       _d.append(_a);
       return;
     }
-    
+
     /* constant assocs */
-    
+
     Object v = _a.valueInComponent(null);
-    
+
     if (v != null) {
       _d.append('"');
       if (v instanceof String) {
@@ -214,7 +225,7 @@ public abstract class WODynamicElement extends WOElement {
       _d.append(" null");
   }
   public static void appendBindingsToDescription
-    (final StringBuilder _d, final Object ... _nameAssocPairs)
+  (final StringBuilder _d, final Object ... _nameAssocPairs)
   {
     if (_nameAssocPairs == null)
       return;
@@ -223,14 +234,14 @@ public abstract class WODynamicElement extends WOElement {
           (String)_nameAssocPairs[i - 1], (WOAssociation)_nameAssocPairs[i]);
     }
   }
-  
+
   public void appendAssocToDescription
-    (final StringBuilder _d, final String _name, final WOAssociation _a)
+  (final StringBuilder _d, final String _name, final WOAssociation _a)
   {
     appendBindingToDescription(_d, _name, _a);
   }
   public void appendAssocsToDescription
-    (final StringBuilder _d, final Object ... _nameAssocPairs)
+  (final StringBuilder _d, final Object ... _nameAssocPairs)
   {
     if (_nameAssocPairs == null)
       return;
