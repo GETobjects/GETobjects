@@ -28,6 +28,7 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
+import org.getobjects.appserver.elements.WOHTMLElementAttributes;
 
 /**
  * WELinkToRemote
@@ -85,22 +86,30 @@ public class WELinkToRemote extends WEPrototypeElement {
   protected WOAssociation fragmentIdentifier;
   protected WOElement     template;
   protected WOElement     onClick;
+  protected WOElement     coreAttributes;
 
   public WELinkToRemote
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs,
+     final WOElement _template)
   {
     super(_name, _assocs, _template);
 
     this.string   = grabAssociation(_assocs, "string");
     this.fragmentIdentifier = grabAssociation(_assocs, "fragmentIdentifier");
     this.onClick  = new WELinkToRemoteScript(_name + "Script", _assocs, null);
+
+    /* core attributes, those do .class and !style binding handling */
+
+    this.coreAttributes =
+      WOHTMLElementAttributes.buildIfNecessary(_name + "_core", _assocs);
+
     this.template = _template;
   }
 
   /* handle requests */
 
   @Override
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     /* links can take form values !!!! (for query-parameters) */
 
     if (this.onClick != null)
@@ -111,7 +120,7 @@ public class WELinkToRemote extends WEPrototypeElement {
   }
 
   @Override
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     if (_ctx.elementID().equals(_ctx.senderID())) {
       if (this.onClick != null)
         return this.onClick.invokeAction(_rq, _ctx);
@@ -129,7 +138,7 @@ public class WELinkToRemote extends WEPrototypeElement {
   /* generate response */
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled()) {
       if (this.template != null)
         this.template.appendToResponse(_r, _ctx);
@@ -140,7 +149,7 @@ public class WELinkToRemote extends WEPrototypeElement {
 
     _r.appendBeginTag("a");
     if (this.fragmentIdentifier != null) {
-      Object cursor = _ctx.cursor();
+      final Object cursor = _ctx.cursor();
       _r.appendAttribute("href", "#" +
           this.fragmentIdentifier.stringValueInComponent(cursor));
     }
@@ -149,6 +158,9 @@ public class WELinkToRemote extends WEPrototypeElement {
     }
 
     this.onClick.appendToResponse(_r, _ctx);
+    if (this.coreAttributes != null)
+      this.coreAttributes.appendToResponse(_r, _ctx);
+
     this.appendExtraAttributesToResponse(_r, _ctx);
     // TODO: otherTagString
     _r.appendBeginTagEnd();
@@ -159,7 +171,7 @@ public class WELinkToRemote extends WEPrototypeElement {
       this.template.appendToResponse(_r, _ctx);
 
     if (this.string != null) {
-      Object cursor = _ctx.cursor();
+      final Object cursor = _ctx.cursor();
       _r.appendContentHTMLString(this.string.stringValueInComponent(cursor));
     }
 
