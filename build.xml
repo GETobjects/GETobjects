@@ -49,13 +49,17 @@
   <property name="compile.listfiles" value="false" />
   <property name="compile.source"    value="1.7" />
   <property name="compile.target"    value="1.7" />
+  <!--  see http://openjdk.java.net/jeps/247 -->
+  <property name="compile.release"   value="7" />
+  
   <presetdef name="javac">
     <javac includeantruntime="false"
            encoding="utf-8"
            debug="${compile.debug}"
            listfiles="${compile.listfiles}"
-           target="${compile.target}"
            source="${compile.source}"
+           target="${compile.target}"
+           release="${compile.release}"
     />
   </presetdef>
 
@@ -230,8 +234,9 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
     >
+      <compilerarg value="-Xlint:-options"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <classpath  refid="build.classpath" />
-
       <patternset refid="foundation"  />
       <patternset refid="eoaccess"    />
       <patternset refid="eocontrol"   />
@@ -244,8 +249,9 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
     >
+      <compilerarg value="-Xlint:-options"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <classpath  refid="build.classpath" />
-
       <patternset refid="appserver"    />
       <patternset refid="jaas"         />
       <patternset refid="jmi"          />
@@ -270,6 +276,8 @@
     <javac srcdir="${src}"
            destdir="${bin.jetty}"
     >
+      <compilerarg value="-Xlint:-options"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <classpath refid="build.classpath" />
       <patternset refid="jetty" />
     </javac>
@@ -279,6 +287,8 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
     >
+      <compilerarg value="-Xlint:-options"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <classpath refid="build.classpath" />
       <patternset refid="servlets" />
     </javac>
@@ -288,6 +298,8 @@
     <javac srcdir="${src}"
            destdir="${bin.core}"
     >
+      <compilerarg value="-Xlint:-options"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <classpath refid="build.classpath" />
       <patternset refid="samples" />
     </javac>
