@@ -21,19 +21,19 @@ public class <#get var:value="templateClassName" /> extends EOActiveRecord {
 <#for var:item="attribute" var:list="attributes">
   protected <#get var:value="attributeJavaType" /> <#get var:value="attributeJavaName" />;</#for>
 
-  public <#get var:value="templateClassName" />(EODatabase _database, String _name) {
+  public <#get var:value="templateClassName" />(final EODatabase _database, final String _name) {
     super(_database, _name);
   }
 
-  public <#get var:value="templateClassName" />(EODatabase _database, EOEntity _entity) {
+  public <#get var:value="templateClassName" />(final EODatabase _database, final EOEntity _entity) {
     super(_database, _entity);
   }
 
-  public <#get var:value="templateClassName" />(EOEntity _entity) {
+  public <#get var:value="templateClassName" />(final EOEntity _entity) {
     super(_entity);
   }
 
-  public <#get var:value="templateClassName" />(EODatabase _database) {
+  public <#get var:value="templateClassName" />(final EODatabase _database) {
     super(_database);
   }
 
@@ -45,7 +45,7 @@ public class <#get var:value="templateClassName" /> extends EOActiveRecord {
   /**<#for var:item="comment" var:list="attributeComments">
     * <#get var:value="comment" /></#for>
     */</#if>
-  public void set<#get var:value="attributeJavaCapsedName" />(<#get var:value="attributeJavaType" /> _<#get var:value="attributeJavaName" />) {
+  public void set<#get var:value="attributeJavaCapsedName" />(final <#get var:value="attributeJavaType" /> _<#get var:value="attributeJavaName" />) {
     this.<#get var:value="attributeJavaName" /> = _<#get var:value="attributeJavaName" />;
   }
   public <#get var:value="attributeJavaType" /> <#get var:value="attributeJavaName" />() {
@@ -62,11 +62,11 @@ public class <#get var:value="templateClassName" /> extends EOActiveRecord {
 <#if var:condition="hasFetchSpecs">  /* Fetchspecs */
 <#for var:item="fetchSpecName" var:list="fetchSpecNames">
   @SuppressWarnings("unchecked")
-  public static <#get var:value="fetchResultJavaType" escapeHTML="NO" /> <#get var:value="fetchSpecName" />(EODatabase _db<#for var:item="bindingKey" var:list="fetchSpec.qualifier.bindingKeys">, Object _<#get var:value="bindingKey" /></#for>) {
-    EOEntity e  = _db.model().entityNamed("<#get var:value="className" />");
+  public static <#get var:value="fetchResultJavaType" escapeHTML="NO" /> <#get var:value="fetchSpecName" />(final EODatabase _db<#for var:item="bindingKey" var:list="fetchSpec.qualifier.bindingKeys">, final Object _<#get var:value="bindingKey" /></#for>) {
+    final EOEntity e  = _db.model().entityNamed("<#get var:value="className" />");
     EOFetchSpecification fs = e.fetchSpecificationNamed("<#get var:value="fetchSpecName" />");<#if var:condition="fetchSpec.qualifier.bindingKeys">
     fs = fs.fetchSpecificationWithQualifierBindings(<#for var:item="bindingKey" var:list="fetchSpec.qualifier.bindingKeys" separator=", ">"<#get var:value="bindingKey" />", _<#get var:value="bindingKey" /></#for>);</#if>
-    List result = _db.objectsWithFetchSpecification(fs);<#if var:condition="isFetchResultJavaTypeGeneric">
+    final List result = _db.objectsWithFetchSpecification(fs);<#if var:condition="isFetchResultJavaTypeGeneric">
     return result;</#if><#if var:condition="isFetchResultJavaTypeGeneric" negate="YES">
     if (org.getobjects.foundation.UObject.isEmpty(result)) return null;
     <#if var:condition="canOptimizeRawFetchResult">return org.getobjects.foundation.UList.valuesForKey(result, "<#get var:value="rawFetchResultSingleAttributeKey" />");</#if><#if var:condition="canOptimizeRawFetchResult" negate="YES">return (<#get var:value="fetchResultJavaType" escapeHTML="NO" />)org.getobjects.foundation.UObject.extractValue(result);</#if></#if>
