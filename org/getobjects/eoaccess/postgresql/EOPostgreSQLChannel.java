@@ -23,7 +23,6 @@ package org.getobjects.eoaccess.postgresql;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -50,9 +49,10 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
   }
   
   /* process columns */
-  
+
+  @Override
   protected Object handleColumnValue
-    (final ResultSetMetaData _meta, final int _coltype, final Object _value)
+    (final String _colName, final int _coltype, final Object _value)
   {
     if (_coltype == 1111) {
       /* _aclitem
