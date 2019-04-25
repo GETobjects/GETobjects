@@ -33,6 +33,8 @@ import org.getobjects.eoaccess.EOAdaptorChannel;
 import org.getobjects.eoaccess.EOAttribute;
 import org.getobjects.eoaccess.EOEntity;
 import org.getobjects.eoaccess.EOSQLExpression;
+import org.getobjects.foundation.UList;
+import org.postgresql.jdbc.PgArray;
 
 /**
  * EOPostgreSQLChannel
@@ -62,7 +64,15 @@ public class EOPostgreSQLChannel extends EOAdaptorChannel {
        */
       return decodeAclItem(_value.toString());
     }
-    
+    else if (_value instanceof PgArray) {
+      try {
+        return UList.asList(((PgArray)_value).getArray());
+      }
+      catch (final SQLException e) {
+        log.error("could not convert PgArray to Java array", e);
+        return _value;
+      }
+    }
     return _value;
   }
 
