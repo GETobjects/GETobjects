@@ -357,7 +357,7 @@ public class EOActiveRecord extends EOCustomObject
   }
 
   @Override
-  public void removeObjectToBothSidesOfRelationshipWithKey
+  public void removeObjectFromBothSidesOfRelationshipWithKey
     (final EORelationshipManipulation _eo, final String _key)
   {
     if (_eo == null || _key == null)

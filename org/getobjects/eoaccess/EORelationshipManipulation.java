@@ -48,6 +48,6 @@ public interface EORelationshipManipulation {
   public void addObjectToBothSidesOfRelationshipWithKey
     (EORelationshipManipulation _eo, String _key);
   
-  public void removeObjectToBothSidesOfRelationshipWithKey
+  public void removeObjectFromBothSidesOfRelationshipWithKey
     (EORelationshipManipulation _eo, String _key);
 }

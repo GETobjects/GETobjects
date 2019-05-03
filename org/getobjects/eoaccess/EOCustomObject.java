@@ -251,7 +251,7 @@ public class EOCustomObject extends NSObject
      */
     this.addObjectToPropertyWithKey(_eo, _key);
   }
-  public void removeObjectToBothSidesOfRelationshipWithKey
+  public void removeObjectFromBothSidesOfRelationshipWithKey
     (final EORelationshipManipulation _eo, final String _key)
   {
     /* Note: we don't know the EOEntity here, so we can't access the inverse
