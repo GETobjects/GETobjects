@@ -44,7 +44,7 @@ import org.getobjects.appserver.core.WOResponse;
  * to ensure a proper component state setup. If you wish, you can further
  * reduce processing overhead using WOConditionals in appropriate places (if
  * you know that those sections do not matter for processing)
- * 
+ *
  * <p>
  * Fragments can be nested. WOFragment sections _never_ disable rendering or
  * change template control flow, they only enable rendering when fragment ids
@@ -66,7 +66,7 @@ import org.getobjects.appserver.core.WOResponse;
  *   onlyOnMatch [in] - boolean      enable/disable processing for other frags
  *   elementName [in] - string       optional name of container element
  *   TBD: wrong?[all other bindings are extra-attrs for elementName]
- *   
+ *
  * </pre>
  */
 public class WOFragment extends WODynamicElement {
@@ -77,24 +77,31 @@ public class WOFragment extends WODynamicElement {
   protected WOAssociation eid;
   protected WOAssociation onlyOnMatch;
   protected WOAssociation elementName;
+  protected WOElement     coreAttributes;
 
   public WOFragment
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
-    
+
     this.name        = grabAssociation(_assocs, "name");
     this.eid         = grabAssociation(_assocs, "id");
     this.onlyOnMatch = grabAssociation(_assocs, "onlyOnMatch");
     this.elementName = grabAssociation(_assocs, "elementName");
+
+    /* core attributes, those do .class and !style binding handling */
+
+    this.coreAttributes =
+      WOHTMLElementAttributes.buildIfNecessary(_name + "_core", _assocs);
+
     this.template    = _template;
-    
+
     if (this.name == null)
       log.warn("no fragment name is set!");
   }
-  
+
   /* support */
-  
+
   protected boolean isFragmentActiveInContext(final WOContext _ctx) {
     final boolean debugOn = log.isDebugEnabled();
     final String rqFragID = _ctx.fragmentID();
@@ -102,28 +109,28 @@ public class WOFragment extends WODynamicElement {
       if (debugOn) log.debug("no fragmentID set in context, we are active.");
       return true;
     }
-    
-    final String fragName = (this.name == null) 
+
+    final String fragName = (this.name == null)
       ? _ctx.elementID()
       : this.name.stringValueInComponent(_ctx.cursor());
     if (fragName == null) { /* we have no fragid in the current state */
       if (debugOn) log.debug("could not determine fragment-id of element");
       return true;
     }
-    
+
     if (!rqFragID.equals(fragName)) {
       if (debugOn)
         log.debug("fragment ID did not match: " + rqFragID + " vs " + fragName);
       return false;
     }
-    
+
     if (debugOn)
-      log.debug("fragment ID matched: " + rqFragID + " vs " + fragName); 
+      log.debug("fragment ID matched: " + rqFragID + " vs " + fragName);
     return true;
   }
-  
+
   /* request handling */
-  
+
   @Override
   public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     if (this.template == null)
@@ -134,7 +141,7 @@ public class WOFragment extends WODynamicElement {
     else if (!this.onlyOnMatch.booleanValueInComponent(_ctx.cursor()))
       this.template.takeValuesFromRequest(_rq, _ctx);
     else if (this.isFragmentActiveInContext(_ctx))
-      this.template.takeValuesFromRequest(_rq, _ctx);      
+      this.template.takeValuesFromRequest(_rq, _ctx);
   }
 
   @Override
@@ -143,13 +150,13 @@ public class WOFragment extends WODynamicElement {
       return null;
 
     final String rqFragID = _ctx.fragmentID();
-    
+
     if (this.onlyOnMatch == null || rqFragID == null)
       return this.template.invokeAction(_rq, _ctx);
-      
+
     if (!this.onlyOnMatch.booleanValueInComponent(_ctx.cursor()))
       return this.template.invokeAction(_rq, _ctx);
-    
+
     if (this.isFragmentActiveInContext(_ctx))
       return this.template.invokeAction(_rq, _ctx);
 
@@ -165,21 +172,21 @@ public class WOFragment extends WODynamicElement {
     final Object  cursor       = _ctx.cursor();
     final boolean wasDisabled  = _ctx.isRenderingDisabled();
     final boolean isFragActive = this.isFragmentActiveInContext(_ctx);
-    boolean doRender = true;     
-    
+    boolean doRender = true;
+
     if (!isFragActive) {
       /* we are not active (no match) */
       if (this.onlyOnMatch != null)
         doRender = !this.onlyOnMatch.booleanValueInComponent(cursor);
     }
-    
+
     if (debugOn) {
-      log.debug("render fragment: active=" + isFragActive + 
+      log.debug("render fragment: active=" + isFragActive +
           ", render=" + doRender + ", wasoff=" + wasDisabled);
     }
-    
+
     /* enable rendering if we are active */
-    
+
     if (isFragActive && wasDisabled) {
       _ctx.enableRendering();
       if (debugOn) log.debug("  enabled rendering ...");
@@ -190,20 +197,20 @@ public class WOFragment extends WODynamicElement {
       else
         log.debug("  rendering was on.");
     }
-    
+
     /* start container element if we have no frag */
 
     String en = null;
     if (!wasDisabled && this.elementName != null)
       en = this.elementName.stringValueInComponent(cursor);
-    
+
     if (en != null) {
       String leid;
-      
+
       _r.appendBeginTag(en);
-      
+
       /* add id of fragment element */
-      
+
       if (this.eid != null)
         leid = this.eid.stringValueInComponent(cursor);
       else if (this.name != null)
@@ -211,13 +218,16 @@ public class WOFragment extends WODynamicElement {
       else
         leid = _ctx.elementID();
       if (leid != null) _r.appendAttribute("id", leid);
-      
+
+      if (this.coreAttributes != null)
+        this.coreAttributes.appendToResponse(_r, _ctx);
+
       /* additional bindings not specifically tracked by the element*/
       this.appendExtraAttributesToResponse(_r, _ctx);
-      
+
       _r.appendBeginTagEnd();
     }
-    
+
     /* do content */
 
     if (doRender && this.template != null) {
@@ -226,12 +236,12 @@ public class WOFragment extends WODynamicElement {
     }
 
     /* close tag if we have one */
-      
+
     if (en != null)
       _r.appendEndTag(en);
-    
+
     /* reestablish old rendering state */
-    
+
     if (isFragActive && wasDisabled) {
       _ctx.disableRendering();
       if (debugOn) log.debug("disabled rendering.");
