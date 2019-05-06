@@ -457,7 +457,11 @@ public class EOEntity extends NSObject
 
   public EOFetchSpecification fetchSpecificationNamed(final String _name) {
     if (_name == null) return null;
-    if (this.fetchSpecifications == null) return null;
+    if (this.fetchSpecifications == null) {
+      log.warn("no EOFetchSpecification named '" + _name + "' found " +
+               "for EOEntity '" + this.name() + "'");
+      return null;
+    }
     return this.fetchSpecifications.get(_name);
   }
 
