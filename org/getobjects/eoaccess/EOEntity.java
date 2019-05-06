@@ -47,7 +47,7 @@ import org.getobjects.foundation.UString;
  * Entity objects can be 'pattern' objects. That is, they can be incomplete and
  * may need to be 'filled' by querying the database information schema. This can
  * involve incomplete attribute sets or a pattern name.
- *  
+ *
  * @see EOModel
  * @see EOActiveDataSource
  */
@@ -75,33 +75,35 @@ public class EOEntity extends NSObject
   protected EOQualifier      restrictingQualifier;
   protected Map<String, EOFetchSpecification> fetchSpecifications;
   protected Map<String, EOAdaptorOperation[]> adaptorOperations;
-  
+
   /* patterns */
-  
+
   protected boolean isExternalNamePattern = false;
-  
+
   /* constructor */
-  
+
   public static EOEntity patternEntityForExternalNameLike
     (final String _pat, final EOAttribute[] _attrs)
   {
-    EOEntity entity = new EOEntity();
+    final EOEntity entity = new EOEntity();
     entity.externalName          = _pat;
     entity.isExternalNamePattern = true;
     entity.attributes            = _attrs;
     return entity;
   }
-  
+
   protected EOEntity() {
   }
-  
+
   public EOEntity
-    (String _name,
-     String _tableName, boolean _tableNameIsPattern, String _schemaName,
-     String _clsname, String _dataSourceClassName,
-     EOAttribute[] _attrs, String[] _primaryKeys, EORelationship[] _rels,
-     Map<String, EOFetchSpecification> _fspecs,
-     Map<String, EOAdaptorOperation[]> _ops)
+    (final String _name,
+     final String _tableName, final boolean _tableNameIsPattern,
+     final String _schemaName,
+     final String _clsname, final String _dataSourceClassName,
+     final EOAttribute[] _attrs, final String[] _primaryKeys,
+     final EORelationship[] _rels,
+     final Map<String, EOFetchSpecification> _fspecs,
+     final Map<String, EOAdaptorOperation[]> _ops)
   {
     this.name                     = _name;
     this.externalName             = _tableName;
@@ -112,41 +114,41 @@ public class EOEntity extends NSObject
     this.relationships            = _rels;
     this.fetchSpecifications      = _fspecs;
     this.adaptorOperations        = _ops;
-    
+
     this.isExternalNamePattern = _tableNameIsPattern;
   }
-  
+
   /* accessors */
 
   public String name() {
     return this.name;
   }
-  
+
   /**
    * Returns the external name of the entity. Usually the database specific
    * table name (eg t_person for the Persons entity).
-   * 
+   *
    * @return the table name
    */
   public String externalName() {
     return this.externalName;
   }
-  
+
   /**
    * Returns true if the tablename is a pattern, eg "users*". This is used to
    * use the same EOEntity definition with multiple (usually dynamic) tables
    * (user01, user02, ...)
-   * 
+   *
    * @return true if the external name is a pattern
    */
   public boolean hasExternalNamePattern() {
     return this.isExternalNamePattern;
   }
-  
+
   /**
    * Returns the name of the SQL92 schema the external name lives in. Eg the
    * default schema for PostgreSQL is 'public'.
-   * 
+   *
    * @return the name of the schema
    */
   public String schemaName() {
@@ -159,7 +161,7 @@ public class EOEntity extends NSObject
   public String dataSourceClassName() {
     return this.dataSourceClassName;
   }
-  
+
   public void setRestrictingQualifier(final EOQualifier _q) {
     // TBD: remove setter method and move parameter to constructor
     this.restrictingQualifier = _q;
@@ -168,71 +170,71 @@ public class EOEntity extends NSObject
     /* this is processed by EOSQLExpression */
     return this.restrictingQualifier;
   }
-  
+
   public boolean isReadOnly() {
     return this.isReadOnly;
   }
-  
-  
+
+
   /* attributes */
-  
+
   /**
    * NOT IMPLEMENTED
    */
   public Exception addAttribute(final EOAttribute _attr) {
     if (_attr == null)
       return null; /* nothing to be done (EOF throws an exception) */
-    
+
     if (this.attributeNamed(_attr.name()) != null)
       return new NSException("attribute with that name is already set");
 
     // TBD: array add/delete ops in UList?
     return new NSException("not implemented");
   }
-  
+
   public EOAttribute attributeNamed(final String _name) {
     // TBD: optimize, used quite often. Eg we might want to take hashes. Also
     //      optimize for misses
     if (_name == null) return null;
     if (this.attributes == null) return null;
-    
+
     // TODO: we might want to check for keypathes?
-    
+
     for (int i = 0; i < this.attributes.length; i++) {
       if (_name.equals(this.attributes[i].name()))
         return this.attributes[i];
-    }    
+    }
     return null;
   }
   public EOAttribute firstAttributeWithColumnName(final String _colName) {
     if (_colName == null) return null;
     if (this.attributes == null) return null;
-    
+
     // TODO: we might want to check for keypathes?
-    
+
     for (int i = 0; i < this.attributes.length; i++) {
       if (_colName.equals(this.attributes[i].columnName()))
         return this.attributes[i];
-    }    
+    }
     return null;
   }
-  
+
   /**
    * Returns all EOAttributes of the entity. This includes attributes which are
    * not exposed as a part of the EO (eg sometimes foreign keys are hidden).
    * Not really used in Go yet ...
-   * 
+   *
    * @return an array of EOAttribute's
    */
   public EOAttribute[] attributes() {
     return this.attributes;
   }
-  
-  public EOAttribute[] attributesWithNames(String[] _names) {
+
+  public EOAttribute[] attributesWithNames(final String[] _names) {
     if (_names == null || this.attributes == null)
       return null;
-    
-    EOAttribute[] attrs = new EOAttribute[_names.length];
+
+    final EOAttribute[] attrs = new EOAttribute[_names.length];
     for (int i = 0; i < _names.length; i++) {
       /* we trim it, better for loaded attributes, but we might want to move
        * the trimming to the loader itself
@@ -241,11 +243,11 @@ public class EOEntity extends NSObject
       if (attrs[i] == null)
         log.warn("did not find attribute " + _names[i] + " in entity: " + this);
     }
-    
+
     return attrs;
   }
-  
-  
+
+
   /**
    * Returns the names of class property attributes and relationships. Those are
    * attributes which are exposed as a part of the EO.
@@ -253,7 +255,7 @@ public class EOEntity extends NSObject
    * The class properties are a subset of the attributes and relship arrays. Eg
    * in regular EOF applications you would not expose database specific details
    * like primary and foreign keys as class properties.
-   * 
+   *
    * @return an array of property names
    */
   public String[] classPropertyNames() {
@@ -261,13 +263,15 @@ public class EOEntity extends NSObject
       return this.classPropertyNames;
     if (this.attributes == null && this.relationships == null)
       return null;
-    
+
     // TODO: currently we treat all attributes as class properties, could be a
     //       subset
-    
-    int attrCount = this.attributes    != null ? this.attributes.length    : 0;
-    int relCount  = this.relationships != null ? this.relationships.length : 0;
-    
+
+    final int attrCount = this.attributes    != null ? this.attributes.length
+                                                     : 0;
+    final int relCount  = this.relationships != null ? this.relationships.length
+                                                     : 0;
+
     // FIXME: Threading?
     this.classPropertyNames = new String[attrCount + relCount];
     if (attrCount > 0) {
@@ -279,21 +283,21 @@ public class EOEntity extends NSObject
     }
     for (int i = 0; i < relCount; i++)
       this.classPropertyNames[attrCount + i] = this.relationships[i].name();
-    
+
     return this.classPropertyNames;
   }
-  
+
   /**
    * Returns the EOAttribute or EORelationship class property with the given
    * name.
    * Note that this ONLY returns class properties, no attributes which are not
    * marked as such (though usually all are ;-).
-   * 
+   *
    * @param  _name - name of the class property
    * @return the EOAttribute or EORelationship, or null if the name is no prop
    */
   public EOProperty classPropertyNamed(final String _name) {
-    String[] pns = this.classPropertyNames(); // ensure the array is built
+    final String[] pns = this.classPropertyNames(); // ensure the array is built
     if (pns != null) {
       // TBD: optimize scan, we might want to store hashes
       boolean found = false;
@@ -305,40 +309,40 @@ public class EOEntity extends NSObject
       }
       if (!found) return null; /* not a class property */
     }
-    
+
     /* lookup property object */
-    
-    EOProperty prop = this.attributeNamed(_name);
+
+    final EOProperty prop = this.attributeNamed(_name);
     if (prop != null) return prop;
 
     return this.relationshipNamed(_name);
   }
-  
-  
+
+
   /**
    * Returns the attributes which are used for optimistic locking. Those are
    * checked for changes when an UPDATE is attempted in the database.
    * For example in OGo we only need the 'objectVersion' as a change marker.
-   * 
+   *
    * @return array of EOAttributes which are used for optimistic locking
    */
   public EOAttribute[] attributesUsedForLocking() {
     return this.attributesUsedForLocking;
   }
-  
-  
+
+
   /* primary keys */
-  
+
   public String[] primaryKeyAttributeNames() {
     return this.primaryKeyAttributeNames;
   }
   public EOAttribute[] primaryKeyAttributes() {
     return this.attributesWithNames(this.primaryKeyAttributeNames());
   }
-  
+
   /**
-   * Extracts the primary key values contained in the given row (usually a Map). 
-   * 
+   * Extracts the primary key values contained in the given row (usually a Map).
+   *
    * @param  _row - a row
    * @return a Map contained the keys/values of the primary keys
    */
@@ -348,62 +352,62 @@ public class EOEntity extends NSObject
       log.warn("got no row to calculate primary key!");
       return null;
     }
-    
-    Map<String, Object> pkey = NSKeyValueCodingAdditions.Utility.valuesForKeys
+
+    final Map<String, Object> pkey = NSKeyValueCodingAdditions.Utility.valuesForKeys
       (_row, this.primaryKeyAttributeNames);
-    
+
     if (pkey == null || pkey.size() == 0) {
-      log.warn("could not calculate primary key (" + 
+      log.warn("could not calculate primary key (" +
                this.primaryKeyAttributeNames + ") from row: " + _row);
       return null;
     }
-    
+
     return pkey;
   }
-  
+
   public EOQualifier qualifierForPrimaryKey(final Object _object) {
     /* we do KVC on the row, so it can be any kind of object */
     final Map<String, Object> pkey = this.primaryKeyForRow(_object);
     if (pkey == null) return null;
-    
+
     return EOQualifier.qualifierToMatchAllValues(pkey);
   }
-  
+
   public EOGlobalID globalIDForRow(final Map<String, Object> _row) {
     final int count = (this.primaryKeyAttributeNames == null)
       ? 0 : this.primaryKeyAttributeNames.length;
     if (count == 0)
       return null;
-    
+
     boolean hadNonNull = false;
     final Object[] keyValues = new Object[count];
     for (int i = 0; i < count; i++) {
       if ((keyValues[i] = _row.get(this.primaryKeyAttributeNames[i])) != null)
         hadNonNull = true;
     }
-    
+
     if (!hadNonNull) {
       log.error("found no primary key value in row, entity: " + this +
           ", row: " + _row);
       return null;
     }
-    
+
     final String ename = this.name();
     if (ename == null) {
       log.error("detected EOEntity w/o name?: " + this);
       return null;
     }
-    
+
     return EOKeyGlobalID.globalIDWithEntityName(ename, keyValues);
   }
-  
-  
+
+
   /* relationships */
-  
+
   /**
    * Returns the EORelationship object for the relationship with the given name.
    * The name can be a keypath, for example 'employments.person'.
-   * 
+   *
    * @param _name - the name of the relationship, eg 'employments'
    * @return the matching EORelationship object or null
    */
@@ -412,81 +416,81 @@ public class EOEntity extends NSObject
     //      optimize for misses
     if (_name == null) return null;
     if (this.relationships == null) return null;
-    
+
     // TODO: we might want to check for keypathes? Yes, definitely!
-    int dotIdx = _name.indexOf('.');
+    final int dotIdx = _name.indexOf('.');
     if (dotIdx >= 0) {
       /* OK, is a keypath, like "employments.person" */
       if (dotIdx == 0)
         return this.relationshipNamed(_name.substring(dotIdx + 1));
-      
-      EORelationship rel = this.relationshipNamed(_name.substring(0, dotIdx));
+
+      final EORelationship rel = this.relationshipNamed(_name.substring(0, dotIdx));
       if (rel == null) return null;
-      
-      EOEntity dest = rel.destinationEntity();
+
+      final EOEntity dest = rel.destinationEntity();
       if (dest == null) return null;
-      
+
       return dest.relationshipNamed(_name.substring(dotIdx + 1));
     }
-    
+
     for (int i = 0; i < this.relationships.length; i++) {
       if (_name.equals(this.relationships[i].name()))
         return this.relationships[i];
-    }    
+    }
     return null;
   }
 
   public EORelationship[] relationships() {
     return this.relationships;
   }
-  
+
   public void connectRelationshipsInModel(final EOModel _model) {
     if (this.relationships == null)
       return;
-    
+
     for (int i = 0; i < this.relationships.length; i++)
       this.relationships[i].connectRelationshipsInModel(_model, this);
   }
-  
-  
+
+
   /* fetch specifications */
-  
+
   public EOFetchSpecification fetchSpecificationNamed(final String _name) {
     if (_name == null) return null;
     if (this.fetchSpecifications == null) return null;
     return this.fetchSpecifications.get(_name);
   }
-  
+
   public String[] fetchSpecificationNames() {
     if (this.fetchSpecifications == null) return null;
-    return this.fetchSpecifications.keySet().toArray(new String[0]); 
+    return this.fetchSpecifications.keySet().toArray(new String[0]);
   }
-  
+
   /* fetch specifications */
-  
+
   public EOAdaptorOperation[] adaptorOperationsNamed(final String _name) {
     if (_name == null) return null;
     if (this.adaptorOperations == null) return null;
     return this.adaptorOperations.get(_name);
   }
-  
+
   public String[] adaptorOperationNames() {
     if (this.adaptorOperations == null) return null;
-    return this.adaptorOperations.keySet().toArray(new String[0]); 
+    return this.adaptorOperations.keySet().toArray(new String[0]);
   }
-  
-  
+
+
   /* containment */
-  
+
   /**
    * Checks whether the given EOAttribute or EORelationship is managed by this
    * object.
-   * 
+   *
    * @param _property - an EOAttribute or EORelationship
    */
   public boolean referencesProperty(final Object _property) {
     if (_property == null) return false;
-    
+
     if (_property instanceof EOAttribute) {
       if (this.attributes != null) {
         for (int i = 0; i < this.attributes.length; i++) {
@@ -510,8 +514,8 @@ public class EOEntity extends NSObject
       }
     }
     else if (_property instanceof String) {
-      String propName = (String)_property;
-      
+      final String propName = (String)_property;
+
       if (this.attributeNamed(propName) != null)
         return true;
       if (this.relationshipNamed(propName) != null)
@@ -519,23 +523,23 @@ public class EOEntity extends NSObject
     }
     else
       log.error("unexpected key in referencesProperty(): " + _property);
-    
+
     return false;
   }
-  
+
   /* pattern models */
-  
+
   public boolean isPatternEntity() {
     if (this.isExternalNamePattern)
       return true;
-    
+
     if (this.attributes != null) {
       for (int i = 0; i < this.attributes.length; i++) {
         if (this.attributes[i].isPatternAttribute())
           return true;
       }
     }
-    
+
     if (this.relationships != null) {
       for (int i = 0; i < this.relationships.length; i++) {
         if (this.relationships[i].isPatternRelationship())
@@ -544,13 +548,13 @@ public class EOEntity extends NSObject
     }
     return false;
   }
-  
+
   public boolean addEntitiesMatchingTableNamesToList
-    (List<EOEntity> _entities, String[] _tableNames)
+    (final List<EOEntity> _entities, final String[] _tableNames)
   {
     if (_tableNames == null || _entities == null)
       return false;
-    
+
     if (!this.isExternalNamePattern) {
       /* check whether we are contained */
       for (int i = 0; i < _tableNames.length; i++) {
@@ -561,34 +565,34 @@ public class EOEntity extends NSObject
       }
       return false;
     }
-    
+
     /* OK, now we need to evaluate the pattern and clone ourselves */
-    
+
     for (int i = 0; i < _tableNames.length; i++) {
       if (!this.doesExternalNameMatchPattern(_tableNames[i]))
         continue;
-      
-      EOEntity entity = this.cloneForExternalName(_tableNames[i]);
+
+      final EOEntity entity = this.cloneForExternalName(_tableNames[i]);
       if (entity != null)
         _entities.add(entity);
     }
     return true;
   }
-  
-  public boolean doesExternalNameMatchPattern(String _tableName) {
+
+  public boolean doesExternalNameMatchPattern(final String _tableName) {
     if (_tableName == null)
       return false;
     if (!this.isExternalNamePattern)
       return _tableName.equals(this.externalName);
-    
+
     // TODO: fix pattern handling, properly process '*' etc
     return this.externalName.contains(_tableName);
   }
-  
-  public EOEntity cloneForExternalName(String _extName) {
+
+  public EOEntity cloneForExternalName(final String _extName) {
     // TBD: should we add the schema as a parameter?
     // TBD: document who calls this
-    EOEntity newEntity =
+    final EOEntity newEntity =
       new EOEntity(_extName /* entity name */,
                    _extName /* table name */,
                    false    /* not a table pattern */,
@@ -601,72 +605,72 @@ public class EOEntity extends NSObject
     newEntity.isReadOnly = this.isReadOnly;
     return newEntity;
   }
-  
-  public EOEntity resolveEntityPatternWithModel(EOModel _storedModel) {
+
+  public EOEntity resolveEntityPatternWithModel(final EOModel _storedModel) {
     if (!this.isPatternEntity())
       return this;
-    
+
     /* lookup peer entity in database model */
-    
-    EOEntity storedEntity =
+
+    final EOEntity storedEntity =
       _storedModel.firstEntityWithExternalName(this.externalName());
     if (storedEntity == null) {
       log.error("database model contains no peer for pattern entity: " + this);
       return null;
     }
-    
+
     /* first evaluate column patterns */
-    
-    List<EOAttribute> resolvedList =
-      new ArrayList<EOAttribute>(this.attributes.length);
-    
+
+    final List<EOAttribute> resolvedList =
+      new ArrayList<>(this.attributes.length);
+
     /* now lets each entity produce a clone for the given table */
     for (int i = 0; i < this.attributes.length; i++) {
       this.attributes[i].addAttributesMatchingAttributesToList
         (resolvedList, storedEntity.attributes, this);
     }
-    
+
     /* fill column attributes */
-    
+
     for (int i = 0; i < resolvedList.size(); i++) {
-      EOAttribute attribute = resolvedList.get(i);
+      final EOAttribute attribute = resolvedList.get(i);
       if (!attribute.isPatternAttribute())
         continue;
-      
-      String      colName    = attribute.columnName();
+
+      final String colName = attribute.columnName();
       EOAttribute storedAttr = null;
-      
+
       if (colName != null)
         storedAttr = storedEntity.firstAttributeWithColumnName(colName);
-      
+
       if (storedAttr == null) /* try to lookup using name */
         storedAttr = storedEntity.attributeNamed(attribute.name());
-      
+
       if (storedAttr == null) {
         log.error("database model contains no peer for attribute: " +attribute);
         return null;
       }
-      
-      EOAttribute newAttribute =
+
+      final EOAttribute newAttribute =
         attribute.resolveAttributePatternWithAttribute(storedAttr);
       if (attribute == null) {
         log.error("database model could not resolve attribute: " + attribute);
         return null;
       }
-      
+
       if (newAttribute.isPatternAttribute()) {
         log.warn("attribute is still a pattern after resolve:\n  a: " +
                  attribute +
                  "\n  s: " + storedAttr);
       }
-      
+
       resolvedList.set(i, newAttribute);
     }
-    
-    EOAttribute[] lAttrs = resolvedList.toArray(new EOAttribute[0]);
-    
+
+    final EOAttribute[] lAttrs = resolvedList.toArray(new EOAttribute[0]);
+
     /* derive information from the peer */
-    
+
     String lName    = this.name;
     String lTable   = this.externalName;
     String lSchema  = this.schemaName;
@@ -678,31 +682,31 @@ public class EOEntity extends NSObject
     if (lClass   == null) lClass   = storedEntity.className();
     if (lDSClass == null) lDSClass = storedEntity.dataSourceClassName();
     if (lName    == null) lName  = lTable; /* reuse tablename as entity name */
-    
+
     String[] pkeys = this.primaryKeyAttributeNames;
     if (pkeys == null) pkeys = storedEntity.primaryKeyAttributeNames();
-    
+
     // recalculate those, later we might want to join them when available
-    String[] props = null;
-    
+    final String[] props = null;
+
     // TODO: this would probably need some more work
     EORelationship[] rels = null;
     if (rels == null) rels = storedEntity.relationships();
-    
+
     EOAttribute[] lockAttrs = this.attributesUsedForLocking;
     if (lockAttrs == null) lockAttrs = storedEntity.attributesUsedForLocking();
-    
+
     // not derived:
     //   restrictingQualifier
     //   fetchSpecifications
-    
+
     /* construct */
-    
-    EOEntity newEntity = new EOEntity
+
+    final EOEntity newEntity = new EOEntity
       (lName, lTable, false /* not a pattern */, lSchema, lClass, lDSClass,
        lAttrs, pkeys, this.relationships,
        this.fetchSpecifications, this.adaptorOperations);
-    
+
     newEntity.attributesUsedForLocking = lockAttrs;
     newEntity.restrictingQualifier     = this.restrictingQualifier;
     newEntity.classPropertyNames       = props;
@@ -712,32 +716,32 @@ public class EOEntity extends NSObject
       log.warn("entity is still a pattern after resolve: " + newEntity +
                ", stored: " + storedEntity);
     }
-    
+
     return newEntity;
   }
-  
-  
+
+
   /* naming conventions */
-  
+
   public static String nameForExternalName
-    (String _s, String _sep, boolean _capitalizeFirstChar)
+    (final String _s, final String _sep, final boolean _capitalizeFirstChar)
   {
     if (_s == null) return null;
-    
-    char[] chars = _s.toCharArray();
+
+    final char[] chars = _s.toCharArray();
     if (chars.length == 0) return "";
-    
-    char[] nchars = new char[chars.length];
+
+    final char[] nchars = new char[chars.length];
     int    j      = 0;
-    
+
     boolean newWord = _capitalizeFirstChar;
-    
+
     for (int i = 0; i < chars.length; i++) {
       if (Character.isWhitespace(chars[i]) || chars[i] == '_') {
         newWord = true;
         continue;
       }
-      
+
       if (newWord) {
         nchars[j] = Character.toUpperCase(chars[i]);
         j++;
@@ -754,17 +758,17 @@ public class EOEntity extends NSObject
   public void beautifyNames() {
     /*
      * Capitalize string, remove spaces and underlines.
-     * 
+     *
      * Eg: person_address => PersonAddress
      */
-    
+
     if (!this.isExternalNamePattern) {
-      this.name = EOEntity.nameForExternalName(this.externalName, "_", 
+      this.name = EOEntity.nameForExternalName(this.externalName, "_",
                                                true /* first char caps */);
     }
-    
+
     /* beautify attributes */
-    
+
     if (this.attributes != null) {
       for (int i = 0; i < this.attributes.length; i++)
         this.attributes[i].beautifyNames();
@@ -775,29 +779,30 @@ public class EOEntity extends NSObject
         this.relationships[i].beautifyNames();
     }
   }
-  
-  
+
+
   /* EOSQLExpression.SQLValue interface, called by EOSQLExpression */
-  
-  public String valueForSQLExpression(EOSQLExpression _expression) {
+
+  @Override
+  public String valueForSQLExpression(final EOSQLExpression _expression) {
     String sql = this.externalName();
-    
+
     if (_expression != null)
       sql = _expression.sqlStringForSchemaObjectName(sql);
-    
+
     if (this.schemaName != null && this.schemaName.length() > 0) {
       String schema = this.schemaName;
       if (_expression != null)
         schema = _expression.sqlStringForSchemaObjectName(schema);
       sql = schema + "." + sql;
     }
-    
+
     return sql;
   }
-  
-  
+
+
   /* description */
-  
+
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
@@ -812,10 +817,10 @@ public class EOEntity extends NSObject
       _d.append(" class='" + this.className + "'");
     if (this.dataSourceClassName != null)
       _d.append(" datasource='" + this.dataSourceClassName + "'");
-    
+
     if (this.isPatternEntity())
       _d.append(" pattern");
-    
+
     if (this.attributes == null || this.attributes.length == 0)
       _d.append(" no-attributes");
     else {
@@ -826,7 +831,7 @@ public class EOEntity extends NSObject
       }
       _d.append("}");
     }
-    
+
     if (this.relationships == null || this.relationships.length == 0)
       _d.append(" no-relships");
     else {
@@ -837,7 +842,7 @@ public class EOEntity extends NSObject
       }
       _d.append("}");
     }
-    
+
     if (this.adaptorOperations != null) {
       _d.append(" ops=");
       _d.append(this.adaptorOperationNames());
