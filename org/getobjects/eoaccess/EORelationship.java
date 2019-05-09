@@ -53,6 +53,17 @@ public class EORelationship extends EOProperty implements EOExpressionEvaluation
     this.isToMany              = _isToMany;
   }
 
+  public EORelationship
+    (final String _name, final boolean _isToMany,
+     final EOEntity _src, final String _dest, final String _relationshipPath)
+  {
+    this.name                  = _name;
+    this.entity                = _src;
+    this.destinationEntityName = _dest;
+    this.relationshipPath      = _relationshipPath;
+    this.isToMany              = _isToMany;
+  }
+
   /* accessors */
 
   /**

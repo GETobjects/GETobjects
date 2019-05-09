@@ -554,13 +554,18 @@ public class EOModelLoader extends NSObject {
     }
     // TODO: join subelements
 
+    s = _node.getAttribute("definition");
+    final String relPath = UObject.isNotEmpty(s) ? s : null;
+
     /* construct */
 
-    EORelationship rel = new EORelationship
-      (name, isToMany, null /* entity */, destEntity, joins);
-    return rel;
-  }
+    if (joins != null)
+      return new EORelationship(name, isToMany, null /* entity */, destEntity,
+                                joins);
 
+    return new EORelationship(name, isToMany, null /* entity */, destEntity,
+                              relPath);
+  }
 
   /* fetch specifications */
 
