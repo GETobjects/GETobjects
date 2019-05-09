@@ -540,7 +540,7 @@ public class EOModelLoader extends NSObject {
     /* join attribute */
 
     s = _node.getAttribute("join");
-    String[] parts = s != null ? s.split(",") : null;
+    final String[] parts = UObject.isNotEmpty(s) ? s.split(",") : null;
     EOJoin[] joins = null;
 
     if (parts != null && parts.length == 1) {
