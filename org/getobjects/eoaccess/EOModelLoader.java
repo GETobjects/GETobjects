@@ -45,9 +45,11 @@ import org.xml.sax.SAXParseException;
 /**
  * Loads the XML representation of an EOModel. You should not use this class
  * directly but rather load the model using EOModel.loadModel();
- * 
+ *
  * <p>
- * Example XML model file:<pre>
+ * Example XML model file:
+ *
+ * <pre>
  * &lt;?xml version="1.0" encoding="utf-8"?&gt;
  * &lt;model version="1.0"&gt;
  *   &lt;entity name="ACLEntries" table="object_acl" primarykey="id"
@@ -56,7 +58,7 @@ import org.xml.sax.SAXParseException;
  *     &lt;attribute name="id"          column="object_acl_id" type="INT" /&gt;
  *     &lt;attribute name="objectId"    column="object_id"     type="INT" /&gt;
  *     &lt;attribute name="principalId" column="auth_id"       type="INT" /&gt;
- *     
+ *
  *     &lt;to-one name="team" to="Teams" join="principalId,id" /&gt;
  *
  *    &lt;fetch name="authzCountFetch" flags="readonly,rawrows,allbinds"&gt;
@@ -67,7 +69,8 @@ import org.xml.sax.SAXParseException;
  *      &lt;/sql&gt;
  *    &lt;/fetch&gt;
  *   &lt;/entity&gt;
- * &lt;/model&gt;</pre>
+ * &lt;/model&gt;
+ * </pre>
  */
 public class EOModelLoader extends NSObject {
   // TBD: document format
@@ -104,17 +107,19 @@ public class EOModelLoader extends NSObject {
    * Handle the "model" tag.
    * <p>
    * Attributes:
+   *
    * <pre>
    *   version
    *   schema  - String - the default schema
    * </pre>
    *
    * Children:
+   *
    * <pre>
    *   element tags
    * </pre>
    */
-  protected EOModel loadModelFromElement(Element _node) {
+  protected EOModel loadModelFromElement(final Element _node) {
     if (_node == null) {
       this.addError("got no model node for parsing");
       return null;
@@ -126,19 +131,19 @@ public class EOModelLoader extends NSObject {
 
     /* process model attributes */
 
-    String modelVersion = _node.getAttribute("version");
-    String schemaName   = _node.getAttribute("schema");
-    Map<String, Object> modelOpts = new HashMap<String, Object>(2);
-    modelOpts.put("version",       modelVersion);
+    final String modelVersion = _node.getAttribute("version");
+    final String schemaName = _node.getAttribute("schema");
+    final Map<String, Object> modelOpts = new HashMap<>(2);
+    modelOpts.put("version", modelVersion);
     modelOpts.put("defaultSchema", schemaName);
 
     /* process entities */
 
     EOEntity[] entities = null;
 
-    NodeList entityNodes = _node.getElementsByTagName("entity");
+    final NodeList entityNodes = _node.getElementsByTagName("entity");
     if (entityNodes != null && entityNodes.getLength() > 0) {
-      int entityCount = entityNodes.getLength();
+      final int entityCount = entityNodes.getLength();
       entities = new EOEntity[entityCount];
       for (int i = 0; i < entityCount; i++) {
         entities[i] =
@@ -162,9 +167,9 @@ public class EOModelLoader extends NSObject {
        *   </model>
        */
 
-      EOAttribute[] patternAttributes = new EOAttribute[1];
+      final EOAttribute[] patternAttributes = new EOAttribute[1];
       patternAttributes[0] =
-        EOAttribute.patternAttributeForColumnWithNameLike("*");
+          EOAttribute.patternAttributeForColumnWithNameLike("*");
       if (patternAttributes[0] == null) {
         this.addError("could not construct a-pattern");
         return null;
@@ -179,11 +184,12 @@ public class EOModelLoader extends NSObject {
       }
     }
 
-    EOModel model = new EOModel(entities);
+    final EOModel model = new EOModel(entities);
     model.connectRelationships();
     return model;
   }
-  protected EOModel loadModelFromDocument(Document _doc) {
+
+  protected EOModel loadModelFromDocument(final Document _doc) {
     return this.loadModelFromElement(_doc.getDocumentElement());
   }
 
@@ -191,6 +197,7 @@ public class EOModelLoader extends NSObject {
    * Handle the "entity" tag.
    * <p>
    * Attributes:
+   *
    * <pre>
    *   name          - String - name of entity
    *   table         - String
@@ -206,6 +213,7 @@ public class EOModelLoader extends NSObject {
    * </pre>
    *
    * Child elements:
+   *
    * <pre>
    *   "attribute" tags
    *   "to-one"    tags
@@ -215,7 +223,7 @@ public class EOModelLoader extends NSObject {
    * </pre>
    */
   protected EOEntity loadEntityFromElement
-    (Element _node, Map<String, Object> _modelOpts)
+    (final Element _node, final Map<String, Object> _modelOpts)
   {
     if (_node == null)
       return null;
@@ -224,11 +232,11 @@ public class EOModelLoader extends NSObject {
       return null;
     }
 
-    EOAttribute[] attrs = this.loadAttributesFromElement(_node);
+    final EOAttribute[] attrs = this.loadAttributesFromElement(_node);
     if (attrs == null)
       return null;
 
-    EORelationship[] relships = this.loadRelationshipsFromElement(_node);
+    final EORelationship[] relships = this.loadRelationshipsFromElement(_node);
 
     /* determine attributes */
 
@@ -237,7 +245,7 @@ public class EOModelLoader extends NSObject {
     String entityName  = _node.getAttribute("name");
     String className   = _node.getAttribute("class");
     String dsClassName = _node.getAttribute("datasource");
-    String eQualifier  = _node.getAttribute("restrictingQualifier");
+    final String eQualifier = _node.getAttribute("restrictingQualifier");
 
     boolean tableNameIsPattern = false;
     if (tableName == null || tableName.length() == 0) {
@@ -287,31 +295,34 @@ public class EOModelLoader extends NSObject {
       log.warn("no primary key found for Entity named " + entityName);
 
     Boolean readonly = this.getBoolAttribute(_node, "readonly");
-    String  flagSet  = _node.getAttribute("flags");
+    final String flagSet = _node.getAttribute("flags");
     if (flagSet != null && flagSet.length() > 0) {
-      if (readonly == null) readonly = flagSet.contains("readonly");
+      if (readonly == null)
+        readonly = flagSet.contains("readonly");
     }
 
     // TODO: process restricting qualifier
 
     /* load fetch specifications and adaptor ops */
 
-    Map<String, EOFetchSpecification> fspecs =
+    final Map<String, EOFetchSpecification> fspecs =
       this.loadFetchSpecificationsFromElement(entityName, _node);
 
-    Map<String, EOAdaptorOperation[]> ops =
+    final Map<String, EOAdaptorOperation[]> ops =
       this.loadAdaptorOperationsFromElement(entityName, _node);
 
     /* construct */
 
-    EOEntity entity =
+    final EOEntity entity =
       new EOEntity(entityName, tableName, tableNameIsPattern, schemaName,
-                   className, dsClassName,
-                   attrs, pkeys, relships, fspecs, ops);
-    if (readonly   != null) entity.isReadOnly = readonly;
+                   className, dsClassName, attrs, pkeys,
+                   relships, fspecs, ops);
+    if (readonly != null)
+      entity.isReadOnly = readonly;
 
     if (eQualifier != null) {
-      EOQualifier q = EOQualifier.qualifierWithQualifierFormat(eQualifier);
+      final EOQualifier q = EOQualifier
+          .qualifierWithQualifierFormat(eQualifier);
       entity.setRestrictingQualifier(q);
     }
 
@@ -320,17 +331,17 @@ public class EOModelLoader extends NSObject {
 
   /* attributes */
 
-  protected EOAttribute[] loadAttributesFromElement(Element _node) {
+  protected EOAttribute[] loadAttributesFromElement(final Element _node) {
     EOAttribute[] attrs = null;
-    NodeList attrNodes = _node.getElementsByTagName("attribute");
+    final NodeList attrNodes = _node.getElementsByTagName("attribute");
     if (attrNodes != null && attrNodes.getLength() > 0) {
-      int attrCount = attrNodes.getLength();
+      final int attrCount = attrNodes.getLength();
       attrs = new EOAttribute[attrCount];
       for (int i = 0; i < attrCount; i++) {
         attrs[i] = this.loadAttributeFromElement((Element)attrNodes.item(i));
         if (attrs[i] == null) {
           log.info("failed to load an attribute node of the model: " +
-                        attrNodes.item(i));
+                   attrNodes.item(i));
           return null;
         }
       }
@@ -349,11 +360,13 @@ public class EOModelLoader extends NSObject {
 
   /**
    * Example:
+   *
    * <pre>
    *   &lt;attribute column="id" autoincrement="true" null="false" /&gt;
    * </pre>
    * <p>
    * Attributes:
+   *
    * <pre>
    *   name           - property name of attribute (defaults to column)
    *   column         - column name of attribute
@@ -365,7 +378,7 @@ public class EOModelLoader extends NSObject {
    *   writeformat    - String
    * </pre>
    */
-  protected EOAttribute loadAttributeFromElement(Element _node) {
+  protected EOAttribute loadAttributeFromElement(final Element _node) {
     if (_node == null)
       return null;
     if (!_node.getTagName().equals("attribute")) {
@@ -380,7 +393,7 @@ public class EOModelLoader extends NSObject {
     boolean isColumnPattern = false;
 
     s = _node.getAttribute("name");
-    String name   = UObject.isNotEmpty(s) ? s : null;
+    String name = UObject.isNotEmpty(s) ? s : null;
     s = _node.getAttribute("column");
     String column = UObject.isNotEmpty(s) ? s : null;
 
@@ -393,20 +406,18 @@ public class EOModelLoader extends NSObject {
           return null;
         }
       }
-      else
+      else {
         isColumnPattern = true;
+      }
     }
     else if (name == null)
       name = column;
 
     s = _node.getAttribute("autoincrement");
-    Boolean isAutoIncrement = UObject.isNotEmpty(s)
-      ? UObject.boolValue(s)
-      : null;
+    final Boolean isAutoIncrement =
+      UObject.isNotEmpty(s) ? UObject.boolValue(s) : null;
     s = _node.getAttribute("null");
-    Boolean allowsNull = UObject.isNotEmpty(s)
-      ? UObject.boolValue(s)
-      : null;
+    Boolean allowsNull = UObject.isNotEmpty(s) ? UObject.boolValue(s) : null;
     s = _node.getAttribute("notnull"); /* backwards compat */
     if (allowsNull != null && UObject.isNotEmpty(s)) {
       log.warn("both 'null' and 'notnull' attribute set for attribute '" +
@@ -417,35 +428,35 @@ public class EOModelLoader extends NSObject {
     }
 
     s = _node.getAttribute("readformat");
-    String readformat = UObject.isNotEmpty(s) ? s : null;
+    final String readformat = UObject.isNotEmpty(s) ? s : null;
     s = _node.getAttribute("writeformat");
-    String writeformat = UObject.isNotEmpty(s) ? s : null;
+    final String writeformat = UObject.isNotEmpty(s) ? s : null;
 
     // TODO: column type
 
-    EOAttribute attr = new EOAttribute(name, column, isColumnPattern,
-                                       _node.getAttribute("type"),
-                                       isAutoIncrement, allowsNull,
-                                       null, // TODO: width
-                                       readformat,
-                                       writeformat,
-                                       null, // TODO: default
-                                       null, /* comment     */
-                                       null, /* collation   */
-                                       null  /* privileges */);
+    final EOAttribute attr = new EOAttribute(name, column, isColumnPattern,
+                                             _node.getAttribute("type"),
+                                             isAutoIncrement, allowsNull,
+                                             null, // TODO: width
+                                             readformat,
+                                             writeformat,
+                                             null, // TODO: default
+                                             null, /* comment     */
+                                             null, /* collation   */
+                                             null  /* privileges */);
     return attr;
   }
 
-  protected EORelationship[] loadRelationshipsFromElement(Element _node) {
+  protected EORelationship[] loadRelationshipsFromElement(final Element _node) {
     /*
      * 'to-one' or 'to-many' tags
      */
     EORelationship[] objects = null;
-    NodeList nodes1 = _node.getElementsByTagName("to-one");
-    NodeList nodesN = _node.getElementsByTagName("to-many");
+    final NodeList nodes1 = _node.getElementsByTagName("to-one");
+    final NodeList nodesN = _node.getElementsByTagName("to-many");
 
-    if ((nodes1 == null || nodes1.getLength() == 0) &&
-        (nodesN == null || nodesN.getLength() == 0))
+    if ((nodes1 == null || nodes1.getLength() == 0)
+        && (nodesN == null || nodesN.getLength() == 0))
       return null;
 
     objects = new EORelationship[nodes1.getLength() + nodesN.getLength()];
@@ -453,10 +464,10 @@ public class EOModelLoader extends NSObject {
     int j = 0;
 
     for (int i = 0; i < nodes1.getLength(); i++, j++) {
-      objects[j] = this.loadRelationshipFromElement((Element)nodes1.item(i));
+      objects[j] = this.loadRelationshipFromElement((Element) nodes1.item(i));
       if (objects[j] == null) {
         log.info("failed to load an relationship node of the model: " +
-                      nodes1.item(i));
+                 nodes1.item(i));
         return null;
       }
     }
@@ -465,7 +476,7 @@ public class EOModelLoader extends NSObject {
       objects[j] = this.loadRelationshipFromElement((Element)nodesN.item(i));
       if (objects[j] == null) {
         log.info("failed to load an relationship node of the model: " +
-                      nodesN.item(i));
+                 nodesN.item(i));
         return null;
       }
     }
@@ -475,20 +486,25 @@ public class EOModelLoader extends NSObject {
   /**
    * 'to-one' or 'to-many' tags
    * <p>
-   * Attributes:<pre>
+   * Attributes:
+   *
+   * <pre>
    *   name              - name of relationship
    *   to or destination - name of target entity
    *   target            - name of target entity
-   *   join              - Strings separated by comma</pre>
+   *   join              - Strings separated by comma
+   * </pre>
    *
-   * Eg:<pre>
+   * Eg:
+   *
+   * <pre>
    *   &lt;to-one  name="toProject" to="Project" join="companyId,ownerId" /&gt;
    *   &lt;to-many name="toOwner"   to="Account" join="ownerId,companyId" /&gt;
    *   &lt;to-one  to="Project" join="companyId,ownerId" />
    * </pre>
    */
   // TODO: support join subelements
-  protected EORelationship loadRelationshipFromElement(Element _node) {
+  protected EORelationship loadRelationshipFromElement(final Element _node) {
     if (_node == null)
       return null;
     if (!_node.getTagName().startsWith("to")) {
@@ -500,10 +516,10 @@ public class EOModelLoader extends NSObject {
 
     String s;
 
-    boolean isToMany = _node.getTagName().contains("many");
+    final boolean isToMany = _node.getTagName().contains("many");
 
     s = _node.getAttribute("name");
-    String name   = UObject.isNotEmpty(s) ? s : null;
+    String name = UObject.isNotEmpty(s) ? s : null;
 
     s = _node.getAttribute("to");
     String destEntity = UObject.isNotEmpty(s) ? s : null;
@@ -548,31 +564,30 @@ public class EOModelLoader extends NSObject {
 
   /* fetch specifications */
 
-  protected Map<String, EOFetchSpecification>
-    loadFetchSpecificationsFromElement(String _entityName, Element _node)
+  protected Map<String, EOFetchSpecification> loadFetchSpecificationsFromElement
+    (final String _entityName, final Element _node)
   {
     /*
      * "fetch" tag
      */
-    NodeList fetchNodes = _node.getElementsByTagName("fetch");
+    final NodeList fetchNodes = _node.getElementsByTagName("fetch");
     if (fetchNodes == null || fetchNodes.getLength() == 0)
       return null;
 
-    int count = fetchNodes.getLength();
-    Map<String, EOFetchSpecification> fspecs =
-      new HashMap<String, EOFetchSpecification>(count);
+    final int count = fetchNodes.getLength();
+    final Map<String, EOFetchSpecification> fspecs = new HashMap<>(count);
 
     for (int i = 0; i < count; i++) {
-      Element node = (Element)fetchNodes.item(i);
+      final Element node = (Element)fetchNodes.item(i);
 
-      EOFetchSpecification fs =
+      final EOFetchSpecification fs =
         this.loadFetchSpecificationFromElement(_entityName, node);
       if (fs == null) {
         log.info("failed to load a fetch node of the model: " + node);
         continue;
       }
 
-      String fsname = node.getAttribute("name");
+      final String fsname = node.getAttribute("name");
       if (fsname == null || fsname.length() == 0) {
         log.info("missing name in a fetch node of the model: " + node);
         continue;
@@ -591,7 +606,9 @@ public class EOModelLoader extends NSObject {
   /**
    * "fetch" tag
    * <p>
-   * Attributes:<pre>
+   * Attributes:
+   *
+   * <pre>
    *   name       - String  - name of fetch specification
    *   rawrows    - boolean - do not map to objects, return raw Map's
    *   distinct   - boolean - make results distinct
@@ -604,16 +621,22 @@ public class EOModelLoader extends NSObject {
    *   offset     - int
    *   prefetch   - CSV     - list of prefetch pathes
    * </pre>
-   * Children:<pre>
+   *
+   * Children:
+   *
+   * <pre>
    *   'attribute' tags - CSV (eg name,lastname,firstname)
    *   'prefetch'  tags - CSV (eg employments.company,projects)
    *   'qualifier' tags
    *   'ordering'  tags
    *   'sql'       tags (with pattern attribute)
    *     - EOCustomQueryExpressionHintKeyBindPattern (with pattern)
-   *     - EOCustomQueryExpressionHintKey (w/o pattern)</pre>
+   *     - EOCustomQueryExpressionHintKey (w/o pattern)
+   * </pre>
    *
-   * Example:<pre>
+   * Example:
+   *
+   * <pre>
    *   &lt;fetch name="count" rawrows="true"&gt;
    *     &lt;sql&gt;SELECT COUNT(*) FROM table&lt;/sql&gt;
    *   &lt;/fetch&gt;
@@ -630,7 +653,7 @@ public class EOModelLoader extends NSObject {
    * </pre>
    */
   protected EOFetchSpecification loadFetchSpecificationFromElement
-    (String _entityName, Element _node)
+    (final String _entityName, final Element _node)
   {
     /*
      * TODO: would be cool to allow intermixing of raw SQL and qualifiers, like:
@@ -649,7 +672,7 @@ public class EOModelLoader extends NSObject {
       return null;
     }
 
-    Map<String, Object> hints = new HashMap<String, Object>(4);
+    Map<String, Object> hints = new HashMap<>(4);
     String s;
 
     /* flags */
@@ -662,7 +685,7 @@ public class EOModelLoader extends NSObject {
     Boolean requiresAllBindings =
       this.getBoolAttribute(_node, "requiresAllBindings");
 
-    String flagSet = _node.getAttribute("flags");
+    final String flagSet = _node.getAttribute("flags");
     if (flagSet != null && flagSet.length() > 0) {
       if (fetchesRawRows == null) fetchesRawRows = flagSet.contains("raw");
       if (distinct       == null) distinct       = flagSet.contains("distinct");
@@ -677,9 +700,9 @@ public class EOModelLoader extends NSObject {
 
     /* more attributes */
 
-    Integer limit  = this.getIntAttribute(_node, "limit");
-    Integer offset = this.getIntAttribute(_node, "offset");
-    String  entityName = _node.getAttribute("entity");
+    final Integer limit = this.getIntAttribute(_node, "limit");
+    final Integer offset = this.getIntAttribute(_node, "offset");
+    String entityName = _node.getAttribute("entity");
     if (entityName != null && entityName.length() == 0)
       entityName = null;
     if (entityName == null)
@@ -734,10 +757,10 @@ public class EOModelLoader extends NSObject {
     /* qualifiers */
 
     s = this.joinTrimmedTextsOfElements
-      (_node.getElementsByTagName("qualifier")," AND ");
-    EOQualifier qualifier = s != null
-      ? EOQualifier.qualifierWithQualifierFormat(s)
-      : null;
+      (_node.getElementsByTagName("qualifier"), " AND ");
+    final EOQualifier qualifier = s != null
+                                ? EOQualifier.qualifierWithQualifierFormat(s)
+                                : null;
     if (s != null && qualifier == null) {
       log.error("could not parse qualifier in model:\n'" + s + "'");
       return null;
@@ -746,7 +769,7 @@ public class EOModelLoader extends NSObject {
     /* sort-orderings */
 
     EOSortOrdering[] orderings = null;
-    NodeList orderingNodes = _node.getElementsByTagName("ordering");
+    final NodeList orderingNodes = _node.getElementsByTagName("ordering");
     if (orderingNodes != null && orderingNodes.getLength() > 0) {
       orderings = new EOSortOrdering[orderingNodes.getLength()];
       for (int i = 0; i < orderingNodes.getLength(); i++) {
@@ -762,10 +785,11 @@ public class EOModelLoader extends NSObject {
 
     /* custom SQL */
 
-    NodeList sqlNodes = _node.getElementsByTagName("sql");
+    final NodeList sqlNodes = _node.getElementsByTagName("sql");
     s = this.joinTrimmedTextsOfElements(sqlNodes, "; ");
     if (UObject.isNotEmpty(s)) {
-      Boolean pat = this.getBoolAttribute((Element)sqlNodes.item(0), "pattern");
+      final Boolean pat =
+        this.getBoolAttribute((Element) sqlNodes.item(0), "pattern");
       if (pat != null && pat)
         hints.put("EOCustomQueryExpressionHintKeyBindPattern", s);
       else
@@ -774,7 +798,8 @@ public class EOModelLoader extends NSObject {
 
     /* construct */
 
-    if (hints.size() == 0) hints = null;
+    if (hints.size() == 0)
+      hints = null;
 
     EOFetchSpecification fs = new EOFetchSpecification
       (entityName, qualifier, orderings, distinct, deep, hints);
@@ -794,7 +819,7 @@ public class EOModelLoader extends NSObject {
     return fs;
   }
 
-  protected EOSortOrdering loadOrderingFromElement(Element _e) {
+  protected EOSortOrdering loadOrderingFromElement(final Element _e) {
     /*
      * Eg:
      *   <ordering key="lastname" operation="DESC" />
@@ -839,31 +864,29 @@ public class EOModelLoader extends NSObject {
     return new EOSortOrdering(key, sel);
   }
 
-
   /* adaptor operations */
 
-  protected Map<String, EOAdaptorOperation[]>
-    loadAdaptorOperationsFromElement(String _entityName, Element _node)
+  protected Map<String, EOAdaptorOperation[]> loadAdaptorOperationsFromElement
+    (final String _entityName, final Element _node)
   {
-    NodeList opNodes = _node.getElementsByTagName("operation");
+    final NodeList opNodes = _node.getElementsByTagName("operation");
     if (opNodes == null || opNodes.getLength() == 0)
       return null;
 
-    int count = opNodes.getLength();
-    Map<String, EOAdaptorOperation[]> ops =
-      new HashMap<String, EOAdaptorOperation[]>(count);
+    final int count = opNodes.getLength();
+    final Map<String, EOAdaptorOperation[]> ops = new HashMap<>(count);
 
     for (int i = 0; i < count; i++) {
-      Element node = (Element)opNodes.item(i);
+      final Element node = (Element) opNodes.item(i);
 
-      EOAdaptorOperation[] op =
+      final EOAdaptorOperation[] op =
         this.loadAdaptorOperationFromElement(_entityName, node);
       if (op == null) {
         log.info("failed to load an operation node of the model: " + node);
         continue;
       }
 
-      String opname = node.getAttribute("name");
+      final String opname = node.getAttribute("name");
       if (opname == null || opname.length() == 0) {
         log.info("missing name in an operation of the model: " + node);
         continue;
@@ -880,7 +903,7 @@ public class EOModelLoader extends NSObject {
   }
 
   protected EOAdaptorOperation[] loadAdaptorOperationFromElement
-    (String _entityName, Element _node)
+    (final String _entityName, final Element _node)
   {
     log.error("loading of operations not yet implemented ...");
     return null;
@@ -888,22 +911,26 @@ public class EOModelLoader extends NSObject {
 
   /* support */
 
-  protected String joinTrimmedTextsOfElements(NodeList _nodes, String _sep) {
+  protected String joinTrimmedTextsOfElements
+    (final NodeList _nodes, final String _sep)
+  {
     if (_nodes == null || _nodes.getLength() == 0)
       return null;
 
-    StringBuilder sb = new StringBuilder(256);
+    final StringBuilder sb = new StringBuilder(256);
     boolean isFirst = true;
     for (int i = 0; i < _nodes.getLength(); i++) {
-      Element node = (Element)_nodes.item(i);
+      final Element node = (Element)_nodes.item(i);
       node.normalize();
 
       String txt = node.getTextContent();
-      if (txt == null) continue;
+      if (txt == null)
+        continue;
 
       /* we replace newlines, so you can't use them inside <sql> elements */
       txt = txt.replace("\n", " ").trim();
-      if (txt.length() == 0) continue;
+      if (txt.length() == 0)
+        continue;
 
       if (isFirst)
         isFirst = false;
@@ -917,22 +944,26 @@ public class EOModelLoader extends NSObject {
 
   /* attribute helpers */
 
-  protected Boolean getBoolAttribute(Element _element, String _attrName) {
+  protected Boolean getBoolAttribute
+    (final Element _element, final String _attrName)
+  {
     if (_element == null || _attrName == null)
       return null;
 
-    String s = _element.getAttribute(_attrName);
+    final String s = _element.getAttribute(_attrName);
     if (UObject.isEmpty(s))
       return null;
 
     return UObject.boolValue(s);
   }
 
-  protected Integer getIntAttribute(Element _element, String _attrName) {
+  protected Integer getIntAttribute
+    (final Element _element, final String _attrName)
+  {
     if (_element == null || _attrName == null)
       return null;
 
-    String s = _element.getAttribute(_attrName);
+    final String s = _element.getAttribute(_attrName);
     if (s == null || s.length() == 0)
       return null;
 
@@ -941,25 +972,27 @@ public class EOModelLoader extends NSObject {
 
   /* support */
 
-  protected Exception newModelLoadingException(String _reason) {
+  protected Exception newModelLoadingException(final String _reason) {
     // TODO: improve error handling
     return new Exception(_reason);
   }
 
-  protected void addError(String _reason) {
+  protected void addError(final String _reason) {
     log.error(_reason);
     this.lastException = this.newModelLoadingException(_reason);
   }
-  protected void addError(String _reason, Exception _e) {
+
+  protected void addError(final String _reason, final Exception _e) {
     log.error(_reason, _e);
 
     // TODO: wrap exception
     this.lastException = _e;
   }
 
-  public EOModel loadModelFromURL(URL _url) {
-    boolean isDebugOn = log.isDebugEnabled();
-    if (isDebugOn) log.debug("loading model from URL: " + _url);
+  public EOModel loadModelFromURL(final URL _url) {
+    final boolean isDebugOn = log.isDebugEnabled();
+    if (isDebugOn)
+      log.debug("loading model from URL: " + _url);
 
     if (_url == null) {
       this.addError("missing URL parameter for loading model");
@@ -970,10 +1003,11 @@ public class EOModelLoader extends NSObject {
 
     DocumentBuilder db;
     try {
-       db = dbf.newDocumentBuilder();
-       if (isDebugOn) log.debug("  using DOM document builder:" + db);
+      db = dbf.newDocumentBuilder();
+      if (isDebugOn)
+        log.debug("  using DOM document builder:" + db);
     }
-    catch (ParserConfigurationException e) {
+    catch (final ParserConfigurationException e) {
       this.addError("failed to create docbuilder for parsing URL: " + _url, e);
       return null;
     }
@@ -983,25 +1017,26 @@ public class EOModelLoader extends NSObject {
     Document doc;
     try {
       doc = db.parse(_url.openStream(), _url.toString());
-      if (isDebugOn) log.debug("  parsed DOM: " + doc);
+      if (isDebugOn)
+        log.debug("  parsed DOM: " + doc);
     }
-    catch (SAXParseException e) {
+    catch (final SAXParseException e) {
       this.addError("XML error at line " + e.getLineNumber() +
                     " when loading model resource: " + _url, e);
       return null;
     }
-    catch (SAXException e) {
+    catch (final SAXException e) {
       this.addError("XML error when loading model resource: " + _url, e);
       return null;
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       this.addError("IO error when loading model resource: " + _url, e);
       return null;
     }
 
     /* transform DOM into model */
 
-    EOModel model = this.loadModelFromDocument(doc);
+    final EOModel model = this.loadModelFromDocument(doc);
 
     if (isDebugOn && model != null) {
       log.debug("  model: " + model);
