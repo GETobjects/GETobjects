@@ -594,16 +594,50 @@ public class EODatabaseChannel extends NSObject
       if (error != null) return error;
     }
 
-    /* fetch flattened relationships (NOT IMPLEMENTED) */
+    /* fetch flattened relationships */
 
     final List<String> flattenedRelationships =
       this.flattenedRelationships(entity, _prefetchRelPathes);
     if (flattenedRelationships != null) {
-      for (String rel: flattenedRelationships) {
-        EORelationship flattenedRel = entity.relationshipNamed(rel);
+      for (final String rel: flattenedRelationships) {
+        final EORelationship flattenedRel = entity.relationshipNamed(rel);
 
-        // TBD: process flattened relationships (walk over initial set)
-        log.warn("not processing flattened relationship: " + flattenedRel);
+        EOEntity curEntity = entity;
+        final EORelationship[] componentRels = flattenedRel.componentRelationships();
+        for (final EORelationship cRel : componentRels) {
+          final String relName = cRel.name();
+          final Exception error = this.fetchRelationship
+              (curEntity, relName, _baseObjects,
+               leveledPrefetches.get(relName), helper, _ec);
+          if (error != null)
+            return error;
+          curEntity = cRel.destinationEntity();
+        }
+      }
+
+      for (final String rel: flattenedRelationships) {
+        final EORelationship flattenedRel = entity.relationshipNamed(rel);
+          for (final EOEnterpriseObject baseObject : _baseObjects) {
+            final EORelationship[] componentRels = flattenedRel.componentRelationships();
+            Object cursor = baseObject;
+            for (final EORelationship cRel : componentRels) {
+              if (cursor instanceof List) {
+                final List<Object> l = (List<Object>)cursor;
+                final List<Object> tmp = new ArrayList<>(l.size());
+                for (final Object o : l) {
+                  final Object v = NSKeyValueCoding.Utility.valueForKey(o, cRel.name());
+                  tmp.add(v);
+                }
+                cursor = tmp;
+              }
+              else {
+                cursor = NSKeyValueCoding.Utility.valueForKey(cursor, cRel.name());
+              }
+            }
+
+            /* do we need to check for EORelationshipManipulation? */
+            baseObject.takeStoredValueForKey(cursor, flattenedRel.name());
+        }
       }
     }
 
