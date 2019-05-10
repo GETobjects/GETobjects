@@ -601,22 +601,6 @@ public class EODatabaseChannel extends NSObject
     if (flattenedRelationships != null) {
       for (final String rel: flattenedRelationships) {
         final EORelationship flattenedRel = entity.relationshipNamed(rel);
-
-        EOEntity curEntity = entity;
-        final EORelationship[] componentRels = flattenedRel.componentRelationships();
-        for (final EORelationship cRel : componentRels) {
-          final String relName = cRel.name();
-          final Exception error = this.fetchRelationship
-              (curEntity, relName, _baseObjects,
-               leveledPrefetches.get(relName), helper, _ec);
-          if (error != null)
-            return error;
-          curEntity = cRel.destinationEntity();
-        }
-      }
-
-      for (final String rel: flattenedRelationships) {
-        final EORelationship flattenedRel = entity.relationshipNamed(rel);
           for (final EOEnterpriseObject baseObject : _baseObjects) {
             final EORelationship[] componentRels = flattenedRel.componentRelationships();
             Object cursor = baseObject;
