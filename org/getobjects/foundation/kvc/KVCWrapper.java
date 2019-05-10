@@ -40,6 +40,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -341,6 +342,8 @@ public class KVCWrapper extends Object {
 
     if (Map.class.isAssignableFrom(_class))
       helper = new MapKVCWrapper(_class);
+    else if (List.class.isAssignableFrom(_class))
+      helper = new ListKVCWrapper(_class);
     else
       helper = new KVCWrapper(_class);
 

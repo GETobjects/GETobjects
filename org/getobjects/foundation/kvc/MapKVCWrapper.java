@@ -67,6 +67,11 @@ public class MapKVCWrapper extends KVCWrapper {
 
     @Override
     public Object get(final Object _instance, final String _key) {
+      // TODO: avg, etc.
+      // @see https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/CollectionOperators.html
+      if (_key.equals("@count"))
+        return ((Map)_instance).size();
+
       return ((Map)_instance).get(_key);
     }
 
