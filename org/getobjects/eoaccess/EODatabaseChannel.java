@@ -602,25 +602,14 @@ public class EODatabaseChannel extends NSObject
       for (final String rel: flattenedRelationships) {
         final EORelationship flattenedRel = entity.relationshipNamed(rel);
           for (final EOEnterpriseObject baseObject : _baseObjects) {
-            final EORelationship[] componentRels = flattenedRel.componentRelationships();
-            Object cursor = baseObject;
-            for (final EORelationship cRel : componentRels) {
-              if (cursor instanceof List) {
-                final List<Object> l = (List<Object>)cursor;
-                final List<Object> tmp = new ArrayList<>(l.size());
-                for (final Object o : l) {
-                  final Object v = NSKeyValueCoding.Utility.valueForKey(o, cRel.name());
-                  tmp.add(v);
-                }
-                cursor = tmp;
-              }
-              else {
-                cursor = NSKeyValueCoding.Utility.valueForKey(cursor, cRel.name());
-              }
-            }
+            final String keyPath = flattenedRel.relationshipPath();
+            final Object v =
+              NSKeyValueCodingAdditions.Utility.valueForKeyPath(baseObject,
+                                                                keyPath);
 
             /* do we need to check for EORelationshipManipulation? */
-            baseObject.takeStoredValueForKey(cursor, flattenedRel.name());
+            if (v != null)
+              baseObject.takeStoredValueForKey(v, flattenedRel.name());
         }
       }
     }
