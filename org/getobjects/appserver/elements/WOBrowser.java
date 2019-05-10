@@ -137,7 +137,9 @@ public class WOBrowser extends WOPopUpButton {
     else if (this.writeValue != null) {
       /* has a 'value' binding, walk list to find matching objects */
       
-      for (int i = 0, toGo = objects.size(); i < toGo; i++) {
+      for (int i = 0, toGo = objects != null ? objects.size() : 0;
+           i < toGo; i++) 
+      {
         Object lItem = objects.get(i);
         Object cv;
         
