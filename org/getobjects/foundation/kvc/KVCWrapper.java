@@ -88,8 +88,8 @@ public class KVCWrapper extends Object {
   /**
    *  Cache of helpers, keyed on the Class of the bean.
    **/
-  private static ConcurrentHashMap<Class,KVCWrapper> helpers = 
-    new ConcurrentHashMap<Class,KVCWrapper>(16);
+  private static ConcurrentHashMap<Class,KVCWrapper> helpers =
+    new ConcurrentHashMap<>(16);
 
   //static {
   //  register(Map.class, MapKVCWrapper.class);
@@ -98,7 +98,7 @@ public class KVCWrapper extends Object {
   private static final Log logger = LogFactory.getLog(KVCWrapper.class);
 
   private static ConcurrentHashMap<Class,Method[]> declaredMethodCache =
-    new ConcurrentHashMap<Class,Method[]>(16);
+    new ConcurrentHashMap<>(16);
 
   /**
    *  Map of PropertyAccessors for the helper's
@@ -121,27 +121,28 @@ public class KVCWrapper extends Object {
    * A {@link StringSplitter} used for parsing apart property paths.
    **/
 
- 
-  protected KVCWrapper(Class _class) {
+
+  protected KVCWrapper(final Class _class) {
     this.clazz = _class;
   }
 
   @SuppressWarnings("unchecked")
-  private static Method[] getPublicDeclaredMethods(Class _class) {
+  private static Method[] getPublicDeclaredMethods(final Class _class) {
     Method methods[] = declaredMethodCache.get(_class);
     if (methods != null) return methods;
-    
+
     final Class fclz = _class;
-    
+
     methods = (Method[]) AccessController.doPrivileged(new PrivilegedAction() {
+      @Override
       public Object run() {
         return fclz.getMethods();
       }
     });
-    
+
     for (int i = 0; i < methods.length; i++) {
-      Method method = methods[i];
-      int    j      = method.getModifiers();
+      final Method method = methods[i];
+      final int    j      = method.getModifiers();
       if (!Modifier.isPublic(j))
         methods[i] = null;
     }
@@ -150,38 +151,38 @@ public class KVCWrapper extends Object {
     return methods;
   }
 
-  public PropertyDescriptor[] getPropertyDescriptors(Class _class)
+  public PropertyDescriptor[] getPropertyDescriptors(final Class _class)
       throws Exception
   {
     /**
      * Our idea of KVC differs from what the Bean API proposes. Instead of
-     * having get<name> and set<name> methods, we expect <name> and 
+     * having get<name> and set<name> methods, we expect <name> and
      * set<name> methods.
-     * 
+     *
      * HH: changed to allow for getXYZ style accessors.
      */
 
-    Map<String,Method> settersMap = new HashMap<String, Method>();
-    Map<String,Method> gettersMap = new HashMap<String, Method>();
+    final Map<String,Method> settersMap = new HashMap<>();
+    final Map<String,Method> gettersMap = new HashMap<>();
 
-    Method methods[] = getPublicDeclaredMethods(_class);
+    final Method methods[] = getPublicDeclaredMethods(_class);
 
     for (int i = 0; i < methods.length; i++) {
-      Method method = methods[i];
+      final Method method = methods[i];
       if (method == null) continue;
-      
+
       String name      = method.getName();
-      int    nameLen   = name.length();
-      int    paraCount = method.getParameterTypes().length;
-      
+      final int    nameLen   = name.length();
+      final int    paraCount = method.getParameterTypes().length;
+
       if (name.startsWith("set")) {
         if (method.getReturnType() != Void.TYPE) continue;
         if (paraCount              != 1)         continue;
         if (nameLen                == 3)         continue;
 
-        char[] chars = name.substring(3).toCharArray();
+        final char[] chars = name.substring(3).toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
-        String decapsedName = new String(chars);
+        final String decapsedName = new String(chars);
 
         if (logger.isDebugEnabled()) {
           logger.debug("Recording setter method [" + method + "] for name \""
@@ -193,9 +194,9 @@ public class KVCWrapper extends Object {
         /* register as a getter */
         if (method.getReturnType() == Void.TYPE) continue;
         if (paraCount > 0) continue;
-        
+
         if (name.startsWith("get")) {
-          char[] chars = name.substring(3).toCharArray();
+          final char[] chars = name.substring(3).toCharArray();
           chars[0] = Character.toLowerCase(chars[0]);
           name = new String(chars);
         }
@@ -209,19 +210,19 @@ public class KVCWrapper extends Object {
 
     }
 
-    Set<PropertyDescriptor> pds = new HashSet<PropertyDescriptor>();
+    final Set<PropertyDescriptor> pds = new HashSet<>();
 
     /* merge all names from getters and setters */
-    Set<String> names = new HashSet<String>(gettersMap.keySet());
+    final Set<String> names = new HashSet<>(gettersMap.keySet());
     names.addAll(settersMap.keySet());
 
-    for (String name : names) {
-      Method getter = gettersMap.get(name);
-      Method setter = settersMap.get(name);
+    for (final String name : names) {
+      final Method getter = gettersMap.get(name);
+      final Method setter = settersMap.get(name);
       if (getter == null && setter == null) continue;
 
       /* this is JavaBeans stuff */
-      PropertyDescriptor descriptor = 
+      final PropertyDescriptor descriptor =
         new PropertyDescriptor(name, getter, setter);
       pds.add(descriptor);
     }
@@ -245,17 +246,17 @@ public class KVCWrapper extends Object {
      */
 
     if (this.accessors != null) return;
-    
+
     /**
      * Construct field accessors for names which aren't occupied
      * by properties, yet. Imagine this as a "last resort".
      */
 
-    final Map<String,FieldAccessor> propertyFieldAccessorMap = 
-      new HashMap<String,FieldAccessor>();
+    final Map<String,FieldAccessor> propertyFieldAccessorMap =
+      new HashMap<>();
     final Field fields[] = this.clazz.getFields();
 
-    for (Field field : fields) {
+    for (final Field field : fields) {
       final int mods = field.getModifiers();
 
       // Skip static variables and non-public instance variables.
@@ -271,32 +272,32 @@ public class KVCWrapper extends Object {
     PropertyDescriptor[] props;
 
     try {
-      props = this.getPropertyDescriptors(this.clazz);
+      props = getPropertyDescriptors(this.clazz);
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       logger.error("Error during getPropertyDescriptors()", e);
       throw new DynamicInvocationException(e);
     }
 
     // TBD: instead build the table locally, and then apply to an
     //      atomic reference?!
-    this.accessors = new ConcurrentHashMap<String,IPropertyAccessor>(16);
+    this.accessors = new ConcurrentHashMap<>(16);
 
     if (logger.isDebugEnabled())
       logger.debug("Recording properties for \"" + this.clazz.getName()
           + "\"");
 
-    for (PropertyDescriptor pd : props) {
+    for (final PropertyDescriptor pd : props) {
       final String name = pd.getName();
 
       if (logger.isDebugEnabled())
         logger.debug("Recording property \"" + name + "\"");
-      
+
       final Method getter      = pd.getReadMethod();
       final Method setter      = pd.getWriteMethod();
       final FieldAccessor fa   = propertyFieldAccessorMap.get(name);
       final Class         type = pd.getPropertyType();
- 
+
       final PropertyAccessor pa =
         PropertyAccessor.getPropertyAccessor(name, type, getter, setter, fa);
       this.accessors.put(name, pa);
@@ -306,7 +307,7 @@ public class KVCWrapper extends Object {
      * Use field accessors for names which are not occupied, yet.
      * This is the default fallback.
      */
-    for (String name : propertyFieldAccessorMap.keySet()) {
+    for (final String name : propertyFieldAccessorMap.keySet()) {
       if (!this.accessors.containsKey(name))
         this.accessors.put(name, propertyFieldAccessorMap.get(name));
     }
@@ -324,9 +325,9 @@ public class KVCWrapper extends Object {
    *
    *  @see #register(Class, Class)
    **/
-  public static KVCWrapper forClass(Class _class) {
+  public static KVCWrapper forClass(final Class _class) {
     // TBD: replace this method
-    
+
     if (logger.isDebugEnabled()) // TBD: expensive
       logger.debug("Getting property helper for class " + _class.getName());
 
@@ -337,7 +338,7 @@ public class KVCWrapper extends Object {
     //     that because it only contained MapKVCWrapper in Go ..., hence it
     //     was unnecessarily expensive.
     //     We might want to replicate this at the Go level.
-    
+
     if (Map.class.isAssignableFrom(_class))
       helper = new MapKVCWrapper(_class);
     else
@@ -363,43 +364,44 @@ public class KVCWrapper extends Object {
     synchronized (this) {
       if (this.accessors == null) buildPropertyAccessors();
     }
-    
+
     // hh: before this was iterating an array over names, hardcoded that for
     //     speed (no array creation, no String ops for exact matches)
     // this.accessors is a concurrent hashmap, hence no synchronized necessary
     IPropertyAccessor accessor;
-    
+
     /* first check exact match, eg 'item' */
-    
+
     if ((accessor = this.accessors.get(_key)) != null)
       return accessor;
 
     /* next check 'getItem' */
-    
+
     final int    len   = _key.length();
     final char[] chars = new char[3 /* get */ + len];
     chars[0] = 'g'; chars[1] = 'e'; chars[2] = 't';
-    
+
     _key.getChars(0, len, chars, 3 /* skip 'get' */);
     final char c0 = chars[3];
     if (c0 > 96 && c0 < 123 /* lowercase ASCII range */)
       chars[3] = (char)(c0 - 32); /* make uppercase */
-    
+
     String s = new String(chars);
     if ((accessor = this.accessors.get(s)) != null)
       return accessor;
-    
+
     /* finally with leading underscore */
-    
+
     chars[3] = c0; /* restore lowercase char */
     chars[2] = '_';
     s = new String(chars, 2, len + 1);
     return this.accessors.get(s);
   }
 
+  @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("<KVCWrapper @");
-    sb.append(this.hashCode());
+    final StringBuilder sb = new StringBuilder("<KVCWrapper @");
+    sb.append(hashCode());
     sb.append(": ");
     sb.append(this.clazz.getName());
     sb.append('>');

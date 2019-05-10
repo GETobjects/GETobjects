@@ -39,18 +39,18 @@ import java.util.Map;
  * A subclass of {@link PropertyHelper} that allows values of a
  * <code>java.util.Map</code> to be accessed as if they were JavaBean
  * properties of the <code>java.util.Map</code> itself.
- * 
+ *
  * <p>
  * This requires that the keys of the <code>Map</code> be valid JavaBeans
  * property names.
- * 
+ *
  * <p>
  * This class includes a static initializer that invokes
  * {@link PropertyHelper#register(Class,Class)}.
- * 
+ *
  * <p>
  * TBD: Better error detection.
- * 
+ *
  * @author Howard Lewis Ship
  * @version $Id: MapKVCWrapper.java,v 1.1.1.1 2002/06/25 10:50:55 znek Exp $
  */
@@ -58,13 +58,14 @@ import java.util.Map;
 public class MapKVCWrapper extends KVCWrapper {
   // Methods of this object are at the bottom. The IPropertyAccessor class
   // follows.
-  
+
   public static class MapAccessor implements IPropertyAccessor {
     // a threadsafe singleton. just wraps Map get/put operations
 
     public MapAccessor() {
     }
 
+    @Override
     public Object get(final Object _instance, final String _key) {
       return ((Map)_instance).get(_key);
     }
@@ -72,22 +73,26 @@ public class MapKVCWrapper extends KVCWrapper {
     /**
      * Returns {@link Object}.class, because we never know the type of objects
      * stored in a {@link Map}.
-     * 
+     *
      */
 
+    @Override
     public Class getReadType() {
       return Object.class;
     }
 
+    @Override
     public Class getWriteType() {
       return Object.class;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public void set(final Object _target, String _key, final Object _value) {
+    public void set(final Object _target, final String _key, final Object _value) {
       ((Map<String,Object>) _target).put(_key, _value);
     }
 
+    @Override
     public String toString() {
       return "MapKVCWrapper.MapAccessor";
     }
@@ -99,7 +104,8 @@ public class MapKVCWrapper extends KVCWrapper {
     super(_class);
   }
 
-  public IPropertyAccessor getAccessor(Object _target, final String _name) {
+  @Override
+  public IPropertyAccessor getAccessor(final Object _target, final String _name) {
     // this is invoked by valueForKey/takeValueForKey of NSObject and
     // NSKeyValueCoding.DefaultImplementation
     IPropertyAccessor result;
