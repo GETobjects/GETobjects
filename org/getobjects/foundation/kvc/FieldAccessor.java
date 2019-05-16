@@ -36,19 +36,19 @@ package org.getobjects.foundation.kvc;
 import java.lang.reflect.Field;
 
 /**
- * 
+ *
  * Facilitiates access to public instance variables as if they were JavaBeans
  * properties.
- * 
+ *
  * @author Howard Lewis Ship
  * @version $Id: FieldAccessor.java,v 1.1.1.1 2002/06/25 10:50:55 znek Exp $
  * @since 1.0.1
- * 
+ *
  */
 class FieldAccessor implements IPropertyAccessor {
-  private Field field;
+  private final Field field;
 
-  FieldAccessor(Field _field) {
+  FieldAccessor(final Field _field) {
     this.field = _field;
   }
 
@@ -57,40 +57,44 @@ class FieldAccessor implements IPropertyAccessor {
   }
 
   // TBD: always building the exception reasons is still costly
- 
-  public void set(Object instance, String key, Object value) {
+
+  @Override
+  public void set(final Object instance, final String key, final Object value) {
     try {
       this.field.set(instance, value);
     }
-    catch (IllegalArgumentException iex) {
+    catch (final IllegalArgumentException iex) {
       throw new DynamicInvocationException(
           "Unable to set public attribute " + this.field.getName() +
           " of " + instance + " to " +
           value + "(" + (value!=null?value.getClass():null) + ")", iex);
     }
-    catch (Exception ex) {
+    catch (final Exception ex) {
       throw new DynamicInvocationException(
-          "Unable to set public attribute " + this.field.getName() + 
+          "Unable to set public attribute " + this.field.getName() +
           " of " + instance + " to " + value + ".",
           ex);
     }
   }
 
-   public Class getReadType() {
+   @Override
+  public Class getReadType() {
     return this.field.getType();
   }
 
+  @Override
   public Class getWriteType() {
     return this.field.getType();
   }
 
-  public Object get(Object instance, String key) {
+  @Override
+  public Object get(final Object instance, final String key) {
     try {
       return this.field.get(instance);
     }
-    catch (Exception ex) {
+    catch (final Exception ex) {
       throw new DynamicInvocationException(
-          "Unable to read public attribute " + this.field.getName() + 
+          "Unable to read public attribute " + this.field.getName() +
           " of " + instance, ex);
     }
   }

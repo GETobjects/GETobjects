@@ -273,7 +273,7 @@ public class KVCWrapper extends Object {
     PropertyDescriptor[] props;
 
     try {
-      props = getPropertyDescriptors(this.clazz);
+      props = this.getPropertyDescriptors(this.clazz);
     }
     catch (final Exception e) {
       logger.error("Error during getPropertyDescriptors()", e);
@@ -365,7 +365,7 @@ public class KVCWrapper extends Object {
    **/
   public IPropertyAccessor getAccessor(final Object _self, final String _key) {
     synchronized (this) {
-      if (this.accessors == null) buildPropertyAccessors();
+      if (this.accessors == null) this.buildPropertyAccessors();
     }
 
     // hh: before this was iterating an array over names, hardcoded that for
@@ -404,7 +404,7 @@ public class KVCWrapper extends Object {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<KVCWrapper @");
-    sb.append(hashCode());
+    sb.append(this.hashCode());
     sb.append(": ");
     sb.append(this.clazz.getName());
     sb.append('>');

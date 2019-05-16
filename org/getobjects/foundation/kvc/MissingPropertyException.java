@@ -36,11 +36,11 @@ package org.getobjects.foundation.kvc;
 /**
  * Exception thrown by {@link PropertyHelper} when an propery is specified which
  * does not exist.
- * 
+ *
  * @author Howard Lewis Ship
  * @version $Id: MissingPropertyException.java,v 1.1.1.1 2002/06/25 10:50:55
  *          znek Exp $
- * 
+ *
  */
 
 public class MissingPropertyException extends RuntimeException {
@@ -48,18 +48,18 @@ public class MissingPropertyException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   // Make this transient, since we can't count on it being serializable.
-  private transient Object  instance;
-  private transient Object  rootObject;
+  private transient Object instance;
+  private transient Object rootObject;
 
-  private String            propertyName;
-  private String            propertyPath;
+  private final String propertyName;
+  private final String propertyPath;
 
-  public MissingPropertyException(Object _instance, String _propertyName) {
+  public MissingPropertyException(final Object _instance, final String _propertyName) {
     this(_instance, _propertyName, _instance, _propertyName);
   }
 
-  public MissingPropertyException(Object _rootObject, String _propertyPath,
-      Object _instance, String _propertyName) {
+  public MissingPropertyException(final Object _rootObject, final String _propertyPath,
+      final Object _instance, final String _propertyName) {
     super("Class " + _instance.getClass().getName() +
           " does not implement the property: " + _propertyName);
 

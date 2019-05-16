@@ -60,22 +60,22 @@ public class PropertyAccessor implements IPropertyAccessor {
     this.name   = _name;
     this.type   = _type;
   }
-  PropertyAccessor(String _name, Class _type, Method _getter, Method _setter) {
+  PropertyAccessor(final String _name, final Class _type, final Method _getter, final Method _setter) {
     this(_name, _type);
     this.getter = _getter;
     this.setter = _setter;
   }
 
-  
+
   private static abstract class MixedAccessor extends PropertyAccessor {
     protected FieldAccessor fa;
 
-    MixedAccessor(final String _name, final Class _type, FieldAccessor _fa) {
+    MixedAccessor(final String _name, final Class _type, final FieldAccessor _fa) {
       super(_name, _type);
       this.fa = _fa;
     }
   }
-  
+
 
   /**
    *  Instances of this class or only created if BOTH _getter AND _fa are
@@ -85,17 +85,19 @@ public class PropertyAccessor implements IPropertyAccessor {
     extends MixedAccessor
   {
     PropertyGetterAndFieldSetterAccessor
-      (String _name, Class _type, Method _getter, FieldAccessor _fa)
+      (final String _name, final Class _type, final Method _getter, final FieldAccessor _fa)
     {
       super(_name, _type, _fa);
       this.getter = _getter;
     }
 
+    @Override
     public Class getWriteType() {
       return this.fa.getWriteType();
     }
 
-    public void set(Object _target, final String _key, final Object _value) {
+    @Override
+    public void set(final Object _target, final String _key, final Object _value) {
       this.fa.set(_target, _key, _value);
     }
   }
@@ -108,37 +110,39 @@ public class PropertyAccessor implements IPropertyAccessor {
     extends MixedAccessor
   {
     PropertySetterAndFieldGetterAccessor
-      (String _name, Class _type, Method _setter, FieldAccessor _fa)
+      (final String _name, final Class _type, final Method _setter, final FieldAccessor _fa)
     {
       super(_name, _type, _fa);
       this.setter = _setter;
     }
 
+    @Override
     public Class getReadType() {
       return this.fa.getReadType();
     }
 
+    @Override
     public Object get(final Object _target, final String key) {
       return this.fa.get(_target, key);
     }
   }
-  
+
 
   /**
    * Factory
    */
   static PropertyAccessor getPropertyAccessor
-    (String _name, Class  _type, Method _getter, Method _setter,
-     FieldAccessor _fa)
+    (final String _name, final Class  _type, final Method _getter, final Method _setter,
+     final FieldAccessor _fa)
   {
     //assert(_name != null, "_name parameter MUST NOT be null!");
     //assert(_type != null, "_type parameter MUST NOT be null!");
     if (_getter == null && _fa != null)
       return new PropertySetterAndFieldGetterAccessor(_name, _type,_setter,_fa);
-    
+
     if (_setter == null && _fa != null)
       return new PropertyGetterAndFieldSetterAccessor(_name, _type,_getter,_fa);
-    
+
     return new PropertyAccessor(_name, _type, _getter, _setter);
   }
 
@@ -152,7 +156,8 @@ public class PropertyAccessor implements IPropertyAccessor {
    *           if the class does not define an accessor method for the property.
    *
    */
-  public Object get(final Object _target, String key) {
+  @Override
+  public Object get(final Object _target, final String key) {
     if (logger.isDebugEnabled())
       logger.debug("Getting property " + this.getName() + " from " + _target);
 
@@ -169,18 +174,18 @@ public class PropertyAccessor implements IPropertyAccessor {
     try {
       result = this.getter.invoke(_target, (Object[])null);
     }
-    catch (RuntimeException e) { /* just reraise runtime exceptions */
+    catch (final RuntimeException e) { /* just reraise runtime exceptions */
       throw e;
     }
-    catch (java.lang.reflect.InvocationTargetException exx) {
-      Throwable e = exx.getTargetException();
+    catch (final java.lang.reflect.InvocationTargetException exx) {
+      final Throwable e = exx.getTargetException();
 
       if (e instanceof RuntimeException) /* just reraise runtime exceptions */
         throw ((RuntimeException)e);
 
       throw new DynamicInvocationException(this.getter, _target, e);
     }
-    catch (java.lang.IllegalAccessException iae) {
+    catch (final java.lang.IllegalAccessException iae) {
       /**
        * TBD: This happens if we do KVC on a Collections.SingletonSet
        *      (as returned by Collections.singleton(). The SingletonSet
@@ -199,7 +204,7 @@ public class PropertyAccessor implements IPropertyAccessor {
       }
       throw new DynamicInvocationException(this.getter, _target, iae);
     }
-    catch (Exception ex) {
+    catch (final Exception ex) {
       throw new DynamicInvocationException(this.getter, _target, ex);
     }
 
@@ -211,6 +216,7 @@ public class PropertyAccessor implements IPropertyAccessor {
     return this.type;
   }
 
+  @Override
   public Class getWriteType() {
     return this.type;
   }
@@ -221,7 +227,8 @@ public class PropertyAccessor implements IPropertyAccessor {
    *           if the class does not define a mutator method for the property.
    *
    */
-  public void set(final Object _target, String key, final Object _value) {
+  @Override
+  public void set(final Object _target, final String key, final Object _value) {
     if (this.setter == null) {
       final String propertyName = this.getName();
 
@@ -240,13 +247,13 @@ public class PropertyAccessor implements IPropertyAccessor {
     try {
       this.setter.invoke(_target, args);
     }
-    catch (IllegalAccessException ex) {
+    catch (final IllegalAccessException ex) {
       throw new DynamicInvocationException(this.setter, _target, ex);
     }
-    catch (IllegalArgumentException ex) {
+    catch (final IllegalArgumentException ex) {
       throw new DynamicInvocationException(this.setter, _target, ex);
     }
-    catch (InvocationTargetException ex) {
+    catch (final InvocationTargetException ex) {
       throw new DynamicInvocationException(this.setter, _target, ex);
     }
   }

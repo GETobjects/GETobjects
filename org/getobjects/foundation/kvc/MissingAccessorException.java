@@ -44,11 +44,11 @@ package org.getobjects.foundation.kvc;
 public class MissingAccessorException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
-  private transient Object  rootObject;
-  private transient Object  object;
+  private transient Object rootObject;
+  private transient Object object;
 
-  private String            propertyPath;
-  private String            propertyName;
+  private String propertyPath;
+  private final String propertyName;
 
   /**
    *  @param _rootObject the initial object for which a property was being set or retrieved.
@@ -59,8 +59,8 @@ public class MissingAccessorException extends RuntimeException {
    *
    **/
 
-  public MissingAccessorException(Object _rootObject, String _propertyPath,
-      Object _object, String _propertyName) {
+  public MissingAccessorException(final Object _rootObject, final String _propertyPath,
+      final Object _object, final String _propertyName) {
     super("Missing accessor in property path: "+  _propertyPath);
 
     this.rootObject   = _rootObject;
@@ -69,8 +69,8 @@ public class MissingAccessorException extends RuntimeException {
     this.propertyName = _propertyName;
   }
 
-  public MissingAccessorException(String message, Object _object,
-      String _propertyName) {
+  public MissingAccessorException(final String message, final Object _object,
+      final String _propertyName) {
     super(message);
 
     this.object = _object;

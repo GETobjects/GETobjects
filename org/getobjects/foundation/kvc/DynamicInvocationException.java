@@ -57,13 +57,13 @@ public class DynamicInvocationException extends RuntimeException
   private static final long serialVersionUID = -6526784320428448859L;
     private Throwable rootCause;
 
-    public DynamicInvocationException(String message) {
+    public DynamicInvocationException(final String message) {
       super(message);
     }
 
-    public DynamicInvocationException(Method _method,
-                                      Object _target,
-                                      Throwable _ex)
+    public DynamicInvocationException(final Method _method,
+                                      final Object _target,
+                                      final Throwable _ex)
     {
         super("An " + _ex.getClass().getName() + " exception occured " +
               "while executing method " + _method.getName() +
@@ -71,21 +71,21 @@ public class DynamicInvocationException extends RuntimeException
         this.rootCause = _ex;
     }
 
-    public DynamicInvocationException(Method _method,
-                                      Object _target,
-                                      InvocationTargetException _ex)
+    public DynamicInvocationException(final Method _method,
+                                      final Object _target,
+                                      final InvocationTargetException _ex)
     {
       super("An error occured while executing method " + _method.getName() +
             " on " + _target + ", " + _ex.getCause());
       this.rootCause = _ex;
     }
 
-    public DynamicInvocationException(String message, Throwable _rootCause) {
+    public DynamicInvocationException(final String message, final Throwable _rootCause) {
       super(message + " RootCause: " + _rootCause);
       this.rootCause = _rootCause;
     }
 
-    public DynamicInvocationException(Throwable _rootCause) {
+    public DynamicInvocationException(final Throwable _rootCause) {
       this.rootCause = _rootCause;
     }
 
