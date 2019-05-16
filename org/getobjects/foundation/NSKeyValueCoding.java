@@ -25,10 +25,10 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.kvc.IPropertyAccessor;
 import org.getobjects.foundation.kvc.KVCWrapper;
-import org.getobjects.foundation.kvc.MissingAccessorException;
-import org.getobjects.foundation.kvc.MissingPropertyException;
 
 public interface NSKeyValueCoding {
 
@@ -41,7 +41,7 @@ public interface NSKeyValueCoding {
 
   /* utility class (use those methods to query objects with KVC) */
 
-  public class Utility { // called KVCWrapper in Marcus' code
+  public class Utility {
 
     public static void takeValueForKey(final Object _o, final Object _value, final String _key) {
       if (_o == null)
@@ -70,21 +70,22 @@ public interface NSKeyValueCoding {
    */
   public class DefaultImplementation {
 
+    private static final Log logger =
+      LogFactory.getLog(DefaultImplementation.class);
+
     public static void takeValueForKey(final Object _o, Object _value, final String _key) {
       // IMPORTANT: keep consistent with NSObject.takeValueForKey()!!
       if (_o == null)
         return;
 
-      try { // TODO: avoid this exception handler (COSTLY!)
-        final IPropertyAccessor accessor =
+      final IPropertyAccessor accessor =
           KVCWrapper.forClass(_o.getClass()).getAccessor(_o, _key);
-        if (accessor == null) {
-          if (_o instanceof NSKeyValueCoding) {
+        if (accessor == null || !accessor.canWriteKey(_key)) {
+          if (_o instanceof NSKeyValueCoding)
             ((NSKeyValueCoding)_o).handleTakeValueForUnboundKey(_value, _key);
-            return;
-          }
-
-          throw new MissingPropertyException(_o, _key);
+          else
+            handleTakeValueForUnboundKey(_o, _value, _key);
+          return;
         }
 
         /* found accessor */
@@ -107,24 +108,6 @@ public interface NSKeyValueCoding {
           }
         }
         accessor.set(_o, _key, _value);
-      }
-      catch (final MissingPropertyException e) {
-        if (_o instanceof NSKeyValueCoding) {
-          ((NSKeyValueCoding)_o).handleTakeValueForUnboundKey(_value, _key);
-          return;
-        }
-
-        throw e; // TODO: better just return?
-      }
-      catch (final MissingAccessorException e) {
-        /* this is when a setX method is missing (but a get is available) */
-        if (_o instanceof NSKeyValueCoding) {
-          ((NSKeyValueCoding)_o).handleTakeValueForUnboundKey(_value, _key);
-          return;
-        }
-
-        throw e; // TODO: better just return?
-      }
     }
 
     public static Object valueForKey(final Object _o, final String _key) {
@@ -132,37 +115,29 @@ public interface NSKeyValueCoding {
       if (_o == null)
         return null;
 
-      try { // TODO: avoid this exception handler (COSTLY!)
-        final IPropertyAccessor accessor =
+      final IPropertyAccessor accessor =
           KVCWrapper.forClass(_o.getClass()).getAccessor(_o, _key);
 
-        if (accessor == null) {
+        if (accessor == null || !accessor.canReadKey(_key)) {
           if (_o instanceof NSKeyValueCoding)
             return ((NSKeyValueCoding)_o).handleQueryWithUnboundKey(_key);
-
-          throw new MissingPropertyException(_o, _key);
+          return handleQueryWithUnboundKey(_o, _key);
         }
 
         return accessor.get(_o, _key);
-      }
-      catch (final MissingPropertyException e) {
-        if (_o instanceof NSKeyValueCoding)
-          return ((NSKeyValueCoding)_o).handleQueryWithUnboundKey(_key);
-
-        throw e; // TODO: better return null?
-      }
-      catch (final MissingAccessorException e) {
-        if (_o instanceof NSKeyValueCoding)
-          return ((NSKeyValueCoding)_o).handleQueryWithUnboundKey(_key);
-
-        throw e; // TODO: better return null?
-      }
     }
 
     public static void handleTakeValueForUnboundKey(final Object _o, final Object _value, final String _key) {
-      // TODO: raise exception? which one?
+      if (logger.isWarnEnabled()) {
+        logger.warn("Can not set value '" + _value + "' for key '" +
+                    _key + "' on instance of class '" + _o.getClass() + "'");
+      }
     }
     public static Object handleQueryWithUnboundKey(final Object _o, final String _key) {
+      if (logger.isWarnEnabled()) {
+        logger.warn("Can not get value for key '" + _key + "' on " +
+                    "instance of class '" + _o.getClass() + "'");
+      }
       return null;
     }
   }
@@ -202,13 +177,13 @@ public interface NSKeyValueCoding {
         return;
 
       if (_key == null || _key.length() == 0) {
-        this.handleTakeValueForUnboundKey(_value, _key);
+        handleTakeValueForUnboundKey(_value, _key);
         return;
       }
 
       final char c0 = _key.charAt(0);
       if (c0 < '0' && c0 > '9') {
-        this.handleTakeValueForUnboundKey(_value, _key);
+        handleTakeValueForUnboundKey(_value, _key);
         return;
       }
 
@@ -217,17 +192,17 @@ public interface NSKeyValueCoding {
         idx = (numFmt.parse(_key)).intValue();
       }
       catch (final ParseException e) {
-        this.handleTakeValueForUnboundKey(_value, _key);
+        handleTakeValueForUnboundKey(_value, _key);
         return;
       }
 
       if (idx < 0) {
-        this.handleTakeValueForUnboundKey(_value, _key);
+        handleTakeValueForUnboundKey(_value, _key);
         return;
       }
 
       if (idx >= this.array.length) { // do we want to support growing?
-        this.handleTakeValueForUnboundKey(_value, _key);
+        handleTakeValueForUnboundKey(_value, _key);
         return;
       }
 
@@ -241,7 +216,7 @@ public interface NSKeyValueCoding {
         return null;
 
       if (_key == null || _key.length() == 0)
-        return this.handleQueryWithUnboundKey(_key);
+        return handleQueryWithUnboundKey(_key);
 
       final char c0 = _key.charAt(0);
 
@@ -257,18 +232,18 @@ public interface NSKeyValueCoding {
       }
 
       if (c0 < '0' && c0 > '9')
-        return this.handleQueryWithUnboundKey(_key);
+        return handleQueryWithUnboundKey(_key);
 
       int idx;
       try {
         idx = (numFmt.parse(_key)).intValue();
       }
       catch (final ParseException e) {
-        return this.handleQueryWithUnboundKey(_key);
+        return handleQueryWithUnboundKey(_key);
       }
 
       if (idx < 0 || idx > this.array.length)
-        return this.handleQueryWithUnboundKey(_key);
+        return handleQueryWithUnboundKey(_key);
 
       return this.array[idx];
     }

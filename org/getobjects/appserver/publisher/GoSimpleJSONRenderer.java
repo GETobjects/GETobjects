@@ -39,7 +39,6 @@ import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UList;
 import org.getobjects.foundation.UObject;
 import org.getobjects.foundation.UString;
-import org.getobjects.foundation.kvc.MissingPropertyException;
 
 /**
  * GoSimpleJSONRenderer
@@ -56,12 +55,12 @@ public class GoSimpleJSONRenderer extends NSObject
   implements IGoObjectRenderer
 {
   protected static final Log log = LogFactory.getLog("GoSimpleJSONRenderer");
-  
+
   final DateFormat dateFormat;
-  
+
   public GoSimpleJSONRenderer() {
     this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));    
+    this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
   /* control rendering */
@@ -69,7 +68,7 @@ public class GoSimpleJSONRenderer extends NSObject
   public boolean isJSONRequest(final WORequest _rq) {
     if (_rq == null)
       return false;
-    
+
     if (_rq.acceptsContentType("application/json", false /* no wildcard */))
       return true;
 
@@ -79,8 +78,9 @@ public class GoSimpleJSONRenderer extends NSObject
 
     return false;
   }
-  
-  public boolean canRenderObjectInContext(Object _object, WOContext _ctx) {
+
+  @Override
+  public boolean canRenderObjectInContext(final Object _object, final WOContext _ctx) {
     /* enforce JSON */
     if (_object instanceof GoJSONResult)
       return true;
@@ -93,12 +93,12 @@ public class GoSimpleJSONRenderer extends NSObject
       return false;
     }
 
-    if (!this.isJSONRequest(rq)) {
+    if (!isJSONRequest(rq)) {
       if (log.isInfoEnabled())
         log.info("request accepts no JSON: " + rq);
       return false;
     }
-    
+
     if (_object instanceof GoException) // 404, 401 and such. Deliver as HTTP.
       return false;
 
@@ -114,7 +114,7 @@ public class GoSimpleJSONRenderer extends NSObject
     if (_object instanceof Map)       return true;
     if (_object instanceof Throwable) return true;
     if (_object instanceof Date)      return true;
-    
+
     final Class itemClazz = _object.getClass().getComponentType();
     if (itemClazz != null) { /* an array */
       // FIXME: check componenttype, refactor this section to be recursive
@@ -127,11 +127,12 @@ public class GoSimpleJSONRenderer extends NSObject
 
   /* rendering */
 
-  public Exception renderObjectInContext(final Object _object, WOContext _ctx) {
+  @Override
+  public Exception renderObjectInContext(final Object _object, final WOContext _ctx) {
     final StringBuilder json = new StringBuilder(4096);
-    final Exception error = this.appendObjectToString(_object, json);
+    final Exception error = appendObjectToString(_object, json);
     if (error != null) return error;
-    
+
     // check for JSONP
     final WORequest rq = _ctx.request();
     String cb = null;
@@ -147,18 +148,18 @@ public class GoSimpleJSONRenderer extends NSObject
       r.setHeaderForKey("application/javascript; charset=utf-8","content-type");
     else
       r.setHeaderForKey("application/json; charset=utf-8", "content-type");
-    
+
     /* Support httpStatus in NSException's, gives the exception a little
      * control. */
     if (_object instanceof NSException) {
-      int status = 
+      final int status =
           UObject.intValue(((NSException)_object).valueForKey("httpStatus"));
       if (status >= 200 && status < 1000)
         r.setStatus(status);
       else
         r.setStatus(500);
     }
-    
+
     r.enableStreaming();
     if (cb != null) r.appendContentString(cb + "(");
     r.appendContentString(json.toString());
@@ -178,17 +179,17 @@ public class GoSimpleJSONRenderer extends NSObject
     "\t", "\\t",
   };
 
-  public Exception appendObjectToString(Object _object, StringBuilder _sb) {
+  public Exception appendObjectToString(final Object _object, final StringBuilder _sb) {
     if (_object == null) {
       _sb.append("null");
       return null;
     }
 
     if (_object instanceof GoJSONResult)
-      return this.appendObjectToString(((GoJSONResult)_object).result(), _sb);
+      return appendObjectToString(((GoJSONResult)_object).result(), _sb);
 
     if (_object instanceof String) {
-      String s = (String)_object;
+      final String s = (String)_object;
       _sb.append("\"");
       _sb.append(UString.replaceInSequence(s, JSEscapeList));
       _sb.append("\"");
@@ -206,27 +207,27 @@ public class GoSimpleJSONRenderer extends NSObject
     }
 
     if (_object instanceof List)
-      return this.appendListToString((List)_object, _sb);
+      return appendListToString((List)_object, _sb);
 
     if (_object instanceof Map)
-      return this.appendMapToString((Map)_object, _sb);
+      return appendMapToString((Map)_object, _sb);
 
     if (_object instanceof Throwable)
-      return this.appendExceptionToString((Throwable)_object, _sb);
+      return appendExceptionToString((Throwable)_object, _sb);
 
     final Class itemClazz = _object.getClass().getComponentType();
     if (itemClazz != null) /* an array */
-      return this.appendListToString(UList.asList(_object), _sb);
-    
+      return appendListToString(UList.asList(_object), _sb);
+
     if (_object instanceof Date)
-      return this.appendDateToString((Date)_object, _sb);
-    
-    return this.appendCustomObjectToString(_object, _sb);
+      return appendDateToString((Date)_object, _sb);
+
+    return appendCustomObjectToString(_object, _sb);
   }
 
   /* specific appenders */
 
-  public Exception appendExceptionToString(Throwable _ex, StringBuilder _sb) {
+  public Exception appendExceptionToString(final Throwable _ex, final StringBuilder _sb) {
     if (_ex == null) {
       _sb.append("null");
       return null;
@@ -239,18 +240,10 @@ public class GoSimpleJSONRenderer extends NSObject
 
     Object v = null;
 
-    if (v == null) {
-      try {
-        v = NSKeyValueCoding.Utility.valueForKey(_ex, "code");
-      }
-      catch (MissingPropertyException e) { } /* we do not care and continue */
-    }
-    if (v == null) {
-      try {
-        v = NSKeyValueCoding.Utility.valueForKey(_ex, "errorCode");
-      }
-      catch (MissingPropertyException e) { } /* we do not care and continue */
-    }
+    if (v == null)
+      v = NSKeyValueCoding.Utility.valueForKey(_ex, "code");
+    if (v == null)
+      v = NSKeyValueCoding.Utility.valueForKey(_ex, "errorCode");
 
     if (_ex instanceof SQLException)
       v = "sql" + ((SQLException)_ex).getSQLState();
@@ -261,7 +254,7 @@ public class GoSimpleJSONRenderer extends NSObject
     if (v == null)
       v = "unknown";
 
-    error = this.appendKeyValuePair("error", v, true, _sb);
+    error = appendKeyValuePair("error", v, true, _sb);
     if (error != null) return error;
 
     /* added messages */
@@ -271,23 +264,21 @@ public class GoSimpleJSONRenderer extends NSObject
     if (pm == sm || (pm != null && sm != null && pm.equals(sm)))
       sm = null;
 
-    error = this.appendKeyValuePair("message", pm, false, _sb);
+    error = appendKeyValuePair("message", pm, false, _sb);
     if (error != null) return error;
 
-    error = this.appendKeyValuePair("localizedMessage", sm, false, _sb);
+    error = appendKeyValuePair("localizedMessage", sm, false, _sb);
     if (error != null) return error;
 
     /* additional standard keys */
 
-    v = null;
-    try { v = NSKeyValueCoding.Utility.valueForKey(_ex, "httpStatus"); }
-    catch (MissingPropertyException e) { } /* we do not care and continue */
+    v = NSKeyValueCoding.Utility.valueForKey(_ex, "httpStatus");
 
-    error = this.appendKeyValuePair("httpStatus", v, false, _sb);
+    error = appendKeyValuePair("httpStatus", v, false, _sb);
     if (error != null) return error;
 
     if (_ex instanceof SQLException) {
-      error = this.appendKeyValuePair
+      error = appendKeyValuePair
         ("sqlstate", ((SQLException)_ex).getSQLState(), false, _sb);
       if (error != null) return error;
     }
@@ -297,18 +288,18 @@ public class GoSimpleJSONRenderer extends NSObject
   }
 
   public Exception appendKeyValuePair
-    (Object _key, Object _value, boolean _isFirst, StringBuilder _sb)
+    (final Object _key, final Object _value, final boolean _isFirst, final StringBuilder _sb)
   {
     if (_value == null) return null;
 
     if (!_isFirst) _sb.append(",");
-    Exception error = this.appendObjectToString(_key, _sb);
+    final Exception error = appendObjectToString(_key, _sb);
     if (error != null) return error;
     _sb.append(':');
-    return this.appendObjectToString(_value, _sb);
+    return appendObjectToString(_value, _sb);
   }
 
-  public Exception appendListToString(List _list, StringBuilder _sb) {
+  public Exception appendListToString(final List _list, final StringBuilder _sb) {
     if (_list == null) {
       _sb.append("null");
       return null;
@@ -317,11 +308,11 @@ public class GoSimpleJSONRenderer extends NSObject
     _sb.append('[');
 
     boolean isFirst = true;
-    for (Object value: _list) {
+    for (final Object value: _list) {
       if (isFirst) isFirst = false;
       else _sb.append(',');
 
-      Exception error = this.appendObjectToString(value, _sb);
+      final Exception error = appendObjectToString(value, _sb);
       if (error != null) return error;
     }
 
@@ -329,7 +320,7 @@ public class GoSimpleJSONRenderer extends NSObject
     return null;
   }
 
-  public Exception appendMapToString(Map _map, StringBuilder _sb) {
+  public Exception appendMapToString(final Map _map, final StringBuilder _sb) {
     if (_map == null) {
       _sb.append("null");
       return null;
@@ -338,7 +329,7 @@ public class GoSimpleJSONRenderer extends NSObject
     _sb.append('{');
 
     boolean isFirst = true;
-    for (Object key: _map.keySet()) {
+    for (final Object key: _map.keySet()) {
       if (isFirst) isFirst = false;
       else _sb.append(',');
 
@@ -346,19 +337,19 @@ public class GoSimpleJSONRenderer extends NSObject
         return new GoInternalErrorException("cannot render given object " +
                                             "as JSON");
       }
-      Exception error = this.appendObjectToString(key, _sb);
+      Exception error = appendObjectToString(key, _sb);
       if (error != null) return error;
 
       _sb.append(':');
-      error = this.appendObjectToString(_map.get(key), _sb);
+      error = appendObjectToString(_map.get(key), _sb);
       if (error != null) return error;
     }
 
     _sb.append('}');
     return null;
   }
-  
-  public Exception appendDateToString(final Date _ts, StringBuilder _sb) {
+
+  public Exception appendDateToString(final Date _ts, final StringBuilder _sb) {
     if (_ts == null) {
       _sb.append("null");
       return null;
@@ -370,11 +361,11 @@ public class GoSimpleJSONRenderer extends NSObject
     return null;
   }
 
-  public Exception appendCustomObjectToString(Object _obj, StringBuilder _sb) {
+  public Exception appendCustomObjectToString(final Object _obj, final StringBuilder _sb) {
     if (_obj instanceof Exception)
       return (Exception)_obj;
 
-    log.warn("cannot render object as JSON: " + _obj + 
+    log.warn("cannot render object as JSON: " + _obj +
              " (" + _obj.getClass() + ")");
     return new GoInternalErrorException("cannot render given object as JSON");
   }

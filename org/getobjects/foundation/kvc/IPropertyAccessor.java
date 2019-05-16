@@ -45,12 +45,9 @@ public interface IPropertyAccessor {
 
   Class getWriteType(); // used to detect Boolean
 
-  /**
-   *  Returns the current value of the property in the instance.
-   * @param key TODO
-   *
-   **/
+  boolean canReadKey(final String key);
   Object get(final Object instance, final String key);
 
+  boolean canWriteKey(final String key);
   void set(final Object instance, final String key, final Object value);
 }

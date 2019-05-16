@@ -66,6 +66,11 @@ public class MapKVCWrapper extends KVCWrapper {
     }
 
     @Override
+    public boolean canReadKey(final String key) {
+      return true;
+    }
+
+    @Override
     public Object get(final Object _instance, final String _key) {
       // TODO: avg, etc.
       // @see https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/CollectionOperators.html
@@ -76,8 +81,8 @@ public class MapKVCWrapper extends KVCWrapper {
     }
 
     @Override
-    public Class getWriteType() {
-      return Object.class;
+    public boolean canWriteKey(final String key) {
+      return false;
     }
 
     @Override
@@ -87,8 +92,8 @@ public class MapKVCWrapper extends KVCWrapper {
     }
 
     @Override
-    public String toString() {
-      return "MapKVCWrapper.MapAccessor";
+    public Class getWriteType() {
+      return Object.class;
     }
   }
 

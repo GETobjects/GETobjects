@@ -35,16 +35,6 @@ package org.getobjects.foundation.kvc;
 
 import java.lang.reflect.Field;
 
-/**
- *
- * Facilitiates access to public instance variables as if they were JavaBeans
- * properties.
- *
- * @author Howard Lewis Ship
- * @version $Id: FieldAccessor.java,v 1.1.1.1 2002/06/25 10:50:55 znek Exp $
- * @since 1.0.1
- *
- */
 class FieldAccessor implements IPropertyAccessor {
   private final Field field;
 
@@ -54,6 +44,28 @@ class FieldAccessor implements IPropertyAccessor {
 
   public String getName() {
     return this.field.getName();
+  }
+
+  @Override
+  public boolean canReadKey(final String key) {
+    return true;
+  }
+
+  @Override
+  public Object get(final Object instance, final String key) {
+    try {
+      return this.field.get(instance);
+    }
+    catch (final Exception ex) {
+      throw new DynamicInvocationException(
+          "Unable to read public attribute " + this.field.getName() +
+          " of " + instance, ex);
+    }
+  }
+
+  @Override
+  public boolean canWriteKey(final String key) {
+    return true;
   }
 
   // TBD: always building the exception reasons is still costly
@@ -80,17 +92,5 @@ class FieldAccessor implements IPropertyAccessor {
   @Override
   public Class getWriteType() {
     return this.field.getType();
-  }
-
-  @Override
-  public Object get(final Object instance, final String key) {
-    try {
-      return this.field.get(instance);
-    }
-    catch (final Exception ex) {
-      throw new DynamicInvocationException(
-          "Unable to read public attribute " + this.field.getName() +
-          " of " + instance, ex);
-    }
   }
 }

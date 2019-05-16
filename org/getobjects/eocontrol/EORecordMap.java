@@ -10,7 +10,6 @@ import java.util.Set;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
-import org.getobjects.foundation.kvc.MissingPropertyException;
 
 /**
  * EORecordMap
@@ -22,7 +21,7 @@ import org.getobjects.foundation.kvc.MissingPropertyException;
  * all result objects.
  */
 public class EORecordMap extends AbstractMap<String, Object>
-  implements Map<String, Object>, Cloneable, 
+  implements Map<String, Object>, Cloneable,
              NSKeyValueCoding, NSKeyValueCodingAdditions
 {
   protected int      size;
@@ -30,14 +29,14 @@ public class EORecordMap extends AbstractMap<String, Object>
   protected int[]    keyHashes;
   protected Object[] values;
   protected Set<Map.Entry<String, Object>> entrySet;
-  
-  public EORecordMap(String[] _keys, int[] _hashes, Object[] _values) {
+
+  public EORecordMap(final String[] _keys, final int[] _hashes, final Object[] _values) {
     /* Those arrays are used as-is, they are considered constant for a
      * group of records!
      */
     this.size = _keys != null ? _keys.length : 0;
     this.keys = _keys;
-    
+
     if (_hashes != null)
       this.keyHashes = _hashes;
     else {
@@ -45,7 +44,7 @@ public class EORecordMap extends AbstractMap<String, Object>
       for (int i = 0; i < this.size; i++)
         this.keyHashes[i] = _keys[i].hashCode();
     }
-    
+
     /* this array must be copied */
     this.values = new Object[this.size];
     if (_values != null) {
@@ -53,30 +52,30 @@ public class EORecordMap extends AbstractMap<String, Object>
         this.values[i] = _values[i];
     }
   }
-  public EORecordMap(String[] _keys, int[] _hashes) {
+  public EORecordMap(final String[] _keys, final int[] _hashes) {
     this(_keys, _hashes, null /* no values */);
   }
-  public EORecordMap(String[] _keys) {
+  public EORecordMap(final String[] _keys) {
     this(_keys, null /* calc hashes */, null /* no values */);
   }
-  
-  
+
+
   /* basic ops */
-  
+
   /**
    * Changes the key of some value. This is used during column=>attribute
    * mapping.
    * <p>
    * CAREFUL: this modifies the key in ALL 'associated' records (eg all results
    * of a single fetch).
-   * 
+   *
    * @param _oldKey - key to replace (eg c_first_name)
    * @param _newKey - new key to use (eg firstName)
    * @return true if the key was found (and got switched), false if not
    */
   public boolean switchKey(final String _oldKey, final String _newKey) {
     final int oldHash = _oldKey.hashCode();
-    
+
     for (int i = this.size - 1; i >= 0; i--) {
       if (this.keyHashes[i] == oldHash) {
         /* same hash */
@@ -89,24 +88,24 @@ public class EORecordMap extends AbstractMap<String, Object>
     }
     return false;
   }
-  
+
   @Override
   public Object put(final String _key, final Object _value) {
     if (_key == null)
       return null;
-    
+
     final int keyHash = _key.hashCode();
     for (int i = this.size - 1; i >= 0; i--) {
       if (this.keyHashes[i] == keyHash) {
         /* same hash */
         if (this.keys[i] == _key || _key.equals(this.keys[i])) {
-          Object oldValue = this.values[i];
+          final Object oldValue = this.values[i];
           this.values[i] = _value;
           return oldValue; /* DONE */
         }
       }
     }
-    
+
     throw new NSException("given key is not a fetch result: " + _key);
   }
 
@@ -114,7 +113,7 @@ public class EORecordMap extends AbstractMap<String, Object>
   public Object get(final Object _key) {
     if (_key == null) return null;
     final int keyHash = _key.hashCode();
-    
+
     for (int i = this.size - 1; i >= 0; i--) {
       if (this.keyHashes[i] == keyHash) {
         /* same hash */
@@ -124,11 +123,11 @@ public class EORecordMap extends AbstractMap<String, Object>
     }
     return null;
   }
-  
+
   @Override
   public boolean containsKey(final Object _key) {
     if (_key == null) return false;
-    
+
     final int keyHash = _key.hashCode();
     for (int i = this.size - 1; i >= 0; i--) {
       if (this.keyHashes[i] == keyHash) {
@@ -139,8 +138,8 @@ public class EORecordMap extends AbstractMap<String, Object>
     }
     return false;
   }
-  
-  
+
+
   /* AbstractMap Entry Point */
 
   @Override
@@ -150,17 +149,18 @@ public class EORecordMap extends AbstractMap<String, Object>
     return this.entrySet;
   }
 
-  
+
   /* cloning */
-  
+
   @Override
   public Object clone() {
     return new EORecordMap(this.keys, this.keyHashes, this.values);
   }
-  
-  
+
+
   /* KVC */
-  
+
+  @Override
   public void takeValueForKey(final Object _value, final String _key) {
     if (_key != null) {
       final int keyHash = _key.hashCode();
@@ -175,14 +175,15 @@ public class EORecordMap extends AbstractMap<String, Object>
         }
       }
     }
-    
+
     /* failed */
-    this.handleTakeValueForUnboundKey(_value, _key);
+    handleTakeValueForUnboundKey(_value, _key);
   }
+  @Override
   public Object valueForKey(final String _key) {
     if (_key == null) return null;
     final int keyHash = _key.hashCode();
-    
+
     for (int i = this.size - 1; i >= 0; i--) {
       if (this.keyHashes[i] == keyHash) {
         /* same hash */
@@ -190,37 +191,40 @@ public class EORecordMap extends AbstractMap<String, Object>
           return this.values[i];
       }
     }
-    return this.handleQueryWithUnboundKey(_key);
+    return handleQueryWithUnboundKey(_key);
   }
-  
-  public void handleTakeValueForUnboundKey(Object _value, String _key) {
-    // do nothing?
-    throw new MissingPropertyException(_value, _key);
+
+  @Override
+  public void handleTakeValueForUnboundKey(final Object _value, final String _key) {
   }
-  public Object handleQueryWithUnboundKey(String _key) {
+  @Override
+  public Object handleQueryWithUnboundKey(final String _key) {
     return null;
   }
 
+  @Override
   public void takeValueForKeyPath(final Object _value, final String _keyPath) {
     NSKeyValueCodingAdditions.DefaultImplementation.
       takeValueForKeyPath(this, _value, _keyPath);
   }
+  @Override
   public Object valueForKeyPath(final String _keyPath) {
     return NSKeyValueCodingAdditions.DefaultImplementation.
-             valueForKeyPath(this, _keyPath);    
+             valueForKeyPath(this, _keyPath);
   }
-  
+
   /**
    * Calls takeValueForKey() for each key/value pair in the Map.
-   * 
+   *
    * @param _map - the key/value pairs to be applied on the object
    */
+  @Override
   public void takeValuesFromDictionary(final Map<String, Object> _map) {
     if (_map == null)
       return;
-    
-    for (String key: _map.keySet())
-      this.takeValueForKey(_map.get(key), key);
+
+    for (final String key: _map.keySet())
+      takeValueForKey(_map.get(key), key);
   }
   /**
    * Calls valueForKey() for each key in the array. If there is no value for the
@@ -228,47 +232,49 @@ public class EORecordMap extends AbstractMap<String, Object>
    * <p>
    * If the key array is empty, we still return an empty map. If the key array
    * is null, we return null.
-   * 
+   *
    * @param _keys - keys to be extracted
    * @return a Map containg the values for the keys, null if _keys is null
    */
+  @Override
   public Map<String, Object> valuesForKeys(final String[] _keys) {
     if (_keys == null)
       return null;
-    
-    Map<String, Object> vals = new HashMap<String, Object>(_keys.length);
+
+    final Map<String, Object> vals = new HashMap<>(_keys.length);
     if (_keys.length == 0) return vals;
-    
+
     for (int i = 0; i < _keys.length; i++) {
-      Object v = this.valueForKey(_keys[i]);
+      final Object v = valueForKey(_keys[i]);
       if (v != null) vals.put(_keys[i], v);
     }
     return vals;
   }
 
-  
+
   /* Entry helpers */
-  
+
   static class EntrySet extends AbstractSet<Map.Entry<String, Object>>
     implements Set<Map.Entry<String, Object>>
   {
-    
+
     protected EORecordMap map;
     protected Entry[] entries;
-    
+
     public EntrySet(final EORecordMap _map) {
       this.map = _map;
     }
 
+    @Override
     public boolean contains(final Object _o) {
       // TBD: complete me
       if (!(_o instanceof Entry))
         return false;
-      
+
       // hm, should be ok ;-)
       if (((Entry)_o).map == this.map)
         return true;
-      
+
       return false;
     }
 
@@ -276,7 +282,7 @@ public class EORecordMap extends AbstractMap<String, Object>
     public Iterator<Map.Entry<String, Object>> iterator() {
       if (this.entries == null)
         this.entries = new Entry[this.map.size];
-      
+
       return new EntrySetIterator(this);
     }
 
@@ -284,68 +290,74 @@ public class EORecordMap extends AbstractMap<String, Object>
     public int size() {
       return this.map.size;
     }
-    
+
   }
-  
+
   static class EntrySetIterator implements Iterator<Map.Entry<String, Object>> {
 
     protected EORecordMap map;
     protected EntrySet    set;
     protected int         idx;
-    
+
     public EntrySetIterator(final EntrySet _set) {
       this.set = _set;
       this.map = _set.map;
       this.idx = 0;
     }
 
+    @Override
     public boolean hasNext() {
       return this.idx < this.map.size;
     }
 
+    @Override
     public Entry next() {
       if (this.idx >= this.map.size)
         return null;
-      
+
       Entry e = this.set.entries[this.idx];
       if (e == null) {
         e = new Entry(this.map, this.idx);
         this.set.entries[this.idx] = e;
       }
-      
+
       this.idx++;
       return e;
     }
 
+    @Override
     public void remove() {
       throw new UnsupportedOperationException("remove not supported");
     }
-    
+
   }
 
   static class Entry implements Map.Entry<String,Object> {
-    
+
     protected EORecordMap map;
     protected int         idx;
-    
+
     public Entry(final EORecordMap _map, final int _idx) {
       this.map = _map;
       this.idx = _idx;
     }
 
+    @Override
     public String getKey() {
       return this.map.keys[this.idx];
     }
 
+    @Override
     public Object getValue() {
       return this.map.values[this.idx];
     }
 
-    public Object setValue(Object _value) {
+    @Override
+    public Object setValue(final Object _value) {
       final Object oldValue = this.map.values[this.idx];
       this.map.values[this.idx] = _value;
       return oldValue;
     }
-    
+
   }
 }

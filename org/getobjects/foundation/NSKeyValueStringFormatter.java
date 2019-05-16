@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.foundation.kvc.MissingPropertyException;
 
 /**
  * NSKeyValueStringFormatter
@@ -67,16 +66,16 @@ public class NSKeyValueStringFormatter extends NSObject {
     protected int      posArgCursor   = 0;
     protected Object[] valArray;
 
-    public ArrayValueHandler(Object[] _array) {
+    public ArrayValueHandler(final Object[] _array) {
       this.valArray = _array;
     }
-    public ArrayValueHandler(List<Object> _list) {
+    public ArrayValueHandler(final List<Object> _list) {
       this.valArray = _list.toArray(new Object[0]);
     }
 
     /**
      * In the array implementation this usually is invoked without a key. When
-     * its called, it consumes a position in the value array as a sideeffect.
+     * it's called, it consumes a position in the value array as a side effect.
      * Hence, you may not call it multiple times!!!
      * <p>
      * However, it does support some keys which do *not* advance the position:
@@ -93,7 +92,7 @@ public class NSKeyValueStringFormatter extends NSObject {
         if ("length".equals(_key) || "size".equals(_key))
           value = new Integer(this.valArray.length);
         else {
-          int idx = Integer.parseInt(_key);
+          final int idx = Integer.parseInt(_key);
           if (idx < 0 || idx >= this.valArray.length)
             this.lastWasKeyMiss = true;
           else
@@ -117,7 +116,7 @@ public class NSKeyValueStringFormatter extends NSObject {
     protected NSKeyValueCodingAdditions kvc;
     protected Object object;
 
-    public KeyValueHandler(Object _object) {
+    public KeyValueHandler(final Object _object) {
       if (_object == null)
         ;
       else if (_object instanceof NSKeyValueCodingAdditions)
@@ -127,23 +126,18 @@ public class NSKeyValueStringFormatter extends NSObject {
     }
 
     @Override
-    public Object valueForKey(String _key) {
+    public Object valueForKey(final String _key) {
       if (_key == null) {
         log.error("missing keypath for %(key)s style format!");
         return null;
       }
 
       Object value = null;
-      try {
-        if (this.kvc != null)
-          value = this.kvc.valueForKeyPath(_key);
-        else {
-          value = NSKeyValueCodingAdditions.Utility
-            .valueForKeyPath(this.object, _key);
-        }
-      }
-      catch (MissingPropertyException e) {
-        this.lastWasKeyMiss = true;
+      if (this.kvc != null)
+        value = this.kvc.valueForKeyPath(_key);
+      else {
+        value = NSKeyValueCodingAdditions.Utility
+          .valueForKeyPath(this.object, _key);
       }
 
       return value;
@@ -178,7 +172,7 @@ public class NSKeyValueStringFormatter extends NSObject {
     /* parse the pattern and replace values */
 
     final char[] pattern = _pattern.toCharArray();
-    StringBuilder sb = new StringBuilder(pattern.length * 2);
+    final StringBuilder sb = new StringBuilder(pattern.length * 2);
     for (int i = 0; i < pattern.length; i++) {
       char c = pattern[i];
 

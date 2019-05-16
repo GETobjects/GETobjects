@@ -13,6 +13,11 @@ public class ListKVCWrapper extends KVCWrapper {
     }
 
     @Override
+    public boolean canReadKey(final String key) {
+      return true;
+    }
+
+    @Override
     public Object get(final Object _instance, final String _key) {
       @SuppressWarnings("unchecked")
       final List<Object> l = (List<Object>)_instance;
@@ -32,8 +37,8 @@ public class ListKVCWrapper extends KVCWrapper {
     }
 
     @Override
-    public Class getWriteType() {
-      return Object.class;
+    public boolean canWriteKey(final String key) {
+      return false;
     }
 
     @Override
@@ -43,8 +48,8 @@ public class ListKVCWrapper extends KVCWrapper {
     }
 
     @Override
-    public String toString() {
-      return "ListKVCWrapper.ListAccessor";
+    public Class getWriteType() {
+      return Object.class;
     }
   }
 

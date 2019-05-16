@@ -51,78 +51,6 @@ import org.apache.commons.logging.LogFactory;
 public class PropertyAccessor implements IPropertyAccessor {
   private static final Log logger = LogFactory.getLog(PropertyAccessor.class);
 
-  protected String name;
-  protected Class  type;
-  protected Method getter;
-  protected Method setter;
-
-  PropertyAccessor(final String _name, final Class _type) {
-    this.name   = _name;
-    this.type   = _type;
-  }
-  PropertyAccessor(final String _name, final Class _type, final Method _getter, final Method _setter) {
-    this(_name, _type);
-    this.getter = _getter;
-    this.setter = _setter;
-  }
-
-
-  private static abstract class MixedAccessor extends PropertyAccessor {
-    protected FieldAccessor fa;
-
-    MixedAccessor(final String _name, final Class _type, final FieldAccessor _fa) {
-      super(_name, _type);
-      this.fa = _fa;
-    }
-  }
-
-
-  /**
-   *  Instances of this class or only created if BOTH _getter AND _fa are
-   *  provided - so no need to test for the existence of both!
-   */
-  private static class PropertyGetterAndFieldSetterAccessor
-    extends MixedAccessor
-  {
-    PropertyGetterAndFieldSetterAccessor
-      (final String _name, final Class _type, final Method _getter, final FieldAccessor _fa)
-    {
-      super(_name, _type, _fa);
-      this.getter = _getter;
-    }
-
-    @Override
-    public Class getWriteType() {
-      return this.fa.getWriteType();
-    }
-
-    @Override
-    public void set(final Object _target, final String _key, final Object _value) {
-      this.fa.set(_target, _key, _value);
-    }
-  }
-
-  /**
-   *  Instances of this class or only created if BOTH _setter AND _fa are
-   *  provided - so no need to test for the existence of both!
-   */
-  private static class PropertySetterAndFieldGetterAccessor
-    extends MixedAccessor
-  {
-    PropertySetterAndFieldGetterAccessor
-      (final String _name, final Class _type, final Method _setter, final FieldAccessor _fa)
-    {
-      super(_name, _type, _fa);
-      this.setter = _setter;
-    }
-
-    @Override
-    public Object get(final Object _target, final String key) {
-      return this.fa.get(_target, key);
-    }
-  }
-
-
   /**
    * Factory
    */
@@ -141,29 +69,37 @@ public class PropertyAccessor implements IPropertyAccessor {
     return new PropertyAccessor(_name, _type, _getter, _setter);
   }
 
+  protected String name;
+  protected Class  type;
+  protected Method getter;
+  protected Method setter;
+
+  PropertyAccessor(final String _name, final Class _type) {
+    this.name   = _name;
+    this.type   = _type;
+  }
+  PropertyAccessor(final String _name, final Class _type, final Method _getter, final Method _setter) {
+    this(_name, _type);
+    this.getter = _getter;
+    this.setter = _setter;
+  }
+
   public String getName() {
     return this.name;
   }
 
-  /**
-   *
-   * @throws MissingAccessorException
-   *           if the class does not define an accessor method for the property.
-   *
-   */
+  @Override
+  public boolean canReadKey(final String key) {
+    return this.getter != null;
+  }
+
   @Override
   public Object get(final Object _target, final String key) {
     if (logger.isDebugEnabled())
       logger.debug("Getting property " + getName() + " from " + _target);
 
-    if (this.getter == null) {
-      final String propertyName = getName();
-
-      throw new MissingAccessorException
-        ("Missing access for property '" + propertyName +
-         "' on object of class " + _target.getClass() +
-         ", accessor: " + this, _target, propertyName);
-    }
+    if (this.getter == null)
+      return null;
 
     final Object result;
     try {
@@ -204,37 +140,17 @@ public class PropertyAccessor implements IPropertyAccessor {
     }
 
     return result;
-
-  }
-
-  public Class getReadType() {
-    return this.type;
   }
 
   @Override
-  public Class getWriteType() {
-    return this.type;
+  public boolean canWriteKey(final String key) {
+    return this.setter != null;
   }
 
-  /**
-   *
-   * @throws MissingAccessorException
-   *           if the class does not define a mutator method for the property.
-   *
-   */
   @Override
   public void set(final Object _target, final String key, final Object _value) {
-    if (this.setter == null) {
-      final String propertyName = getName();
-
-      throw new MissingAccessorException(
-          "No mutator method for property: " + propertyName,
-          _target, propertyName);
-    }
-
-    if (logger.isDebugEnabled())
-      logger.debug("Setting property " + getName() + " of " + _target
-          + " to " + _value);
+    if (this.setter == null)
+      return;
 
     final Object[] args = new Object[1];
     args[0] = _value;
@@ -250,6 +166,78 @@ public class PropertyAccessor implements IPropertyAccessor {
     }
     catch (final InvocationTargetException ex) {
       throw new DynamicInvocationException(this.setter, _target, ex);
+    }
+  }
+
+  @Override
+  public Class getWriteType() {
+    return this.type;
+  }
+
+
+
+  private static abstract class MixedAccessor extends PropertyAccessor {
+    protected FieldAccessor fa;
+
+    MixedAccessor(final String _name, final Class _type, final FieldAccessor _fa) {
+      super(_name, _type);
+      this.fa = _fa;
+    }
+  }
+
+
+  /**
+   *  Instances of this class or only created if BOTH _getter AND _fa are
+   *  provided - so no need to test for the existence of both!
+   */
+  private static class PropertyGetterAndFieldSetterAccessor
+    extends MixedAccessor
+  {
+    PropertyGetterAndFieldSetterAccessor
+      (final String _name, final Class _type, final Method _getter, final FieldAccessor _fa)
+    {
+      super(_name, _type, _fa);
+      this.getter = _getter;
+    }
+
+    @Override
+    public boolean canWriteKey(final String key) {
+      return this.fa.canWriteKey(key);
+    }
+
+    @Override
+    public void set(final Object _target, final String _key, final Object _value) {
+      this.fa.set(_target, _key, _value);
+    }
+
+    @Override
+    public Class getWriteType() {
+      return this.fa.getWriteType();
+    }
+  }
+
+  /**
+   *  Instances of this class or only created if BOTH _setter AND _fa are
+   *  provided - so no need to test for the existence of both!
+   */
+  private static class PropertySetterAndFieldGetterAccessor
+    extends MixedAccessor
+  {
+    PropertySetterAndFieldGetterAccessor
+      (final String _name, final Class _type, final Method _setter, final FieldAccessor _fa)
+    {
+      super(_name, _type, _fa);
+      this.setter = _setter;
+    }
+
+    @Override
+    public boolean canReadKey(final String key) {
+      return this.fa.canReadKey(key);
+    }
+
+    @Override
+    public Object get(final Object _target, final String key) {
+      return this.fa.get(_target, key);
     }
   }
 }
