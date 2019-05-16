@@ -77,11 +77,6 @@ class FieldAccessor implements IPropertyAccessor {
     }
   }
 
-   @Override
-  public Class getReadType() {
-    return this.field.getType();
-  }
-
   @Override
   public Class getWriteType() {
     return this.field.getType();

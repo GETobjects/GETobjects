@@ -117,11 +117,6 @@ public class PropertyAccessor implements IPropertyAccessor {
     }
 
     @Override
-    public Class getReadType() {
-      return this.fa.getReadType();
-    }
-
-    @Override
     public Object get(final Object _target, final String key) {
       return this.fa.get(_target, key);
     }
@@ -159,10 +154,10 @@ public class PropertyAccessor implements IPropertyAccessor {
   @Override
   public Object get(final Object _target, final String key) {
     if (logger.isDebugEnabled())
-      logger.debug("Getting property " + this.getName() + " from " + _target);
+      logger.debug("Getting property " + getName() + " from " + _target);
 
     if (this.getter == null) {
-      final String propertyName = this.getName();
+      final String propertyName = getName();
 
       throw new MissingAccessorException
         ("Missing access for property '" + propertyName +
@@ -197,7 +192,7 @@ public class PropertyAccessor implements IPropertyAccessor {
        */
       if (logger.isWarnEnabled()) {
         logger.warn("illegal access:\n" +
-            "  property: " + this.getName() + "\n" +
+            "  property: " + getName() + "\n" +
             "  method:   " + this.getter + "\n" +
             "  target:   " + _target.getClass(),
             iae);
@@ -230,7 +225,7 @@ public class PropertyAccessor implements IPropertyAccessor {
   @Override
   public void set(final Object _target, final String key, final Object _value) {
     if (this.setter == null) {
-      final String propertyName = this.getName();
+      final String propertyName = getName();
 
       throw new MissingAccessorException(
           "No mutator method for property: " + propertyName,
@@ -238,7 +233,7 @@ public class PropertyAccessor implements IPropertyAccessor {
     }
 
     if (logger.isDebugEnabled())
-      logger.debug("Setting property " + this.getName() + " of " + _target
+      logger.debug("Setting property " + getName() + " of " + _target
           + " to " + _value);
 
     final Object[] args = new Object[1];

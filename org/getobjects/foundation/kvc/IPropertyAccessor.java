@@ -43,8 +43,7 @@ package org.getobjects.foundation.kvc;
 
 public interface IPropertyAccessor {
 
-  Class getReadType();  // unused
-  Class getWriteType(); // actually used to detect Boolean
+  Class getWriteType(); // used to detect Boolean
 
   /**
    *  Returns the current value of the property in the instance.

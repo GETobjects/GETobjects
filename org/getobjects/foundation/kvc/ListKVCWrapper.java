@@ -31,17 +31,6 @@ public class ListKVCWrapper extends KVCWrapper {
       return tmp;
     }
 
-    /**
-     * Returns {@link Object}.class, because we never know the type of objects
-     * stored in a {@link List}.
-     *
-     */
-
-    @Override
-    public Class getReadType() {
-      return Object.class;
-    }
-
     @Override
     public Class getWriteType() {
       return Object.class;
