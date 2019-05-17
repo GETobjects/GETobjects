@@ -10,6 +10,7 @@ import java.util.Set;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
+import org.getobjects.foundation.kvc.NSUnknownKeyException;
 
 /**
  * EORecordMap
@@ -196,6 +197,8 @@ public class EORecordMap extends AbstractMap<String, Object>
 
   @Override
   public void handleTakeValueForUnboundKey(final Object _value, final String _key) {
+    // do nothing?
+    throw new NSUnknownKeyException(_key, this);
   }
   @Override
   public Object handleQueryWithUnboundKey(final String _key) {

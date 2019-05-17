@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.getobjects.foundation.kvc.IPropertyAccessor;
 import org.getobjects.foundation.kvc.KVCWrapper;
+import org.getobjects.foundation.kvc.NSUnknownKeyException;
 
 public interface NSKeyValueCoding {
 
@@ -132,6 +133,7 @@ public interface NSKeyValueCoding {
         logger.warn("Can not set value '" + _value + "' for key '" +
                     _key + "' on instance of class '" + _o.getClass() + "'");
       }
+      throw new NSUnknownKeyException(_key, _o);
     }
     public static Object handleQueryWithUnboundKey(final Object _o, final String _key) {
       if (logger.isWarnEnabled()) {
