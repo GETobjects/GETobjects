@@ -38,13 +38,18 @@ public class ListKVCWrapper extends KVCWrapper {
 
     @Override
     public boolean canWriteKey(final String key) {
-      return false;
+      return true;
     }
 
     @Override
     public void set
       (final Object _target, final String _key, final Object _value)
     {
+      @SuppressWarnings("unchecked")
+      final List<Object> l = (List<Object>)_target;
+      for (final Object o : l) {
+        NSKeyValueCoding.Utility.takeValueForKey(o, _value, _key);
+      }
     }
 
     @Override
