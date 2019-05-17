@@ -82,7 +82,7 @@ public class MapKVCWrapper extends KVCWrapper {
 
     @Override
     public boolean canWriteKey(final String key) {
-      return false;
+      return true;
     }
 
     @Override
