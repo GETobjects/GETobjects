@@ -48,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * Helper methods for the String object.
  * <p>
  * Things which are covered by Java:
- * 
+ *
  * <pre>
  *   isdigit() => Character.isDigit()
  *   isspace() => Character.isWhitespace()
@@ -64,13 +64,13 @@ public class UString {
   private UString() {
   } /* do not allow construction */
 
-  public static boolean isAlNumString(String _s, boolean _startWithChar) {
+  public static boolean isAlNumString(final String _s, final boolean _startWithChar) {
     /* Note: we consider empty strings as valid */
     if (_s == null)
       return false;
 
     for (int i = _s.length() - 1; i >= 0; i--) {
-      char c = _s.charAt(i);
+      final char c = _s.charAt(i);
 
       if ((c < '0') || (c > '9' && c < 'A') || (c > 'Z' && c < 'a') || c > 'z')
         return false;
@@ -87,7 +87,7 @@ public class UString {
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @param _trim - whether the parts should be trimmed (using String.trim())
@@ -95,14 +95,14 @@ public class UString {
    * @return a List of partial strings
    */
   public static List<String> componentsListSeparatedByString(String _csv,
-      final String _sep, boolean _trim, boolean _removeEmpty) {
+      final String _sep, final boolean _trim, final boolean _removeEmpty) {
     int csvlen, seplen;
 
     if (_csv == null)
       return null;
     if (_sep == null || (seplen = _sep.length()) == 0
         || (csvlen = _csv.length()) == 0) {
-      List<String> l = new ArrayList<String>(1);
+      final List<String> l = new ArrayList<>(1);
       if (_trim)
         _csv = _csv.trim();
       if (!_removeEmpty || _csv.length() > 0)
@@ -110,7 +110,7 @@ public class UString {
       return l;
     }
 
-    ArrayList<String> l = new ArrayList<String>(16);
+    final ArrayList<String> l = new ArrayList<>(16);
     int pos, nextSep;
     for (pos = 0; pos < csvlen && (nextSep = _csv.indexOf(_sep, pos)) >= 0;) {
       String s = _csv.substring(pos, nextSep);
@@ -135,7 +135,7 @@ public class UString {
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @return a List of partial strings
@@ -148,33 +148,33 @@ public class UString {
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @return an array of partial strings
    */
-  public static String[] componentsSeparatedByString(String _csv, String _sep) {
+  public static String[] componentsSeparatedByString(final String _csv, final String _sep) {
     if (_csv == null)
       return null;
     if (_sep == null || _csv.length() == 0)
       return new String[] { _csv };
 
-    List<String> parts = componentsListSeparatedByString(_csv, _sep);
+    final List<String> parts = componentsListSeparatedByString(_csv, _sep);
     return parts != null ? parts.toArray(new String[parts.size()]) : null;
   }
 
   /**
    * This is very similiar to String.split(), but split() takes a regex, which
    * is often the wrong thing (one would need to escape custom separators).
-   * 
+   *
    * @param _csv - the string to split
    * @param _sep - the separator to split at
    * @param _trim - whether the parts should be trimmed (using String.trim())
    * @param _removeEmpty - remove empty components from the result set
    * @return an array of partial strings
    */
-  public static String[] componentsSeparatedByString(String _csv, String _sep,
-      boolean _trim, boolean _removeEmpty) {
+  public static String[] componentsSeparatedByString(String _csv, final String _sep,
+      final boolean _trim, final boolean _removeEmpty) {
     if (_csv == null)
       return null;
     if (_sep == null || _sep.length() == 0) {
@@ -186,18 +186,18 @@ public class UString {
     if (_csv.length() == 0)
       return _removeEmpty ? emptyStringArray : new String[] { _csv };
 
-    List<String> parts = componentsListSeparatedByString(_csv, _sep, _trim,
+    final List<String> parts = componentsListSeparatedByString(_csv, _sep, _trim,
         _removeEmpty);
     return parts != null ? parts.toArray(new String[parts.size()]) : null;
   }
 
-  public static String componentsJoinedByString(Collection _l, String _sep) {
+  public static String componentsJoinedByString(final Collection _l, final String _sep) {
     if (_l == null)
       return null;
 
-    StringBuilder sb = new StringBuilder(128);
+    final StringBuilder sb = new StringBuilder(128);
     boolean isFirst = true;
-    for (Object o : _l) {
+    for (final Object o : _l) {
       if (isFirst)
         isFirst = false;
       else
@@ -208,7 +208,7 @@ public class UString {
     return sb.toString();
   }
 
-  public static String componentsJoinedByString(List _l, String _sep) {
+  public static String componentsJoinedByString(final List _l, final String _sep) {
     int len;
 
     if (_l == null)
@@ -219,7 +219,7 @@ public class UString {
     if (len == 1)
       return _l.get(0).toString();
 
-    StringBuilder sb = new StringBuilder(len * 10);
+    final StringBuilder sb = new StringBuilder(len * 10);
     for (int i = 0; i < len; i++) {
       if (i > 0)
         sb.append(_sep);
@@ -228,7 +228,7 @@ public class UString {
     return sb.toString();
   }
 
-  public static String componentsJoinedByString(Object[] _l, String _sep) {
+  public static String componentsJoinedByString(final Object[] _l, final String _sep) {
     int len;
 
     if (_l == null)
@@ -239,7 +239,7 @@ public class UString {
     if (len == 1)
       return _l[0] != null ? _l[0].toString() : "<null>";
 
-    StringBuilder sb = new StringBuilder(len * 10);
+    final StringBuilder sb = new StringBuilder(len * 10);
     for (int i = 0; i < len; i++) {
       if (i > 0)
         sb.append(_sep);
@@ -248,7 +248,7 @@ public class UString {
     return sb.toString();
   }
 
-  public static String replaceInSequence(String _s, String[] _patterns) {
+  public static String replaceInSequence(String _s, final String[] _patterns) {
     if (_s == null)
       return _s;
     if (_patterns == null || _patterns.length == 0)
@@ -260,8 +260,8 @@ public class UString {
     return _s;
   }
 
-  public static int indexOfStringBySkippingQuotes(String _haystack,
-      String _needle, String _quotes, char _escape) {
+  public static int indexOfStringBySkippingQuotes(final String _haystack,
+      final String _needle, final String _quotes, final char _escape) {
     // TODO: speed ...
     // TODO: check correctness with invalid input !
     if (_haystack == null || _needle == null)
@@ -269,12 +269,12 @@ public class UString {
     if (_quotes == null || _quotes.length() == 0)
       return _haystack.indexOf(_needle);
 
-    int len = _haystack.length();
-    int slen = _needle.length();
-    char sc = _needle.charAt(0);
+    final int len = _haystack.length();
+    final int slen = _needle.length();
+    final char sc = _needle.charAt(0);
 
     for (int i = 0; i < len; i++) {
-      char c = _haystack.charAt(i);
+      final char c = _haystack.charAt(i);
 
       if (c == sc) {
         if (slen == 1)
@@ -297,7 +297,7 @@ public class UString {
 
   /**
    * Checks whether the path begins with the _prefixPath. Example:
-   * 
+   *
    * <pre>
    *   path:     [ 'hello', 'world', 'Donald' ]
    *   match:    [ 'hello' ]
@@ -306,12 +306,12 @@ public class UString {
    *   no-match: [ 'hello', 'world', 'Donald', 'Duck' ]
    *   match:    [ 'hello', 'world', 'Donald' ]
    * </pre>
-   * 
+   *
    * @param _self - base path
    * @param _prefixPath - prefix path
    * @return true if the basepath starts with the prefix path
    */
-  public static boolean startsWith(String[] _self, String[] _prefixPath) {
+  public static boolean startsWith(final String[] _self, final String[] _prefixPath) {
     if (_self == null || _prefixPath == null)
       return false;
 
@@ -335,7 +335,7 @@ public class UString {
    * mailto:// prefix. This method is not exact since and performs no further
    * validation. Its mostly to decide whether a prefix must be added to a
    * generic String.
-   * 
+   *
    * @param _s - an arbitrary string, eg mailto:info@skyrix.de
    * @return the protocol if the String looks like an URL, null otherwise
    */
@@ -372,14 +372,14 @@ public class UString {
     return null;
   }
 
-  public static String stringByDecodingURLComponent(String _s, String _charset) {
+  public static String stringByDecodingURLComponent(final String _s, String _charset) {
     if (_s == null)
       return null;
     if (_charset == null)
       _charset = "utf-8";
     try {
       return URLDecoder.decode(_s, _charset);
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.warn("could not decode part of URL: " + _s);
     }
     return null;
@@ -394,7 +394,7 @@ public class UString {
    * obtain the bytes for unsafe characters.
    * <p>
    * Careful: path component and query encoding work differently!
-   * 
+   *
    * @param _s - the string to encode
    * @param _charset - the charset to use in the encoding (eg 'utf-8')
    * @return the encoded string
@@ -414,7 +414,7 @@ public class UString {
         return ((Boolean) _s).booleanValue() ? "1" : "0";
 
       return URLEncoder.encode(_s.toString(), _charset);
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.warn("could not encode part of URL: " + _s);
     }
     return null;
@@ -424,16 +424,16 @@ public class UString {
    * Properly encodes a URL path component according to the percent escaping
    * rules required for characters of the reserved and unreserved sets as
    * described in RFC3986 section 2.2 and section 2.3 respectively.
-   * 
+   *
    * NOTE: This includes the "/" character as the method name indicates.
-   * 
+   *
    * @see http://tools.ietf.org/html/rfc3986#section-2.2
-   * 
+   *
    * @param _s - the string to encode
    * @param _charset - the charset to use in the encoding (eg 'utf-8')
    * @return the encoded string
    */
-  public static String stringByEncodingURLComponent(Object _s, String _charset) {
+  public static String stringByEncodingURLComponent(final Object _s, String _charset) {
     if (_s == null)
       return null;
     if (_charset == null)
@@ -447,7 +447,7 @@ public class UString {
 
     int i, count = s.length();
     for (i = 0; i < count; i++) {
-      char c = s.charAt(i);
+      final char c = s.charAt(i);
       if (c < 0x2d || c == 0x2f || (c > 0x39 && c < 0x3c)
           || (c > 0x3e && c < 0x41) || (c >= 0x5b && c <= 0x5d) || c > 0x7e)
         break;
@@ -456,13 +456,13 @@ public class UString {
     if (i == count)
       return s; // nothing to replace
 
-    StringBuilder sb = new StringBuilder(count + 2);
+    final StringBuilder sb = new StringBuilder(count + 2);
     sb.append(s.substring(0, i));
     try {
-      byte[] rep = s.substring(i).getBytes(_charset);
+      final byte[] rep = s.substring(i).getBytes(_charset);
       count = rep.length;
       for (i = 0; i < count; i++) {
-        char c = (char) rep[i];
+        final char c = (char) rep[i];
         if (c < 0x2d || c == 0x2f || (c > 0x39 && c < 0x3c)
             || (c > 0x3e && c < 0x41) || c == 0x5a || c == 0x5d || c > 0x7e) {
           sb.append('%');
@@ -473,7 +473,7 @@ public class UString {
         }
       }
       return sb.toString();
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.warn("could not encode URL component: " + _s);
       return null;
     }
@@ -484,27 +484,27 @@ public class UString {
    * handling. It encodes all key/value pairs of the Map as Strings.
    * <p>
    * The result of this method is a string like:
-   * 
+   *
    * <pre>
    *   a=5&b=3&c=10
    * </pre>
-   * 
+   *
    * @param _m - the key/value pairs to encode
    * @param _charset - the charset to use in the encoding
    * @return the encoded string
    */
-  public static String stringByEncodingQueryParameters(Map _m, String _charset) {
+  public static String stringByEncodingQueryParameters(final Map _m, String _charset) {
     if (_m == null || _m.size() == 0)
       return null;
 
     if (_charset == null)
       _charset = "utf-8";
-    StringBuilder sb = new StringBuilder(_m.size() * 32);
+    final StringBuilder sb = new StringBuilder(_m.size() * 32);
     try {
       boolean didAdd = false;
 
-      for (Object key : _m.keySet()) {
-        Object value = _m.get(key);
+      for (final Object key : _m.keySet()) {
+        final Object value = _m.get(key);
 
         if (key == null && value == null)
           continue;
@@ -549,7 +549,7 @@ public class UString {
           sb.append(URLEncoder.encode(value.toString(), _charset));
         }
       }
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.warn("could not encode part of URL: " + _m + ", part: " + sb);
       return null;
     }
@@ -564,6 +564,7 @@ public class UString {
    *             {@link NSXmlEntityTextCoder#stringByEscapingXMLString(String)}
    *             instead
    */
+  @Deprecated
   public static String stringByEscapingXMLString(final String _s) {
     return NSXmlEntityTextCoder.stringByEscapingXMLString(_s);
   }
@@ -575,6 +576,7 @@ public class UString {
    *             {@link NSHtmlEntityTextCoder#stringByEscapingHTMLString(String)}
    *             instead
    */
+  @Deprecated
   public static String stringByEscapingHTMLString(final String _s) {
     return NSHtmlEntityTextCoder.stringByEscapingHTMLString(_s);
   }
@@ -584,6 +586,7 @@ public class UString {
    *             {@link NSHtmlAttributeEntityTextCoder#appendEscapedHTMLAttributeValue(StringBuilder,String)}
    *             instead
    */
+  @Deprecated
   public static void appendEscapedHTMLAttributeValue(final StringBuilder _sb,
       final String _s) {
     NSHtmlAttributeEntityTextCoder.appendEscapedHTMLAttributeValue(_sb, _s);
@@ -594,6 +597,7 @@ public class UString {
    *             {@link NSHtmlAttributeEntityTextCoder#stringByEscapingHTMLAttributeValue(String)}
    *             instead
    */
+  @Deprecated
   public static String stringByEscapingHTMLAttributeValue(final String _s) {
     return NSHtmlAttributeEntityTextCoder
         .stringByEscapingHTMLAttributeValue(_s);
@@ -605,7 +609,7 @@ public class UString {
     if (_s == null)
       return null;
 
-    char[] chars = _s.toCharArray();
+    final char[] chars = _s.toCharArray();
     if (chars.length == 0)
       return "";
 
@@ -631,7 +635,7 @@ public class UString {
    * converted to UTF-8 and then run through the appropriate MessageDigest. This
    * method is not exactly high performance, if you need to encode a lot of
    * strings you might want to do it manually.
-   * 
+   *
    * @param _p - the String which a hash shall be calculated for
    * @return the hash as a String
    */
@@ -642,11 +646,11 @@ public class UString {
     String pwdhash = null;
     try {
       // TODO: cache digest in thread local variable?
-      MessageDigest md5 = MessageDigest.getInstance("MD5");
+      final MessageDigest md5 = MessageDigest.getInstance("MD5");
       md5.update(getBytes(_p, null));
 
-      byte[] bytehash = md5.digest();
-      StringBuilder hexString = new StringBuilder();
+      final byte[] bytehash = md5.digest();
+      final StringBuilder hexString = new StringBuilder();
       for (int i = 0; i < bytehash.length; i++) {
         String s = Integer.toHexString(0xFF & bytehash[i]);
         if (s.length() == 1)
@@ -656,7 +660,7 @@ public class UString {
       md5.reset();
 
       pwdhash = hexString.toString();
-    } catch (NoSuchAlgorithmException e) {
+    } catch (final NoSuchAlgorithmException e) {
       System.err.println("Did not find MD5 hash generator!");
       return null;
     }
@@ -670,7 +674,7 @@ public class UString {
 
   /**
    * Returns the data as a String containing hex byte pairs (eg 0FAADE...).
-   * 
+   *
    * @param _p - a byte array
    * @return a String representing the data, or null on error
    */
@@ -678,9 +682,9 @@ public class UString {
     if (_data == null)
       return null;
 
-    StringBuilder hexString = new StringBuilder(_data.length * 2);
+    final StringBuilder hexString = new StringBuilder(_data.length * 2);
     for (int i = 0; i < _data.length; i++) {
-      String s = Integer.toHexString(0xFF & _data[i]);
+      final String s = Integer.toHexString(0xFF & _data[i]);
       if (s.length() == 1)
         hexString.append('0');
       hexString.append(s);
@@ -693,18 +697,18 @@ public class UString {
   /**
    * Decodes the given String as BASE64. Since BASE64 decoding results in binary
    * data, a charset must be specified for the resulting String.
-   * 
+   *
    * @param _src - the String to decode as BASE64
    * @param _charset - the charset to decode the String in (null => UTF-8)
    * @return the String decoded from the BASE64
    */
-  public static String stringByDecodingBase64(String _src, String _charset) {
+  public static String stringByDecodingBase64(final String _src, final String _charset) {
     return newFromBytes(UData.dataByDecodingBase64(_src), _charset);
   }
 
   /**
    * Decodes the given String as BASE64/UTF-8.
-   * 
+   *
    * @param _src - the String to decode as BASE64
    * @return the String decoded from the BASE64
    */
@@ -714,7 +718,7 @@ public class UString {
 
   /**
    * Encodes the given bytes as BASE64.
-   * 
+   *
    * @param _data - the data to encode as BASE64
    * @return BASE64 representing of the _data
    */
@@ -729,12 +733,12 @@ public class UString {
   /**
    * Encodes the given String as BASE64. Since BASE64 encoding works on binary
    * data, a charset must be specified for the input String.
-   * 
+   *
    * @param _src - the String to encode as BASE64
    * @param _charset - the charset to encode the String in (null => UTF-8)
    * @return BASE64 representing of the String
    */
-  public static String stringByEncodingBase64(String _src, String _charset) {
+  public static String stringByEncodingBase64(final String _src, final String _charset) {
     return stringByEncodingBase64(getBytes(_src, _charset));
   }
 
@@ -742,7 +746,7 @@ public class UString {
    * This is just like String.getBytes(_charset), except that it does not throw
    * an exception on errors but just returns null (we usually encode in UTF-8
    * which never throws any errors ...).
-   * 
+   *
    * @param _s - String to get bytes for
    * @param _charset - the charset, use null for UTF-8
    * @return the bytes representing the String in the given charset, or null
@@ -753,7 +757,7 @@ public class UString {
 
     try {
       return _s.getBytes(_charset != null ? _charset : "utf8");
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.info("unsupported encoding during attempt to get bytes of String", e);
       return null;
     }
@@ -763,7 +767,7 @@ public class UString {
    * This is just like new String(b[], _charset), except that it does not throw
    * an exception on errors but just returns null (we usually encode in UTF-8
    * which never throws any errors ...).
-   * 
+   *
    * @param _s - String to get bytes for
    * @param _charset - the charset, use null for UTF-8
    * @return the bytes representing the String in the given charset, or null
@@ -773,7 +777,7 @@ public class UString {
       return null;
     try {
       return new String(_data, (_charset != null ? _charset : "utf8"));
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.info("unsupported encoding during attempt to make String", e);
       return null;
     }
@@ -782,15 +786,15 @@ public class UString {
   /**
    * Converts a String from one charset to another. Therefor it just calls
    * <code>newFromBytes(getBytes(_src, _charsetFrom), _charsetTo)</code>.
-   * 
+   *
    * @param _src the String to convert
    * @param _charsetFrom charset of the source
    * @param _charsetTo charset of the destination
-   * 
+   *
    * @return the convertet String
    */
-  public static String convert(String _src, String _charsetFrom,
-      String _charsetTo) {
+  public static String convert(final String _src, final String _charsetFrom,
+      final String _charsetTo) {
     if (_src == null)
       return null;
 
@@ -803,7 +807,7 @@ public class UString {
    * Loads a file/URL/stream/etc into a String. UData.loadContentFromSource() is
    * used to load the data, then the data is converted to a String in the given
    * encoding (defaults to UTF-8).
-   * 
+   *
    * @param _file - some kind of object which specifies a file (eg File)
    * @param _encoding - the charset to use (eg utf8)
    * @return the contents of the file as a String, or null on error
@@ -814,7 +818,7 @@ public class UString {
     if (_encoding == null)
       _encoding = "utf8";
 
-    byte[] data = UData.loadContentFromSource(_file);
+    final byte[] data = UData.loadContentFromSource(_file);
     if (data == null) {
       if (log.isInfoEnabled())
         log.info("could not load String from file: " + _file);
@@ -823,7 +827,7 @@ public class UString {
 
     try {
       return new String(data, _encoding);
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.warn("could not instantiate " + _encoding
           + " encoded String from file: " + _file);
       return null;
@@ -834,7 +838,7 @@ public class UString {
    * Loads a file/URL/stream/etc into a String. UData.loadContentFromSource() is
    * used to load the data, then the data is converted to a String in the
    * default encoding (UTF-8).
-   * 
+   *
    * @param _file - some kind of object which specifies a file (eg File)
    * @return the contents of the file as a String, or null on error
    */
@@ -844,7 +848,7 @@ public class UString {
 
   /**
    * Writes the given String in the given encoding to the given File.
-   * 
+   *
    * @param _data - String to write (must not be null, may be empty)
    * @param _encoding - encoding to write the string in (defaults to UTF-8)
    * @param _file - File to write to
@@ -852,7 +856,7 @@ public class UString {
    * @return null if everything is fine, the error otherwise
    */
   public static Exception writeToFile(final String _data, String _encoding,
-      File _file, boolean _atomically) {
+      final File _file, final boolean _atomically) {
     if (_data == null) // use "" for empty strings!
       return new NSException("got no data to write ...");
 
@@ -862,7 +866,7 @@ public class UString {
     byte[] bytes;
     try {
       bytes = _data.getBytes(_encoding);
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       return e;
     }
 
@@ -871,7 +875,7 @@ public class UString {
 
   /**
    * Writes the given String in UTF-8 encoding.
-   * 
+   *
    * @param _data - String to write
    * @param _path - File to write to
    * @param _atomically - whether we should write atomically
@@ -892,7 +896,7 @@ public class UString {
   /**
    * Load an array of lines from the given file. Lines starting with # or // and
    * empty lines are ignored. Lines are trimmed (using trim()).
-   * 
+   *
    * @param _file - the File to read the lines from
    * @return an array of Strings, or null if the file could not be opened
    */
@@ -903,7 +907,7 @@ public class UString {
     FileInputStream fis;
     try {
       fis = new FileInputStream(_file);
-    } catch (FileNotFoundException e) {
+    } catch (final FileNotFoundException e) {
       log.info("did not find file: " + _file.getAbsolutePath());
       return null;
     }
@@ -912,21 +916,21 @@ public class UString {
         lineCommentStarters);
   }
 
-  public static String[] loadLinesFromFile(InputStream _in, boolean _trim,
-      String _foldToken, String[] _commentTokens) {
+  public static String[] loadLinesFromFile(final InputStream _in, final boolean _trim,
+      final String _foldToken, final String[] _commentTokens) {
     if (_in == null)
       return null;
 
-    BufferedReader r = new BufferedReader(new InputStreamReader(_in));
+    final BufferedReader r = new BufferedReader(new InputStreamReader(_in));
     try {
-      List<String> lines = new ArrayList<String>(16);
+      final List<String> lines = new ArrayList<>(16);
       String s;
       String pendingLine = null;
 
       while ((s = r.readLine()) != null) {
         if (_commentTokens != null) {
           for (int i = 0; i < _commentTokens.length; i++) {
-            int cidx = s.indexOf(_commentTokens[i]);
+            final int cidx = s.indexOf(_commentTokens[i]);
             if (cidx != -1)
               s = s.substring(0, cidx);
           }
@@ -963,13 +967,13 @@ public class UString {
       }
 
       return lines.toArray(new String[lines.size()]);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("failed to read lines file", e);
       return null;
     } finally {
       try {
         _in.close();
-      } catch (IOException e) {
+      } catch (final IOException e) {
         System.err.println("could not close input stream: " + e);
       }
     }
@@ -979,14 +983,14 @@ public class UString {
 
   /**
    * Returns a String which contains the characters of a and b. Sample:
-   * 
+   *
    * <pre>
    * UString.unionCharacterSets(&quot;abc&quot;, &quot;ab&quot;); // &quot;abc&quot;
    * UString.unionCharacterSets(&quot;abc&quot;, &quot;abc&quot;); // &quot;abc&quot;
    * UString.unionCharacterSets(&quot;ab&quot;, &quot;bc&quot;); // &quot;abc&quot;
    * UString.unionCharacterSets(&quot;ab&quot;, &quot;c&quot;); // &quot;abc&quot;
    * </pre>
-   * 
+   *
    * @param _a - a set of characters
    * @param _b - a set of characters
    * @return a String containing the chars of a and b
@@ -995,8 +999,8 @@ public class UString {
     // TBD: improve algorithm, this *****
     if (_a == _b)
       return _a;
-    int al = _a != null ? _a.length() : 0;
-    int bl = _b != null ? _b.length() : 0;
+    final int al = _a != null ? _a.length() : 0;
+    final int bl = _b != null ? _b.length() : 0;
     if (al == 0)
       return bl != 0 ? _b : "";
     if (bl == 0)
@@ -1005,7 +1009,7 @@ public class UString {
     // TBD: assumes that both sets have distinct contents
     StringBuilder sb = null;
     for (int i = 0; i < bl; i++) {
-      char c = _b.charAt(i);
+      final char c = _b.charAt(i);
       if (_a.indexOf(c) >= 0) /* a contains char */
         continue;
 
@@ -1022,14 +1026,14 @@ public class UString {
   /**
    * Returns a String containing all chars which are in set _a <em>and</em> _b.
    * Sample:
-   * 
+   *
    * <pre>
    * UString.intersectCharacterSets(&quot;rwId&quot;, &quot;rd&quot;); // &quot;rd&quot;
    * UString.intersectCharacterSets(&quot;rw&quot;, &quot;rw&quot;); // &quot;rw&quot;
    * UString.intersectCharacterSets(&quot;rw&quot;, &quot;&quot;); // &quot;&quot;
    * UString.intersectCharacterSets(&quot;rw&quot;, &quot;r&quot;); // &quot;r&quot;
    * </pre>
-   * 
+   *
    * @param _a - set of chars
    * @param _b - set of chars
    * @return a set of chars containing the chars which are in _a and _b
@@ -1039,17 +1043,17 @@ public class UString {
     // TBD: we might want to have a char[] variant
     if (_a == _b)
       return _a;
-    int al = _a != null ? _a.length() : 0;
-    int bl = _b != null ? _b.length() : 0;
+    final int al = _a != null ? _a.length() : 0;
+    final int bl = _b != null ? _b.length() : 0;
     if (al == 0)
       return bl != 0 ? _b : "";
     if (bl == 0)
       return _a;
 
     // TBD: assumes that both sets have distinct contents
-    StringBuilder sb = new StringBuilder(al);
+    final StringBuilder sb = new StringBuilder(al);
     for (int i = 0; i < al; i++) {
-      char c = _a.charAt(i);
+      final char c = _a.charAt(i);
       if (_b.indexOf(c) >= 0) /* b contains char */
         sb.append(c);
     }
@@ -1060,32 +1064,32 @@ public class UString {
   /**
    * Remove all chars from a which are in b. The sets do not need to be ordered.
    * Sample:
-   * 
+   *
    * <pre>
    * UString.exceptCharacterSets(&quot;rwId&quot;, &quot;rd&quot;); // &quot;wI&quot;
    * UString.exceptCharacterSets(&quot;rw&quot;, &quot;rw&quot;); // &quot;&quot;
    * </pre>
-   * 
+   *
    * @param _a - set of chars
    * @param _charsToRemove - set of chars to be removed from _a
    * @return set representing _a - _b
    */
-  public static String exceptCharacterSets(String _a, String _charsToRemove) {
+  public static String exceptCharacterSets(final String _a, final String _charsToRemove) {
     // TBD: improve algorithm, this *****
     // TBD: we might want to have a char[] variant
     if (_a == _charsToRemove)
       return ""; /* both sets identical => remove all */
 
-    int al = _a != null ? _a.length() : 0;
+    final int al = _a != null ? _a.length() : 0;
     if (al == 0)
       return ""; /* nothing contained in a in the first place */
     if (_charsToRemove == null || _charsToRemove.length() == 0)
       return _a; /* nothing to remove in a */
 
     // TBD: assumes that both sets have distinct contents
-    StringBuilder sb = new StringBuilder(al);
+    final StringBuilder sb = new StringBuilder(al);
     for (int i = 0; i < al; i++) {
-      char c = _a.charAt(i);
+      final char c = _a.charAt(i);
       if (_charsToRemove.indexOf(c) < 0)
         /* _charsToRemove does not contain char */
         sb.append(c);
@@ -1100,22 +1104,22 @@ public class UString {
 
   /**
    * Returns an array of chars which contains the characters of a and b. Sample:
-   * 
+   *
    * <pre>
    * UString.unionCharacterSets(&quot;abc&quot;, &quot;ab&quot;); // &quot;abc&quot;
    * UString.unionCharacterSets(&quot;abc&quot;, &quot;abc&quot;); // &quot;abc&quot;
    * UString.unionCharacterSets(&quot;ab&quot;, &quot;bc&quot;); // &quot;abc&quot;
    * UString.unionCharacterSets(&quot;ab&quot;, &quot;c&quot;); // &quot;abc&quot;
    * </pre>
-   * 
+   *
    * @param _a - a set of characters
    * @param _b - a set of characters
    * @return a char array containing the chars of a and b
    */
   public static char[] unionCharacterSets(final char[] _a, final char[] _b) {
     // TBD: improve algorithm, this *****
-    int al = _a != null ? _a.length : 0;
-    int bl = _b != null ? _b.length : 0;
+    final int al = _a != null ? _a.length : 0;
+    final int bl = _b != null ? _b.length : 0;
     if (al == 0)
       return bl != 0 ? _b : emptyCharacterSet;
     if (bl == 0)
@@ -1124,7 +1128,7 @@ public class UString {
     // TBD: assumes that both sets have distinct contents
     StringBuilder sb = null; // using a string-buffer is stupid
     for (int i = 0; i < bl; i++) {
-      char c = _b[i];
+      final char c = _b[i];
 
       int j = 0;
       for (j = 0; j < al; j++) {
@@ -1163,9 +1167,9 @@ public class UString {
     if (_qs == null || _qs.length() == 0)
       return null;
 
-    String[] parts = _qs.split("&");
+    final String[] parts = _qs.split("&");
 
-    Map<String, Object> qd = new HashMap<String, Object>(parts.length);
+    final Map<String, Object> qd = new HashMap<>(parts.length);
 
     if (_charset == null)
       _charset = "utf-8";
@@ -1176,7 +1180,7 @@ public class UString {
         String value;
 
         key = parts[i];
-        int idx = key.indexOf('=');
+        final int idx = key.indexOf('=');
         if (idx >= 0) {
           value = key.substring(idx + 1);
           key = key.substring(0, idx);
@@ -1191,10 +1195,10 @@ public class UString {
 
         /* process multivalues */
 
-        Object qdValue = qd.get(key);
+        final Object qdValue = qd.get(key);
         if (qdValue != null) {
           if (!(qdValue instanceof Collection)) {
-            Collection<Object> l = new ArrayList<Object>(4);
+            final Collection<Object> l = new ArrayList<>(4);
             l.add(qdValue);
             l.add(value);
             qd.put(key, l);
@@ -1203,7 +1207,7 @@ public class UString {
         } else
           qd.put(key, value); /* yes, we also put 'null' values! */
       }
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.error("could not decode query string due to charset: " + _charset, e);
     }
 
@@ -1218,7 +1222,7 @@ public class UString {
     try {
       /* Note: FileReader uses MacRoman as the encoding on MacOS 10.4 */
       fr = new InputStreamReader(in, _enc);
-    } catch (UnsupportedEncodingException e) {
+    } catch (final UnsupportedEncodingException e) {
       log.error("unsupported encoding for document: " + in);
       return null;
     }
@@ -1229,19 +1233,19 @@ public class UString {
 
     StringBuilder sb = new StringBuilder(4096);
     try {
-      char buf[] = new char[4096];
+      final char buf[] = new char[4096];
       int len;
 
       while ((len = reader.read(buf)) != -1)
         sb.append(buf, 0, len);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("error loading content: " + in, e);
       sb = null;
     } finally {
       if (reader != null) {
         try {
           reader.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
           log.error("could not close reader for file: " + in);
         }
       }
@@ -1252,7 +1256,7 @@ public class UString {
 
   /**
    * Reading legacy files in ISO-Latin-1 (ISO-8859-1).
-   * 
+   *
    * @param in - InputStream
    * @return a String if something could be read, null on error
    */
@@ -1262,7 +1266,7 @@ public class UString {
 
   /**
    * Reading legacy files in ISO-Latin-1 (ISO-8859-1).
-   * 
+   *
    * @param _file - File object
    * @return a String if something could be read, null on error
    */
@@ -1271,13 +1275,13 @@ public class UString {
     try {
       fs = new FileInputStream(_file);
       return UString.readFromStream(fs, "ISO-8859-1");
-    } catch (FileNotFoundException e) {
+    } catch (final FileNotFoundException e) {
       return null;
     } finally {
       if (fs != null) {
         try {
           fs.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
         }
       }
     }
@@ -1288,13 +1292,13 @@ public class UString {
   /**
    * Returns true if the given char buffer starts with the characters of the
    * given string.
-   * 
+   *
    * @param _buf - the buffer to check
    * @param _idx - start to compare at _buf[_idx]
    * @param _s - the String which must match
    * @return true if the all chars of the String match the buffer at _idx
    */
-  public static boolean startsWith(final char[] _buf, int _idx, String _s) {
+  public static boolean startsWith(final char[] _buf, final int _idx, final String _s) {
     if (_s == null)
       return false;
 
@@ -1317,20 +1321,20 @@ public class UString {
 
   /**
    * Removes HTML comments from the given String. HTML comments are:
-   * 
+   *
    * <pre>
    *   &lt;!-- Hello --&gt;
    *   &lt;!-- Hello -- -- Hello --&gt;
    *   &lt;!------- Hello --&gt;
    *   &lt;!----&gt;
    * </pre>
-   * 
+   *
    * We do not support those valid SGML comments:
-   * 
+   *
    * <pre>
    *   &lt;!----&gt; Hello --&gt;
    * </pre>
-   * 
+   *
    * @param String containing HTML comments
    * @return String which is stripped from HTML comments
    */
@@ -1385,18 +1389,18 @@ public class UString {
 
   /**
    * Compresses duplicate whitespace into one. Example:
-   * 
+   *
    * <pre>
    *   "    hello   " =&gt; " hello "
    * </pre>
-   * 
+   *
    * Eg this is used by the WOHTMLParser to compress whitespace in HTML content.
-   * 
+   *
    * @param _s - the String to be compressed (eg "  Hello  World  ")
    * @param _ws - the whitespace characters (eg " \t\r\n" [default]))
    * @return the compressed String
    */
-  public static String stringByCompressingWhiteSpace(String _s, String _ws) {
+  public static String stringByCompressingWhiteSpace(final String _s, String _ws) {
     if (_s == null)
       return null;
     if (_ws == null)
@@ -1410,7 +1414,7 @@ public class UString {
     int j = 1; /* we always consume the first char */
     boolean lastWasWS = _ws.indexOf(buf[0]) >= 0;
     for (int i = 1; i < llen; i++) {
-      boolean thisIsWS = _ws.indexOf(buf[i]) >= 0;
+      final boolean thisIsWS = _ws.indexOf(buf[i]) >= 0;
 
       if (!thisIsWS || !lastWasWS) { /* regular char or first WS, consume */
         buf[j] = buf[i]; /* move char left */
@@ -1424,19 +1428,19 @@ public class UString {
 
   /**
    * Removes the escape char from the given String. Example:
-   * 
+   *
    * <pre>
    *   "\$Hello\$  \\ World" => "$Hello$  \ World"
    * </pre>
-   * 
+   *
    * The method does not process special escape chars (like \n => char 10, '\n'
    * will end up as 'n').
-   * 
+   *
    * @param _s - String where escape chars should be removed from
    * @param _c - escape char, eg '\'
    * @return String w/o escape chars
    */
-  public static String stringByUnescapingWithEscapeChar(String _s, char _c) {
+  public static String stringByUnescapingWithEscapeChar(final String _s, final char _c) {
     if (_s == null)
       return null;
 
@@ -1445,7 +1449,7 @@ public class UString {
 
     final char[] buf = _s.toCharArray();
     final int llen = buf.length;
-    int j = 0;
+    final int j = 0;
 
     for (int i = 0; i < llen; i++) {
       if (buf[i] == _c) {
@@ -1464,17 +1468,17 @@ public class UString {
    * String at the last position.
    * <p>
    * Example:
-   * 
+   *
    * <pre>
    *   path is [ '/', 'tmp' ]
    *   str  is 'test.log'
    *   result: [ '/', 'tmp', 'test.log' ]
    * </pre>
-   * 
+   *
    * Obviously this isn't a very fast way to build multi component pathes, but
    * its convenient for quick hacks.
    * <p>
-   * 
+   *
    * @param _path - the existing String array (can be null)
    * @param _str - the String to add to the array (can be null)
    * @return a new array containing a copy of the old path plus the String
@@ -1489,7 +1493,7 @@ public class UString {
     return newPath;
   }
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     String s = "DÖF";
     s = stringByEncodingURLComponent(s, null);
     System.out.print("enc: " + s);
