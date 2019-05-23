@@ -22,8 +22,10 @@
 package org.getobjects.eoaccess;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -417,8 +419,25 @@ public class EOAdaptorChannel extends NSObject implements NSDisposable {
                 /* Note: this is just the DATE component, no TIME */
                 stmt.setDate(i + 1, (java.sql.Date)value);
               }
-              else if (value instanceof byte[])
+              else if (value instanceof byte[]) {
                 stmt.setBytes(i + 1, (byte[])value);
+              }
+              else if (value instanceof List) {
+                final List l = (List)value;
+
+                // due to Java's type erasure we have to make educated guesses
+                int valuesSqlType;
+                if (l.size() > 0)
+                  valuesSqlType = this.sqlTypeForValue(l.get(0), null);
+                else
+                  valuesSqlType = java.sql.Types.INTEGER;
+
+                final String valuesTypeName =
+                  JDBCType.valueOf(valuesSqlType).getName();
+                final Array a =
+                  this.connection().createArrayOf(valuesTypeName, l.toArray());
+                stmt.setArray(i + 1, a);
+              }
               else if (value instanceof EOQualifierVariable) {
                 log.error("detected unresolved qualifier variable: " + value);
                 this._releaseResources(stmt, null);
