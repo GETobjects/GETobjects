@@ -1362,19 +1362,34 @@ public class EODatabaseChannel extends NSObject
         final Object v = ((NSKeyValueCoding)baseObject).valueForKey(srcName);
         if (v == null) continue;
 
-        /* Most often the source key is unique and we have just one
-         * entry, but its not a strict requirement
-         */
-        List<EOEnterpriseObject> vobjects = valueToObjects.get(v);
-        if (vobjects == null) {
-          vobjects = new ArrayList<>(1);
-          valueToObjects.put(v, vobjects);
+        // Is this a native array?
+        if (v instanceof List) {
+          final List<Object> keys = (List<Object>)v;
+          for (final Object key : keys) {
+            List<EOEnterpriseObject> vobjects = valueToObjects.get(key);
+            if (vobjects == null) {
+              vobjects = new ArrayList<>(1);
+              valueToObjects.put(key, vobjects);
+            }
+            vobjects.add(baseObject);
+          }
+          srcValues.addAll(keys); // duplicates are allowed!
         }
-        vobjects.add(baseObject);
+        else {
+          /* Most often the source key is unique and we have just one
+           * entry, but it's not a strict requirement
+           */
+          List<EOEnterpriseObject> vobjects = valueToObjects.get(v);
+          if (vobjects == null) {
+            vobjects = new ArrayList<>(1);
+            valueToObjects.put(v, vobjects);
+          }
+          vobjects.add(baseObject);
 
-        /* Note: we could also use vobjects.keySet() */
-        if (!srcValues.contains(v))
-          srcValues.add(v);
+          /* Note: we could also use vobjects.keySet() */
+          if (!srcValues.contains(v))
+            srcValues.add(v);
+        }
       }
     }
   }
