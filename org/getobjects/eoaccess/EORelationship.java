@@ -330,6 +330,10 @@ public class EORelationship extends EOProperty implements EOExpressionEvaluation
       if (myEntity != rel.destinationEntity())
         continue; /* other entity, does not point back */
 
+      // circular reference: doesn't have inverseRelationship
+      if (rel == this)
+        continue;
+
       final EOJoin[] relJoins = rel.joins();
       if (relJoins == null || relJoins.length != this.joins.length)
         continue; /* join array sizes do not match */
@@ -338,10 +342,7 @@ public class EORelationship extends EOProperty implements EOExpressionEvaluation
       final EOJoin myJoin = myJoins[0];
       final EOJoin enemy  = relJoins[0];
 
-      // TBD: equality might not be correct since joins can be directed
-      //      (relevant for LEFT/RIGHT joins I guess)
-      if (myJoin == enemy || myJoin.equals(enemy) ||
-          myJoin.isReciprocalToJoin(enemy))
+      if (myJoin.isReciprocalToJoin(enemy))
         return rel;
     }
 
