@@ -56,15 +56,21 @@ import org.getobjects.foundation.NSObject;
  * http://www.faqs.org/rfcs/rfc2965.html (only implemented by Opera?)
  */
 public class WOCookie extends NSObject {
+
+  public enum SameSite {
+    None, Strict, Lax
+  }
+
   protected static final Log log = LogFactory.getLog("WOCookie");
-  
-  protected String  name;     /* name of cookie, eg 'wosid'   */
-  protected String  value;    /* value of cookie, eg '283873' */
-  protected String  path;     /* path the cookie is valid for, eg '/MyApp' */
-  protected String  domain;   /* domain the cookie is valid for (.com) */
-  protected Date    date;
-  protected int     timeout;  /* in seconds (-1 == do not expire) */
-  protected boolean isSecure; /* whether cookie requires an HTTPS connection */
+
+  protected String   name;     /* name of cookie, eg 'wosid'   */
+  protected String   value;    /* value of cookie, eg '283873' */
+  protected String   path;     /* path the cookie is valid for, eg '/MyApp' */
+  protected String   domain;   /* domain the cookie is valid for (.com) */
+  protected Date     date;
+  protected int      timeout;  /* in seconds (-1 == do not expire) */
+  protected boolean  isSecure; /* whether cookie requires an HTTPS connection */
+  protected SameSite sameSite; /* instruct browser when to send cookie */
 
   public WOCookie(final String _name, final String _value, final String _path, final String _domain,
                   final Date _date, final boolean _isSecure)
@@ -76,6 +82,7 @@ public class WOCookie extends NSObject {
     this.date     = _date;
     this.isSecure = _isSecure;
     this.timeout  = -1; /* do not expire cookie (use date) */
+    this.sameSite = SameSite.Lax;
   }
 
   public WOCookie(final String _name, final String _value, final String _path, final String _domain,
@@ -87,6 +94,7 @@ public class WOCookie extends NSObject {
     this.domain   = _domain;
     this.timeout  = _timeoutInS;
     this.isSecure = _isSecure;
+    this.sameSite = SameSite.Lax;
   }
 
   public WOCookie(final String _name, final String _value, final String _path, final String _domain,
@@ -98,6 +106,7 @@ public class WOCookie extends NSObject {
     this.domain   = _domain;
     this.isSecure = _isSecure;
     this.timeout  = -1; /* do not expire cookie */
+    this.sameSite = SameSite.Lax;
   }
 
   public WOCookie(final String _name, final String _value) {
@@ -105,6 +114,7 @@ public class WOCookie extends NSObject {
     this.value    = _value;
     this.timeout  = -1; /* do not expire cookie */
     this.isSecure = false;
+    this.sameSite = SameSite.Lax;
   }
 
 
@@ -171,8 +181,16 @@ public class WOCookie extends NSObject {
   public String path() {
     return this.path;
   }
-    
-  
+
+  public void setSameSite(final SameSite _sameSite) {
+    if (_sameSite == SameSite.None && !this.isSecure)
+      log.warn("'None' directive requires secure attribute!");
+    this.sameSite = _sameSite;
+  }
+  public SameSite sameSite() {
+    return this.sameSite;
+  }
+
   /* generating HTTP cookie */
 
   /**
@@ -222,7 +240,10 @@ public class WOCookie extends NSObject {
 
     if (this.isSecure)
       sb.append("; secure");
-    
+
+    sb.append("; SameSite=");
+    sb.append(this.sameSite.toString());
+
     return sb.toString();
   }
 
@@ -255,7 +276,8 @@ public class WOCookie extends NSObject {
     String  path = null;
     final String domain = null;
     boolean isSecure = false;
-    
+    String sameSite = null;
+
     for (int i = 0; i < opts.length; i++) {
       final String opt = opts[i].trim();
       if (opt.startsWith("domain="))
@@ -264,11 +286,25 @@ public class WOCookie extends NSObject {
         path = opt.substring(5);
       else if (opt.equals("secure"))
         isSecure = true;
+      else if (opt.startsWith("SameSite="))
+        sameSite = opt.substring(9);
       else
         log.error("unknown cookie option: " + opt + " in: " + _s);
     }
-    
-    return new WOCookie(name, value, path, domain, isSecure);
+
+    final WOCookie c = new WOCookie(name, value, path, domain, isSecure);
+    if (sameSite != null) {
+      if (sameSite.equals("Strict"))
+        c.setSameSite(SameSite.Strict);
+      else if (sameSite.equals("Lax"))
+        c.setSameSite(SameSite.Lax);
+      else if (sameSite.equals("None"))
+        c.setSameSite(SameSite.None);
+      else {
+        log.error("unknown SameSite option: " + sameSite);
+      }
+    }
+    return c;
   }
 
 
@@ -301,7 +337,10 @@ public class WOCookie extends NSObject {
       _d.append(this.timeout);
       _d.append("s");
     }
-    
+
+    _d.append(" SameSite=");
+    _d.append(this.sameSite.toString());
+
     if (this.isSecure)
       _d.append(" secure");
   }
