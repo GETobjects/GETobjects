@@ -219,9 +219,16 @@ public class KVCWrapper extends Object {
 
     for (final String name : names) {
       final Method getter = gettersMap.get(name);
-      final Method setter = settersMap.get(name);
+      Method setter = settersMap.get(name);
       if (getter == null && setter == null) continue;
 
+      // sanity checks - avoid a possible exception in PropertyDescriptor!
+      if (getter != null && setter != null) {
+        if (setter.getParameterCount() != 1)
+          setter = null;
+        else if (!setter.getParameterTypes()[0].equals(getter.getReturnType()))
+          setter = null;
+      }
       /* this is JavaBeans stuff */
       final PropertyDescriptor descriptor =
         new PropertyDescriptor(name, getter, setter);
