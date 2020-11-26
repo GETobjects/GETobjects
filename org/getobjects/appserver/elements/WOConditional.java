@@ -122,14 +122,14 @@ public class WOConditional extends WODynamicElement {
       final Map<String, WOAssociation> assocs = new HashMap<>(4);
 
       if (mkey != null && mkey.isValueConstant()) {
-        _assocs.put("condition", WOAssociation.associationWithKeyPath(key));
         final String key = mkey.stringValueInComponent(null);
+        assocs.put("condition", WOAssociation.associationWithKeyPath(key));
       }
       else if (mkey != null)
-        _assocs.put("condition", new WODynamicKeyPathAssociation(mkey));
+        assocs.put("condition", new WODynamicKeyPathAssociation(mkey));
 
-      if (mvalue  != null) _assocs.put("value",  mvalue);
-      if (mnegate != null) _assocs.put("negate", mnegate);
+      if (mvalue  != null) assocs.put("value",  mvalue);
+      if (mnegate != null) assocs.put("negate", mnegate);
 
       if (multiStack == null)
         multiStack = new ArrayList<>(4);
