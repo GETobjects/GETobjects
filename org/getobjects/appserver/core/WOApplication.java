@@ -83,10 +83,10 @@ import org.getobjects.foundation.UObject;
  * FIXME: document it way more.<br>
  * FIXME: document how it works in a Servlet environment<br>
  * FIXME: document how properties are located and loaded
- * 
+ *
  * <h3>Differences to WebObjects</h3>
  * FIXME: document all the diffs ;-)
- * 
+ *
  * <h4>QuerySession</h4>
  * In addition to Context and Session subclasses, Go has the concept of a
  * 'QuerySession'. The baseclass is WOQuerySession and an application can
@@ -98,7 +98,7 @@ import org.getobjects.foundation.UObject;
  * renderer factory.
  * <br>
  * Request handler processing can be turned on and off.
- * 
+ *
  * <h4>pageWithName()</h4>
  * In Go this supports component specific resource managers, not just the
  * global one. The WOApplication pageWithName takes this into account, it
@@ -114,7 +114,7 @@ public class WOApplication extends NSObject
 
   protected AtomicInteger     requestCounter       = new AtomicInteger(0);
   protected AtomicInteger     activeDispatchCount  = new AtomicInteger(0);
-  
+
   protected WOCORSConfig      corsConfig;
 
   protected WORequestHandler  defaultRequestHandler;
@@ -142,42 +142,42 @@ public class WOApplication extends NSObject
    * The constructor is triggered by WOServletAdaptor.
    */
   public WOApplication() {
-    this.extraAttributes = new ConcurrentHashMap<String, Object>(32);
+    this.extraAttributes = new ConcurrentHashMap<>(32);
   }
 
   public void init() {
     /* at the very beginning, load configuration */
     this.loadProperties();
-    
+
     /* add CORS origins */
     this.corsConfig = new WOCORSConfig(this.properties);
-    
+
     /* page caches */
-    
+
     this.pageCacheSize = UObject.intValue(
         this.properties.getProperty("WOPageCacheSize", "5"));
     this.permanentPageCacheSize = UObject.intValue(
         this.properties.getProperty("WOPermanentPageCacheSize", "5"));
-    
+
     /* global objects */
-    
+
     this.goClassRegistry   = new GoClassRegistry(this);
     this.goProductManager  = new GoProductManager(this);
 
     this.resourceManager = WOPackageLinker.linkApplication(this);
 
     this.requestHandlerRegistry =
-      new ConcurrentHashMap<String, WORequestHandler>(4);
+      new ConcurrentHashMap<>(4);
 
-    this.registerInitialRequestHandlers();
-    this.setupDefaultClasses();
+    registerInitialRequestHandlers();
+    setupDefaultClasses();
 
     this.sessionStore      = WOSessionStore.serverSessionStore();
     this.statisticsStore   = new WOStatisticsStore();
   }
-  
+
   /* Note: this is called by WOPackageLinker.linkApplication() */
-  public void linkDefaultPackages(WOPackageLinker _linker) {
+  public void linkDefaultPackages(final WOPackageLinker _linker) {
     _linker.linkFramework(WOHTMLDynamicElement.class.getPackage().getName());
     _linker.linkFramework(WOApplication.class.getPackage().getName());
   }
@@ -194,17 +194,17 @@ public class WOApplication extends NSObject
     WORequestHandler rh;
 
     rh = new WODirectActionRequestHandler(this);
-    this.registerRequestHandler(rh, this.directActionRequestHandlerKey());
-    this.registerRequestHandler(rh, "x");
-    this.setDefaultRequestHandler(rh);
+    registerRequestHandler(rh, directActionRequestHandlerKey());
+    registerRequestHandler(rh, "x");
+    setDefaultRequestHandler(rh);
 
     rh = new WOResourceRequestHandler(this);
-    this.registerRequestHandler(rh, this.resourceRequestHandlerKey());
-    this.registerRequestHandler(rh, "WebServerResources");
-    this.registerRequestHandler(rh, "Resources");
+    registerRequestHandler(rh, resourceRequestHandlerKey());
+    registerRequestHandler(rh, "WebServerResources");
+    registerRequestHandler(rh, "Resources");
 
     rh = new WOComponentRequestHandler(this);
-    this.registerRequestHandler(rh, this.componentRequestHandlerKey());
+    registerRequestHandler(rh, componentRequestHandlerKey());
   }
 
   /**
@@ -219,10 +219,10 @@ public class WOApplication extends NSObject
   protected void setupDefaultClasses() {
     /* try to find a Context/Session in the application package */
     String pkgname = this.getClass().getName();
-    int idx = pkgname.lastIndexOf('.');
+    final int idx = pkgname.lastIndexOf('.');
     pkgname = (idx == -1) ? "" : pkgname.substring(0, idx + 1);
 
-    String ctxClassName = this.contextClassName();
+    String ctxClassName = contextClassName();
     if (ctxClassName == null)
       ctxClassName = "Context";
 
@@ -261,7 +261,7 @@ public class WOApplication extends NSObject
    * @param _path - the path to be looked up
    * @return the Object where the GoLookup process will start
    */
-  public Object rootObjectInContext(final WOContext _ctx, String[] _path) {
+  public Object rootObjectInContext(final WOContext _ctx, final String[] _path) {
     return this;
   }
 
@@ -281,19 +281,19 @@ public class WOApplication extends NSObject
    * @param _ctx    - the context of the whole operation
    * @return a default method object, or null if there is none
    */
-  public IGoCallable lookupDefaultMethod(Object _object, final WOContext _ctx) {
+  public IGoCallable lookupDefaultMethod(final Object _object, final WOContext _ctx) {
     // TBD: SOPE also had a feature called 'redirect-to-default'. Eg if you
     //      open /persons/, it might redirect you to /persons/index.
     //      This can be useful to make relative URLs work right (Zope uses
     //      the base-URL in HTML for this)
     String defaultMethodName = "default";
     boolean isPOST = false;
-    
+
     if (_object == null)
       return null;
-    
+
     /* figure out default method name, we use Zope2 semantics */
-    
+
     final WORequest rq = _ctx != null ? _ctx.request() : null;
     if (rq != null) {
       final String m = rq.method();
@@ -302,7 +302,7 @@ public class WOApplication extends NSObject
       else if ("POST".equals(m))
         isPOST = true;
     }
-    
+
     // TBD: Should default methods support acquisition? Maybe, other methods
     //      are acquired too?
     Object o = null;
@@ -323,19 +323,19 @@ public class WOApplication extends NSObject
       }
       return null;
     }
-    
+
     if (o instanceof IGoCallable) {
       if (log.isDebugEnabled())
         log.debug("using default method " + o);
       return (IGoCallable)o;
     }
-    
+
     if (o instanceof NSException) // runtime exceptions, no throw necessary
       throw (NSException)o;
     else if (o instanceof Exception) {
-      Exception e = (Exception)o;
+      final Exception e = (Exception)o;
       log.error("Exception during default method lookup", e);
-      NSException ne = new NSException(e.getMessage());
+      final NSException ne = new NSException(e.getMessage());
       throw ne;
     }
     else {
@@ -387,16 +387,16 @@ public class WOApplication extends NSObject
     this.activeDispatchCount.incrementAndGet();
 
     if (profile.isInfoEnabled())
-      this.logRequestStart(_rq, rqId);
-    
-    
+      logRequestStart(_rq, rqId);
+
+
     /* CORS. This is not the perfect place to do this - the objects themselves
      * should decide their origin policy. But we have to get started somehow ;-)
      */
     final String origin = _rq.headerForKey("origin");
     Map<String, List<String>> corsHeaders = null;
     if (origin != null && origin.length() > 0) {
-      corsHeaders = this.validateOriginOfRequest(origin, _rq);
+      corsHeaders = validateOriginOfRequest(origin, _rq);
       if (corsHeaders == null) {
         r = new WOResponse(_rq);
         r.setStatus(403);
@@ -405,30 +405,30 @@ public class WOApplication extends NSObject
       else
         _rq._setCORSHeaders(corsHeaders);
     }
-    
-    
+
+
     /* Catch OPTIONS, doesn't work with CORS and Authentication. Maybe that is
      * the right thing to do anyways? Or should OPTIONS /missing return a 404?
      */
     if (_rq.method().equals("OPTIONS")) {
       final WOContext tmpctx = new WOContext(this, _rq);
       log.debug("Not using object publishing for OPTIONS ...");
-      r = this.optionsForObjectInContext(null, tmpctx);
+      r = optionsForObjectInContext(null, tmpctx);
     }
-    
-    
+
+
     /* and here comes the regular processing */
-    
+
     if (r == null) {
       /* select WORequestHandler to process the request */
-      final WORequestHandler rh;      
+      final WORequestHandler rh;
 
-      if (this.useHandlerRequestDispatch()) {
+      if (useHandlerRequestDispatch()) {
         /*
          * This is the regular WO approach, derive a request handler from
          * the URL and then pass the request on for processing to that handler.
          */
-        rh = this.requestHandlerForRequest(_rq);
+        rh = requestHandlerForRequest(_rq);
       }
       else {
         /* This method does the GoStyle request processing. Its called by
@@ -447,15 +447,15 @@ public class WOApplication extends NSObject
         try {
           r = rh.handleRequest(_rq);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
           log.error("WOApplication caught exception", e);
           r = null;
         }
       }
     }
-    
+
     /* CORS, add headers to response */
-    
+
     if (corsHeaders != null && r != null && corsHeaders.size() > 0) {
       if (r.isStreaming()) // already sets the CORS headers
         log.info("CORS: cannot add headers, response is streaming ...");
@@ -464,7 +464,7 @@ public class WOApplication extends NSObject
           r.setHeadersForKey(corsHeaders.get(key), key);
       }
     }
-    
+
     /* finish up */
 
     if (!isCachingEnabled()) { /* help with debugging weak references */
@@ -475,12 +475,12 @@ public class WOApplication extends NSObject
     this.activeDispatchCount.decrementAndGet();
 
     if (profile.isInfoEnabled())
-      this.logRequestEnd(_rq, rqId, r);
+      logRequestEnd(_rq, rqId, r);
     return r;
   }
-  
+
   /* CORS */
-  
+
   public WOResponse optionsForObjectInContext
     (final Object _clientObject, final WOContext _ctx)
   {
@@ -489,7 +489,7 @@ public class WOApplication extends NSObject
     //   TBD: Should this check whether the clientObject supports PUT and
     //        such, and enables CORS, etc?
     // Access-Control-Request-Headers: origin, x-requested-with
-    WOResponse r = new WOResponse(_ctx.request());
+    final WOResponse r = new WOResponse(_ctx.request());
     r.setStatus(200);
     // FIXME: add all relevant headers
     return r;
@@ -501,7 +501,7 @@ public class WOApplication extends NSObject
       return this.corsConfig.validateOriginOfRequest(_origin, _rq);
     return null;
   }
-  
+
   /* rendering results */
 
   public static final NSSelector selRendererForObjectInContext =
@@ -531,7 +531,8 @@ public class WOApplication extends NSObject
    * @param _ctx - the context in which the rendering should happen
    * @return a renderer object (usually an IGoRenderer)
    */
-  public Object rendererForObjectInContext(Object _o, WOContext _ctx) {
+  @Override
+  public Object rendererForObjectInContext(final Object _o, final WOContext _ctx) {
     if (_o == null)
       return null;
 
@@ -539,9 +540,9 @@ public class WOApplication extends NSObject
     // TBD: this is somewhat mixed up, works in association with handleException
 
     if (_o instanceof GoSecurityException) {
-      IGoAuthenticator authenticator =((GoSecurityException)_o).authenticator();
+      final IGoAuthenticator authenticator =((GoSecurityException)_o).authenticator();
       if (authenticator instanceof IGoObjectRendererFactory) {
-        Object renderer = ((IGoObjectRendererFactory)authenticator)
+        final Object renderer = ((IGoObjectRendererFactory)authenticator)
           .rendererForObjectInContext(_o, _ctx);
         if (renderer != null)
           return renderer;
@@ -587,7 +588,7 @@ public class WOApplication extends NSObject
    * @param _ctx    - the context in which the rendering should happen
    * @return a WOResponse containing the rendered results
    */
-  public WOResponse renderObjectInContext(Object _result, WOContext _ctx) {
+  public WOResponse renderObjectInContext(final Object _result, final WOContext _ctx) {
     if (false) {
       // this is non-sense, we might have already called a method and the result
       // is a plain null.
@@ -604,7 +605,7 @@ public class WOApplication extends NSObject
 
     /* lookup renderer (by walking the traversal path) */
 
-    Object renderer = this.rendererForObjectInContext(_result, _ctx);
+    final Object renderer = rendererForObjectInContext(_result, _ctx);
 
     /* check renderer */
 
@@ -621,7 +622,7 @@ public class WOApplication extends NSObject
 
     Object renderError;
     if (renderer instanceof IGoObjectRenderer) {
-      IGoObjectRenderer typedRenderer = ((IGoObjectRenderer)renderer);
+      final IGoObjectRenderer typedRenderer = ((IGoObjectRenderer)renderer);
 
       renderError = typedRenderer.renderObjectInContext(_result, _ctx);
     }
@@ -630,16 +631,16 @@ public class WOApplication extends NSObject
         renderError = selRendererForObjectInContext.invoke
           (renderer, new Object[] { _result, _ctx });
       }
-      catch (IllegalArgumentException e) {
+      catch (final IllegalArgumentException e) {
         renderError = e;
       }
-      catch (NoSuchMethodException e) {
+      catch (final NoSuchMethodException e) {
         renderError = e;
       }
-      catch (IllegalAccessException e) {
+      catch (final IllegalAccessException e) {
         renderError = e;
       }
-      catch (InvocationTargetException e) {
+      catch (final InvocationTargetException e) {
         renderError = e;
       }
     }
@@ -647,7 +648,7 @@ public class WOApplication extends NSObject
     if (renderError != null) { /* some error occurred */
       /* render the error ... */
       // TODO: need to avoid unlimited recursion?
-      return this.renderObjectInContext(renderError, _ctx);
+      return renderObjectInContext(renderError, _ctx);
     }
 
     /* everything was great */
@@ -665,12 +666,12 @@ public class WOApplication extends NSObject
    * @param _ctx - the WOContext the request happened in
    * @return a WOResponse to be used for the application object
    */
-  public WOResponse redirectToApplicationEntry(WOContext _ctx) {
+  public WOResponse redirectToApplicationEntry(final WOContext _ctx) {
     // TBD: Add a behaviour which makes sense for Go based applications,
     //      eg redirect to default method.
     // This is called by renderObjectInContext()
-    final WORequestHandler  drh = this.defaultRequestHandler();
-    final WOResourceManager rm  = this.resourceManager();
+    final WORequestHandler  drh = defaultRequestHandler();
+    final WOResourceManager rm  = resourceManager();
     String url = null;
 
     /* Note: in both cases we use the DA request handler for entry */
@@ -691,7 +692,7 @@ public class WOApplication extends NSObject
       return null;
     }
 
-    final Map<String, Object>   qd = new HashMap<String, Object>(1);
+    final Map<String, Object>   qd = new HashMap<>(1);
     final Map<String, Object[]> fv = _ctx.request().formValues();
     if (fv != null) qd.putAll(fv);
     if (_ctx.hasSession())
@@ -729,7 +730,7 @@ public class WOApplication extends NSObject
       final String[] qks = _rq.formValueKeys();
       if (qks != null && qks.length > 0) {
         sb.append(" F[");
-        for (String qk: qks) {
+        for (final String qk: qks) {
           sb.append(" ");
           sb.append(qk);
 
@@ -743,7 +744,7 @@ public class WOApplication extends NSObject
           if (vs != null && vs.length > 0) {
             sb.append('=');
             boolean isFirst = true;
-            for (Object v: vs) {
+            for (final Object v: vs) {
               if (isFirst) isFirst = false;
               else sb.append(",");
 
@@ -783,7 +784,7 @@ public class WOApplication extends NSObject
    * @param _rqId - the numeric ID of the request (counter)
    * @param _r    - the generated WOResponse
    */
-  protected void logRequestEnd(WORequest _rq, int _rqId, WOResponse _r) {
+  protected void logRequestEnd(final WORequest _rq, final int _rqId, final WOResponse _r) {
     final StringBuilder sb = new StringBuilder(512);
     sb.append("WOApp[");
     sb.append(_rqId);
@@ -798,7 +799,7 @@ public class WOApplication extends NSObject
         sb.append(s);
       }
       else if (!_r.isStreaming()) {
-        int len = _r.content().length;
+        final int len = _r.content().length;
         sb.append(" len=");
         sb.append(len);
       }
@@ -829,7 +830,7 @@ public class WOApplication extends NSObject
       if (duration > 0.0) {
         // TBD: are there more efficient ways to do this? (apparently there is
         //      no way to cache the parsed format?)
-        Formatter formatter = new Formatter(sb, Locale.US);
+        final Formatter formatter = new Formatter(sb, Locale.US);
         formatter.format(" (%.3fs)", duration);
         formatter.close(); // didn't know that ;-)
       }
@@ -857,14 +858,14 @@ public class WOApplication extends NSObject
 
     if ("/favicon.ico".equals(_rq.uri())) {
       log.debug("detected favicon.ico request, use resource handler.");
-      rh = this.requestHandlerRegistry.get(this.resourceRequestHandlerKey());
+      rh = this.requestHandlerRegistry.get(resourceRequestHandlerKey());
       if (rh != null) return rh;
     }
 
     if ((k = _rq.requestHandlerKey()) == null) {
       log.debug("no request handler key in request, using default:" +
                      _rq.uri());
-      return this.defaultRequestHandler();
+      return defaultRequestHandler();
     }
 
     if ((rh = this.requestHandlerRegistry.get(k)) != null)
@@ -872,7 +873,7 @@ public class WOApplication extends NSObject
 
     log.debug("did not find request handler key, using default: " + k +
                    " / " + _rq.uri());
-    return this.defaultRequestHandler();
+    return defaultRequestHandler();
   }
 
   /**
@@ -881,7 +882,7 @@ public class WOApplication extends NSObject
    * @param _rh  - the request handler object to be mapped
    * @param _key - the request handler key which will trigger the handler
    */
-  public void registerRequestHandler(WORequestHandler _rh, final String _key) {
+  public void registerRequestHandler(final WORequestHandler _rh, final String _key) {
     this.requestHandlerRegistry.put(_key, _rh);
   }
 
@@ -977,7 +978,7 @@ public class WOApplication extends NSObject
    * @param _ctx      - the context for the component
    * @return the WOComponent or null if the WOResourceManager found none
    */
-  public WOComponent pageWithName(String _pageName, final WOContext _ctx) {
+  public WOComponent pageWithName(final String _pageName, final WOContext _ctx) {
     pageLog.debug("pageWithName:" + _pageName);
 
     WOResourceManager rm = null;
@@ -985,7 +986,7 @@ public class WOApplication extends NSObject
     if (cursor != null)
       rm = cursor.resourceManager();
     if (rm == null)
-      rm = this.resourceManager();
+      rm = resourceManager();
 
     if (rm == null) {
       pageLog.error("did not find a resource manager to instantiate: " +
@@ -1042,7 +1043,7 @@ public class WOApplication extends NSObject
    * @param _ctx - the WOContext in which the session should be restored
    * @return the restored and awake session or null if it could not be restored
    */
-  public WOSession restoreSessionWithID(final String _sid, WOContext _ctx) {
+  public WOSession restoreSessionWithID(final String _sid, final WOContext _ctx) {
     final WORequest rq = _ctx != null ? _ctx.request() : null;
     //System.err.println("RESTORE: " + _sid + ": " + rq.cookies());
 
@@ -1051,7 +1052,7 @@ public class WOApplication extends NSObject
       return null;
     }
 
-    final WOSessionStore st = this.sessionStore();
+    final WOSessionStore st = sessionStore();
     if (st == null) {
       log.info("cannot restore session, no store is available: " + _sid);
       return null;
@@ -1060,12 +1061,12 @@ public class WOApplication extends NSObject
     WOSession sn = st.checkOutSessionForID(_sid, rq);
     if (sn == null && rq != null) {
       /* check all cookies */
-      Collection<String> vals = rq.cookieValuesForKey(WORequest.SessionIDKey);
+      final Collection<String> vals = rq.cookieValuesForKey(WORequest.SessionIDKey);
       if (vals != null) {
         if (vals.size() > 1 && log.isWarnEnabled())
           log.warn("multiple sid-cookies in request: " + rq.cookies());
 
-        for (String sid: vals) {
+        for (final String sid: vals) {
           if (sid == null) continue;
           if (sid.equals(_sid)) continue; // already checked that
 
@@ -1099,7 +1100,7 @@ public class WOApplication extends NSObject
     if (_ctx == null || !_ctx.hasSession())
       return false;
 
-    final WOSessionStore st = this.sessionStore();
+    final WOSessionStore st = sessionStore();
     if (st == null) {
       log.error("cannot save session, missing a session store!");
       return false;
@@ -1144,15 +1145,15 @@ public class WOApplication extends NSObject
       return null;
     }
 
-    final WOSession sn = this.createSessionForRequest(_ctx.request());
+    final WOSession sn = createSessionForRequest(_ctx.request());
     if (sn == null) {
       log.debug("createSessionForRequest returned null ...");
       return null;
     }
-    
-    final Object tov = this.defaults().valueForKey("WOSessionTimeOut");
+
+    final Object tov = defaults().valueForKey("WOSessionTimeOut");
     if (tov != null) {
-      int to = UObject.intValue(tov);
+      final int to = UObject.intValue(tov);
       if (to < 1)
         log.error("unexpected WOSessionTimeOut value (must be >0s):" + tov);
       else
@@ -1227,12 +1228,12 @@ public class WOApplication extends NSObject
 
   /* error handling */
 
-  public WOActionResults handleException(Throwable _e, WOContext _ctx) {
+  public WOActionResults handleException(final Throwable _e, final WOContext _ctx) {
     /* support for security infrastructure */
     if (_e instanceof GoSecurityException) {
-      IGoAuthenticator authenticator =((GoSecurityException)_e).authenticator();
+      final IGoAuthenticator authenticator =((GoSecurityException)_e).authenticator();
       if (authenticator instanceof IGoObjectRendererFactory)
-        return this.renderObjectInContext(_e, _ctx);
+        return renderObjectInContext(_e, _ctx);
 
       if (log.isDebugEnabled()) {
         if (authenticator == null)
@@ -1246,17 +1247,17 @@ public class WOApplication extends NSObject
     else if (_e instanceof SecurityException) {
       WOResponse r = _ctx.response();
       if (r == null) r = new WOResponse(_ctx != null ? _ctx.request() : null);
-      r.setStatus(403);;
+      r.setStatus(403);
 
       log.warn("Core Java security exception", _e);
       return r;
     }
-   
+
     if (true) { // new behavior for testing
-      final WOResponse r = this.renderObjectInContext(_e, _ctx);
+      final WOResponse r = renderObjectInContext(_e, _ctx);
       return r;
     }
-    
+
     // TODO: improve exception page, eg include stacktrace
     _ctx.response().appendContentHTMLString("fail: " + _e.toString());
     _e.printStackTrace();
@@ -1269,7 +1270,7 @@ public class WOApplication extends NSObject
     return _ctx.response();
   }
 
-  public WOActionResults handleMissingAction(String _action, WOContext _ctx) {
+  public WOActionResults handleMissingAction(final String _action, final WOContext _ctx) {
     /* this is called if a direct action could not be found */
     // TODO: improve exception page
     _ctx.response().appendContentHTMLString("missing action: " + _action);
@@ -1373,7 +1374,7 @@ public class WOApplication extends NSObject
    * @param _response - the response
    * @param _ctx      - the context
    */
-  public void appendToResponse(WOResponse _response, final WOContext _ctx) {
+  public void appendToResponse(final WOResponse _response, final WOContext _ctx) {
     if (_ctx.hasSession())
       _ctx.session().appendToResponse(_response, _ctx);
     else {
@@ -1429,7 +1430,7 @@ public class WOApplication extends NSObject
     /* Load configuration from the current directory. We might want
      * to change the lookup strategy ...
      */
-    File f = this.userDomainPropertiesFile();
+    final File f = userDomainPropertiesFile();
     if (f != null && f.exists()) {
       try {
         in = new FileInputStream(f);
@@ -1438,12 +1439,12 @@ public class WOApplication extends NSObject
         else
           log.info("did load user domain properties: " + f);
       }
-      catch (FileNotFoundException e) {
+      catch (final FileNotFoundException e) {
         log.error("did not find user domains file: " + f);
       }
     }
 
-    for (Object key: sysProps.keySet()) {
+    for (final Object key: sysProps.keySet()) {
       /* we add all keys starting with uppercase, weird, eh?! ;-)
        * this passes through WOxyz stuff and avoids the standard Java props
        */
@@ -1455,7 +1456,7 @@ public class WOApplication extends NSObject
 
     /* Finally, add volatile properties set by the adapter */
     if (this.volatileProperties != null) {
-      for (Object key: this.volatileProperties.keySet()) {
+      for (final Object key: this.volatileProperties.keySet()) {
         if (!(key instanceof String))
           continue;
         this.properties.put(key, this.volatileProperties.get(key));
@@ -1473,7 +1474,7 @@ public class WOApplication extends NSObject
   protected File userDomainPropertiesFile() {
     // Note: I don't think 'user.dir' actually returns something. The system
     //       properties are probably reset by Jetty
-    String fn = this.getClass().getSimpleName() + ".properties";
+    final String fn = this.getClass().getSimpleName() + ".properties";
     return new File(System.getProperty("user.dir", "."), fn);
   }
 
@@ -1491,16 +1492,18 @@ public class WOApplication extends NSObject
       this.properties.load(_in);
       return true;
     }
-    catch (IOException ioe) {
+    catch (final IOException ioe) {
       return false;
     }
   }
 
   /* a trampoline to make the properties accessible via KVC */
   protected NSObject defaults = new NSObject() {
+    @Override
     public void takeValueForKey(final Object _value, final String _key) {
       // do nothing, we do not mutate properties
     }
+    @Override
     public Object valueForKey(final String _key) {
       return WOApplication.this.properties.getProperty(_key);
     }
@@ -1532,14 +1535,14 @@ public class WOApplication extends NSObject
     return r;
   }
 
-  public void setPermanentPageCacheSize(int _size) {
+  public void setPermanentPageCacheSize(final int _size) {
     this.permanentPageCacheSize = _size;
   }
   public int permanentPageCacheSize() {
     return this.permanentPageCacheSize;
   }
 
-  public void setPageCacheSize(int _size) {
+  public void setPageCacheSize(final int _size) {
     this.pageCacheSize = _size;
   }
   public int pageCacheSize() {
@@ -1551,11 +1554,11 @@ public class WOApplication extends NSObject
 
   @Override
   public Object handleQueryWithUnboundKey(final String _key) {
-    return this.objectForKey(_key);
+    return objectForKey(_key);
   }
   @Override
-  public void handleTakeValueForUnboundKey(Object _value, final String _key) {
-    this.setObjectForKey(_value, _key);
+  public void handleTakeValueForUnboundKey(final Object _value, final String _key) {
+    setObjectForKey(_value, _key);
   }
 
 
@@ -1568,24 +1571,25 @@ public class WOApplication extends NSObject
 
   /* GoObject */
 
-  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
+  @Override
+  public Object lookupName(final String _name, final IGoContext _ctx, final boolean _acquire) {
     if (_name == null)
       return null;
 
     /* a few hardcoded object pathes */
 
     // TODO: why hardcode? move it to a GoClass!
-    if ("s".equals(_name))     return this.sessionStore();
-    if ("stats".equals(_name)) return this.statisticsStore();
+    if ("s".equals(_name))     return sessionStore();
+    if ("stats".equals(_name)) return statisticsStore();
 
     if ("favicon.ico".equals(_name)) {
       log.debug("detected favicon.ico name, returning resource handler.");
-      return this.requestHandlerRegistry.get(this.resourceRequestHandlerKey());
+      return this.requestHandlerRegistry.get(resourceRequestHandlerKey());
     }
 
     /* check class */
 
-    final GoClass goClass = this.goClassInContext(_ctx);
+    final GoClass goClass = goClassInContext(_ctx);
     if (goClass != null) {
       final Object o = goClass.lookupName(this, _name, _ctx);
       if (o != null) return o;
@@ -1605,15 +1609,17 @@ public class WOApplication extends NSObject
 
   /* extra attributes */
 
+  @Override
   public void setObjectForKey(final Object _value, final String _key) {
     if (_value == null) {
-      this.removeObjectForKey(_key);
+      removeObjectForKey(_key);
       return;
     }
 
     this.extraAttributes.put(_key, _value);
   }
 
+  @Override
   public void removeObjectForKey(final String _key) {
     if (this.extraAttributes == null)
       return;
@@ -1621,6 +1627,7 @@ public class WOApplication extends NSObject
     this.extraAttributes.remove(_key);
   }
 
+  @Override
   public Object objectForKey(final String _key) {
     if (_key == null || this.extraAttributes == null)
       return null;
@@ -1628,6 +1635,7 @@ public class WOApplication extends NSObject
     return this.extraAttributes.get(_key);
   }
 
+  @Override
   public Map<String,Object> variableDictionary() {
     return this.extraAttributes;
   }
@@ -1654,7 +1662,7 @@ public class WOApplication extends NSObject
     _d.append(this.activeDispatchCount.get());
 
     if (this.extraAttributes != null)
-      this.appendExtraAttributesToDescription(_d);
+      appendExtraAttributesToDescription(_d);
   }
 
   public void appendExtraAttributesToDescription(final StringBuilder _d) {
@@ -1663,7 +1671,7 @@ public class WOApplication extends NSObject
 
     _d.append(" vars=");
     boolean isFirst = true;
-    for (String ekey: this.extraAttributes.keySet()) {
+    for (final String ekey: this.extraAttributes.keySet()) {
       if (isFirst) isFirst = false;
       else _d.append(",");
 
