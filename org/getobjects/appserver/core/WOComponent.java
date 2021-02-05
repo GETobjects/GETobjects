@@ -576,7 +576,7 @@ public class WOComponent extends WOElement
     if (!binding.isValueSettableInComponent(lParent))
       return false;
 
-    binding.setValue(_value, _name);
+    binding.setValue(_value, lParent);
     return true;
   }
 
