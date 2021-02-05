@@ -7,9 +7,23 @@
   <name value="WOConditional" ns="http://www.opengroupware.org/go"/>
   <name value="if" ns="http://www.opengroupware.org/go"/>
 
-  <binding name="condition" required="YES"/>
-  <binding name="value" />
+  <binding name="condition"/>
   <binding name="negate" defaults="YES/NO"/>
-  <binding name="qualifier" />
+  <binding name="not" />
+
+  <binding name="value" />
+  <binding name="v" />
+
   <binding name="match" />
+
+  <binding name="qualifier" />
+  <binding name="q" />
+
+  <binding name="key1" />
+  <binding name="value1" />
+  <binding name="negate1" />
+
+  <binding name="k1" />
+  <binding name="v1" />
+  <binding name="neg1" />
 </wo>
