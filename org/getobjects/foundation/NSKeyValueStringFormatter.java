@@ -246,13 +246,6 @@ public class NSKeyValueStringFormatter extends NSObject {
       }
 
       switch ((c = pattern[pos])) {
-        case 'i':
-          if (value == null)
-            sb.append("0");
-          else
-            sb.append(UObject.intValue(value));
-          break;
-
         case '@':
         case 's':
           if (value == null)
@@ -261,11 +254,36 @@ public class NSKeyValueStringFormatter extends NSObject {
             sb.append(value);
           break;
 
+        case 'i':
+          if (value == null)
+            sb.append("0");
+          else
+            sb.append(UObject.intValue(value));
+          break;
+
         case 'U':
           if (value == null)
             sb.append("");
           else
             sb.append(UString.stringByEncodingURLComponent(value, null));
+          break;
+
+          /*
+           * `id` values
+           * @see https://stackoverflow.com/questions/70579/what-are-valid-values-for-the-id-attribute-in-html
+           * `.` values are permitted by the specs, but can easily lead to
+           * errors with jQuery selectors!
+           */
+        case 'I':
+          if (value == null)
+            sb.append("");
+          else
+            sb.append(UObject.stringValue(value).replaceAll("\\.| |@", "_"));
+          break;
+
+        case 'J':
+          final NSJavaScriptWriter js = new NSJavaScriptWriter(sb);
+          js.appendConstant(value);
           break;
 
         default:
