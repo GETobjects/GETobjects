@@ -31,9 +31,9 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.appserver.elements.links.WOLinkGenerator;
 import org.getobjects.foundation.UString;
+import org.getobjects.foundation.NSJavaScriptWriter;
 
 /**
  * WELinkToRemoteScript
@@ -321,7 +321,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
     return true;
   }
 
-  protected void appendCallbacksToJS(WOJavaScriptWriter _js, Object cursor) {
+  protected void appendCallbacksToJS(NSJavaScriptWriter _js, Object cursor) {
     if (this.callbacks == null)
       return;
 
@@ -353,7 +353,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
   }
 
   @SuppressWarnings("unchecked")
-  protected void appendHeadersToJS(WOJavaScriptWriter _js, Object cursor) {
+  protected void appendHeadersToJS(NSJavaScriptWriter _js, Object cursor) {
     Map<String, Object> lRequestHeaders = null;
 
     if (this.headers != null) {
@@ -402,7 +402,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
 
   }
 
-  public void appendJavaScript(WOJavaScriptWriter _js, WOContext _ctx) {
+  public void appendJavaScript(NSJavaScriptWriter _js, WOContext _ctx) {
     Object cursor =_ctx.cursor();
 
     String s;
@@ -512,7 +512,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
         // TODO: add support for queryParameters etc
         if ((s = strForAssoc(this.name, _ctx.cursor())) != null) {
           /* eg "{'q': $F('q')}" */
-          s =  UString.replaceInSequence(s, WOJavaScriptWriter.JSEscapeList);
+          s =  UString.replaceInSequence(s, NSJavaScriptWriter.JSEscapeList);
           _js.append("{'");
           _js.append(s);
           _js.append("': $F('");
@@ -549,7 +549,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
     if (_ctx.isRenderingDisabled())
       return;
 
-    WOJavaScriptWriter js = new WOJavaScriptWriter();
+    NSJavaScriptWriter js = new NSJavaScriptWriter();
     this.appendJavaScript(js, _ctx);
 
     if (this.event != null) {

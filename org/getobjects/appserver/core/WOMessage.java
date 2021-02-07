@@ -44,13 +44,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.foundation.NSDisposable;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSHtmlAttributeEntityTextCoder;
 import org.getobjects.foundation.NSHtmlEntityTextCoder;
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.NSTextCoder;
+import org.getobjects.foundation.NSJavaScriptWriter;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -638,7 +638,7 @@ public abstract class WOMessage extends NSObject
    * @param js - the script to be appended
    * @return an Exception if an error occured, null if everything is fine
    */
-  public Exception appendContentScript(final WOJavaScriptWriter js) {
+  public Exception appendContentScript(final NSJavaScriptWriter js) {
     if (js == null) return null;
 
     StringBuilder sb = this.stringBuffer != null

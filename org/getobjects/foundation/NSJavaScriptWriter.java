@@ -1,25 +1,22 @@
-package org.getobjects.appserver.elements;
+package org.getobjects.foundation;
 
 import java.util.List;
 import java.util.Map;
-
-import org.getobjects.foundation.NSObject;
-import org.getobjects.foundation.UString;
 
 /*
  * WOJavaScriptWriter
  * 
  * Note: this is only a temporary solution which might go away.
  */
-public class WOJavaScriptWriter extends NSObject {
+public class NSJavaScriptWriter extends NSObject {
 
   protected StringBuilder js;
   
-  public WOJavaScriptWriter(StringBuilder _sb) {
+  public NSJavaScriptWriter(StringBuilder _sb) {
     super();
     this.js = _sb != null ? _sb : new StringBuilder(1024);
   }
-  public WOJavaScriptWriter() {
+  public NSJavaScriptWriter() {
     this(null);
   }
   

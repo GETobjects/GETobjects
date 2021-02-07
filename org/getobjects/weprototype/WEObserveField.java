@@ -28,8 +28,8 @@ import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.appserver.elements.links.WOLinkGenerator;
+import org.getobjects.foundation.NSJavaScriptWriter;
 
 /**
  * WEObserveField
@@ -82,7 +82,7 @@ public class WEObserveField extends WEPrototypeElement {
 
   protected static final String defaultFrequency = "0.75";
 
-  public void appendJavaScript(WOJavaScriptWriter _js, WOContext _ctx) {
+  public void appendJavaScript(NSJavaScriptWriter _js, WOContext _ctx) {
     String lName, lFrequency, lOn, lF;
 
     if ((lFrequency = strForAssoc(this.frequency, _ctx.cursor())) != null)
@@ -137,7 +137,7 @@ public class WEObserveField extends WEPrototypeElement {
     if (_ctx.isRenderingDisabled())
       return;
 
-    WOJavaScriptWriter js = new WOJavaScriptWriter();
+    NSJavaScriptWriter js = new NSJavaScriptWriter();
     this.appendJavaScript(js, _ctx);
     _r.appendContentScript(js);
   }

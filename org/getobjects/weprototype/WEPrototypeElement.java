@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WODynamicElement;
 import org.getobjects.appserver.core.WOElement;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
+import org.getobjects.foundation.NSJavaScriptWriter;
 
 /**
  * WEPrototypeElement
@@ -58,7 +58,7 @@ public abstract class WEPrototypeElement extends WODynamicElement {
   /* AJAX calls */
   
   protected void beginAjaxCallWithUpdater
-    (WOJavaScriptWriter _js, Object _updater)
+    (NSJavaScriptWriter _js, Object _updater)
   {
     _js.append("new Ajax.");
     if (_updater != null) {

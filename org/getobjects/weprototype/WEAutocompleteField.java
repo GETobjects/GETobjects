@@ -32,9 +32,9 @@ import org.getobjects.appserver.core.WOElementWalker;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.elements.WOGenericContainer;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.appserver.elements.WORepetition;
 import org.getobjects.appserver.elements.links.WOLinkGenerator;
+import org.getobjects.foundation.NSJavaScriptWriter;
 
 /**
  * WEAutocompleteField
@@ -206,7 +206,7 @@ public class WEAutocompleteField extends WEPrototypeElement {
 
   /* generate response */
 
-  protected void appendOption(WOJavaScriptWriter _js, String _name,
+  protected void appendOption(NSJavaScriptWriter _js, String _name,
       WOAssociation _assoc, WOContext _ctx)
   {
     if (_assoc == null) return;
@@ -216,7 +216,7 @@ public class WEAutocompleteField extends WEPrototypeElement {
     _js.append(",");
   }
 
-  protected void appendLiteralOption(WOJavaScriptWriter _js, String _name,
+  protected void appendLiteralOption(NSJavaScriptWriter _js, String _name,
       WOAssociation _assoc, WOContext _ctx)
   {
     if (_assoc == null) return;
@@ -226,7 +226,7 @@ public class WEAutocompleteField extends WEPrototypeElement {
     _js.append(",");
   }
 
-  public void appendJavaScript(WOJavaScriptWriter _js, WOContext _ctx) {
+  public void appendJavaScript(NSJavaScriptWriter _js, WOContext _ctx) {
     _js.append("new Ajax.Autocompleter(");
     _js.appendConstant(this.inputElementNameInContext(_ctx));
     _js.append(", ");
@@ -282,7 +282,7 @@ public class WEAutocompleteField extends WEPrototypeElement {
 
       _r.appendEndTag(tagName);
 
-      WOJavaScriptWriter js = new WOJavaScriptWriter();
+      NSJavaScriptWriter js = new NSJavaScriptWriter();
       this.appendJavaScript(js, _ctx);
       _r.appendContentScript(js);
     }

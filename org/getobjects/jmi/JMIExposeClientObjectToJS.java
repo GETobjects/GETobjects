@@ -32,10 +32,10 @@ import org.getobjects.appserver.core.WODynamicElement;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOMessage;
 import org.getobjects.appserver.core.WOResponse;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.appserver.publisher.IGoCallable;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoLocation;
+import org.getobjects.foundation.NSJavaScriptWriter;
 import org.getobjects.appserver.publisher.GoClass;
 import org.getobjects.ofs.IGoFolderish;
 
@@ -91,7 +91,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected void exposeMethod
-    (final String _methodName, final WOJavaScriptWriter _js, IGoContext _ctx)
+    (final String _methodName, final NSJavaScriptWriter _js, IGoContext _ctx)
   {
     if (_methodName == null || _methodName.length() == 0)
       return;
@@ -106,7 +106,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected String exposeGoClass
-    (final GoClass _cls, final WOJavaScriptWriter _js, final IGoContext _ctx)
+    (final GoClass _cls, final NSJavaScriptWriter _js, final IGoContext _ctx)
   {
     /*
      * TODO: plenty of things, just a prototype ;-)
@@ -159,7 +159,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
   }
   
   protected void exposeClientObject
-    (final Object _object, final WOJavaScriptWriter _js, final IGoContext _ctx)
+    (final Object _object, final NSJavaScriptWriter _js, final IGoContext _ctx)
   {
     if (_object == null) {
       _js.append("var clientObject = ");
@@ -247,7 +247,7 @@ public class JMIExposeClientObjectToJS extends WODynamicElement {
     if (clientObject == null)
       return;
     
-    final WOJavaScriptWriter js = new WOJavaScriptWriter();
+    final NSJavaScriptWriter js = new NSJavaScriptWriter();
     
     /* add document information */
     

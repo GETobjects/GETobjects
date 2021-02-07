@@ -32,10 +32,10 @@ import org.getobjects.appserver.core.WODisplayGroup;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
-import org.getobjects.appserver.elements.WOJavaScriptWriter;
 import org.getobjects.eocontrol.EODataSource;
 import org.getobjects.eocontrol.EOSortOrdering;
 import org.getobjects.foundation.NSKeyValueCodingAdditions;
+import org.getobjects.foundation.NSJavaScriptWriter;
 
 /**
  * WEBindDisplayGroup
@@ -276,7 +276,7 @@ public class WEBindDisplayGroup extends WEDynamicElement {
   };
   
   protected void appendSortOrderings
-    (WOJavaScriptWriter _js, WODisplayGroup _dg, EOSortOrdering[] _sos)
+    (NSJavaScriptWriter _js, WODisplayGroup _dg, EOSortOrdering[] _sos)
   {
     if (_sos == null) {
       _js.appendConstant(null);
@@ -293,7 +293,7 @@ public class WEBindDisplayGroup extends WEDynamicElement {
     _js.endArray();
   }
   
-  protected void appendJavaScript(WOJavaScriptWriter _js, WOContext _ctx) {
+  protected void appendJavaScript(NSJavaScriptWriter _js, WOContext _ctx) {
     Object  cursor      = _ctx.cursor();
     String  jsProxyName = this.jsProxy.stringValueInComponent(cursor);
     boolean doUpdate    = false;
@@ -419,7 +419,7 @@ public class WEBindDisplayGroup extends WEDynamicElement {
         _r.appendBeginTagEnd();
         _r.appendContentString("\n//<![CDATA[\n");
         
-        WOJavaScriptWriter sb = new WOJavaScriptWriter();
+        NSJavaScriptWriter sb = new NSJavaScriptWriter();
         this.appendJavaScript(sb, _ctx);
         _r.appendContentString(sb.script());
         sb = null;
