@@ -63,58 +63,64 @@ public class WOCookie extends NSObject {
 
   protected static final Log log = LogFactory.getLog("WOCookie");
 
-  protected String   name;     /* name of cookie, eg 'wosid'   */
-  protected String   value;    /* value of cookie, eg '283873' */
-  protected String   path;     /* path the cookie is valid for, eg '/MyApp' */
-  protected String   domain;   /* domain the cookie is valid for (.com) */
+  protected String   name;       /* name of cookie, eg 'wosid'   */
+  protected String   value;      /* value of cookie, eg '283873' */
+  protected String   path;       /* path the cookie is valid for, eg '/MyApp' */
+  protected String   domain;     /* domain the cookie is valid for (.com) */
   protected Date     date;
-  protected int      timeout;  /* in seconds (-1 == do not expire) */
-  protected boolean  isSecure; /* whether cookie requires an HTTPS connection */
-  protected SameSite sameSite; /* instruct browser when to send cookie */
+  protected int      timeout;    /* in seconds (-1 == do not expire) */
+  protected boolean  isSecure;   /* whether cookie requires an HTTPS connection */
+  protected SameSite sameSite;   /* instruct browser when to send cookie */
+  protected boolean  isHttpOnly; /* @see https://www.cookiepro.com/knowledge/httponly-cookie/ */
+
 
   public WOCookie(final String _name, final String _value, final String _path, final String _domain,
                   final Date _date, final boolean _isSecure)
   {
-    this.name     = _name;
-    this.value    = _value;
-    this.path     = _path;
-    this.domain   = _domain;
-    this.date     = _date;
-    this.isSecure = _isSecure;
-    this.timeout  = -1; /* do not expire cookie (use date) */
-    this.sameSite = SameSite.Lax;
+    this.name       = _name;
+    this.value      = _value;
+    this.path       = _path;
+    this.domain     = _domain;
+    this.date       = _date;
+    this.isSecure   = _isSecure;
+    this.timeout    = -1; /* do not expire cookie (use date) */
+    this.sameSite   = SameSite.Lax;
+    this.isHttpOnly = false;
   }
 
   public WOCookie(final String _name, final String _value, final String _path, final String _domain,
                   final int _timeoutInS, final boolean _isSecure)
   {
-    this.name     = _name;
-    this.value    = _value;
-    this.path     = _path;
-    this.domain   = _domain;
-    this.timeout  = _timeoutInS;
-    this.isSecure = _isSecure;
-    this.sameSite = SameSite.Lax;
+    this.name       = _name;
+    this.value      = _value;
+    this.path       = _path;
+    this.domain     = _domain;
+    this.timeout    = _timeoutInS;
+    this.isSecure   = _isSecure;
+    this.sameSite   = SameSite.Lax;
+    this.isHttpOnly = false;
   }
 
   public WOCookie(final String _name, final String _value, final String _path, final String _domain,
                   final boolean _isSecure)
   {
-    this.name     = _name;
-    this.value    = _value;
-    this.path     = _path;
-    this.domain   = _domain;
-    this.isSecure = _isSecure;
-    this.timeout  = -1; /* do not expire cookie */
-    this.sameSite = SameSite.Lax;
+    this.name       = _name;
+    this.value      = _value;
+    this.path       = _path;
+    this.domain     = _domain;
+    this.isSecure   = _isSecure;
+    this.timeout    = -1; /* do not expire cookie */
+    this.sameSite   = SameSite.Lax;
+    this.isHttpOnly = false;
   }
 
   public WOCookie(final String _name, final String _value) {
-    this.name     = _name;
-    this.value    = _value;
-    this.timeout  = -1; /* do not expire cookie */
-    this.isSecure = false;
-    this.sameSite = SameSite.Lax;
+    this.name       = _name;
+    this.value      = _value;
+    this.timeout    = -1; /* do not expire cookie */
+    this.isSecure   = false;
+    this.sameSite   = SameSite.Lax;
+    this.isHttpOnly = false;
   }
 
 
@@ -191,6 +197,13 @@ public class WOCookie extends NSObject {
     return this.sameSite;
   }
 
+  public void setHttpOnly(final boolean _isHttpOnly) {
+    this.isHttpOnly = _isHttpOnly;
+  }
+  public boolean isHttpOnly() {
+    return this.isHttpOnly;
+  }
+
   /* generating HTTP cookie */
 
   /**
@@ -241,6 +254,9 @@ public class WOCookie extends NSObject {
     if (this.isSecure)
       sb.append("; secure");
 
+    if (this.isHttpOnly)
+      sb.append("; HttpOnly");
+
     sb.append("; SameSite=");
     sb.append(this.sameSite.toString());
 
@@ -275,7 +291,8 @@ public class WOCookie extends NSObject {
 
     String  path = null;
     final String domain = null;
-    boolean isSecure = false;
+    boolean isSecure   = false;
+    boolean isHttpOnly = false;
     String sameSite = null;
 
     for (int i = 0; i < opts.length; i++) {
@@ -286,6 +303,8 @@ public class WOCookie extends NSObject {
         path = opt.substring(5);
       else if (opt.equals("secure"))
         isSecure = true;
+      else if (opt.equals("HttpOnly"))
+        isHttpOnly = true;
       else if (opt.startsWith("SameSite="))
         sameSite = opt.substring(9);
       else
@@ -293,6 +312,7 @@ public class WOCookie extends NSObject {
     }
 
     final WOCookie c = new WOCookie(name, value, path, domain, isSecure);
+    c.setHttpOnly(isHttpOnly);
     if (sameSite != null) {
       if (sameSite.equals("Strict"))
         c.setSameSite(SameSite.Strict);
@@ -343,6 +363,8 @@ public class WOCookie extends NSObject {
 
     if (this.isSecure)
       _d.append(" secure");
+    if (this.isHttpOnly)
+      _d.append(" HttpOnly");
   }
 
 
