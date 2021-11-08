@@ -53,14 +53,14 @@ import org.getobjects.appserver.elements.WOForm;
  *     [sub-template]
  *   &lt;/form&gt;</pre>
  * <p>
- * 
+ *
  * Bindings:<pre>
  *   id                 [in] - string (elementID and HTML DOM id)
  *   target             [in] - string
  *   method             [in] - string (POST/GET)
  *   forceTakeValues    [in] - boolean (whether the form *must* run takevalues)
  * </pre>
- * 
+ *
  * Bindings (WOLinkGenerator):
  * <pre>
  *   href               [in] - string
@@ -73,13 +73,13 @@ import org.getobjects.appserver.elements.WOForm;
  *   queryDictionary    [in] - Map&lt;String,String&gt;
  *   - all bindings starting with a ? are stored as query parameters.
  * </pre>
- * 
+ *
  * AJAX Bindings:<pre>
  *   type               [in] - synchronous/asynchronous
  *   update             [in] - string|dict (element id or keyed on handler)
  *   position           [in] - string      (before/top/bottom/after/..)
  *   event              [in] - string      (event handler to use (def: onclick))
- *   
+ *
  *   confirm            [in] - string (JS function or code)
  *   condition          [in] - string (JS function or code)
  *   before             [in] - string (JS function or code)
@@ -97,7 +97,7 @@ import org.getobjects.appserver.elements.WOForm;
  *   loaded             [in] - string (JS function or code) [not guaranteed]
  *   interactive        [in] - string (JS function or code) [not guaranteed]
  * </pre>
- * 
+ *
  * Extra Bindings:<pre>
  *   - !bindings are added to 'style'
  *   - .bindings are added to 'class' if they resolve to true
@@ -105,12 +105,12 @@ import org.getobjects.appserver.elements.WOForm;
  */
 public class WEFormToRemote extends WOForm {
   static boolean alwaysPassIn = false;
-  
+
   protected WELinkToRemoteScript onSubmit;
 
 
   public WEFormToRemote
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
 
@@ -118,25 +118,27 @@ public class WEFormToRemote extends WOForm {
       /* we have a different default event */
       _assocs.put("event", new WOValueAssociation("onsubmit"));
     }
-    
+
     this.onSubmit = new WELinkToRemoteScript
       (_name + "Script", _assocs,
        WELinkToRemoteScript.PARAMETERMODE_FORM,
        this.link);
   }
-  
-  
+
+
   /* generate response */
-  
+
   @Override
   public void appendCoreAttributesToResponse
-    (String _id, WOResponse _r, WOContext _ctx)
+    (final String _id, final WOResponse _r, final WOContext _ctx)
   {
+    final Object cursor = _ctx != null ? _ctx.cursor() : null;
+
     _r.appendBeginTag("form");
     if (_id != null) _r.appendAttribute("id", _id);
-    
+
     if (this.link != null) {
-      String url = this.link.fullHrefInContext(_ctx);
+      final String url = this.link.fullHrefInContext(_ctx);
       /* Note: this encodes the ampersands in query strings as &amp;! */
       if (url != null) _r.appendAttribute("action", url);
     }
@@ -149,7 +151,7 @@ public class WEFormToRemote extends WOForm {
 
     if (this.coreAttributes != null)
       this.coreAttributes.appendToResponse(_r, _ctx);
-    
+
     this.appendExtraAttributesToResponse(_r, _ctx);
     // TODO: otherTagString
     _r.appendBeginTagEnd();
