@@ -118,6 +118,8 @@ public class WEFormToRemote extends WOForm {
       /* we have a different default event */
       _assocs.put("event", new WOValueAssociation("onsubmit"));
     }
+    if (this.method != null)
+      _assocs.put("method", this.method);
 
     this.onSubmit = new WELinkToRemoteScript
       (_name + "Script", _assocs,
@@ -146,7 +148,12 @@ public class WEFormToRemote extends WOForm {
       /* a form MUST have some target, no? */
       _r.appendAttribute("action", _ctx.componentActionURL());
     }
-    
+
+    String m = null;
+    if (this.method != null)
+      m = this.method.stringValueInComponent(cursor);
+    _r.appendAttribute("method", m != null ? m : "POST");
+
     this.onSubmit.appendToResponse(_r, _ctx);
 
     if (this.coreAttributes != null)
