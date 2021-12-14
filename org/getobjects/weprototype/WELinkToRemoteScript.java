@@ -32,8 +32,8 @@ import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.elements.links.WOLinkGenerator;
-import org.getobjects.foundation.UString;
 import org.getobjects.foundation.NSJavaScriptWriter;
+import org.getobjects.foundation.UString;
 
 /**
  * WELinkToRemoteScript
@@ -139,13 +139,13 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
   protected WOAssociation with;
   protected WOAssociation name;
 
-  public void init(String _name, Map<String, WOAssociation> _assocs) {
+  public void init(final String _name, final Map<String, WOAssociation> _assocs) {
     this.parameterMode = PARAMETERMODE_LINK;
 
     this.type      = grabAssociation(_assocs, "type");
     this.update    = grabAssociation(_assocs, "update");
     this.position  = grabAssociation(_assocs, "position");
-    this.method    = grabAssociation(_assocs, "method");
+    this.method    = grabAssociation(_assocs, "method", "POST");
     this.event     = grabAssociation(_assocs, "event");
 
     this.confirm   = grabAssociation(_assocs, "confirm");
@@ -182,22 +182,22 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
   }
 
   public WELinkToRemoteScript
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
-    this.init(_name, _assocs);
+    init(_name, _assocs);
   }
 
   public WELinkToRemoteScript
-    (String _name, Map<String, WOAssociation> _assocs, int _parameterMode,
-     WOLinkGenerator _link)
+    (final String _name, final Map<String, WOAssociation> _assocs, final int _parameterMode,
+     final WOLinkGenerator _link)
   {
     super(_name, _assocs, null /* template */);
 
     if (_link != null)
       this.link = _link; /* this makes the initializer skip the linkscan */
 
-    this.init(_name, _assocs);
+    init(_name, _assocs);
 
     this.parameterMode = _parameterMode;
 
@@ -210,18 +210,18 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
   /* helper */
 
   protected static Map<String, WOAssociation> extractCallbacks
-    (Map<String, WOAssociation> _assocs)
+    (final Map<String, WOAssociation> _assocs)
   {
     if (_assocs == null)
       return null;
 
-    Map<String, WOAssociation> cbs = new HashMap<String, WOAssociation>(8);
-    List<String> keysToRemove = new ArrayList<String>(8);
+    final Map<String, WOAssociation> cbs = new HashMap<>(8);
+    final List<String> keysToRemove = new ArrayList<>(8);
 
-    for (String name: _assocs.keySet()) {
+    for (final String name: _assocs.keySet()) {
       String cb = null;
-      char c0 = name.charAt(0);
-      int  nl = name.length();
+      final char c0 = name.charAt(0);
+      final int  nl = name.length();
 
       switch (c0) {
         case 'c':
@@ -259,7 +259,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
       }
     }
 
-    for (String k: keysToRemove)
+    for (final String k: keysToRemove)
       _assocs.remove(k);
 
     return (cbs.size() == 0) ? null : cbs;
@@ -275,14 +275,16 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
 
   /* handle requests */
 
-  public void takeValuesFromRequest(WORequest _rq, WOContext _ctx) {
+  @Override
+  public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
     /* links can take form values !!!! (for query-parameters) */
 
     if (this.link != null)
       this.link.takeValuesFromRequest(_rq, _ctx);
   }
 
-  public Object invokeAction(WORequest _rq, WOContext _ctx) {
+  @Override
+  public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
     if (_ctx.elementID().equals(_ctx.senderID())) {
       if (this.link != null)
         return this.link.invokeAction(_rq, _ctx);
@@ -296,13 +298,13 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
 
   /* generate response */
 
-  public static boolean isSimpleJavaScriptID(String _js) {
+  public static boolean isSimpleJavaScriptID(final String _js) {
     if (_js == null)
       return false;
 
     boolean isFirstChar = true;
     for (int i = 0, len = _js.length(); i < len; i++) {
-      char c = _js.charAt(i);
+      final char c = _js.charAt(i);
 
       if (isFirstChar) {
         if (!Character.isJavaIdentifierStart(c))
@@ -321,12 +323,12 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
     return true;
   }
 
-  protected void appendCallbacksToJS(NSJavaScriptWriter _js, Object cursor) {
+  protected void appendCallbacksToJS(final NSJavaScriptWriter _js, final Object cursor) {
     if (this.callbacks == null)
       return;
 
     String s;
-    for (String cn: this.callbacks.keySet()) {
+    for (final String cn: this.callbacks.keySet()) {
       if ((s = strForAssoc(this.callbacks.get(cn), cursor)) == null)
         continue;
 
@@ -353,7 +355,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
   }
 
   @SuppressWarnings("unchecked")
-  protected void appendHeadersToJS(NSJavaScriptWriter _js, Object cursor) {
+  protected void appendHeadersToJS(final NSJavaScriptWriter _js, final Object cursor) {
     Map<String, Object> lRequestHeaders = null;
 
     if (this.headers != null) {
@@ -362,18 +364,18 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
     }
 
     if (this.accept != null) {
-      Object v = this.accept.valueInComponent(cursor);
+      final Object v = this.accept.valueInComponent(cursor);
       if (v != null) {
         if (lRequestHeaders == null)
-          lRequestHeaders = new HashMap<String, Object>(2);
+          lRequestHeaders = new HashMap<>(2);
         else
-          lRequestHeaders = new HashMap<String, Object>(lRequestHeaders);
+          lRequestHeaders = new HashMap<>(lRequestHeaders);
       }
 
       if (v instanceof String)
         lRequestHeaders.put("Accept", v);
       else if (v instanceof List) {
-        String s = UString.componentsJoinedByString((List)v, ", ");
+        final String s = UString.componentsJoinedByString((List)v, ", ");
         lRequestHeaders.put("Accept", s);
       }
       else if (v instanceof StringBuilder)
@@ -389,7 +391,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
       _js.append(", requestHeaders: [ ");
 
       boolean isFirst = true;
-      for (String key: lRequestHeaders.keySet()) {
+      for (final String key: lRequestHeaders.keySet()) {
         if (isFirst) isFirst = false;
         else _js.append(", ");
 
@@ -402,8 +404,8 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
 
   }
 
-  public void appendJavaScript(NSJavaScriptWriter _js, WOContext _ctx) {
-    Object cursor =_ctx.cursor();
+  public void appendJavaScript(final NSJavaScriptWriter _js, final WOContext _ctx) {
+    final Object cursor =_ctx.cursor();
 
     String s;
     int braceCloseCount = 0;
@@ -430,7 +432,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
 
     /* now generate AJAX call */
 
-    this.beginAjaxCallWithUpdater(_js,
+    beginAjaxCallWithUpdater(_js,
         this.update != null ? this.update.valueInComponent(cursor) : null);
 
 
@@ -471,15 +473,14 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
     _js.append(", evalScripts:true"); // this evaluates scripts in the content
 
     /* method */
-    if (this.method != null) {
-      _js.append(", method:");
-      _js.appendString(this.method.stringValueInComponent(cursor));
-    }
+    _js.append(", method:");
+    final String m = this.method.stringValueInComponent(cursor);
+    _js.appendString(m != null ? m : "POST");
 
     /* headers */
 
     if (this.headers != null || this.accept != null)
-      this.appendHeadersToJS(_js, cursor);
+      appendHeadersToJS(_js, cursor);
 
     /* position */
     if ((s = strForAssoc(this.position, cursor)) != null) {
@@ -527,7 +528,7 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
     /* callbacks */
 
     if (this.callbacks != null)
-      this.appendCallbacksToJS(_js, cursor);
+      appendCallbacksToJS(_js, cursor);
 
     /* close AJAX call */
     _js.append("});");
@@ -545,15 +546,15 @@ public class WELinkToRemoteScript extends WEPrototypeElement {
   }
 
   @Override
-  public void appendToResponse(WOResponse _r, WOContext _ctx) {
+  public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
     NSJavaScriptWriter js = new NSJavaScriptWriter();
-    this.appendJavaScript(js, _ctx);
+    appendJavaScript(js, _ctx);
 
     if (this.event != null) {
-      String onWhat = this.event.stringValueInComponent(_ctx.cursor());
+      final String onWhat = this.event.stringValueInComponent(_ctx.cursor());
 
       if (onWhat != null)
         _r.appendAttribute(onWhat, js.script());
