@@ -7,6 +7,8 @@
   <name value="WORadioButton" ns="http://www.opengroupware.org/go"/>
   <name value="radio" ns="http://www.opengroupware.org/go"/>
 
+  <bindings class="WOInput"/>
+
   <binding name="selection" settable="YES"/>
   <binding name="checked" settable="YES"/>
 

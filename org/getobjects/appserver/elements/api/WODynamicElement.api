@@ -11,6 +11,7 @@
   -->
   <!-- any element may have this -->
   <binding name="id"  />
+  <binding name="class" />
   <!-- these are provided by the template parser... -->
   <binding name="if" defaults="YES/NO"/>
   <binding name="ifnot" defaults="YES/NO"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?> 
 
 <wo class="WOHtml"
-    superclass="WOHTMLDynamicComponent"
+    superclass="WOHTMLDynamicElement"
     xmlns="http://www.opengroupware.org/go/api"
     ns="http://www.opengroupware.org/go"
 >
