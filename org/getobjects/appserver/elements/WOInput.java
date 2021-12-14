@@ -93,7 +93,7 @@ public abstract class WOInput extends WOHTMLDynamicElement {
       if (_assocs.containsKey("id"))
         log.warn("specified 'id' and 'idname' bindings: " + _name);
       else
-        _assocs.put("id", idName);
+        this.eid = idName;
     }
     
     // TODO: warn against NAME (uppercase) association?
