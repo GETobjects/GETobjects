@@ -410,7 +410,7 @@ public class WODisplayGroup extends NSObject {
     return null; /* stay on page */
   }
   
-  public WOActionResults displayPreviousPatch() {
+  public WOActionResults displayPreviousBatch() {
     this.clearSelection();
     
     this.currentBatchIndex--;
