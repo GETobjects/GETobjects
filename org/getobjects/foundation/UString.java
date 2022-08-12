@@ -34,6 +34,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -726,8 +727,7 @@ public class UString {
     if (_data == null)
       return null;
 
-    // TBD: use non-private mechanism?!
-    return new sun.misc.BASE64Encoder().encodeBuffer(_data);
+    return Base64.getEncoder().encodeToString(_data);
   }
 
   /**

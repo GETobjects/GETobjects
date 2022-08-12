@@ -30,6 +30,7 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -342,14 +343,7 @@ public class UData extends NSObject {
     if (_src == null)
       return null;
 
-    try {
-      // TBD: use non-private mechanism?!
-      return new sun.misc.BASE64Decoder().decodeBuffer(_src);
-    }
-    catch (IOException e) {
-      log.error("could not decode base64 string", e);
-    }
-    return null;
+    return Base64.getDecoder().decode(_src);
   }
 
 
