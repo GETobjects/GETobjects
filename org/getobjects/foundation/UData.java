@@ -71,10 +71,10 @@ public class UData extends NSObject {
     byte[] results = new byte[0];
     try {
       int    didRead;
-      byte[] buf = new byte[4096];
+      final byte[] buf = new byte[4096];
 
       while ((didRead = in.read(buf)) > 0) {
-        byte[] nre = new byte[results.length + didRead];
+        final byte[] nre = new byte[results.length + didRead];
         System.arraycopy(results, 0 /* start of source */,
                          nre,     0 /* start in dest   */,
                          results.length);
@@ -85,7 +85,7 @@ public class UData extends NSObject {
         results = nre;
       }
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       log.warn("failed to read data from stream: " + _in, e);
       return null;
     }
@@ -93,7 +93,7 @@ public class UData extends NSObject {
       try {
         in.close();
       }
-      catch (IOException e) {
+      catch (final IOException e) {
         log.warn("could not close input stream", e);
       }
     }
@@ -126,10 +126,10 @@ public class UData extends NSObject {
     if (_o instanceof File) {
       try {
         /* Note: stream is closed by load function */
-        FileInputStream is = new FileInputStream((File)_o);
+        final FileInputStream is = new FileInputStream((File)_o);
         return loadContentFromStream(is);
       }
-      catch (FileNotFoundException e) {
+      catch (final FileNotFoundException e) {
         log.info("could not open file: " + _o);
         return null;
       }
@@ -138,10 +138,10 @@ public class UData extends NSObject {
     if (_o instanceof String) {
       try {
         /* Note: stream is closed by load function */
-        FileInputStream is = new FileInputStream((String)_o);
+        final FileInputStream is = new FileInputStream((String)_o);
         return loadContentFromStream(is);
       }
-      catch (FileNotFoundException e) {
+      catch (final FileNotFoundException e) {
         log.info("could not open file: " + _o);
         return null;
       }
@@ -152,7 +152,7 @@ public class UData extends NSObject {
         /* Note: stream is closed by load function */
         return loadContentFromStream(((URL)_o).openStream());
       }
-      catch (IOException e) {
+      catch (final IOException e) {
         log.info("could not open URL: " + _o, e);
         return null;
       }
@@ -165,7 +165,7 @@ public class UData extends NSObject {
 
   /* writing files */
 
-  public static Exception writeToStream(byte[] _data, OutputStream _out) {
+  public static Exception writeToStream(final byte[] _data, final OutputStream _out) {
     if (_data == null)
       return new NSException("got no data to write ...");
     if (_out == null)
@@ -175,7 +175,7 @@ public class UData extends NSObject {
       _out.write(_data, 0, _data.length);
       _out.flush();
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       return e;
     }
 
@@ -199,14 +199,14 @@ public class UData extends NSObject {
       try {
         tmpFile = File.createTempFile(".UData", ".atomicwrite", _file.getParentFile());
       }
-      catch (IOException e) {
+      catch (final IOException e) {
         return e;
       }
 
       try {
         os = new FileOutputStream(tmpFile);
       }
-      catch (FileNotFoundException e) {
+      catch (final FileNotFoundException e) {
         tmpFile.delete();
         return e;
       }
@@ -215,19 +215,19 @@ public class UData extends NSObject {
       try {
         os = new FileOutputStream(_file);
       }
-      catch (FileNotFoundException e) {
+      catch (final FileNotFoundException e) {
         return e;
       }
     }
 
     /* write data to stream */
 
-    Exception error = writeToStream(_data, os);
+    final Exception error = writeToStream(_data, os);
 
     try {
       if (os != null) os.close();
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       log.warn("could not close output stream: " + os, e);
       os = null;
     }
@@ -321,7 +321,7 @@ public class UData extends NSObject {
       md5.reset(); // TBD: superflous?
       return res;
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (final NoSuchAlgorithmException e) {
       log.error("did not find MD5 hash generator", e);
       return null;
     }
@@ -338,7 +338,7 @@ public class UData extends NSObject {
    * @param _src - the String containing the BASE64.
    * @return the decoded byte array, or null if decoding failed
    */
-  public static byte[] dataByDecodingBase64(String _src) {
+  public static byte[] dataByDecodingBase64(final String _src) {
     if (_src == null)
       return null;
 
@@ -368,7 +368,7 @@ public class UData extends NSObject {
    * @param _algo     - algorithm to use for encryption (eg AES or DES)
    * @return the encrypted array of bytes, or null if something failed
    */
-  public static byte[] encrypt(byte[] _data, String _password, String _algo) {
+  public static byte[] encrypt(final byte[] _data, final String _password, final String _algo) {
     if (_password == null || _data == null || _password.length() == 0)
       return null;
 
@@ -376,7 +376,7 @@ public class UData extends NSObject {
 
     int idx;
     if (_password.charAt(0) == '{' && (idx = _password.indexOf('}')) > 1) {
-      String hashAlgo = _password.substring(1, idx);
+      final String hashAlgo = _password.substring(1, idx);
 
       // TBD: use generic mechanism
       if (hashAlgo.equalsIgnoreCase("md5"))
@@ -405,7 +405,7 @@ public class UData extends NSObject {
    * @param _algo     - algorithm to use for encryption (eg AES or DES)
    * @return the encrypted array of bytes, or null if something failed
    */
-  public static byte[] decrypt(byte[] _data, String _password, String _algo) {
+  public static byte[] decrypt(final byte[] _data, final String _password, final String _algo) {
     if (_password == null || _data == null || _password.length() == 0)
       return null;
 
@@ -413,7 +413,7 @@ public class UData extends NSObject {
 
     int idx;
     if (_password.charAt(0) == '{' && (idx = _password.indexOf('}')) > 1) {
-      String hashAlgo = _password.substring(1, idx);
+      final String hashAlgo = _password.substring(1, idx);
 
       // TBD: use generic mechanism
       if (hashAlgo.equalsIgnoreCase("md5"))
@@ -438,7 +438,7 @@ public class UData extends NSObject {
    * @param _algo - algorithm to use for encryption (eg AES or DES)
    * @return the encrypted array of bytes, or null if something failed
    */
-  public static byte[] encrypt(byte[] _data, byte[] _key, String _algo) {
+  public static byte[] encrypt(final byte[] _data, final byte[] _key, String _algo) {
     if (_key == null || _data == null)
       return null;
 
@@ -453,11 +453,11 @@ public class UData extends NSObject {
     try {
       enc = Cipher.getInstance(_algo);
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (final NoSuchAlgorithmException e) {
       log.error("no AES available", e);
       return null;
     }
-    catch (NoSuchPaddingException e) {
+    catch (final NoSuchPaddingException e) {
       log.error("AES padding error", e);
       return null;
     }
@@ -465,7 +465,7 @@ public class UData extends NSObject {
     try {
       enc.init(Cipher.ENCRYPT_MODE, key);
     }
-    catch (InvalidKeyException e) {
+    catch (final InvalidKeyException e) {
       log.error("invalid AES key (#" + _key.length + " bytes)", e);
       return null;
     }
@@ -473,11 +473,11 @@ public class UData extends NSObject {
     try {
       return enc.doFinal(_data);
     }
-    catch (IllegalBlockSizeException e) {
+    catch (final IllegalBlockSizeException e) {
       log.error("illegal block size when encrypting data", e);
       return null;
     }
-    catch (BadPaddingException e) {
+    catch (final BadPaddingException e) {
       log.error("bad padding while encrypting data", e);
       return null;
     }
@@ -492,7 +492,7 @@ public class UData extends NSObject {
    * @param _algo - algorithm to use for encryption (eg AES or DES)
    * @return the encrypted array of bytes, or null if something failed
    */
-  public static byte[] decrypt(byte[] _data, byte[] _key, String _algo) {
+  public static byte[] decrypt(final byte[] _data, final byte[] _key, String _algo) {
     if (_key == null || _data == null)
       return null;
 
@@ -507,11 +507,11 @@ public class UData extends NSObject {
     try {
       enc = Cipher.getInstance(_algo);
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (final NoSuchAlgorithmException e) {
       log.error("no AES available", e);
       return null;
     }
-    catch (NoSuchPaddingException e) {
+    catch (final NoSuchPaddingException e) {
       log.error("AES padding error", e);
       return null;
     }
@@ -519,7 +519,7 @@ public class UData extends NSObject {
     try {
       enc.init(Cipher.DECRYPT_MODE, key);
     }
-    catch (InvalidKeyException e) {
+    catch (final InvalidKeyException e) {
       log.error("invalid AES key (#" + _key.length + " bytes)", e);
       return null;
     }
@@ -527,11 +527,11 @@ public class UData extends NSObject {
     try {
       return enc.doFinal(_data);
     }
-    catch (IllegalBlockSizeException e) {
+    catch (final IllegalBlockSizeException e) {
       log.error("illegal block size when decrypting data", e);
       return null;
     }
-    catch (BadPaddingException e) {
+    catch (final BadPaddingException e) {
       log.error("bad padding while decrypting data", e);
       return null;
     }
