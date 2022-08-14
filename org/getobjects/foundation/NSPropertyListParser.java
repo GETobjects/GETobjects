@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * NSPropertyListParser
  * <p>
- * This class implements a parser for the old-style property list format. 
+ * This class implements a parser for the old-style property list format.
  * You would not usually invoke it directly, but rather use the
  * {@link NSPropertyListSerialization} utility function class, eg:
  * <pre>
@@ -68,10 +68,10 @@ import org.apache.commons.logging.LogFactory;
  * process.
  */
 public class NSPropertyListParser extends NSObject {
-  // Note: this is a straight port of the ObjC parser and therefore 
+  // Note: this is a straight port of the ObjC parser and therefore
   //       somewhat clumsy
 
-  protected static Log plistLog = 
+  protected static Log plistLog =
                          LogFactory.getLog("NSPropertyListParser");
   protected Log log; /* redefined by WODParser */
 
@@ -85,7 +85,7 @@ public class NSPropertyListParser extends NSObject {
    * Whether or not to parse dictionary keys as value objects,
    * or as identifiers. Example:<pre>
    *   { 10 = Hello; 11 = World;</pre>
-   * With value keys enabled, 10 and 11 will be parsed a Number objects. 
+   * With value keys enabled, 10 and 11 will be parsed a Number objects.
    * If not, they are parsed as String keys.
    */
   protected boolean useValueKeys;
@@ -104,8 +104,8 @@ public class NSPropertyListParser extends NSObject {
   public Object parse() {
     if (this.isDebugOn) this.log.debug("start parsing ...");
 
-    final Object o = this._parseProperty();
-    this.resetTransient(); /* cleanup unnecessary state */
+    final Object o = _parseProperty();
+    resetTransient(); /* cleanup unnecessary state */
 
     if (this.isDebugOn) {
       if (o != null)
@@ -126,7 +126,7 @@ public class NSPropertyListParser extends NSObject {
    * @return the parsed property list object
    */
   public Object parse(final String _s) {
-    this.setString(_s);
+    setString(_s);
     return this.parse();
   }
   /**
@@ -136,7 +136,7 @@ public class NSPropertyListParser extends NSObject {
    * @return the parsed property list object
    */
   public Object parse(final char[] _buf) {
-    this.setCharBuffer(_buf);
+    setCharBuffer(_buf);
     return this.parse();
   }
 
@@ -155,7 +155,7 @@ public class NSPropertyListParser extends NSObject {
     try {
       return this.parse(new String(_buf, "utf8"));
     }
-    catch (UnsupportedEncodingException e) {
+    catch (final UnsupportedEncodingException e) {
       this.log.error("failed to transform byte array to UTF-8", e);
       return null;
     }
@@ -198,7 +198,7 @@ public class NSPropertyListParser extends NSObject {
     try {
       o = _url.getContent(urlTypes);
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       this.log.error("failed to read from URL: " + _url, e);
     }
     if (o == null)
@@ -211,7 +211,7 @@ public class NSPropertyListParser extends NSObject {
     if (o instanceof InputStream) // TODO: check charset header?
       return this.parse((InputStream)o);
 
-    this.log.error("don't know how to deal with URL content: " + 
+    this.log.error("don't know how to deal with URL content: " +
                    o.getClass());
     return null;
   }
@@ -253,7 +253,7 @@ public class NSPropertyListParser extends NSObject {
   /* setting input */
 
   public void setCharBuffer(final char[] _buffer) {
-    this.reset();
+    reset();
     this.buffer        = _buffer;
     this.idx           = 0;
     this.len           = _buffer.length;
@@ -261,7 +261,7 @@ public class NSPropertyListParser extends NSObject {
   }
 
   public void setString(final String _str) {
-    this.setCharBuffer(_str.toCharArray());
+    setCharBuffer(_str.toCharArray());
   }
 
   public void resetTransient() {
@@ -270,7 +270,7 @@ public class NSPropertyListParser extends NSObject {
     this.len    = -1;
   }
   public void reset() {
-    this.resetTransient();
+    resetTransient();
     this.lastException = null;
   }
 
@@ -283,7 +283,7 @@ public class NSPropertyListParser extends NSObject {
     this.lastException = null;
   }
 
-  protected void addException(String _error) {
+  protected void addException(final String _error) {
     // TODO: keep old exceptions?
     this.lastException =
       new NSPropertyListSyntaxException(_error, this.lastException);
@@ -307,12 +307,12 @@ public class NSPropertyListParser extends NSObject {
   protected boolean _isBreakCharAt(final int cpos) {
     if (this.idx + cpos >= this.len) // break on EOF
       return true;
-    
+
     return _isBreakChar(this.buffer[this.idx + cpos]);
   }
 
   protected boolean _isIdChar(final char _c) {
-    return (this._isBreakChar(_c) && (_c != '.')) ? false : true;
+    return (_isBreakChar(_c) && (_c != '.')) ? false : true;
   }
 
   protected static int _valueOfHexChar(final char _c) {
@@ -398,7 +398,7 @@ public class NSPropertyListParser extends NSObject {
 
           if (!commentIsClosed) {
             /* EOF found, comment wasn't closed */
-            this.addException("comment was not closed (expected '*/')");
+            addException("comment was not closed (expected '*/')");
             return false;
           }
 
@@ -419,15 +419,15 @@ public class NSPropertyListParser extends NSObject {
   }
 
   protected String _parseIdentifier() {
-    if (!this._skipComments()) {
+    if (!_skipComments()) {
       /* EOF reached during comment-skipping */
-      this.addException("did not find an id (expected 'a-zA-Z0-0')");
+      addException("did not find an id (expected 'a-zA-Z0-0')");
       return null;
     }
 
     int pos      = this.idx;
     int ilen     = 0;
-    int startPos = pos;
+    final int startPos = pos;
 
     if (this.isDebugOn)
       this.log.debug("_parseId(): pos=" + pos + ", len=" + this.len);
@@ -445,12 +445,12 @@ public class NSPropertyListParser extends NSObject {
       String s = "";
 
       if (this.idx < this.len) {
-        int ml = this.len - this.idx;
+        final int ml = this.len - this.idx;
         s = new String(this.buffer, this.idx, ml > 16 ? 16 : ml);
         s = ": " + s;
       }
 
-      this.addException(
+      addException(
           "did not find an id (expected 'a-zA-Z0-0') at pos " +
           this.idx + s);
       return null;
@@ -461,33 +461,33 @@ public class NSPropertyListParser extends NSObject {
   }
 
   /**
-   * This is called by _parseProperty if the property could not be 
-   * identified as a primitive value (eg a Number or quoted String). 
+   * This is called by _parseProperty if the property could not be
+   * identified as a primitive value (eg a Number or quoted String).
    * Example:<pre>
    *   person.address.street</pre>
    * But <em>NOT</em>:<pre>
    *   "person.address.street"</pre>
    *
    * <p>
-   * The method parses a set of identifiers (using _parseIdentifier()) 
+   * The method parses a set of identifiers (using _parseIdentifier())
    * which is separated by a dot.
    *
    * <p>
-   * Its also called by the WOD parsers _parseAssociationProperty() 
+   * Its also called by the WOD parsers _parseAssociationProperty()
    * method.
    *
    * @return the parsed String, eg "person.address.street"
    */
   protected String _parseKeyPath() {
-    if (!this._skipComments()) {
+    if (!_skipComments()) {
       /* EOF reached during comment-skipping */
-      this.addException("did not find an keypath (expected id)");
+      addException("did not find an keypath (expected id)");
       return null;
     }
 
-    final String firstComponent = this._parseIdentifier();
+    final String firstComponent = _parseIdentifier();
     if (firstComponent == null) {
-      this.addException("did not find an keypath (expected id)");
+      addException("did not find an keypath (expected id)");
       return null;
     }
 
@@ -497,16 +497,16 @@ public class NSPropertyListParser extends NSObject {
     if (this.buffer[this.idx] != '.')
       return firstComponent;
 
-    StringBuilder keypath = new StringBuilder(64);
+    final StringBuilder keypath = new StringBuilder(64);
     keypath.append(firstComponent);
 
     while (this.buffer[this.idx] == '.') {
       this.idx += 1; /* skip '.' */
       keypath.append('.');
 
-      final String component = this._parseIdentifier();
+      final String component = _parseIdentifier();
       if (component == null) {
-        this.addException("expected component after '.' in keypath!");
+        addException("expected component after '.' in keypath!");
         break; // TODO: should we return null?
       }
 
@@ -525,23 +525,23 @@ public class NSPropertyListParser extends NSObject {
    */
   protected String _parseQString() {
     /* skip comments and spaces */
-    if (!this._skipComments()) {
+    if (!_skipComments()) {
       /* EOF reached during comment-skipping */
-      this.addException("did not find a quoted string (expected '\"')");
+      addException("did not find a quoted string (expected '\"')");
       return null;
     }
 
     final char quoteChar = this.buffer[this.idx];
     if (quoteChar != '"' && quoteChar != '\'') {
       /* it's not a quoted string */
-      this.addException("did not find a quoted string (expected '\"')");
+      addException("did not find a quoted string (expected '\"')");
       return null;
     }
 
     /* a quoted string */
     int pos      = this.idx + 1;  /* skip quote */
     int ilen     = 0;
-    int startPos = pos;
+    final int startPos = pos;
     boolean containsEscaped = false;
 
     /* loop until closing quote */
@@ -551,7 +551,7 @@ public class NSPropertyListParser extends NSObject {
         pos++; /* skip following char */
         ilen++;
         if (pos == this.len) {
-          this.addException("escape in quoted string not finished!");
+          addException("escape in quoted string not finished!");
           return null;
         }
       }
@@ -561,7 +561,7 @@ public class NSPropertyListParser extends NSObject {
 
     if (pos == this.len) { /* syntax error, quote not closed */
       this.idx = pos;
-      this.addException("quoted string not closed (expected '" + 
+      addException("quoted string not closed (expected '" +
                         quoteChar + "')");
       return null;
     }
@@ -599,17 +599,17 @@ public class NSPropertyListParser extends NSObject {
 
   protected byte[] _parseData() {
     /* skip comments and spaces */
-    if (!this._skipComments()) {
+    if (!_skipComments()) {
       /* EOF reached during comment-skipping */
-      this.addException("did not find a data block (expected '<')");
+      addException("did not find a data block (expected '<')");
       return null;
     }
 
     if (this.buffer[this.idx] != '<') { /* it's not a data block */
-      this.addException("did not find a data block (expected '<')");
+      addException("did not find a data block (expected '<')");
       return null;
     }
-    
+
     final ByteArrayOutputStream data = new ByteArrayOutputStream();
 
     this.idx++;  /* skip start marker */
@@ -622,7 +622,7 @@ public class NSPropertyListParser extends NSObject {
       if (next != ' ') {
         final int nibbleValue = _valueOfHexChar(next);
         if (nibbleValue == -1) {
-          this.addException("unexpected character '"+next+"' in data!");
+          addException("unexpected character '"+next+"' in data!");
           return null;
         }
         if (!isLowNibble) {
@@ -635,22 +635,22 @@ public class NSPropertyListParser extends NSObject {
         isLowNibble = !isLowNibble; /* toggle */
       }
       else if (isLowNibble) {
-        this.addException("malformed data entry!");
+        addException("malformed data entry!");
         return null;
       }
-      
+
       this.idx++;
       if (this.idx == this.len) { /* unexpected EOF */
-        this.addException("data block not closed (expected '>')");
+        addException("data block not closed (expected '>')");
         return null;
       }
     }
-    
+
     if (isLowNibble) {
-      this.addException("malformed data entry!");
+      addException("malformed data entry!");
       return null;
     }
-    
+
     // skip stop marker
     this.idx++;
     return data.toByteArray();
@@ -661,12 +661,12 @@ public class NSPropertyListParser extends NSObject {
       return null;
 
     if (this.useValueKeys)
-      return this._parseProperty();
+      return _parseProperty();
 
     if (this.buffer[this.idx] == '"')
-      return this._parseQString();
+      return _parseQString();
 
-    return this._parseIdentifier();
+    return _parseIdentifier();
   }
 
   protected Map<Object,Object> _parseDict() {
@@ -674,35 +674,35 @@ public class NSPropertyListParser extends NSObject {
       this.log.debug("_parseDict(): pos=" + this.idx + ", len="+this.len);
 
     /* skip comments and spaces */
-    if (!this._skipComments()) {
+    if (!_skipComments()) {
       /* EOF reached during comment-skipping */
-      this.addException("did not find dictionary (expected '{')");
+      addException("did not find dictionary (expected '{')");
       return null;
     }
 
     if (this.buffer[this.idx] != '{') { /* it's not a dict that follows */
-      this.addException("did not find dictionary (expected '{')");
+      addException("did not find dictionary (expected '{')");
       return null;
     }
 
     this.idx += 1; /* skip '{' */
 
-    if (!this._skipComments()) {
-      this.addException("dictionary was not closed (expected '}')");
+    if (!_skipComments()) {
+      addException("dictionary was not closed (expected '}')");
       return null; /* EOF */
     }
 
     if (this.buffer[this.idx] == '}') { /* an empty dictionary */
       this.idx += 1; /* skip the '}' */
-      return new HashMap<Object, Object>(0); // TODO: add an emptymap obj?
+      return new HashMap<>(0); // TODO: add an emptymap obj?
     }
 
-    final Map<Object, Object> result = new HashMap<Object, Object>(16);
+    final Map<Object, Object> result = new HashMap<>(16);
     boolean didFail = false;
 
     do {
-      if (!this._skipComments()) {
-        this.addException("dictionary was not closed (expected '}')");
+      if (!_skipComments()) {
+        addException("dictionary was not closed (expected '}')");
         didFail = true;
         break; /* unexpected EOF */
       }
@@ -713,36 +713,36 @@ public class NSPropertyListParser extends NSObject {
       }
 
       /* read key property or identifier */
-      final Object key = this.parseDictionaryKey();
+      final Object key = parseDictionaryKey();
       if (key == null) { /* syntax error */
         if (this.lastException == null)
-          this.addException("got nil-key in dictionary ..");
+          addException("got nil-key in dictionary ..");
         didFail = true;
         break;
       }
 
       /* The following parses:  (comment|space)* '=' (comment|space)* */
-      if (!this._skipComments()) {
-        this.addException("expected '=' after key in dictionary");
+      if (!_skipComments()) {
+        addException("expected '=' after key in dictionary");
         didFail = true;
         break; /* unexpected EOF */
       }
       /* now we need a '=' assignment */
       if (this.buffer[this.idx] != '=') {
-        this.addException("expected '=' after key '" + key +
+        addException("expected '=' after key '" + key +
                           "' in dictionary");
         didFail = true;
         break;
       }
       this.idx += 1; /* skip '=' */
-      if (!this._skipComments()) {
-        this.addException("expected value after '=' in dictionary");
+      if (!_skipComments()) {
+        addException("expected value after '=' in dictionary");
         didFail = true;
         break; /* unexpected EOF */
       }
 
       /* read value property */
-      final Object value = this._parseProperty();
+      final Object value = _parseProperty();
       if (this.lastException != null) {
         didFail = true;
         break;
@@ -751,8 +751,8 @@ public class NSPropertyListParser extends NSObject {
       result.put(key, value);
 
       /* read trailing ';' if available */
-      if (!this._skipComments()) {
-        this.addException("dictionary was not closed (expected '}')");
+      if (!_skipComments()) {
+        addException("dictionary was not closed (expected '}')");
         didFail = true;
         break; /* unexpected EOF */
       }
@@ -760,7 +760,7 @@ public class NSPropertyListParser extends NSObject {
         this.idx += 1; /* skip ';' */
       else { /* no ; at end of pair, only allowed at end of dictionary */
         if (this.buffer[this.idx] != '}') { /* dictionary wasn't closed */
-          this.addException("key-value pair without ';' at the end");
+          addException("key-value pair without ';' at the end");
           didFail = true;
           break;
         }
@@ -775,43 +775,43 @@ public class NSPropertyListParser extends NSObject {
     if (this.isDebugOn)
       this.log.debug("_parseArray(): pos=" + this.idx +", len="+this.len);
 
-    if (!this._skipComments()) {
+    if (!_skipComments()) {
       /* EOF reached during comment-skipping */
-      this.addException("did not find array (expected '(')");
+      addException("did not find array (expected '(')");
       return null;
     }
 
     if (this.buffer[this.idx] != '(') { /* it's not an array */
-      this.addException("did not find array (expected '(')");
+      addException("did not find array (expected '(')");
       return null;
     }
 
     this.idx += 1; /* skip '(' */
 
-    if (!this._skipComments()) {
-      this.addException("array was not closed (expected '}')");
+    if (!_skipComments()) {
+      addException("array was not closed (expected '}')");
       return null; /* EOF */
     }
 
     if (this.buffer[this.idx] == ')') { /* an empty array */
       this.idx += 1; /* skip the ')' */
-      return new ArrayList<Object>(0); // TODO: add an empty-map obj?
+      return new ArrayList<>(0); // TODO: add an empty-map obj?
     }
 
-    List<Object> result = new ArrayList<Object>(16);
+    List<Object> result = new ArrayList<>(16);
 
     do {
-      final Object element = this._parseProperty();
+      final Object element = _parseProperty();
       if (element == null) {
-        this.addException("expected element in array at: " + this.idx);
+        addException("expected element in array at: " + this.idx);
         result = null;
         break;
       }
 
       result.add(element);
 
-      if (!this._skipComments()) {
-        this.addException("array was not closed (expected ')' or ',')");
+      if (!_skipComments()) {
+        addException("array was not closed (expected ')' or ',')");
         result = null;
         break;
       }
@@ -822,19 +822,19 @@ public class NSPropertyListParser extends NSObject {
       }
 
       if (this.buffer[this.idx] != ',') { /* (no) next element */
-        this.addException("expected ')' or ',' after array element");
+        addException("expected ')' or ',' after array element");
         result = null;
         break;
       }
 
       this.idx += 1; /* skip ',' */
-      if (!this._skipComments()) {
-        this.addException("array was not closed (expected ')')");
+      if (!_skipComments()) {
+        addException("array was not closed (expected ')')");
         result = null;
         break;
       }
 
-      if (this.buffer[this.idx] == ')') { 
+      if (this.buffer[this.idx] == ')') {
         /* closed array, like this '(1,2,)' */
         this.idx += 1; /* skip ')' */
         break;
@@ -851,13 +851,13 @@ public class NSPropertyListParser extends NSObject {
       return null;
 
     if (_digitPath.indexOf('.') == -1)
-      return new Integer(_digitPath);
+      return Integer.valueOf(_digitPath);
 
-    return new Double(_digitPath);
+    return Double.valueOf(_digitPath);
   }
 
-  protected static boolean _ucIsEqual(final char[] _buf, int _pos,
-                                      String _s) 
+  protected static boolean _ucIsEqual(final char[] _buf, final int _pos,
+                                      final String _s)
   {
     final int len = _s.length();
     if (_buf.length < (_pos + len))
@@ -881,11 +881,11 @@ public class NSPropertyListParser extends NSObject {
    *   <li>'{' will trigger _parseDict()
    *   <li>'(' will trigger _parseArray()
    *   <li>'&lt;' will trigger _parseData()
-   *   <li>if it starts with a digit or '-', attempt to parse it as a 
+   *   <li>if it starts with a digit or '-', attempt to parse it as a
    *       number
    *     (but could be a String like 001.html). If the parsing succeeds
    *     (no NumberFormatException), a Number will be returned
-   *   <li>"YES", "NO", "true", "false" - will be returned as Boolean 
+   *   <li>"YES", "NO", "true", "false" - will be returned as Boolean
    *       objects
    *   <li>"null", "nil" - will be returned as Java null
    *   <li>all other Strings will trigger _parseKeyPath()
@@ -904,37 +904,37 @@ public class NSPropertyListParser extends NSObject {
 
     if (this.isDebugOn) this.log.debug("parse property at: " + this.idx);
 
-    if (!this._skipComments())
+    if (!_skipComments())
       return null; /* EOF */
 
     final char c = this.buffer[this.idx];
     switch (c) {
       case '"': /* quoted string */
       case '\'': /* quoted string */
-        result = this._parseQString();
+        result = _parseQString();
         break;
 
       case '{': /* dictionary */
-        result = this._parseDict();
+        result = _parseDict();
         break;
 
       case '(': /* array */
-        result = this._parseArray();
+        result = _parseArray();
         break;
 
       case '<': /* data */
-        result = this._parseData();
+        result = _parseData();
         break;
 
       default:
         if (Character.isDigit(c) || (c == '-')) {
-          final String digitPath = this._parseKeyPath();
+          final String digitPath = _parseKeyPath();
             // TODO: why is this?
 
           try {
             result = _parseDigitPath(digitPath);
           }
-          catch (NumberFormatException e) {
+          catch (final NumberFormatException e) {
             /* eg: 001.html = 15; */
             result = digitPath;
           }
@@ -946,7 +946,7 @@ public class NSPropertyListParser extends NSObject {
           if (c == 'Y' || c == 'N' || c == 't' || c == 'f' || c == 'n') {
             // Note: we do not allow a space behind a const, eg '= true ;'
             /* parse YES and NO, true and false */
-            if (_ucIsEqual(this.buffer, this.idx, "YES") && 
+            if (_ucIsEqual(this.buffer, this.idx, "YES") &&
                 _isBreakCharAt(3)) {
               result        = Boolean.TRUE;
               valueProperty = true;
@@ -988,10 +988,10 @@ public class NSPropertyListParser extends NSObject {
             /* this means: did not match a constant yet */
             // TODO: should be renamed "parseUnquotedString"? This is a
             //       leftover from the .wod parser
-            result = this._parseKeyPath();
+            result = _parseKeyPath();
         }
         else {
-          this.addException("invalid char");
+          addException("invalid char");
         }
         break; /* end of default branch */
     }
@@ -1005,7 +1005,7 @@ public class NSPropertyListParser extends NSObject {
     }
 
     if (result == null)
-      this.addException("error in property value");
+      addException("error in property value");
 
     if (this.isDebugOn) {
       this.log.debug("finished parsing property at " + this.idx + ": " +

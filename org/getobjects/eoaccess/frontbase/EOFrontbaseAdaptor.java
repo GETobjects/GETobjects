@@ -7,20 +7,21 @@ import org.getobjects.eoaccess.EOModel;
 
 public class EOFrontbaseAdaptor extends EOAdaptor {
 
-  public EOFrontbaseAdaptor(String _url, Properties _p, EOModel _model) {
+  public EOFrontbaseAdaptor(final String _url, final Properties _p, final EOModel _model) {
     super(_url, _p, _model);
   }
 
   /* JDBC driver */
 
+  @Override
   protected boolean loadDriver() {
     try {
       // The newInstance() call is a work around for some
       // broken Java implementations
-      Class.forName("com.frontbase.jdbc.FBJDriver").newInstance();
+      Class.forName("com.frontbase.jdbc.FBJDriver").getDeclaredConstructor().newInstance();
       return true;
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return false;
     }
   }

@@ -27,11 +27,11 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.publisher.GoClass;
+import org.getobjects.appserver.publisher.GoClassRegistry;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoLocation;
 import org.getobjects.appserver.publisher.IGoObject;
-import org.getobjects.appserver.publisher.GoClass;
-import org.getobjects.appserver.publisher.GoClassRegistry;
 import org.getobjects.eoaccess.EOValidation;
 import org.getobjects.foundation.NSException;
 import org.getobjects.foundation.NSObject;
@@ -94,7 +94,7 @@ public abstract class OFSBaseObject extends NSObject
    * @param _fm        - the storage backend (IOFSFileManager)
    * @param _storepath - the storage path as an array of filenames
    */
-  public void setStorageLocation(IOFSFileManager _fm, String[] _storepath) {
+  public void setStorageLocation(final IOFSFileManager _fm, final String[] _storepath) {
     this.fileManager = _fm;
     this.storagePath = _storepath;
   }
@@ -102,9 +102,11 @@ public abstract class OFSBaseObject extends NSObject
 
   /* IGoLocation interface */
 
+  @Override
   public Object container() {
     return this.container;
   }
+  @Override
   public String nameInContainer() {
     return this.nameInContainer;
   }
@@ -115,10 +117,10 @@ public abstract class OFSBaseObject extends NSObject
   public String stringPathInContainer() {
     // TODO: not recommended to use this to avoid escaping issues
     // TODO: fix escaping of '/'
-    final String[] p = this.pathInContainer();
+    final String[] p = pathInContainer();
     if (p        == null) return null;
     if (p.length == 0)    return "/";
-    return "/" + UString.componentsJoinedByString(this.pathInContainer(), "/");
+    return "/" + UString.componentsJoinedByString(pathInContainer(), "/");
   }
 
   /**
@@ -146,19 +148,23 @@ public abstract class OFSBaseObject extends NSObject
 
   /* EOValidation interface */
 
+  @Override
   public Exception validateForSave() {
     // TODO: iterate over properties and send them validateValueForKey
     return null; /* everything is awesome */
   }
 
+  @Override
   public Exception validateForInsert() {
-    return this.validateForSave();
+    return validateForSave();
   }
+  @Override
   public Exception validateForDelete() {
-    return this.validateForSave();
+    return validateForSave();
   }
+  @Override
   public Exception validateForUpdate() {
-    return this.validateForSave();
+    return validateForSave();
   }
 
 
@@ -179,7 +185,7 @@ public abstract class OFSBaseObject extends NSObject
    * @return a fileinfo object or null if the storage path could not be resolved
    */
   public IOFSFileInfo fileInfo() {
-    final IOFSFileInfo[] fileInfos = this.fileInfos();
+    final IOFSFileInfo[] fileInfos = fileInfos();
     return fileInfos != null && fileInfos.length > 0 ? fileInfos[0] : null;
   }
 
@@ -209,7 +215,7 @@ public abstract class OFSBaseObject extends NSObject
    * @return a Date representing the timestamp
    */
   public Date lastModified() {
-    final IOFSFileInfo info = this.fileInfo();
+    final IOFSFileInfo info = fileInfo();
     return info != null ? new Date(info.lastModified()) : null;
   }
 
@@ -222,13 +228,13 @@ public abstract class OFSBaseObject extends NSObject
    */
   public long size() {
     /* Note: this is actually "storageSize", rendering result could be diff */
-    final IOFSFileInfo info = this.fileInfo();
+    final IOFSFileInfo info = fileInfo();
     return info != null ? info.length() : null;
   }
 
   public String pathExtension() {
     /* Note: this is the path extension in the store */
-    final IOFSFileInfo info = this.fileInfo();
+    final IOFSFileInfo info = fileInfo();
     return info != null ? info.pathExtension() : null;
   }
 
@@ -242,7 +248,7 @@ public abstract class OFSBaseObject extends NSObject
    * @return the WebDAV resource type
    */
   public Object davResourceType() {
-    return this.isFolderish() ? "collection" : null;
+    return isFolderish() ? "collection" : null;
   }
 
 
@@ -263,12 +269,13 @@ public abstract class OFSBaseObject extends NSObject
     return reg.goClassForJavaObject(this, _ctx);
   }
 
-  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
+  @Override
+  public Object lookupName(final String _name, final IGoContext _ctx, final boolean _acquire) {
     /* lookup using GoClass */
 
-    final GoClass cls = this.goClassInContext(_ctx);
+    final GoClass cls = goClassInContext(_ctx);
     if (cls != null) {
-      Object o = cls.lookupName(this, _name, _ctx);
+      final Object o = cls.lookupName(this, _name, _ctx);
       if (o != null) return o;
     }
 
@@ -306,10 +313,10 @@ public abstract class OFSBaseObject extends NSObject
    */
   public byte[] content() {
     // TODO: move to Foundation (NSReadStreamAsByteArray() or sth like this)
-    final long size = this.size();
+    final long size = size();
     if (size == 0) return new byte[0]; /* empty file */
 
-    final InputStream in = this.openStream();
+    final InputStream in = openStream();
     if (in == null) return null;
 
     if (size > contentLoadSizeLimit || size > Integer.MAX_VALUE) {
@@ -330,7 +337,7 @@ public abstract class OFSBaseObject extends NSObject
         pos += gotlen;
       }
     }
-    catch (IOException ioe) {
+    catch (final IOException ioe) {
       // TODO: what to do with failed requests?
       log().warn("could not read content of file: " + this);
       contents = null;
@@ -340,7 +347,7 @@ public abstract class OFSBaseObject extends NSObject
         try {
           in.close();
         }
-        catch (IOException e) {
+        catch (final IOException e) {
           log().warn("could not close input stream", e);
           e.printStackTrace();
         }
@@ -360,13 +367,13 @@ public abstract class OFSBaseObject extends NSObject
     }
 
     if (_content instanceof String) {
-      final String enc = this.contentEncoding();
+      final String enc = contentEncoding();
       final String s   = (String)_content;
 
       try {
         _content = enc != null ? s.getBytes(enc) : s.getBytes();
       }
-      catch (UnsupportedEncodingException e) {
+      catch (final UnsupportedEncodingException e) {
         log.error("could not encode contents with charset '" + enc + "':"+this);
         return e;
       }
@@ -387,10 +394,10 @@ public abstract class OFSBaseObject extends NSObject
     return null;
   }
   public String contentAsString() {
-    final String enc = this.contentEncoding();
+    final String enc = contentEncoding();
 
     // TODO: directly read string from stream using a Reader
-    final byte[] contents = this.content();
+    final byte[] contents = content();
     if (contents == null)
       return null;
 
@@ -400,7 +407,7 @@ public abstract class OFSBaseObject extends NSObject
     try {
       return new String(contents, enc);
     }
-    catch (UnsupportedEncodingException e) {
+    catch (final UnsupportedEncodingException e) {
       log.error("could not decode contents with charset '" + enc + "':" + this);
       return null;
     }
@@ -411,22 +418,22 @@ public abstract class OFSBaseObject extends NSObject
 
   public Object valueForFileSystemKey(final String _key) {
     if ("NSFileType".equals(_key))
-      return this.isFolderish() ? "NSFileTypeDirectory" : "NSFileTypeRegular";
+      return isFolderish() ? "NSFileTypeDirectory" : "NSFileTypeRegular";
 
     if ("NSFileName".equals(_key))
-      return this.nameInContainer();
+      return nameInContainer();
 
     if ("NSFilePath".equals(_key))
-      return this.pathInContainer();
+      return pathInContainer();
 
     if ("NSFileModificationDate".equals(_key))
-      return this.lastModified();
+      return lastModified();
 
     if (this.fileManager == null || this.storagePath == null)
       return null;
 
     if ("NSFileSize".equals(_key))
-      return this.storagePath != null ? new Long(this.size()) : null;
+      return this.storagePath != null ? Long.valueOf(size()) : null;
 
     log().warn("unprocessed NSFile.. KVC key: '" + _key + "': " + this);
     return null;
@@ -438,7 +445,7 @@ public abstract class OFSBaseObject extends NSObject
       return this;
 
     if (_key.startsWith("NSFile"))
-      return this.valueForFileSystemKey(_key);
+      return valueForFileSystemKey(_key);
 
     return super.handleQueryWithUnboundKey(_key);
   }
@@ -463,7 +470,7 @@ public abstract class OFSBaseObject extends NSObject
       _d.append(" in=");
       _d.append(this.container.getClass().getSimpleName());
       if (this.container instanceof IGoLocation) {
-        String cs = ((IGoLocation)this.container).nameInContainer();
+        final String cs = ((IGoLocation)this.container).nameInContainer();
         if (cs != null) {
           _d.append('[');
           _d.append(cs);

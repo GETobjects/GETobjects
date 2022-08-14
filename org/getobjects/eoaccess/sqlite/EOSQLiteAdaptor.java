@@ -9,20 +9,21 @@ import org.getobjects.eoaccess.EOModel;
 
 public class EOSQLiteAdaptor extends EOAdaptor {
 
-  public EOSQLiteAdaptor(String _url, Properties _p, EOModel _model) {
+  public EOSQLiteAdaptor(final String _url, final Properties _p, final EOModel _model) {
     super(_url, _p, _model);
   }
 
   /* JDBC driver */
 
+  @Override
   protected boolean loadDriver() {
     try {
       // The newInstance() call is a work around for some
       // broken Java implementations
-      Class.forName("org.sqlite.JDBC").newInstance();
+      Class.forName("org.sqlite.JDBC").getDeclaredConstructor().newInstance();
       return true;
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return false;
     }
   }
@@ -30,7 +31,7 @@ public class EOSQLiteAdaptor extends EOAdaptor {
     /* adaptor specific objects */
 
   @Override
-  protected EOAdaptorChannel primaryCreateChannelForConnection(Connection _c) {
+  protected EOAdaptorChannel primaryCreateChannelForConnection(final Connection _c) {
     /* can be overridden by subclasses to provide specific channels */
     return new EOSQLiteChannel(this, _c);
   }

@@ -90,7 +90,7 @@ public class NSKeyValueStringFormatter extends NSObject {
 
       if (_key != null) {
         if ("length".equals(_key) || "size".equals(_key))
-          value = new Integer(this.valArray.length);
+          value = Integer.valueOf(this.valArray.length);
         else {
           final int idx = Integer.parseInt(_key);
           if (idx < 0 || idx >= this.valArray.length)

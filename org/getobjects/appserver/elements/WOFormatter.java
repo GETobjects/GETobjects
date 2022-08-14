@@ -139,7 +139,7 @@ public abstract class WOFormatter extends NSObject {
     if (_s == null)
       return null;
 
-    final Format fmt = this.formatInContext(_ctx);
+    final Format fmt = formatInContext(_ctx);
     //System.err.println("FORMAT WITH: " + fmt);
     //System.err.println("  value: " + _s + " [" + _s.getClass() + "]");
     if (fmt == null)
@@ -152,9 +152,9 @@ public abstract class WOFormatter extends NSObject {
      * A bit hackish, but better for various reasons (eg JS bridge)
      */
     if (v instanceof Long) {
-      long l = ((Long)v).longValue();
+      final long l = ((Long)v).longValue();
       if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE)
-        v = new Integer((int)l);
+        v = Integer.valueOf((int)l);
     }
     //System.err.println("  IS: " + v + " [" + v.getClass() + "]");
     return v;
@@ -173,14 +173,14 @@ public abstract class WOFormatter extends NSObject {
     if (_o == null)
       return null;
 
-    final Format fmt = this.formatInContext(_ctx);
+    final Format fmt = formatInContext(_ctx);
     if (fmt == null)
       return (_o != null ? _o.toString() : null);
 
     try {
       return fmt.format(_o);
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       log.error("cannot format object '" + _o +
       		"' with format '" + fmt + "': " + e);
       return _o.toString();
@@ -202,7 +202,7 @@ public abstract class WOFormatter extends NSObject {
    * @param _ctx - the WOContext
    * @return a String suitable for editing fields, eg WOTextField
    */
-  public String editingStringForObjectValue(final Object _o, WOContext _ctx) {
-    return this.stringForObjectValue(_o, _ctx);
+  public String editingStringForObjectValue(final Object _o, final WOContext _ctx) {
+    return stringForObjectValue(_o, _ctx);
   }
 }

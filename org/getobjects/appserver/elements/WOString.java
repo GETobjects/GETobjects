@@ -39,15 +39,15 @@ import org.getobjects.foundation.UObject;
  * Just a plain, dynamic string. The 'value' can be an arbitrary object which is
  * then formatted using a java.text.Format.
  * <p>
- * 
+ *
  * Sample:<pre>
  *   ComponentName: WOString {
  *     value = name;
  *   }</pre>
- * 
+ *
  * Renders:
  *   The element renders the given value, possibly after applying conversions.
- * 
+ *
  * <p>
  * Bindings:
  * <pre>
@@ -77,7 +77,7 @@ import org.getobjects.foundation.UObject;
  */
 public class WOString extends WOHTMLDynamicElement {
   protected Log log = LogFactory.getLog("WOString");
-  
+
   protected WOAssociation value;
   protected WOAssociation valuePattern;
   protected WOAssociation valueWhenEmpty;
@@ -89,10 +89,10 @@ public class WOString extends WOHTMLDynamicElement {
   protected WOElement     coreAttributes;
 
   public WOString
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
-    
+
     this.value          = grabAssociation(_assocs, "value");
     this.valuePattern   = grabAssociation(_assocs, "%value");
     this.escapeHTML     = grabAssociation(_assocs, "escapeHTML");
@@ -100,56 +100,56 @@ public class WOString extends WOHTMLDynamicElement {
     this.insertBR       = grabAssociation(_assocs, "insertBR");
     this.prefix         = grabAssociation(_assocs, "prefix");
     this.suffix         = grabAssociation(_assocs, "suffix");
-    
+
     this.formatter = WOFormatter.formatterForAssociations(_assocs);
-    
+
     this.coreAttributes =
       WOHTMLElementAttributes.buildIfNecessary(_name + "_core", _assocs);
   }
-  
+
   public WOString(final WOAssociation _value, final boolean _escapeHTML) {
     super(null /* name */, null /* assocs */, null /* template */);
-    
+
     this.value      = _value;
     this.escapeHTML =
-      WOAssociation.associationWithValue(new Boolean(_escapeHTML)); 
+      WOAssociation.associationWithValue(Boolean.valueOf(_escapeHTML));
   }
-  
+
   /* some convenience accessors for from-code creation */
-  
+
   public WOString(final Object _value) {
     this(WOAssociation.associationWithValue(_value), true /* escapeHTML */);
   }
-  
-  
+
+
   /* generate response */
-  
+
   protected String stringInContext(final WOContext _ctx) {
     final boolean isDebugOn = this.log.isDebugEnabled();
     final Object  cursor = _ctx.cursor();
     Object  v        = null;
-    
+
     if (this.value != null) {
       if ((v = this.value.valueInComponent(cursor)) == null) {
         if (isDebugOn)
           this.log.debug("  value binding return no object: " + this.value);
       }
       if (this.valuePattern != null) {
-        String pat = this.valuePattern.stringValueInComponent(cursor);
+        final String pat = this.valuePattern.stringValueInComponent(cursor);
         v = pat != null ? NSKeyValueStringFormatter.format(pat, v) : null;
       }
     }
     else if (this.valuePattern != null) {
-      String pat = this.valuePattern.stringValueInComponent(cursor);
+      final String pat = this.valuePattern.stringValueInComponent(cursor);
       v = pat != null ? NSKeyValueStringFormatter.format(pat, cursor) : null;
     }
     else {
       if (isDebugOn) this.log.debug("  no value binding: " + cursor);
       v = null; // hm
     }
-    
+
     /* valueWhenEmpty */
-    
+
     if (v != null) {
       if (v instanceof String) {
         if (((String)v).length() == 0)
@@ -160,16 +160,16 @@ public class WOString extends WOHTMLDynamicElement {
       if (v == null) // Note: length==0 is checked above
         v = this.valueWhenEmpty.valueInComponent(cursor);
     }
-    
+
     /* format value */
-    
+
     String s;
-    
+
     if (this.formatter != null) {
       try {
         s = this.formatter.stringForObjectValue(v, _ctx);
       }
-      catch (NullPointerException e) {
+      catch (final NullPointerException e) {
         log().error("exception during formatting of value: " + v +
             "\n  formatter: " + this.formatter +
             "\n  context:   " + _ctx, e);
@@ -180,7 +180,7 @@ public class WOString extends WOHTMLDynamicElement {
       s = UObject.stringValue(v);
     else
       s = null;
-    
+
     return s;
   }
 
@@ -189,44 +189,44 @@ public class WOString extends WOHTMLDynamicElement {
     // method is pretty long, maybe we want to split it up
     if (_ctx.isRenderingDisabled())
       return;
-    
+
     final boolean isDebugOn = this.log.isDebugEnabled();
     final Object  cursor = _ctx.cursor();
     boolean doEscape = true;
     String  s;
-    
+
     if (isDebugOn) this.log.debug("append, cursor: " + cursor);
-    
+
     /* determine string to render */
-    
-    s = this.stringInContext(_ctx);
+
+    s = stringInContext(_ctx);
 
     /* is escaping required? */
-    
+
     if (this.escapeHTML != null) {
       if (!this.escapeHTML.booleanValueInComponent(cursor))
         doEscape = false;
     }
 
     if (isDebugOn) this.log.debug("  escape: " + doEscape);
-    
+
     /* insertBR processing */
-    
+
     if (this.insertBR != null && s != null) {
       if (this.insertBR.booleanValueInComponent(cursor)) {
-        s = this.handleInsertBR(s, doEscape);
+        s = handleInsertBR(s, doEscape);
         doEscape = false;
       }
     }
-    
+
     /* append */
-    
+
     if (s != null && s.length() > 0) {
       String t;
-      
+
       if ((this.extraKeys != null && this.extraKeys.length > 0) ||
           this.coreAttributes != null)
-        this.appendWrappedStringToResponse(_r, _ctx, s, doEscape);
+        appendWrappedStringToResponse(_r, _ctx, s, doEscape);
       else if (doEscape) {
         t = this.prefix!=null ? this.prefix.stringValueInComponent(cursor):null;
         if (t != null) _r.appendContentHTMLString(t);
@@ -245,11 +245,11 @@ public class WOString extends WOHTMLDynamicElement {
     else if (isDebugOn)
       this.log.debug("  no content to render.");
   }
-  
+
   /**
    * Rewrites \n characters to &lt;br /&gt; tags. Note: the result must not be
    * escaped in subsequent processing.
-   * 
+   *
    * @param _s        - String to rewrite
    * @param _doEscape - whether the parts need to be escaped
    * @return the rewritten string
@@ -257,7 +257,7 @@ public class WOString extends WOHTMLDynamicElement {
   public String handleInsertBR(final String _s, final boolean _doEscape) {
     if (_s == null)
       return null;
-    
+
     /* Note: we can't use replace() because we need to escape the individual
      *       parts.
      */
@@ -266,7 +266,7 @@ public class WOString extends WOHTMLDynamicElement {
     final StringBuilder sb = new StringBuilder(lines.length * 80 + 16);
     boolean isFirst = true;
 
-    for (String line: lines) {
+    for (final String line: lines) {
       if (isFirst)
         isFirst = false;
       else
@@ -278,25 +278,25 @@ public class WOString extends WOHTMLDynamicElement {
     }
     return sb.toString();
   }
-  
+
   /**
    * Embeds the String in an HTML tag, &lt;span&gt; per default.
-   * 
+   *
    * @param _r       - the WOResponse to add to
    * @param _ctx     - the WOContext in which the operation runs
    * @param s        - the already formatted string to render
    * @param doEscape - whether to use appendContentHTMLString() or not
    */
   public void appendWrappedStringToResponse
-    (final WOResponse _r, final WOContext _ctx, String s, boolean doEscape)
+    (final WOResponse _r, final WOContext _ctx, final String s, final boolean doEscape)
   {
     /* this allows you to attach attributes to a text :-) */
     final Object cursor = _ctx.cursor();
     final int attrCount = this.extraKeys != null ? this.extraKeys.length : 0;
     String elementName = null;
-    
+
     /* first scan for elementName */
-    
+
     for (int i = 0; i < attrCount; i++) {
       if ("elementName".equals(this.extraKeys[i])) {
         elementName = this.extraValues[i].stringValueInComponent(cursor);
@@ -304,32 +304,32 @@ public class WOString extends WOHTMLDynamicElement {
       }
     }
     if (elementName == null) elementName = "span";
-    
+
     /* start tag */
-    
+
     _r.appendBeginTag(elementName);
-    
+
     /* render attributes */
-    
+
     if (this.coreAttributes != null)
       this.coreAttributes.appendToResponse(_r, _ctx);
-    
+
     for (int i = 0; i < attrCount; i++) {
       if ("elementName".equals(this.extraKeys[i]))
         continue;
-      
+
       _r.appendAttribute(this.extraKeys[i],
           this.extraValues[i].stringValueInComponent(cursor));
     }
-    
+
     /* finish start tag */
-    
+
     _r.appendBeginTagEnd();
-    
+
     /* render content */
 
-    String p=this.prefix!=null?this.prefix.stringValueInComponent(cursor):null;
-    String t=this.suffix!=null?this.suffix.stringValueInComponent(cursor):null;
+    final String p=this.prefix!=null?this.prefix.stringValueInComponent(cursor):null;
+    final String t=this.suffix!=null?this.suffix.stringValueInComponent(cursor):null;
     if (doEscape) {
       if (p != null) _r.appendContentHTMLString(p);
       _r.appendContentHTMLString(s);
@@ -340,25 +340,25 @@ public class WOString extends WOHTMLDynamicElement {
       _r.appendContentString(s);
       if (t != null) _r.appendContentString(t);
     }
-    
+
     /* end tag */
-    
+
     _r.appendEndTag(elementName);
   }
-  
-  
+
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
-    this.appendAssocToDescription(_d, "value",          this.value);
-    this.appendAssocToDescription(_d, "valuePattern",   this.valuePattern);
-    this.appendAssocToDescription(_d, "valueWhenEmpty", this.valueWhenEmpty);
-    this.appendAssocToDescription(_d, "escapeHTML",     this.escapeHTML);
-    this.appendAssocToDescription(_d, "insertBR",       this.insertBR);
-    
+
+    appendAssocToDescription(_d, "value",          this.value);
+    appendAssocToDescription(_d, "valuePattern",   this.valuePattern);
+    appendAssocToDescription(_d, "valueWhenEmpty", this.valueWhenEmpty);
+    appendAssocToDescription(_d, "escapeHTML",     this.escapeHTML);
+    appendAssocToDescription(_d, "insertBR",       this.insertBR);
+
     if (this.formatter != null) {
       _d.append(" formatter=");
       _d.append(this.formatter);

@@ -45,13 +45,13 @@ import org.getobjects.foundation.UObject;
  * <p>
  * Sample:
  * <pre>
- * &#064;GoMethod(slot = "default", protectedBy="View", 
+ * &#064;GoMethod(slot = "default", protectedBy="View",
  *           keyedParameters={ "limit", "idx", "sort", "filter", "filterop" })
  * public Object defaultAction
  *   (int limit, int idx, String s, String filter, String filterOp)</pre>
  * Note: We considered parameter annotations as too verbose.<br>
  * Note: You can still further annotate the GoClass in product.plist.
- * 
+ *
  * <p>
  * Open points:
  * <ul>
@@ -71,35 +71,35 @@ public class GoJavaMethod extends NSObject
   protected String   name; // purely informational?
   protected Method   method;
   protected GoMethod methodInfo; // annotation
-  
+
   public GoJavaMethod(final String _name, final Method _method) {
     this.name   = _name;
     this.method = _method;
-    
+
     if (this.method == null)
       log.error("Method object missing in GoJavaMethod named " + _name);
     else
       this.methodInfo = this.method.getAnnotation(GoMethod.class);
   }
-  
+
   /* accessors */
-  
+
   public String name() {
     return this.name;
   }
   public Method method() {
     return this.method;
   }
-  
+
   /* GoCallable */
-  
+
   private static final Object[] emptyArgs = new Object[0];
-  
+
   /**
    * Calculate the parameters for the Go method call.
    * <p>
    * All this is subject to change, it doesn't look quite right yet.
-   * 
+   *
    * @param _object
    * @param _ctx
    * @return
@@ -113,37 +113,37 @@ public class GoJavaMethod extends NSObject
     final int argCount = argTypes != null ? argTypes.length : 0;
     if (argCount == 0)
       return emptyArgs;
-    
+
     WORequest rq = null;
     boolean hasFormValues = false;
     final String[] keyedParameters = this.methodInfo.keyedParameters();
     final int numKeyed = keyedParameters != null ? keyedParameters.length : 0;
-    
+
     if (numKeyed > 0) {
       if (_ctx instanceof WOContext)
         rq = ((WOContext)_ctx).request();
       if (rq != null)
         hasFormValues = rq.hasFormValues();
     }
-    
+
     final Object[] args = new Object[argTypes.length];
     for (int i = 0; i < argTypes.length; i++) {
       final Class<?> argType = argTypes[i];
       String argKey = null;
-      
+
       if (i < numKeyed) {
         argKey = keyedParameters[i];
         if (UObject.isEmpty(argKey))
           argKey = null;
       }
-      
+
       if (argKey != null && hasFormValues) {
         // use the form values to fill the method arguments
-        Object[] v = rq.formValuesForKey(argKey);
-        args[i] = this.coerceFormValueToArgumentType(v, argType);
+        final Object[] v = rq.formValuesForKey(argKey);
+        args[i] = coerceFormValueToArgumentType(v, argType);
         continue;
       }
-      
+
       // TBD: the arguments themselves could have annotations.
       // But they don't look very good - too long, eg:
       // public Object login(@GoParam("login") String login, ...)
@@ -151,7 +151,7 @@ public class GoJavaMethod extends NSObject
       // @GoMethod(keyedParameters={ "login", "password" });
       // TBD: Java 8 can grab parameter names via reflection if the code was
       // compiled with -parameters
-      
+
       if (argType.isAssignableFrom(IGoContext.class))
         args[i] = _ctx;
       else if (argType.isAssignableFrom(WOContext.class))
@@ -159,10 +159,10 @@ public class GoJavaMethod extends NSObject
       else {
         log.error("Cannot yet deal with this GoMethod argument: " + argType);
       }
-    }    
+    }
     return args;
   }
-  
+
   @SuppressWarnings("unchecked")
   public Object coerceFormValueToArgumentType
     (final Object[] _v, final Class<?> _argType)
@@ -171,133 +171,136 @@ public class GoJavaMethod extends NSObject
     // FIXME: Cache all the dynamic lookup
     if (_v == null)
       return null;
-    
+
     if (_argType.isAssignableFrom(_v.getClass()))
       return _v;
 
-    int vCount = _v.length;
-    
+    final int vCount = _v.length;
+
     /* check whether the argument is some array-ish thing */
-    
+
     if (_argType.isArray()) {
       final Class<?> itemType = _argType.getComponentType();
       final Object typedArray =
         java.lang.reflect.Array.newInstance(itemType, vCount);
       for (int i = 0; i < vCount; i++) {
-        Object[] v = { _v[i] };
-        Object sv = this.coerceFormValueToArgumentType(v, itemType);
+        final Object[] v = { _v[i] };
+        final Object sv = coerceFormValueToArgumentType(v, itemType);
         java.lang.reflect.Array.set(typedArray, i, sv);
       }
       return typedArray;
     }
-    
+
     if (_argType.isAssignableFrom(List.class))
       return UList.asList(_v);
     if (_argType.isAssignableFrom(Set.class))
       return new HashSet(UList.asList(_v));
     if (_argType.isAssignableFrom(Collection.class))
       return UList.asList(_v);
-    
+
     /* empty assignment */
-    
+
     if (vCount == 0) {
       if (!_argType.isPrimitive())
         return null; // all objects, return null
-      
-      if (_argType == Boolean.TYPE) return new Boolean(false);
-      if (_argType == Integer.TYPE) return new Integer(-1);
-      if (_argType == Double.TYPE)  return new Double(-1.0);
-      if (_argType == Float.TYPE)   return new Float(-1.0);
-      if (_argType == Short.TYPE)   return new Integer(-1);
-      if (_argType == Long.TYPE)    return new Long(-1);
+
+      if (_argType == Boolean.TYPE) return Boolean.valueOf(false);
+      if (_argType == Integer.TYPE) return Integer.valueOf(-1);
+      if (_argType == Double.TYPE)  return Double.valueOf(-1.0);
+      if (_argType == Float.TYPE)   return Float.valueOf(-1.0f);
+      if (_argType == Short.TYPE)   return Integer.valueOf(-1);
+      if (_argType == Long.TYPE)    return Long.valueOf(-1);
       log.error("Unexpected primitive arg type: " + _argType);
       return new GoInternalErrorException("Unexpected primitive type!");
     }
-    
+
     /* check whether it is a directly assignable type */
-    
+
     if (vCount == 1) {
       /* some type coercion. Can we reuse anything from KVC here? */
       // Note: Go supports various Zope form value formats, e.g. 'age:int'
       //       Check WOServletRequest for more.
       final Object v = _v[0];
-      
+
       if (_argType.isAssignableFrom(v.getClass()))
         return v;
-      
+
       /* some basic coercion */
-      
+
       if (_argType.isPrimitive()) {
-        if (_argType == Boolean.TYPE) 
-          return new Boolean(UObject.boolValue(v));
-        
+        if (_argType == Boolean.TYPE)
+          return Boolean.valueOf(UObject.boolValue(v));
+
         if (_argType == Integer.TYPE || _argType == Short.TYPE)
-          return new Integer(UObject.intValue(v));
-        
+          return Integer.valueOf(UObject.intValue(v));
+
         if (_argType == Long.TYPE)
-          return new Long(UObject.intOrLongValue(v).longValue());
+          return Long.valueOf(UObject.intOrLongValue(v).longValue());
       }
       else if (_argType.isAssignableFrom(String.class))
         return v.toString();
-      
+
       return v; // might crash
     }
-    
-    
+
+
     /* error out, return exception as value */
-    
+
     log.error("Cannot convert form value to Java argument " + _argType + ": " +
               _v);
     return new GoInternalErrorException(
                  "Cannot convert form value to Java parameter");
   }
-  
+
+  @Override
   public Object callInContext(final Object _object, final IGoContext _ctx) {
     if (this.method == null) {
       log.error("GoJavaMethod has not Method: " + this);
       return new GoInternalErrorException("GoJavaMethod has no method?");
     }
-    
+
     if (_object == null) { // Objective-C semantics ;-)
       log.info("calling GoMethod on null (noop): " + this);
       return null;
     }
-    
+
     // TODO: implement me
     // TODO: implement parameter handling
-    
-    Object[] args = this.argumentsForMethodCallInContext(_object, _ctx);
-    
+
+    final Object[] args = argumentsForMethodCallInContext(_object, _ctx);
+
     Object result = null;
     try {
       result = this.method.invoke(_object, args);
     }
-    catch (IllegalArgumentException e) {
+    catch (final IllegalArgumentException e) {
       result = e;
       log.error("Invalid argument on Java method on object: " + _object, e);
     }
-    catch (IllegalAccessException e) {
+    catch (final IllegalAccessException e) {
       result = e;
       log.error("Cannot access Java method on object: " + _object, e);
     }
-    catch (InvocationTargetException e) {
+    catch (final InvocationTargetException e) {
       result = e.getCause();
       log.error("Invocation target error on method with object: " + _object,
                 e.getCause());
     }
-    
+
     return result;
   }
 
+  @Override
   public boolean isCallableInContext(final IGoContext _ctx) {
     /* always callable, no? */
     return true;
   }
-  
-  
+
+
   /* secured object */
 
-  public Exception validateObject(IGoContext _ctx) {
+  @Override
+  public Exception validateObject(final IGoContext _ctx) {
     // TBD: all this is probably not quite right. If a GoJavaMethod is declared
     //      as protectedBy, this actually needs to go into the GoJavaClass
     //      security info (it protects the slot).
@@ -305,23 +308,23 @@ public class GoJavaMethod extends NSObject
     //      but this is really more like a class.validateName(self.name).
     if (this.methodInfo == null)
       return IGoSecuredObject.DefaultImplementation.validateObject(this, _ctx);
-    
+
     if (this.methodInfo.isPrivate())
       return new GoAccessDeniedException("attempt to access private object");
-    
+
     if (this.methodInfo.protectedBy() != null) {
       // 1st: The protectedBy should have already been checked by the GoClass
       //      validateName(). The caller can't get access to this object w/o
       //      passing the GoJavaClass.
       // But: The main reason why this doesn't work right is because permissions
       //      are currently not acquired properly. Otherwise the default imp
-      //      would notice that the method has no, e.g. defaultRoles, and 
+      //      would notice that the method has no, e.g. defaultRoles, and
       //      continue to ask GoJavaClass, and local-roles etc.
       if (false) // disabled
-        return this.validatePermission(this.methodInfo.protectedBy(), _ctx);
+        return validatePermission(this.methodInfo.protectedBy(), _ctx);
       return null; // all good
     }
-    
+
     if (this.methodInfo.isPublic())
       return null;
 
@@ -329,13 +332,15 @@ public class GoJavaMethod extends NSObject
     return new GoAccessDeniedException("attempt to access private object");
   }
 
+  @Override
   public Exception validatePermission
     (final String _permission, final IGoContext _ctx)
   {
     return IGoSecuredObject.DefaultImplementation
              .validatePermissionOnObject(this, _permission, _ctx);
   }
-  
+
+  @Override
   public Exception validateName(final String _name, final IGoContext _ctx) {
     // For a GoMethod this would be called if something like a 'method
     // inspector' is attached to the method.
@@ -346,13 +351,14 @@ public class GoJavaMethod extends NSObject
     return IGoSecuredObject.DefaultImplementation
              .validateNameOfObject(this, _name, _ctx);
   }
-  
-  
+
+
   /* description */
-  
+
+  @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.name != null)
       _d.append(" name=" + this.name);
   }

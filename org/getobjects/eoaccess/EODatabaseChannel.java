@@ -127,13 +127,13 @@ public class EODatabaseChannel extends NSObject
    * @return null if everything went fine, an exception otherwise
    */
   public Exception begin() {
-    if (this.isInTransaction()) {
+    if (isInTransaction()) {
       log.error("attempted a nested transaction!");
       return new NSException("transaction already in progress");
     }
 
     if (this.adChannel == null) {
-      if ((this.adChannel = this.acquireChannel()) == null)
+      if ((this.adChannel = acquireChannel()) == null)
         return new NSException("could not acquire a channel");
     }
 
@@ -142,7 +142,7 @@ public class EODatabaseChannel extends NSObject
       return null;
 
     /* if we could not begin a tx, we always close the channel */
-    this.releaseChannel();
+    releaseChannel();
     return error;
   }
 
@@ -159,7 +159,7 @@ public class EODatabaseChannel extends NSObject
     }
 
     final Exception error = this.adChannel.commit();
-    this.releaseChannel();
+    releaseChannel();
     return error;
   }
 
@@ -176,7 +176,7 @@ public class EODatabaseChannel extends NSObject
     }
 
     final Exception error = this.adChannel.rollback();
-    this.releaseChannel();
+    releaseChannel();
     return error;
   }
 
@@ -357,7 +357,7 @@ public class EODatabaseChannel extends NSObject
     if (perfOn) perflog.debug("primarySelectObjectsWithFetchSpecification ..");
 
     /* tear down */
-    this.cancelFetch();
+    cancelFetch();
 
     /* prepare */
 
@@ -365,14 +365,14 @@ public class EODatabaseChannel extends NSObject
     this.fetchesRawRows = _fs.fetchesRawRows();
     this.ec             = _ec;
 
-    this.setCurrentEntity(this.database.entityNamed(_fs.entityName()));
+    setCurrentEntity(this.database.entityNamed(_fs.entityName()));
     if (this.currentEntity == null && !this.fetchesRawRows) {
       log.error("missing entity named: " + _fs.entityName());
       return new Exception("did not find entity for fetch!");
     }
 
     final EOAttribute[] selectList =
-      this.selectListForFetchSpecification(this.currentEntity, _fs);
+      selectListForFetchSpecification(this.currentEntity, _fs);
 
     if (isDebugOn) {
       log.debug("  entity: " + this.currentEntity.name());
@@ -399,7 +399,7 @@ public class EODatabaseChannel extends NSObject
     Exception error = null;
     try {
       if (this.adChannel == null) {
-        this.adChannel = this.acquireChannel();
+        this.adChannel = acquireChannel();
         didOpenChannel = true;
       }
       if (this.adChannel == null) // TODO: improve error
@@ -431,7 +431,7 @@ public class EODatabaseChannel extends NSObject
       //      a connection with errors)
     }
     finally {
-      if (didOpenChannel) this.releaseChannel();
+      if (didOpenChannel) releaseChannel();
     }
 
     if (perfOn) perflog.debug("primarySelectObjectsWithFetchSpecification.");
@@ -461,7 +461,7 @@ public class EODatabaseChannel extends NSObject
     /* simple case, no prefetches */
 
     if (prefetchRelPathes == null || prefetchRelPathes.length == 0)
-      return this.primarySelectObjectsWithFetchSpecification(_fs, _ec);
+      return primarySelectObjectsWithFetchSpecification(_fs, _ec);
 
     final boolean isDebugOn = log.isDebugEnabled();
     if (isDebugOn) {
@@ -479,10 +479,10 @@ public class EODatabaseChannel extends NSObject
     boolean didOpenChannel = false;
     try {
       if (this.adChannel == null) {
-        this.adChannel = this.acquireChannel();
+        this.adChannel = acquireChannel();
         didOpenChannel = true;
 
-        if ((error = this.begin()) != null)
+        if ((error = begin()) != null)
           return error;
       }
       if (this.adChannel == null) // TODO: improve error
@@ -491,26 +491,26 @@ public class EODatabaseChannel extends NSObject
 
       /* First we fetch all primary objects and collect them in a List */
 
-      error = this.primarySelectObjectsWithFetchSpecification(_fs, _ec);
+      error = primarySelectObjectsWithFetchSpecification(_fs, _ec);
       if (error != null) {
-        this.cancelFetch(); /* better be sure ;-) */
+        cancelFetch(); /* better be sure ;-) */
         return error; /* initial fetch failed */
       }
 
       baseObjects = new ArrayList<>(this.recordCount);
       EOEnterpriseObject o;
-      while ((o = (EOEnterpriseObject)this.fetchObject()) != null) {
+      while ((o = (EOEnterpriseObject)fetchObject()) != null) {
         baseObjects.add(o);
         // TBD: already extract something?
       }
-      this.cancelFetch();
+      cancelFetch();
 
       if (isDebugOn)
         log.debug("fetched objects: " + baseObjects.size());
 
       /* Then we fetch relationships for the 'baseObjects' we just fetched. */
 
-      error = this.fetchRelationships
+      error = fetchRelationships
         (_fs.entityName(), prefetchRelPathes, baseObjects, _ec);
       if (error != null) return error;
     }
@@ -520,9 +520,9 @@ public class EODatabaseChannel extends NSObject
          *       increase the likeliness that something fails. So: rollback in
          *       both ways.
          */
-        this.rollback(); // TBD: do we actually care about the result?
+        rollback(); // TBD: do we actually care about the result?
 
-        this.releaseChannel();
+        releaseChannel();
       }
     }
 
@@ -571,7 +571,7 @@ public class EODatabaseChannel extends NSObject
     /* process relationships (key is a level1 name, value are the subpaths) */
 
     final Map<String, List<String>> leveledPrefetches =
-      this.levelPrefetchSpecificiation(entity, _prefetchRelPathes);
+      levelPrefetchSpecificiation(entity, _prefetchRelPathes);
 
     /*
      * Maps/caches Lists of values for a given attribute in the base result.
@@ -587,7 +587,7 @@ public class EODatabaseChannel extends NSObject
       /* The relName is never a path, its a level-1 key. the value in
        * leveledPrefetches contains 'subpathes'.
        */
-      final Exception error = this.fetchRelationship
+      final Exception error = fetchRelationship
         (entity, relName, _baseObjects,
          leveledPrefetches.get(relName), helper, _ec);
 
@@ -597,7 +597,7 @@ public class EODatabaseChannel extends NSObject
     /* fetch flattened relationships */
 
     final List<String> flattenedRelationships =
-      this.flattenedRelationships(entity, _prefetchRelPathes);
+      flattenedRelationships(entity, _prefetchRelPathes);
     if (flattenedRelationships != null) {
       for (final String rel: flattenedRelationships) {
         final EORelationship flattenedRel = entity.relationshipNamed(rel);
@@ -749,15 +749,15 @@ public class EODatabaseChannel extends NSObject
 
     final boolean isDebugOn = log.isDebugEnabled();
     Exception error;
-    if ((error = this.selectObjectsWithFetchSpecification(fs, _ec)) != null) {
-      this.cancelFetch(); /* better be sure ;-) */
+    if ((error = selectObjectsWithFetchSpecification(fs, _ec)) != null) {
+      cancelFetch(); /* better be sure ;-) */
       return error; // rollback must be handled in caller
     }
 
     if (isDebugOn) log.debug("process rel results ...");
 
     Object relObject;
-    while ((relObject = this.fetchObject()) != null) {
+    while ((relObject = fetchObject()) != null) {
       /* targetName is the target attribute in the join */
       final Object v = ((NSKeyValueCoding)relObject).valueForKey(targetName);
 
@@ -845,7 +845,7 @@ public class EODatabaseChannel extends NSObject
       return null;
 
     if (!this.records.hasNext()) {
-      this.cancelFetch();
+      cancelFetch();
       return null;
     }
 
@@ -881,7 +881,7 @@ public class EODatabaseChannel extends NSObject
     if (this.objects != null) {
       if (!this.objects.hasNext()) {
         if (isDebugOn) log.debug("    return no object, finished fetching.");
-        this.cancelFetch();
+        cancelFetch();
         return null;
       }
 
@@ -892,7 +892,7 @@ public class EODatabaseChannel extends NSObject
 
     /* fetch raw row from adaptor channel */
 
-    final Map<String, Object> row = this.fetchRow();
+    final Map<String, Object> row = fetchRow();
     if (row == null) {
       if (isDebugOn) log.debug("    return no row, finished fetching.");
       // TBD: should we cancel?
@@ -905,7 +905,7 @@ public class EODatabaseChannel extends NSObject
 
     final Class clazz = this.currentClass != null // TBD: other way around?
       ? this.currentClass
-      : this.objectClassForRow(row);
+      : objectClassForRow(row);
 
     if (this.currentClass == null) { // TBD: retrieve dynamically
       log.warn("    missing class, return raw row: " + row);
@@ -1018,7 +1018,7 @@ public class EODatabaseChannel extends NSObject
     /* turn db ops into adaptor ops */
 
     final List<EOAdaptorOperation> aops =
-      this.adaptorOperationsForDatabaseOperations(_ops);
+      adaptorOperationsForDatabaseOperations(_ops);
     if (aops == null || aops.size() == 0)
       return null; /* nothing to do */
 
@@ -1028,7 +1028,7 @@ public class EODatabaseChannel extends NSObject
     Exception error = null;
     try {
       if (this.adChannel == null) {
-        this.adChannel = this.acquireChannel();
+        this.adChannel = acquireChannel();
         didOpenChannel = true;
       }
 
@@ -1044,7 +1044,7 @@ public class EODatabaseChannel extends NSObject
       error = e;
     }
     finally {
-      if (didOpenChannel) this.releaseChannel();
+      if (didOpenChannel) releaseChannel();
     }
 
     return error;
@@ -1218,8 +1218,8 @@ public class EODatabaseChannel extends NSObject
 
   @Override
   public void dispose() {
-    this.cancelFetch();
-    this.releaseChannel();
+    cancelFetch();
+    releaseChannel();
     this.database = null;
   }
 
@@ -1236,7 +1236,7 @@ public class EODatabaseChannel extends NSObject
 
   @Override
   public Object next() {
-    return this.fetchObject();
+    return fetchObject();
   }
 
   @Override
@@ -1324,7 +1324,7 @@ public class EODatabaseChannel extends NSObject
     public List<Object> getSourceValues(final String srcName) {
       List<Object> result = this.sourceKeyToValues.get(srcName);
       if (result == null) {
-        this.fill(srcName);
+        fill(srcName);
         result = this.sourceKeyToValues.get(srcName);
       }
       return result;
@@ -1336,7 +1336,7 @@ public class EODatabaseChannel extends NSObject
       Map<Object, List<EOEnterpriseObject>> result =
         this.sourceKeyToValueToObjects.get(srcName);
       if (result == null) {
-        this.fill(srcName);
+        fill(srcName);
         result = this.sourceKeyToValueToObjects.get(srcName);
       }
       return result;
@@ -1364,6 +1364,7 @@ public class EODatabaseChannel extends NSObject
 
         // Is this a native array?
         if (v instanceof List) {
+          @SuppressWarnings("unchecked")
           final List<Object> keys = (List<Object>)v;
           for (final Object key : keys) {
             List<EOEnterpriseObject> vobjects = valueToObjects.get(key);

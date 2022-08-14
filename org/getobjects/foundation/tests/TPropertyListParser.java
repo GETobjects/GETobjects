@@ -36,7 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TPropertyListParser {
-  
+
   protected NSPropertyListParser parser = null;
 
   @Before
@@ -48,65 +48,65 @@ public class TPropertyListParser {
   public void tearDown() {
     this.parser = null;
   }
-  
+
   /* tests */
-  
+
   @Test public void testParseEmptyDict() {
-    Object plist = this.parser.parse("{}");
+    final Object plist = this.parser.parse("{}");
     assertNotNull("got no map, expected empty dict", plist);
     assertTrue   ("result is not a Map",        plist instanceof Map);
     assertTrue   ("result is not an empty Map", ((Map)plist).isEmpty());
   }
 
   @Test public void testParseEmptyArray() {
-    Object plist = this.parser.parse("()");
+    final Object plist = this.parser.parse("()");
     assertNotNull("got no plist, expected empty array", plist);
     assertTrue   ("result is not a List",        plist instanceof List);
     assertTrue   ("result is not an empty List", ((List)plist).isEmpty());
   }
 
   @Test public void testParseSimpleArray() {
-    Object plist = this.parser.parse("( 1, abc, 3.1415 )");
+    final Object plist = this.parser.parse("( 1, abc, 3.1415 )");
     assertNotNull("got no plist, expected array", plist);
     assertTrue   ("result is not a List",         plist instanceof List);
-    
-    List a = (List)plist;
+
+    final List a = (List)plist;
     assertFalse("result is an empty List",   a.isEmpty());
     assertTrue ("result is not of length 3", 3 == a.size());
-    
-    assertEquals("1st elem is not an Int(1)",     new Integer(1), a.get(0));
+
+    assertEquals("1st elem is not an Int(1)",     Integer.valueOf(1), a.get(0));
     assertEquals("2nd elem is not 'abc'",         "abc",          a.get(1));
-    assertEquals("3rd elem is not a Dbl(3.1415)", new Double(3.1415), a.get(2));
+    assertEquals("3rd elem is not a Dbl(3.1415)", Double.valueOf(3.1415), a.get(2));
   }
 
   @Test public void testParseNestedArray() {
-    Object plist = this.parser.parse("( test, ( 1, 2, ( 3.1, 3.2), 4 ))");
+    final Object plist = this.parser.parse("( test, ( 1, 2, ( 3.1, 3.2), 4 ))");
     assertNotNull("got no plist, expected array", plist);
     assertTrue   ("result is not a List",         plist instanceof List);
-    
-    List a = (List)plist;
+
+    final List a = (List)plist;
     assertFalse("result is an empty List",   a.isEmpty());
     assertTrue ("result is not of length 2", 2 == a.size());
-    
-    List b = (List)a.get(1);
+
+    final List b = (List)a.get(1);
     assertTrue("2nd-level-array is not of len 4", 4 == b.size());
-    
-    List c = (List)b.get(2);
+
+    final List c = (List)b.get(2);
     assertTrue("3rd-level-array is not of len 2", 2 == c.size());
   }
-  
+
   @Test public void testParseUnclosedArray() {
-    Object plist = this.parser.parse("( abc, def");
+    final Object plist = this.parser.parse("( abc, def");
     assertNotNull("got no error exception", this.parser.lastException());
     assertNull("got a list despite syntax error", plist);
   }
-  
+
   @Test public void testParseDictResource() {
-    Object plist = NSPropertyListParser.parse(this.getClass(), "GenericHTML");
+    final Object plist = NSPropertyListParser.parse(this.getClass(), "GenericHTML");
     assertNotNull("got no map, expected dict", plist);
     assertTrue   ("result is not a Map",       plist instanceof Map);
-    
-    Map pmap = (Map)plist;
+
+    final Map pmap = (Map)plist;
     assertEquals("value mismatch for isRegularWebBrowser",
                  Boolean.TRUE, pmap.get("isRegularWebBrowser"));
     assertEquals("value mismatch for browserCanResize",
@@ -116,10 +116,10 @@ public class TPropertyListParser {
     assertEquals("value mismatch for networkType",
                  "isdn", pmap.get("networkType"));
   }
-  
+
   @Test public void testSingleLinePlist() {
-    Object plist = this.parser.parse("( { name = 'Donald Duck'; },2,3)");
-    
+    final Object plist = this.parser.parse("( { name = 'Donald Duck'; },2,3)");
+
     assertNotNull("got no plist, expected array", plist);
     assertTrue   ("result is not a List",        plist instanceof List);
   }

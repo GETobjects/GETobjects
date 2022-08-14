@@ -117,6 +117,7 @@ public abstract class WOAssociation extends NSObject
    *
    * @return true if the value of the association never changes, false otherwise
    */
+  @Override
   public boolean isValueConstant() {
     return false;
   }
@@ -129,6 +130,7 @@ public abstract class WOAssociation extends NSObject
    *
    * @return true if the value of the association can be set, false otherwise
    */
+  @Override
   public boolean isValueSettable() {
     return true;
   }
@@ -140,8 +142,9 @@ public abstract class WOAssociation extends NSObject
    *
    * @return true if the value of the association does not change
    */
+  @Override
   public boolean isValueConstantInComponent(final Object _cursor) {
-    return this.isValueConstant();
+    return isValueConstant();
   }
 
   /**
@@ -152,43 +155,52 @@ public abstract class WOAssociation extends NSObject
    *
    * @return true if the value of the association can be set, false otherwise
    */
+  @Override
   public boolean isValueSettableInComponent(final Object _cursor) {
-    return this.isValueSettable();
+    return isValueSettable();
   }
 
 
   /* values */
 
+  @Override
   public void setValue(final Object _value, final Object _cursor) {
     /* Note: crappy name due to WO compatibility */
   }
 
-  public Object valueInComponent(Object _cursor) {
+  @Override
+  public Object valueInComponent(final Object _cursor) {
     return null;
   }
 
 
   /* specific values */
 
+  @Override
   public void setBooleanValue(final boolean _value, final Object _cursor) {
-    this.setValue(_value ? Boolean.TRUE : Boolean.FALSE, _cursor);
+    setValue(_value ? Boolean.TRUE : Boolean.FALSE, _cursor);
   }
+  @Override
   public boolean booleanValueInComponent(final Object _cursor) {
-    return UObject.boolValue(this.valueInComponent(_cursor));
+    return UObject.boolValue(valueInComponent(_cursor));
   }
 
+  @Override
   public void setIntValue(final int _value, final Object _cursor) {
-    this.setValue(new Integer(_value), _cursor);
+    setValue(Integer.valueOf(_value), _cursor);
   }
+  @Override
   public int intValueInComponent(final Object _cursor) {
-    return UObject.intValue(this.valueInComponent(_cursor));
+    return UObject.intValue(valueInComponent(_cursor));
   }
 
+  @Override
   public void setStringValue(final String _value, final Object _cursor) {
-    this.setValue(_value, _cursor);
+    setValue(_value, _cursor);
   }
+  @Override
   public String stringValueInComponent(final Object _cursor) {
-    Object v = this.valueInComponent(_cursor);
+    final Object v = valueInComponent(_cursor);
 
     if (v == null)
       return null;
@@ -203,7 +215,7 @@ public abstract class WOAssociation extends NSObject
   /* prefix registry */
 
   protected static ConcurrentHashMap<String, Class> prefixToAssoc =
-    new ConcurrentHashMap<String, Class>(16);
+    new ConcurrentHashMap<>(16);
 
   public static Class getAssociationClassForPrefix(final String _prefix) {
     return _prefix != null ? prefixToAssoc.get(_prefix) : null;
@@ -255,7 +267,7 @@ public abstract class WOAssociation extends NSObject
   {
     WOAssociation assoc = null;
 
-    char c = _prefix.charAt(0);
+    final char c = _prefix.charAt(0);
 
     switch (c) {
       case 'c':
@@ -296,8 +308,8 @@ public abstract class WOAssociation extends NSObject
            * required because we can't specify plists in .html
            * template attributes. (we might want to change that?)
            */
-          NSPropertyListParser parser = new NSPropertyListParser();
-          Object v = parser.parse(_value);
+          final NSPropertyListParser parser = new NSPropertyListParser();
+          final Object v = parser.parse(_value);
           if (v == null) {
             log.warn("could not parse plist value of association: " + _value,
                      parser.lastException());
@@ -340,7 +352,7 @@ public abstract class WOAssociation extends NSObject
     }
 
     if (assoc == null) {
-      Class clazz = prefixToAssoc.get(_prefix);
+      final Class clazz = prefixToAssoc.get(_prefix);
       if (clazz != null)
         assoc = (WOAssociation)NSJavaRuntime.NSAllocateObject(clazz, _value);
     }

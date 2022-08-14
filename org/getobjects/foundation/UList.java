@@ -37,15 +37,15 @@ public class UList extends NSObject {
 
   private UList() {} /* do not allow construction */
 
-  public static final <T> List<T> create(T... _values) {
-    int len = _values != null ? _values.length : 0;
+  public static final <T> List<T> create(final T... _values) {
+    final int len = _values != null ? _values.length : 0;
     if (len == 0)
-      return new ArrayList<T>(1); /* 0 makes the map choose a value? */
-    
-    ArrayList<T> l = new ArrayList<T>(len);
+      return new ArrayList<>(1); /* 0 makes the map choose a value? */
+
+    final ArrayList<T> l = new ArrayList<>(len);
     for (int i = 0; i < len; i++)
       l.add(_values[i]);
-    
+
     return l;
   }
 
@@ -106,7 +106,7 @@ public class UList extends NSObject {
    * @param _object - the object to be searched for (or null)
    * @return the last index of object in the array, or -1 if it wasn't found
    */
-  public static int lastIndexOfObjectEqualTo(Object[] _array, Object _object) {
+  public static int lastIndexOfObjectEqualTo(final Object[] _array, final Object _object) {
     if (_array == null || _array.length == 0)
       return -1;
 
@@ -141,22 +141,22 @@ public class UList extends NSObject {
     final int len = _list.size();
 
     if (_batchSize >= len || _batchSize < 1) {
-      batches = new ArrayList<List<Object>>(1);
+      batches = new ArrayList<>(1);
       batches.add(new ArrayList<Object>(_list));
       return batches;
     }
 
     int batchCount = len / _batchSize;
     if (len % _batchSize != 0) batchCount++;
-    batches = new ArrayList<List<Object>>(batchCount);
+    batches = new ArrayList<>(batchCount);
 
-    List<Object> batch = new ArrayList<Object>(_batchSize);
+    List<Object> batch = new ArrayList<>(_batchSize);
     batches.add(batch);
 
     int fillSize = 0;
     for (int i = 0; i < len; i++) {
       if (fillSize == _batchSize) {
-        batch = new ArrayList<Object>(_batchSize);
+        batch = new ArrayList<>(_batchSize);
         batches.add(batch);
         fillSize = 0;
       }
@@ -185,10 +185,10 @@ public class UList extends NSObject {
       return null;
 
     List<List<Object>> batches;
-    int len = _array.length;
+    final int len = _array.length;
 
     if (_batchSize >= len || _batchSize < 1) {
-      batches = new ArrayList<List<Object>>(1);
+      batches = new ArrayList<>(1);
       batches.add(Arrays.asList(_array));
       return batches;
     }
@@ -196,15 +196,15 @@ public class UList extends NSObject {
 
     int batchCount = len / _batchSize;
     if (len % _batchSize != 0) batchCount++;
-    batches = new ArrayList<List<Object>>(batchCount);
+    batches = new ArrayList<>(batchCount);
 
-    List<Object> batch = new ArrayList<Object>(_batchSize);
+    List<Object> batch = new ArrayList<>(_batchSize);
     batches.add(batch);
 
     int fillSize = 0;
     for (int i = 0; i < len; i++) {
       if (fillSize == _batchSize) {
-        batch = new ArrayList<Object>(_batchSize);
+        batch = new ArrayList<>(_batchSize);
         batches.add(batch);
         fillSize = 0;
       }
@@ -240,11 +240,11 @@ public class UList extends NSObject {
    * @param _key     the key of the values to be retrieved
    * @return a list containing the values for the given key
    */
-  public static List valuesForKey(Collection _objects, String _key) {
+  public static List valuesForKey(final Collection _objects, final String _key) {
     if (_objects == null)
       return null;
 
-    int len = _objects.size();
+    final int len = _objects.size();
     if (len == 0) return emptyList;
 
     final List values = new ArrayList(len);
@@ -289,7 +289,7 @@ public class UList extends NSObject {
     final int len = _objects.size();
     if (len == 0) return emptyList;
 
-    final List<Object> values = new ArrayList<Object>(len);
+    final List<Object> values = new ArrayList<>(len);
     for (int i = 0; i < len; i++) {
       Object o = _objects.get(i);
 
@@ -321,7 +321,7 @@ public class UList extends NSObject {
    * @param _key     the key of the values to be retrieved
    * @return an array containing the values for the given key
    */
-  public static Object[] valuesForKey(Object[] _objects, String _key) {
+  public static Object[] valuesForKey(final Object[] _objects, final String _key) {
     if (_objects == null)
       return null;
 
@@ -360,12 +360,12 @@ public class UList extends NSObject {
    * @param _path    the keypath of the values to be retrieved
    * @return an array containing the values for the given key
    */
-  public static Object[] valuesForKeyPath(Object[] _objects, String _path) {
+  public static Object[] valuesForKeyPath(final Object[] _objects, final String _path) {
     /* separate method for performance reasons */
     if (_objects == null)
       return null;
 
-    int len = _objects.length;
+    final int len = _objects.length;
     if (len == 0) return emptyArray;
 
     final Object[] values = new Object[len];
@@ -405,9 +405,9 @@ public class UList extends NSObject {
       return null;
 
     final Map<Object, List<Object>> resultMap =
-      new HashMap<Object, List<Object>>(16);
+      new HashMap<>(16);
 
-    for (Object object: _objects) {
+    for (final Object object: _objects) {
       /* we do the instanceof because the first case is the usual one */
       final Object group = (object instanceof NSKeyValueCodingAdditions)
         ? ((NSKeyValueCodingAdditions)object).valueForKeyPath(_keyPath)
@@ -415,7 +415,7 @@ public class UList extends NSObject {
 
       List<Object> groupValues = resultMap.get(group);
       if (groupValues == null) {
-        groupValues = new ArrayList<Object>(4);
+        groupValues = new ArrayList<>(4);
         resultMap.put(group, groupValues);
       }
 
@@ -482,9 +482,9 @@ public class UList extends NSObject {
     if (keyPathCount == 1)
       return UList.groupByKeyPath(_objects, _keyPathes[0]);
 
-    final Map<Object, Object> resultMap = new HashMap<Object, Object>(16);
+    final Map<Object, Object> resultMap = new HashMap<>(16);
 
-    for (Object object: _objects) {
+    for (final Object object: _objects) {
       Map    groupCursor = resultMap;
       Object group;
 
@@ -511,7 +511,7 @@ public class UList extends NSObject {
 
       List<Object> groupValues = (List<Object>)groupCursor.get(group);
       if (groupValues == null) {
-        groupValues = new ArrayList<Object>(4);
+        groupValues = new ArrayList<>(4);
         groupCursor.put(group, groupValues);
       }
 
@@ -553,8 +553,8 @@ public class UList extends NSObject {
    * @return a Map constructed according to the specification
    */
   public static Map extractRecordFromArray
-    (Object[] _array, Object[] _keys, int[] _keyIndices, Format[] _keyFormats,
-     boolean _excludeNulls)
+    (final Object[] _array, Object[] _keys, final int[] _keyIndices, final Format[] _keyFormats,
+     final boolean _excludeNulls)
   {
     if (_array == null)
       return null;
@@ -572,7 +572,7 @@ public class UList extends NSObject {
       /* retrieve value */
 
       if (_keyIndices != null) {
-        int idx = i < _keyIndices.length ? _keyIndices[i] : -1;
+        final int idx = i < _keyIndices.length ? _keyIndices[i] : -1;
         value = i >= 0 && i < _array.length ? _array[idx] : null;
       }
       else
@@ -584,7 +584,7 @@ public class UList extends NSObject {
         try {
           value = _keyFormats[i].parseObject(value.toString());
         }
-        catch (ParseException e) {
+        catch (final ParseException e) {
           value = e;
         }
       }
@@ -624,15 +624,15 @@ public class UList extends NSObject {
    * @return a List of Maps constructed according to the specification
    */
   public static List<Map> extractRecordsFromArrays
-    (Object[][] _array, Object[] _keys, int[] _keyIndices, Format[] _keyFormats,
-     boolean _excludeNulls)
+    (final Object[][] _array, final Object[] _keys, final int[] _keyIndices, final Format[] _keyFormats,
+     final boolean _excludeNulls)
   {
     if (_array == null)
       return null;
 
-    final List<Map> list = new ArrayList<Map>(_array.length);
+    final List<Map> list = new ArrayList<>(_array.length);
 
-    for (Object[] recordArray: _array) {
+    for (final Object[] recordArray: _array) {
       list.add(UList.extractRecordFromArray(
           recordArray, _keys, _keyIndices, _keyFormats, _excludeNulls));
     }
@@ -660,14 +660,14 @@ public class UList extends NSObject {
 
     final Class itemClazz = _array.getClass().getComponentType();
     if (itemClazz == null) { /* not an array */
-      List al = new ArrayList(1);
+      final List al = new ArrayList(1);
       al.add(_array);
       return al;
     }
 
     if (itemClazz == java.lang.Integer.TYPE) {
       final int[] nums = (int[])_array;
-      List<Integer> al = new ArrayList<Integer>(nums.length);
+      final List<Integer> al = new ArrayList<>(nums.length);
       for (int i = 0; i < nums.length; i++)
         al.add(nums[i]);
       return al;
@@ -675,7 +675,7 @@ public class UList extends NSObject {
 
     if (itemClazz == java.lang.Long.TYPE) {
       final long[] nums = (long[])_array;
-      List<Long> al = new ArrayList<Long>(nums.length);
+      final List<Long> al = new ArrayList<>(nums.length);
       for (int i = 0; i < nums.length; i++)
         al.add(nums[i]);
       return al;
@@ -709,7 +709,7 @@ public class UList extends NSObject {
     }
     else {
       // NOTE: array isn't null, but element might be!
-      Class componentType = _array.getClass().getComponentType();
+      final Class componentType = _array.getClass().getComponentType();
       extendedArray = (T[])Array.newInstance(componentType, _array.length + 1);
       System.arraycopy(_array, 0, extendedArray, 0, _array.length);
     }
@@ -729,7 +729,7 @@ public class UList extends NSObject {
       return null;
 
     final List al = new ArrayList(_objects.size());
-    for (Object o: _objects) {
+    for (final Object o: _objects) {
       if (o instanceof NSObject) {
         if (((NSObject)o).isEmpty())
           continue;
@@ -780,7 +780,7 @@ public class UList extends NSObject {
           try {
             nums[i] = Integer.parseInt((String)v);
           }
-          catch (NumberFormatException e) {
+          catch (final NumberFormatException e) {
             nums[i] = 0;
           }
         }
@@ -810,9 +810,9 @@ public class UList extends NSObject {
     if (_count == 0)
       return Collections.EMPTY_LIST;
 
-    final List<Number> l = new ArrayList<Number>(_count);
+    final List<Number> l = new ArrayList<>(_count);
     for (int i = 0; i < _count; i++)
-      l.add(new Integer(i));
+      l.add(Integer.valueOf(i));
     return l;
   }
 }

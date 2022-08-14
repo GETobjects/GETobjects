@@ -38,18 +38,18 @@ import org.junit.Test;
 /*
  * Needs:
  *   CREATE DATABASE jopetest CHARACTER SET 'utf8';
- *   GRANT ALL PRIVILEGES ON *.* TO jopetest@localhost 
+ *   GRANT ALL PRIVILEGES ON *.* TO jopetest@localhost
  *     IDENTIFIED BY 'jopetest' WITH GRANT OPTION;
  *   CREATE TABLE umlauts ( id INT, text VARCHAR(255) ) CHARACTER SET 'utf8';
  */
 public class TSQLUmlauts {
-  
-  static final String url = 
+
+  static final String url =
     "jdbc:mysql://localhost/jopetest?user=jopetest&password=jopetest";
     //"&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8";
   EOAdaptor        adaptor;
   EOAdaptorChannel channel;
-  
+
   static char[] char1 = new char[] { 72, 101, 223 };
   static char[] char2 = new char[] { 77, 252, 108, 108, 101, 114 };
   static String text1 = new String(char1);
@@ -60,7 +60,7 @@ public class TSQLUmlauts {
     this.adaptor = EOAdaptor.adaptorWithURL(url);
     this.channel = this.adaptor.openChannel();
     this.channel.performUpdateSQL("DELETE FROM umlauts");
-    
+
     // Not necessary:
     //  this.channel.performUpdateSQL("SET character_set_client = 'utf8'");
     //  this.channel.performUpdateSQL("SET character_set_connection = 'utf8'");
@@ -75,22 +75,22 @@ public class TSQLUmlauts {
     this.adaptor.dispose();
     this.adaptor = null;
   }
-  
+
   /* tests */
-  
+
   @Test
   public void testUmlautsReadWrite1() {
-    this.testUmlautsReadWrite(42, text1, char1);
+    testUmlautsReadWrite(42, text1, char1);
   }
-  
+
   @Test
   public void testUmlautsReadWrite2() {
-    this.testUmlautsReadWrite(43, text2, char2);    
+    testUmlautsReadWrite(43, text2, char2);
   }
 
   /* support */
-  
-  protected void printChars(String _prefix, char[] _chars) {
+
+  protected void printChars(final String _prefix, final char[] _chars) {
     System.err.print(_prefix);
     if (_chars == null || _chars.length == 0) {
       System.err.println("no chars to print ...");
@@ -101,28 +101,28 @@ public class TSQLUmlauts {
     System.err.println("");
   }
 
-  protected void testUmlautsReadWrite(int i, String _txt, char[] _chrs) {
+  protected void testUmlautsReadWrite(final int i, final String _txt, final char[] _chrs) {
     /* first insert a record */
-    
-    Map<String, Object> record = new HashMap<String, Object>(2);
-    record.put("id", new Integer(i));
+
+    final Map<String, Object> record = new HashMap<>(2);
+    record.put("id", Integer.valueOf(i));
     record.put("text", _txt);
     assertTrue("insert failed", this.channel.insertRow("umlauts", record));
-    
+
     //this.printChars("original-string: ", _txt.toCharArray());
-    
+
     /* then retrieve it */
-    
-    List<Map<String, Object>> records =
+
+    final List<Map<String, Object>> records =
       this.channel.performSQL("SELECT text FROM umlauts WHERE id = " + i);
     assertNotNull("error performing select",   records);
     assertTrue("did not find inserted record", records.size() == 1);
-    
+
     /* check field */
-    
-    String text = (String)records.get(0).get("text");
+
+    final String text = (String)records.get(0).get("text");
     //this.printChars("result-string:   ", text.toCharArray());
-    
+
     assertTrue("got no value for 'text' column", text != null);
     assertTrue("'text' column is empty",         text.length() > 0);
 

@@ -25,21 +25,19 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.getobjects.appserver.core.WOContext;
-import org.getobjects.appserver.core.WOResourceManager;
 import org.getobjects.foundation.UString;
 
 /*
  * WOExternalResourceManager
- * 
+ *
  * TBD: document
  * TBD: implement ;-)
- * 
+ *
  * Pattern:
  *   templateDirPattern: $home/templates/$name
  *   stringsDirPattern:  $home/translations/$name
  *   wwwDirPattern:      /var/www/$name
- * 
+ *
  * OGo resource pathes:
  *   /usr/share/opengroupware.org-1.1/templates/BundleName/*.[html|wod|wox]
  *   /usr/share/opengroupware.org-1.1/translations/Language.lproj/BundleName.str
@@ -52,47 +50,48 @@ import org.getobjects.foundation.UString;
  *   PREFIX/APPNAME-APPVERSION/templates/Themes/THEME/BUNDLE/RESOURCE
  */
 public class WOExternalResourceManager extends WOResourceManager {
-  
+
   protected String[] prefixList;
   protected String   templateDirPattern;
   protected String   stringsDirPattern;
   protected String   wwwDirPattern;
-  
+
   protected File resourceDir;
   protected File wwwDir;
 
-  public WOExternalResourceManager(boolean _enableCaching) {
+  public WOExternalResourceManager(final boolean _enableCaching) {
     super(_enableCaching);
   }
-  
+
   /* labels */
 
   @Override
   public ResourceBundle stringTableWithName
-    (String _name, String _fwname, String[] _langs)
+    (String _name, final String _fwname, final String[] _langs)
   {
     if (_name == null) _name = "LocalizableStrings";
-    
+
     // TBD
     System.err.println("asked for stringtable " + _name + " in " + _fwname +
         " langs: " + UString.componentsJoinedByString(_langs, ","));
     return null;
   }
-  
+
   /* internal resources */
-  
+
   @Override
-  public URL urlForResourceNamed(String _name, String[] _langs) {
+  public URL urlForResourceNamed(final String _name, final String[] _langs) {
     System.err.println("asked for resource " + _name +
         " langs: " + UString.componentsJoinedByString(_langs, ","));
     // TBD
     return null;
   }
-  
+
   /* external resources */
-  
+
+  @Override
   public String urlForResourceNamed
-    (String _name, String _fwname, List<String> _langs, WOContext _ctx)
+    (final String _name, final String _fwname, final List<String> _langs, final WOContext _ctx)
   {
     System.err.println("asked for URL " + _name + " in " + _fwname +
         " langs: " + UString.componentsJoinedByString(_langs, ","));
@@ -101,16 +100,17 @@ public class WOExternalResourceManager extends WOResourceManager {
   }
 
   /* class lookup */
-  
-  public Class lookupClass(String _name) {
+
+  @Override
+  public Class lookupClass(final String _name) {
     /* we cannot discover classes, only resources */
     return null;
   }
-  
+
   /* description */
-  
+
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
   }
 }

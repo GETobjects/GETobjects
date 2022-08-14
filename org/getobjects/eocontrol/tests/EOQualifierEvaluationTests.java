@@ -34,20 +34,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class EOQualifierEvaluationTests {
-  
+
   protected Map<String, Object> duckMap;
   protected Map<String, Object> mouseMap;
 
   @Before
   public void setUp() {
-    this.duckMap  = new HashMap<String, Object>(2);
-    this.mouseMap = new HashMap<String, Object>(2);
-    
+    this.duckMap  = new HashMap<>(2);
+    this.mouseMap = new HashMap<>(2);
+
     this.duckMap.put("name",  "Duck");
     this.mouseMap.put("name", "Mouse");
 
-    this.duckMap.put("salary", new Integer(100));
-    this.mouseMap.put("salary", new Integer(1000));
+    this.duckMap.put("salary",  Integer.valueOf(100));
+    this.mouseMap.put("salary", Integer.valueOf(1000));
 
     this.duckMap.put("isDuck",  Boolean.TRUE);
     this.mouseMap.put("isDuck", Boolean.FALSE);
@@ -61,71 +61,71 @@ public class EOQualifierEvaluationTests {
 
   @Test
   public void testSimpleKeyValueQualifierString() {
-    EOQualifierEvaluation q = parse("name = 'Duck'");
-    
+    final EOQualifierEvaluation q = parse("name = 'Duck'");
+
     assertTrue("duck name did not match", q.evaluateWithObject(this.duckMap));
     assertFalse("mouse name did match", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   @Test
   public void testSimpleKeyValueQualifierIntLessThan() {
-    EOQualifierEvaluation q = parse("salary < 500");
+    final EOQualifierEvaluation q = parse("salary < 500");
     assertTrue("salary match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("salary match failed", q.evaluateWithObject(this.mouseMap));
   }
 
   @Test
   public void testSimpleKeyValueQualifierIntLessThanEdge() {
-    EOQualifierEvaluation q = parse("salary < 1000");
+    final EOQualifierEvaluation q = parse("salary < 1000");
     assertTrue("salary match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("salary match failed", q.evaluateWithObject(this.mouseMap));
   }
 
   @Test
   public void testSimpleKeyValueQualifierIntLessThanOrEqual() {
-    EOQualifierEvaluation q = parse("salary <= 1000");
+    final EOQualifierEvaluation q = parse("salary <= 1000");
     assertTrue("salary match failed", q.evaluateWithObject(this.duckMap));
     assertTrue("salary match failed", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   @Test
   public void testPrefixExtOpColon() {
-    EOQualifierEvaluation q = parse("name hasPrefix: 'Du'");
+    final EOQualifierEvaluation q = parse("name hasPrefix: 'Du'");
     assertTrue("name match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("name matched", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   @Test
   public void testPrefixExtOp() {
-    EOQualifierEvaluation q = parse("name hasPrefix 'Du'");
+    final EOQualifierEvaluation q = parse("name hasPrefix 'Du'");
     assertTrue("name match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("name matched", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   @Test
   public void testDynamicLookupExtOp() {
-    EOQualifierEvaluation q = parse("name startsWith 'Du'");
+    final EOQualifierEvaluation q = parse("name startsWith 'Du'");
     assertTrue("name match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("name matched", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   @Test
   public void testBoolBoolComparison() {
-    EOQualifierEvaluation q = parse("isDuck = YES");
+    final EOQualifierEvaluation q = parse("isDuck = YES");
     assertTrue("bool match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("bool matched", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   @Test
   public void testBoolStringComparison() {
-    EOQualifierEvaluation q = parse("isDuck = 'YES'");
+    final EOQualifierEvaluation q = parse("isDuck = 'YES'");
     assertTrue("bool match failed", q.evaluateWithObject(this.duckMap));
     assertFalse("bool matched", q.evaluateWithObject(this.mouseMap));
   }
-  
+
   /* utility */
-  
-  protected static EOQualifierEvaluation parse(String _fmt) {
+
+  protected static EOQualifierEvaluation parse(final String _fmt) {
     return (EOQualifierEvaluation)
       EOQualifier.qualifierWithQualifierFormat(_fmt);
   }

@@ -21,6 +21,7 @@
 package org.getobjects.appserver.products;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,44 +60,44 @@ import org.xml.sax.SAXParseException;
  * {
  *   factories = {
  *   };
- *   
+ *
  *   renderers = {
  *     org.getobjects.ofs.OFSResourceFileRenderer = {
  *     };
  *   };
- * 
+ *
  *   classes = {
- *   
+ *
  *     org.getobjects.ofs.OFSBaseObject = {
  *       protectedBy   = "View";
  *       defaultAccess = "allow";
- *       
+ *
  *       defaultRoles = {
  *         "View"                    = "Anonymous";
  *         "WebDAV Access"           = "Authenticated";
  *         "Change Images and Files" = "Owner";
  *       };
- *       
+ *
  *       slots = {
  *       };
- *      
+ *
  *       methods = {
  *       };
  *     };
- *     
+ *
  *     org.getobjects.ofs.OFSFolder = {
  *       superclass = "org.getobjects.ofs.OFSBaseObject";
- *     
+ *
  *       slots = {
  *       };
- *       
+ *
  *       methods = {
  *         "-manage_workspace" = {
  *           protectedBy = "View Management Screens";
  *           pageName    = "JMIManageFolder";
  *         };
  *       };
- *       
+ *
  *       slots = {
  *         "-manage_addChildren" = { // this is like an ivar, an array plist
  *           protectedBy = "View Management Screens";
@@ -112,7 +113,7 @@ import org.xml.sax.SAXParseException;
  *   }
  * }
  * </pre>
- * 
+ *
  * The code is also prepared for an XML version of that, but that is not yet
  * finished.
 */
@@ -131,138 +132,156 @@ public class GoProductInfo extends NSObject
   protected ClassLoader  classLoader;
   protected Object       product; /* instance of the WOFramework class */
   protected IGoObjectRenderer[] renderers;
-  
+
   public GoProductInfo(final String _fqn) {
     this.fqn = _fqn;
   }
-  
+
   /* accessors */
-  
+
   public String fullyQualifiedName() {
     return this.fqn;
   }
   public String simpleName() {
-    int idx = this.fqn.lastIndexOf('.');
+    final int idx = this.fqn.lastIndexOf('.');
     return idx != -1 ? this.fqn.substring(idx + 1) : this.fqn;
   }
-  
+
   public synchronized boolean isLoaded() {
     return this.product != null;
   }
-  
+
   public synchronized ClassLoader classLoader() {
     if (this.classLoader == null)
       this.classLoader = GoProductInfo.class.getClassLoader();
     return this.classLoader;
   }
-  
+
   public synchronized Object product() {
     return this.product;
   }
-  
+
   /* renderers */
-  
-  public Object rendererForObjectInContext(Object _result, WOContext _ctx) {
+
+  @Override
+  public Object rendererForObjectInContext(final Object _result, final WOContext _ctx) {
     IGoObjectRenderer[] ra;
     synchronized (this) {
       if ((ra = this.renderers) == null)
         return null;
     }
-    
-    for (IGoObjectRenderer r: ra) {
+
+    for (final IGoObjectRenderer r: ra) {
       if (r.canRenderObjectInContext(_result, _ctx))
         return r;
     }
-    
+
     return null;
   }
-  
+
   /* common GoObject support */
-  
+
   public String nameInContainer() {
-    return this.simpleName();
+    return simpleName();
   }
-  
+
   /* loading */
-  
+
   public boolean loadProductIntoApplication(final WOApplication _app) {
-    final Object lproduct = this.primaryLoadProduct(_app);
+    final Object lproduct = primaryLoadProduct(_app);
     if (lproduct == null)
       return false;
-    
+
     synchronized(this) {
       this.product = lproduct;
-      this.loadProduct(this.product, _app);
+      loadProduct(this.product, _app);
     }
-    
+
     return true;
   }
-  
+
   protected Class primaryLoadCode(final WOApplication _app) {
-    final ClassLoader cl = this.classLoader();
+    final ClassLoader cl = classLoader();
     if (cl == null) {
       log.error("did not find class loader for product: " + this);
       return null;
     }
-    
+
     /* find/load product class */
-    
+
     Class cls = null;
     try {
       cls = cl.loadClass(this.fqn + ".WOFramework");
     }
-    catch (ClassNotFoundException e) {
+    catch (final ClassNotFoundException e) {
     }
-    
+
     /* hack for main package */
     if (cls == null && _app != null) {
-      Class appCls = _app.getClass();
+      final Class appCls = _app.getClass();
       if (this.fqn.equals(appCls.getPackage().getName()))
         cls = appCls;
     }
-    
+
     if (cls == null)
       log.warn("did not find product class: " + this.fqn);
-    
+
     return cls;
   }
-  
+
+  @SuppressWarnings("unchecked")
   protected Object primaryLoadProduct(final WOApplication _app) {
-    final Class cls = this.primaryLoadCode(_app);
+    final Class cls = primaryLoadCode(_app);
     if (cls == null)
       return null;
-    
+
     /* instantiate product */
-    
+
     Object loadingProduct;
     try {
       /* hack for main class */
       if (cls.isInstance(_app))
         loadingProduct = _app;
       else
-        loadingProduct = cls.newInstance();
+        loadingProduct = cls.getDeclaredConstructor().newInstance();
     }
-    catch (InstantiationException e) {
+    catch (final InstantiationException e) {
       log.warn("could not instantiate product class: " + cls, e);
       return null;
     }
-    catch (IllegalAccessException e) {
+    catch (final IllegalAccessException e) {
       log.warn("no permissions to instantiate product class: " + cls, e);
       return null;
     }
-    
+    catch (final IllegalArgumentException e) {
+      log.warn("illegal argument for instantiating product class: " + cls, e);
+      return null;
+    }
+    catch (final InvocationTargetException e) {
+      log.warn("could not instantiate product class: " + cls, e);
+      return null;
+    }
+    catch (final NoSuchMethodException e) {
+      log.warn("could not instantiate product class: " + cls, e);
+      return null;
+    }
+    catch (final SecurityException e) {
+      log.warn("no permissions to instantiate product class: " + cls, e);
+      return null;
+    }
+
     return loadingProduct;
   }
 
   /* manifest */
-  
+
   public void loadMethod(final GoClass _cls, final String _name, final Map _pp){
     if (log.isInfoEnabled()) log.info("register: " + _name + " on " + _cls);
-    
+
     final String action    = (String)_pp.get("action");
     final String pageName  = (String)_pp.get("pageName");
     final String className = (String)_pp.get("actionClass");
-    
+
     Object value;
     if (pageName != null && pageName.length() > 0)
       value = new GoPageInvocation(pageName, action);
@@ -273,45 +292,45 @@ public class GoProductInfo extends NSObject
           _name + "' in class " + _cls + ": " + _pp);
       value = null;
     }
-    
+
     if (value != null) _cls.setValueForSlot(value, _name);
   }
-  
+
   public void loadSlot(final GoClass _cls, final String _name, final Map _pp) {
     final String valueClass = (String)_pp.get("valueClass");
     Object value      = _pp.get("value");
-    
+
     if (log.isInfoEnabled()) log.info("register: " + _name + " on " + _cls);
-    
+
     if (valueClass != null) {
       // TODO: use class loader
-      Class valueClazz = NSJavaRuntime.NSClassFromString(valueClass);
+      final Class valueClazz = NSJavaRuntime.NSClassFromString(valueClass);
       if (valueClazz == null) {
         log.error("did not find value class: '" + valueClass + "'");
         return;
       }
-      
+
       if (_pp.containsKey("value"))
         value = NSJavaRuntime.NSAllocateObject(valueClazz, Object.class, value);
       else
         value = NSJavaRuntime.NSAllocateObject(valueClazz);
     }
-    
+
     _cls.setValueForSlot(value, _name);
   }
-  
+
   public void loadSlotSecurity
-    (GoClass _cls, String _name, Map _pp, GoSecurityInfo _info)
+    (final GoClass _cls, final String _name, final Map _pp, final GoSecurityInfo _info)
   {
     if (_name == null || _info == null || _pp == null)
       return;
-    
+
     final String protectedBy = (String)_pp.get("protectedBy");
     if (protectedBy == null)
       return;
-    
+
     //System.err.println("PROTECTED: " + _name + ": " + protectedBy);
-    
+
     if ("<public>".equals(protectedBy))
       _info.declarePublic(_name);
     else if ("<private>".equals(protectedBy))
@@ -319,10 +338,10 @@ public class GoProductInfo extends NSObject
     else
       _info.declareProtected(protectedBy, _name);
   }
-  
+
   @SuppressWarnings("unchecked")
-  public void loadClassSettings(GoClassRegistry _reg, String _name, Map _pp) {
-    Class cls = NSJavaRuntime.NSClassFromString(_name);
+  public void loadClassSettings(final GoClassRegistry _reg, final String _name, final Map _pp) {
+    final Class cls = NSJavaRuntime.NSClassFromString(_name);
 //  if (cls == null) {
 //    String pkg = WOFramework.class.getPackage().getName();
 //    cls = NSJavaRuntime.NSClassFromString(pkg + "." + _name);
@@ -331,19 +350,19 @@ public class GoProductInfo extends NSObject
       log.error("did not find class referred to by product.plist: " + _name);
       return;
     }
-    
-    GoClass joClass = _reg.goClassForJavaClass(cls, null /* ctx */);
+
+    final GoClass joClass = _reg.goClassForJavaClass(cls, null /* ctx */);
     if (joClass == null) {
       log.error("did not find GoClass: " + cls);
       return;
     }
-    
+
     /* security declarations */
-    
+
     final GoSecurityInfo sinfo = joClass.securityInfo();
-    
+
     //System.err.println("LOAD " + _name + ": " + _pp);
-    
+
     Object tmp = _pp.get("protectedBy");
     if ("<public>".equals(tmp))
       sinfo.declareObjectPublic();
@@ -351,16 +370,16 @@ public class GoProductInfo extends NSObject
       sinfo.declareObjectPrivate();
     else if (tmp != null)
       sinfo.declareObjectProtected((String)tmp);
-    
+
     if ((tmp = _pp.get("defaultAccess")) != null)
       sinfo.setDefaultAccess((String)tmp);
-    
+
     if ((tmp = _pp.get("defaultRoles")) != null) {
-      Map<String, Object> defRoles = (Map<String, Object>)tmp;
-      for (String permission: defRoles.keySet()) {
-        Object v = defRoles.get(permission);
+      final Map<String, Object> defRoles = (Map<String, Object>)tmp;
+      for (final String permission: defRoles.keySet()) {
+        final Object v = defRoles.get(permission);
         if (v == null) continue;
-        
+
         if (v instanceof String)
           sinfo.declareRoleAsDefaultForPermissions((String)v, permission);
         else if (v instanceof List) {
@@ -372,126 +391,126 @@ public class GoProductInfo extends NSObject
       }
     }
     //System.err.println("  SEC: " + sinfo);
-    
+
     /* load slots */
-    
+
     final Map slots = (Map)_pp.get("slots");
     if (slots != null) {
-      for (Object name: slots.keySet()) {
-        Map pp = (Map)slots.get(name);
+      for (final Object name: slots.keySet()) {
+        final Map pp = (Map)slots.get(name);
         loadSlot(joClass, (String)name, pp);
         loadSlotSecurity(joClass, (String)name, pp, sinfo);
       }
     }
-    
+
     /* load methods */
-    
+
     final Map methods = (Map)_pp.get("methods");
     if (methods != null) {
-      for (Object name: methods.keySet()) {
-        Map pp = (Map)methods.get(name);
+      for (final Object name: methods.keySet()) {
+        final Map pp = (Map)methods.get(name);
         loadMethod(joClass, (String)name, pp);
         loadSlotSecurity(joClass, (String)name, pp, sinfo);
       }
     }
   }
-  
-  public void loadProductPropertyList(final Map pp, GoClassRegistry registry) {
+
+  public void loadProductPropertyList(final Map pp, final GoClassRegistry registry) {
     if (pp == null)
       return;
-    
+
     /* classes */
-    
+
     final Map classes = (Map)pp.get("classes");
     if (classes != null) {
-      for (Object k: classes.keySet())
-        this.loadClassSettings(registry, (String)k, (Map)classes.get(k));
+      for (final Object k: classes.keySet())
+        loadClassSettings(registry, (String)k, (Map)classes.get(k));
     }
-    
+
     /* categories */
-    
+
     final Map categories = (Map)pp.get("categories");
     if (categories != null) {
-      for (Object k: categories.keySet())
-        this.loadClassSettings(registry, (String)k, (Map)categories.get(k));
+      for (final Object k: categories.keySet())
+        loadClassSettings(registry, (String)k, (Map)categories.get(k));
     }
-    
+
     /* renderers */
-    
+
     final Map rendererInfos = (Map)pp.get("renderers");
     if (rendererInfos != null) {
       final List<IGoObjectRenderer> loadingRenderers =
-        new ArrayList<IGoObjectRenderer>(4);
-      for (Object k: rendererInfos.keySet()) {
+        new ArrayList<>(4);
+      for (final Object k: rendererInfos.keySet()) {
         // TODO: do something with the renderer settings ... (priority etc)
         // TODO: use class loader
-        String className = k.toString();
+        final String className = k.toString();
         IGoObjectRenderer renderer = null;
         Class rcls = null;
-        
+
         /* try to load via class loader */
-        
+
         if (this.classLoader != null) {
           try {
             rcls = this.classLoader.loadClass(className);
           }
-          catch (ClassNotFoundException e) {
+          catch (final ClassNotFoundException e) {
             try {
               rcls = this.classLoader.loadClass(this.fqn + "." + className);
             }
-            catch (ClassNotFoundException e2) {
+            catch (final ClassNotFoundException e2) {
               log.error("Could not load class of renderer: " + className, e2);
             }
           }
         }
-        
+
         /* use global loading mechanism */
-        
+
         if (rcls == null) {
           rcls = NSJavaRuntime.NSClassFromString(className);
           if (rcls == null)
             rcls = NSJavaRuntime.NSClassFromString(this.fqn + "." + className);
         }
-        
+
         /* instantiate and remember renderer */
-        
+
         if (rcls != null)
           renderer = (IGoObjectRenderer)NSJavaRuntime.NSAllocateObject(rcls);
-        
+
         if (renderer != null)
           loadingRenderers.add(renderer);
         else
           log.error("Could not instantiate product renderer: " + k);
       }
-      
+
       if (loadingRenderers.size() > 0) {
         synchronized(this) {
           this.renderers = loadingRenderers.toArray(new IGoObjectRenderer[0]);
         }
       }
     }
-    
+
     /* factories */
     // TODO
   }
-  
-  public void loadProductXML(Document _doc, GoClassRegistry _registry) {
+
+  public void loadProductXML(final Document _doc, final GoClassRegistry _registry) {
     // TBD: load product info from XML
     log.fatal("XML config based products are not yet available ...");
   }
 
-  public void loadProduct(Object _product, WOApplication _app) {
+  public void loadProduct(final Object _product, final WOApplication _app) {
     // TBD: a bit hackish ... separate into proper loader objects
     //      ... or just drop the .plist format completely ...
     if (_product == null)
       return;
-    
+
     final GoClassRegistry registry = _app.goClassRegistry();
     if (registry == null) {
       log.error("application has no class registry: " + _app);
       return;
     }
-    
+
     /* find product.plist manifest */
 
     URL manifestURL = _product.getClass().getResource("product.xml");
@@ -504,7 +523,7 @@ public class GoProductInfo extends NSObject
          if (log.isDebugEnabled())
            log.debug("  using DOM document builder:" + db);
       }
-      catch (ParserConfigurationException e) {
+      catch (final ParserConfigurationException e) {
         log.error("failed to create docbuilder for parsing URL: " +
                   manifestURL, e);
         return;
@@ -517,26 +536,26 @@ public class GoProductInfo extends NSObject
         doc = db.parse(manifestURL.openStream(), manifestURL.toString());
         if (log.isDebugEnabled()) log.debug("  parsed DOM: " + doc);
       }
-      catch (SAXParseException e) {
+      catch (final SAXParseException e) {
         log.error("XML error at line " + e.getLineNumber() +
                   " when loading model resource: " + manifestURL, e);
         return;
       }
-      catch (SAXException e) {
+      catch (final SAXException e) {
         log.error("XML error when loading model resource: " + manifestURL, e);
         return;
       }
-      catch (IOException e) {
+      catch (final IOException e) {
         log.error("IO error when loading model resource: " + manifestURL, e);
         return;
       }
-      
+
       /* transform DOM into product info */
-      
-      this.loadProductXML(doc, registry);
+
+      loadProductXML(doc, registry);
       return; /* we are done */
     }
-    
+
     // TBD: we could optionally let the product do all the setup itself (if it
     //      conforms to some protocol)
     manifestURL = _product.getClass().getResource("product.plist");
@@ -544,16 +563,16 @@ public class GoProductInfo extends NSObject
       log.info("product has no product.plist: " + _product);
       return;
     }
-    
-    NSPropertyListParser plistParser = new NSPropertyListParser();
-    Map pp = (Map)plistParser.parse(manifestURL);
+
+    final NSPropertyListParser plistParser = new NSPropertyListParser();
+    final Map pp = (Map)plistParser.parse(manifestURL);
     if (pp == null) {
       log.error("could not load products.plist of product: " + _product,
                 plistParser.lastException());
       return;
     }
-    
-    this.loadProductPropertyList(pp, registry);
+
+    loadProductPropertyList(pp, registry);
   }
 
 

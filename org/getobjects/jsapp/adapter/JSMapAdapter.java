@@ -44,12 +44,12 @@ public class JSMapAdapter extends NativeJavaObject {
   public JSMapAdapter() {
   }
 
-  public JSMapAdapter(Scriptable _scope, Object _javaObject, Class _type){
+  public JSMapAdapter(final Scriptable _scope, final Object _javaObject, final Class _type){
     super(_scope, _javaObject, _type);
   }
 
   public JSMapAdapter
-    (Scriptable _scope, Object _javaObject, Class _type, boolean _isAdapter)
+    (final Scriptable _scope, final Object _javaObject, final Class _type, final boolean _isAdapter)
   {
     super(_scope, _javaObject, _type, _isAdapter);
   }
@@ -63,23 +63,23 @@ public class JSMapAdapter extends NativeJavaObject {
      */
     if (log != null && log.isDebugEnabled())
       log.debug("ADAPTOR HAS?: " + _name + " from " + this.javaObject);
-    
+
     System.err.println("HAS: " + _name + ": " + this.javaObject);
-    
+
     if (((Map)this.javaObject).containsKey(_name))
       return true;
-    
+
     return super.has(_name, _start);
   }
-  
+
   @Override
   public boolean has(final int _idx, final Scriptable _start) {
-    if (((Map)this.javaObject).containsKey(new Integer(_idx)))
+    if (((Map)this.javaObject).containsKey(Integer.valueOf(_idx)))
       return true;
-    
+
     return super.has(_idx, _start);
   }
-  
+
   /**
    * Get the value of a property. First check the superclass for methods of the
    * Java class (will be returned as Callables), then check for WOComponent
@@ -100,14 +100,14 @@ public class JSMapAdapter extends NativeJavaObject {
   public Object get(final String _name, final Scriptable _start) {
     final Map map = (Map)this.javaObject;
     if (map == null || !map.containsKey(_name))
-      return super.get(_name, _start); 
-    
+      return super.get(_name, _start);
+
     final Object value = map.get(_name);
     if (log != null && log.isDebugEnabled()) {
       log.debug("ADAPTOR GET '" + _name + "': " + value +
           "\n  from " + this.javaObject);
     }
-    
+
     if (value instanceof Scriptable ||
         value instanceof String ||
         value instanceof Number ||
@@ -117,26 +117,26 @@ public class JSMapAdapter extends NativeJavaObject {
       return value; // return JS stuff as-is!
     }
 
-    Context cx = Context.getCurrentContext();
+    final Context cx = Context.getCurrentContext();
     return cx.getWrapFactory().wrap(cx,
         this  /* scope? */,
         value /* Java object to be wrapped for JS */,
-        null  /* static type? */); 
+        null  /* static type? */);
   }
-  
+
   @Override
   public Object get(final int _idx, final Scriptable _start) {
     final Map    map = (Map)this.javaObject;
-    final Object key = new Integer(_idx);
+    final Object key = Integer.valueOf(_idx);
     if (map == null || !map.containsKey(key))
-      return super.get(_idx, _start); 
-    
-    Object value = map.get(key);
+      return super.get(_idx, _start);
+
+    final Object value = map.get(key);
     if (log != null && log.isDebugEnabled()) {
       log.debug("ADAPTOR GET [" + _idx + "]: " + value +
           "\n  from " + this.javaObject);
     }
-    
+
     if (value instanceof Scriptable ||
         value instanceof String ||
         value instanceof Number ||
@@ -146,13 +146,13 @@ public class JSMapAdapter extends NativeJavaObject {
       return value; // return JS stuff as-is!
     }
 
-    Context cx = Context.getCurrentContext();
+    final Context cx = Context.getCurrentContext();
     return cx.getWrapFactory().wrap(cx,
         this  /* scope? */,
         value /* Java object to be wrapped for JS */,
-        null  /* static type? */); 
+        null  /* static type? */);
   }
-  
+
   @Override
   public Object[] getIds() {
     // hm, return all IDs, our Go API does not support that. We would need to
@@ -162,15 +162,15 @@ public class JSMapAdapter extends NativeJavaObject {
       log.error("GETIDS on " + this.javaObject);
     return super.getIds();
   }
-  
-  
+
+
   @SuppressWarnings("unchecked")
   @Override
-  public void put(final String _name, final Scriptable _start, Object _value) {
+  public void put(final String _name, final Scriptable _start, final Object _value) {
     try {
       // hm, here we get Undefined!
       Object v;
-      
+
       if (_value instanceof Undefined) {
         /* We keep 'Undefined' (we could map to NSNull?). Undefined is pushed
          * when the script does 'var a'. Note that the assignment (var a = 5)
@@ -182,29 +182,29 @@ public class JSMapAdapter extends NativeJavaObject {
         // TBD: should we convert numbers and such?
         v = Context.jsToJava(_value, Object.class);
       }
-      
+
       if (log != null && log.isDebugEnabled()) {
         log.debug("ADAPTOR PUT: " + _name +
             " = " + _value +
             " (" + v + ") " +
             " on " + this.javaObject);
       }
-      
-      ((Map)this.javaObject).put(_name, v); 
-    } 
-    catch(RuntimeException e) {
-      Context.throwAsScriptRuntimeEx(e); 
-    } 
+
+      ((Map)this.javaObject).put(_name, v);
+    }
+    catch(final RuntimeException e) {
+      Context.throwAsScriptRuntimeEx(e);
+    }
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
-  public void put(final int _idx, final Scriptable _start, Object _value) {
-    final Object key = new Integer(_idx);
+  public void put(final int _idx, final Scriptable _start, final Object _value) {
+    final Object key = Integer.valueOf(_idx);
     try {
       // hm, here we get Undefined!
       Object v;
-      
+
       if (_value instanceof Undefined) {
         /* We keep 'Undefined' (we could map to NSNull?). Undefined is pushed
          * when the script does 'var a'. Note that the assignment (var a = 5)
@@ -216,46 +216,46 @@ public class JSMapAdapter extends NativeJavaObject {
         // TBD: should we convert numbers and such?
         v = Context.jsToJava(_value, Object.class);
       }
-      
+
       if (log != null && log.isDebugEnabled()) {
         log.debug("ADAPTOR PUT: [" + _idx +
             "] = " + _value +
             " (" + v + ") " +
             " on " + this.javaObject);
       }
-      
-      ((Map)this.javaObject).put(key, v); 
-    } 
-    catch(RuntimeException e) {
-      Context.throwAsScriptRuntimeEx(e); 
-    } 
+
+      ((Map)this.javaObject).put(key, v);
+    }
+    catch(final RuntimeException e) {
+      Context.throwAsScriptRuntimeEx(e);
+    }
   }
-  
+
   @Override
   public void delete(final String _name) {
     try {
       ((Map)this.javaObject).remove(_name);
-    } 
-    catch (RuntimeException e) {
-      Context.throwAsScriptRuntimeEx(e); 
-    } 
+    }
+    catch (final RuntimeException e) {
+      Context.throwAsScriptRuntimeEx(e);
+    }
   }
-  
+
   @Override
   public void delete(final int _idx) {
     try {
-      ((Map)this.javaObject).remove(new Integer(_idx));
-    } 
-    catch (RuntimeException e) {
-      Context.throwAsScriptRuntimeEx(e); 
-    } 
+      ((Map)this.javaObject).remove(Integer.valueOf(_idx));
+    }
+    catch (final RuntimeException e) {
+      Context.throwAsScriptRuntimeEx(e);
+    }
   }
 
-  
+
   /* description */
-  
+
   @Override
   public String toString() {
-    return this.javaObject != null ? this.javaObject.toString() : "<null>"; 
-  } 
+    return this.javaObject != null ? this.javaObject.toString() : "<null>";
+  }
 }

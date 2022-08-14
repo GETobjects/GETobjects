@@ -30,54 +30,55 @@ import org.getobjects.eoaccess.EOModel;
 public class EODerbyAdaptor extends EOAdaptor {
 
   public EODerbyAdaptor
-    (String _url, Properties _connectionProperties, EOModel _model)
+    (final String _url, final Properties _connectionProperties, final EOModel _model)
   {
     super(_url, _connectionProperties, _model);
   }
 
   /* JDBC driver */
 
+  @Override
   protected boolean loadDriver() {
     try {
       // The newInstance() call is a work around for some
       // broken Java implementations
-      Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
+      Class.forName("org.apache.derby.jdbc.EmbeddedDriver").getDeclaredConstructor().newInstance();
       return true;
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return false;
     }
   }
-  
+
   /* Derby */
-  
-  public static void setSystemDirectory(String _dir) {
-    Properties p = System.getProperties();
+
+  public static void setSystemDirectory(final String _dir) {
+    final Properties p = System.getProperties();
     p.setProperty("derby.system.home", _dir);
   }
-  
+
   public SQLException shutdown() {
     try {
       DriverManager.getConnection("jdbc:derby:;shutdown=true");
-      
+
       /* garbage collect Derby driver class to allow a reload */
       System.gc();
     }
-    catch (SQLException e) {
+    catch (final SQLException e) {
       return e;
     }
 
     return null;
   }
-  
-  public SQLException shutdownDatabase(String _dbname) {
+
+  public SQLException shutdownDatabase(final String _dbname) {
     if (_dbname == null || _dbname.length() == 0)
       return null;
 
     try {
       DriverManager.getConnection("jdbc:derby:" + _dbname + ";shutdown=true");
     }
-    catch (SQLException e) {
+    catch (final SQLException e) {
       return e;
     }
 

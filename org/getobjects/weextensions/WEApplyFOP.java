@@ -48,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * namespace is defined to be be the XSL/Format namespace. Which means that
  * you can use the XSL:FO tags w/o a prefix (just &lt;block&gt; instead of
  * &lt;fo:block&gt;, etc).
- * 
+ *
  * <p>
  * Performance:
  * This approach is not exactly the fasted way to produce the PDF. The element
@@ -58,7 +58,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * The String is then parsed as XML by FOP and the PDF is written into a
  * temporary byte buffer. So the PDF is also held in memory before it gets
  * delivered.
- * 
+ *
  * <p>
  * Example:<pre>
  *   &lt;wo:WEApplyFOP&gt;
@@ -70,7 +70,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *         &lt;region-body region-name="page-content"/&gt;
  *       &lt;/simple-page-master&gt;
  *     &lt;/layout-master-set&gt;
- *     
+ *
  *     &lt;page-sequence master-reference="a4"&gt;
  *       &lt;flow flow-name="page-content"&gt;
  *         &lt;block font-size="18pt"
@@ -84,21 +84,21 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *       &lt;/flow&gt;
  *     &lt;/page-sequence&gt;
  *   &lt;/wo:WEApplyFOP&gt;</pre>
- * 
+ *
  * <p>
  * Bindings:
  * <pre>
- *   data        [out] - byte[] - receives the rendering result 
- *   response    [out] - WOResponse - receives the rendering result 
+ *   data        [out] - byte[] - receives the rendering result
+ *   response    [out] - WOResponse - receives the rendering result
  *   mimeType    [in]  - String - output format, eg 'application/pdf'
  *   disposition [in]  - String - content-disposition
  *   filename    [in]  - String - content-disposition filename
  *   error       [out] - Exception - any FOP error</pre>
  */
 public class WEApplyFOP extends WODynamicElement {
-  
+
   protected static FopFactory fopFactory = FopFactory.newInstance();
-  
+
   protected WOAssociation data;
   protected WOAssociation response;
   protected WOAssociation mimeType;
@@ -115,14 +115,14 @@ public class WEApplyFOP extends WODynamicElement {
   protected WOAssociation title;
   protected WOAssociation keywords;
   protected WOAssociation targetResolution;
-  
+
   protected WOElement     template;
 
   public WEApplyFOP
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
-    
+
     this.data             = grabAssociation(_assocs, "data");
     this.response         = grabAssociation(_assocs, "response");
     this.mimeType         = grabAssociation(_assocs, "mimeType");
@@ -138,10 +138,10 @@ public class WEApplyFOP extends WODynamicElement {
     this.title            = grabAssociation(_assocs, "title");
     this.keywords         = grabAssociation(_assocs, "keywords");
     this.targetResolution = grabAssociation(_assocs, "targetResolution");
-    
+
     this.template = _template;
   }
-  
+
   /* generate response */
 
   @Override
@@ -152,20 +152,20 @@ public class WEApplyFOP extends WODynamicElement {
       ? this.mimeType.stringValueInComponent(cursor)
       : null;
     if (format == null) format = "application/pdf";
-    
+
     final int defaultOutputCapacity = 64 * 1024; // 64k
-    
+
     /* first generate the XSL:FO instructions contained in the template */
-    
-    String fo = this.renderFOInContext(_ctx);
-    
-    
+
+    String fo = renderFOInContext(_ctx);
+
+
     /* convert the FO response into an XML input stream */
 
-    InputSource xmlInput = new InputSource(new StringReader(fo));
+    final InputSource xmlInput = new InputSource(new StringReader(fo));
     fo = null; /* release memory early, can be quite large! */
-    
-    
+
+
     /* The iText book says browsers do not deal well with missing
      * content-lengths, so we can't stream the PDF directly.
      * Technically it would probably be best to stream to a file and then
@@ -176,17 +176,17 @@ public class WEApplyFOP extends WODynamicElement {
 
 
     /* generate PDF */
-    
+
     Exception lError  = null;
     byte[]    result = null;
-    
+
     synchronized (fopFactory) { /* FOP is not thread safe?! */
-      
+
       /* configure user agent */
 
-      FOUserAgent ua = fopFactory.newFOUserAgent();
+      final FOUserAgent ua = fopFactory.newFOUserAgent();
       String v;
-      
+
       // TBD: kinda crappy
       if (this.baseURL != null) {
         if ((v = this.baseURL.stringValueInComponent(cursor)) != null)
@@ -205,7 +205,7 @@ public class WEApplyFOP extends WODynamicElement {
           ua.setAuthor(v);
       }
       if (this.creationDate != null) {
-        Date d = (Date)this.creationDate.valueInComponent(cursor);
+        final Date d = (Date)this.creationDate.valueInComponent(cursor);
         if (d != null) ua.setCreationDate(d);
       }
       if (this.title != null) {
@@ -219,7 +219,7 @@ public class WEApplyFOP extends WODynamicElement {
       if (this.targetResolution != null) {
         Object o = this.targetResolution.stringValueInComponent(cursor);
         if (o instanceof String)
-          o = new Double(Double.parseDouble((String)o));
+          o = Double.valueOf(Double.parseDouble((String)o));
         if (o instanceof Number)
           ua.setTargetResolution(((Number)o).floatValue());
         else if (o != null)
@@ -228,7 +228,7 @@ public class WEApplyFOP extends WODynamicElement {
 
 
       /* process content using FOP */
-      
+
       try {
         ContentHandler fop =
           fopFactory.newFop(format, ua, bas).getDefaultHandler();
@@ -240,7 +240,7 @@ public class WEApplyFOP extends WODynamicElement {
         fop    = null;
         reader = null;
       }
-      catch (Exception e) {
+      catch (final Exception e) {
         lError = e;
         if (this.error == null)
           delog.error("FOP exception during rendering: " + this, e);
@@ -248,22 +248,22 @@ public class WEApplyFOP extends WODynamicElement {
     }
 
     /* extract result array */
-    
+
     if (lError == null)
       result = bas.toByteArray();
-    
+
     /* release memory early, can be quite large! */
     bas = null;
-    
-    
+
+
     /* handle result */
-    
+
     if (this.error != null)
       this.error.setValue(lError, cursor);
-        
+
     if (this.data != null)
       this.data.setValue(result, cursor);
-    
+
     if (this.data == null || this.response != null) {
       if (lError != null && this.error == null && result == null) {
         _r.appendContentString("<h2>FOP Error</h2><pre>");
@@ -275,7 +275,7 @@ public class WEApplyFOP extends WODynamicElement {
           ? new WOResponse(_ctx != null ? _ctx.request() : null)
           : _r; /* render directly */
 
-        String d = this.contentDispositionInContext(_ctx);
+        final String d = contentDispositionInContext(_ctx);
         if (d != null) or.setHeaderForKey(d, "content-disposition");
 
         or.setHeaderForKey("close",            "connection");
@@ -289,50 +289,50 @@ public class WEApplyFOP extends WODynamicElement {
         or = null;
       }
     }
-    
+
     result = null;
   }
-  
+
   /**
    * Returns the content-disposition for the response, for example:<pre>
    *   inline; filename=test.pdf</pre>
-   * 
+   *
    * @param _ctx - the WOContext
    * @return a content-disposition value, or null
    */
   public String contentDispositionInContext(final WOContext _ctx) {
     if (this.disposition == null && this.filename == null)
       return null;
-    
+
     String d = null;
     String f = null;
-      
+
     if (this.disposition != null)
       d = this.disposition.stringValueInComponent(_ctx.cursor());
     if (this.filename != null)
       f = this.filename.stringValueInComponent(_ctx.cursor());
 
     if (UObject.isEmpty(d)) d = "inline";
-    
+
     if (UObject.isNotEmpty(f))
       d += "; filename=" + f; // TBD: quoting?
-    
+
     return d;
   }
-  
+
   /**
    * This method renders the elements template into a separate response,
    * and then extracts that content as a String.
    * <p>
    * Note: we also embed the template content in the XSL:FO root-tag for
    * convenience.
-   * 
+   *
    * @param _ctx - the active WOContext
    * @return the String containing the rendering instructions
    */
   public String renderFOInContext(final WOContext _ctx) {
     // TBD: would be better to stream to a temporary file?
-    WOResponse foResponse = new WOResponse(_ctx != null ? _ctx.request() :null);
+    final WOResponse foResponse = new WOResponse(_ctx != null ? _ctx.request() :null);
     foResponse.setContentEncoding("utf-8");
     foResponse.setHeaderForKey("text/xml", "Content-Type");
     foResponse.setTextCoder
@@ -342,21 +342,21 @@ public class WEApplyFOP extends WODynamicElement {
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
     foResponse.appendContentString(
         "<root xmlns=\"http://www.w3.org/1999/XSL/Format\">");
-    
+
     this.template.appendToResponse(foResponse, _ctx);
-    
+
     foResponse.appendContentString("</root>");
-    
+
     return foResponse.contentString();
   }
-  
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
-    WODynamicElement.appendBindingsToDescription(_d, 
+
+    WODynamicElement.appendBindingsToDescription(_d,
         "data",        this.data,
         "mimeType",    this.mimeType,
         "disposition", this.disposition,
@@ -365,5 +365,5 @@ public class WEApplyFOP extends WODynamicElement {
         "error",       this.error
     );
   }
-  
+
 }

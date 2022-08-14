@@ -24,89 +24,90 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.getobjects.appserver.publisher.IGoCallable;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoObject;
-import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TGoTraversalPath extends WOTestWithFullEnvironment {
-  
+
   /* root => level1 => level2 => method */
-  @SuppressWarnings("synthetic-access")
   static Object testTree =
     new MyJoObject("level1",
         new MyJoObject("level2",
             new MyJoObject("method",
-                new MyJoMethod()))); 
+                new MyJoMethod())));
 
+  @Override
   @Before
   public void setUp() {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
   }
-  
+
   /* tests */
-  
+
   @Test public void testSimpleLookup() {
-    final GoTraversalPath path = 
+    final GoTraversalPath path =
       new GoTraversalPath( new String[] { "level1" }, testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
-    
+
     path.traverse();
     assertNull("a traversal error occurred: " + path.lastException(),
                path.lastException());
-    
+
     assertNotNull("got no result",        path.resultObject());
     assertNotNull("got no client object", path.clientObject());
     assertEquals("result and clientObject are not equal",
                  path.resultObject(), path.clientObject());
   }
-  
+
   @Test public void testEmptyTraversalPath() {
     final GoTraversalPath path =
       new GoTraversalPath( new String[0], testTree, this.context );
     assertNotNull("got no traversal path object for empty path", path);
-    
+
     path.traverse();
     assertNull("a traversal error occurred: " + path.lastException(),
                path.lastException());
-    
-    assertEquals("empty lookup path didn't return root", 
+
+    assertEquals("empty lookup path didn't return root",
                  testTree, path.resultObject());
-    assertEquals("empty lookup path didn't return root as clientObject", 
+    assertEquals("empty lookup path didn't return root as clientObject",
                  testTree, path.clientObject());
   }
-  
+
   @Test public void testNullRoot() {
-    final GoTraversalPath path = 
+    final GoTraversalPath path =
       new GoTraversalPath( new String[] { "level1" }, null, this.context );
     assertNotNull("got no traversal path object for path", path);
-    
+
     path.traverse();
     assertNull("a traversal error occurred: " + path.lastException(),
                path.lastException());
-    
+
     assertNull("got a result despite null root",        path.resultObject());
     assertNull("got a client object despite null root", path.clientObject());
   }
-   
+
   @Test public void testMethodLookup() {
-    final GoTraversalPath path = 
+    final GoTraversalPath path =
       new GoTraversalPath( new String[] { "level1", "level2", "method" },
                            testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
-    
+
     path.traverse();
     assertNull("a traversal error occurred: " + path.lastException(),
                path.lastException());
-    
+
     assertNotNull("got no result",        path.resultObject());
     assertNotNull("got no client object", path.clientObject());
     assertEquals("result and clientObject are equal despite method in path",
@@ -114,75 +115,78 @@ public class TGoTraversalPath extends WOTestWithFullEnvironment {
   }
 
   @Test public void testMethodLookupWithPathInfo() {
-    final GoTraversalPath path = 
+    final GoTraversalPath path =
       new GoTraversalPath( new String[] {
                              "level1", "level2", "method", "1", "2"
                            },
                            testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
-    
+
     path.traverse();
     assertNull("a traversal error occurred: " + path.lastException(),
                path.lastException());
-    
+
     assertNotNull("got no result",        path.resultObject());
     assertNotNull("got no client object", path.clientObject());
     assertEquals("result and clientObject are equal despite method in path",
                  path.resultObject(), path.clientObject());
-    
-    String[] pathInfo = path.pathInfo();
+
+    final String[] pathInfo = path.pathInfo();
     assertNotNull("missing path info ...", pathInfo);
-    assertEquals("expected path info length does not match", 
+    assertEquals("expected path info length does not match",
                  2, pathInfo.length);
-    assertEquals("first path info value does not match", 
+    assertEquals("first path info value does not match",
                  "1", pathInfo[0]);
-    assertEquals("second path info value does not match", 
+    assertEquals("second path info value does not match",
                  "2", pathInfo[1]);
   }
-  
+
   @Test public void testLookupMissing() {
-    final GoTraversalPath path = 
+    final GoTraversalPath path =
       new GoTraversalPath( new String[] { "missinglink.html" },
                            testTree, this.context );
     assertNotNull("got no traversal path object for path", path);
-    
+
     path.traverse();
     assertNull("a traversal error occurred: " + path.lastException(),
                path.lastException());
-    
+
     assertNull("got a result",        path.resultObject());
     assertNull("got a client object", path.clientObject());
   }
-  
+
   /* objects to traverse */
-  
+
   private static class MyJoObject implements IGoObject {
-    
-    private String name;
-    private Object child;
-    
+
+    private final String name;
+    private final Object child;
+
     public MyJoObject(final String _name, final Object _child) {
       this.name  = _name;
       this.child = _child;
     }
-    
-    public Object lookupName(String _name, IGoContext _ctx, boolean _aquire) {
+
+    @Override
+    public Object lookupName(final String _name, final IGoContext _ctx, final boolean _aquire) {
       if (this.name.equals(_name))
         return this.child;
-      
+
       return null;
     }
   }
 
   private static class MyJoMethod implements IGoCallable {
 
+    @Override
     public Object callInContext(final Object _object, final IGoContext _ctx) {
       return this;
     }
 
-    public boolean isCallableInContext(IGoContext _ctx) {
+    @Override
+    public boolean isCallableInContext(final IGoContext _ctx) {
       return true;
     }
-    
+
   }
 }

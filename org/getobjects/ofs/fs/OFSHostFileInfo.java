@@ -33,71 +33,82 @@ import org.getobjects.foundation.UString;
  * Just a wrapper around java.io.File.
  */
 public class OFSHostFileInfo extends NSObject implements IOFSFileInfo {
-  
+
   protected String   pathAsString;
   protected String[] path;
   protected File     file;
-  
+
   public OFSHostFileInfo(final String[] _path, final File _file) {
     this.path = _path;
     this.file = _file.getAbsoluteFile();
   }
-  
-  
+
+
   /* accessors */
-  
+
   public File getFile() {
     return this.file;
   }
-  
+
+  @Override
   public String[] getPath() {
     return this.path;
   }
 
+  @Override
   public String getName() {
     return (this.path == null || this.path.length == 0)
       ? null /* root */
       : this.path[this.path.length - 1];
   }
-  
+
   public boolean isRoot() {
     return this.path == null || this.path.length == 0;
   }
-  
+
+  @Override
   public boolean isDirectory() {
     return this.file.isDirectory();
   }
 
+  @Override
   public boolean isFile() {
     return this.file.isFile();
   }
 
+  @Override
   public long lastModified() {
     return this.file.lastModified();
   }
-  
+
+  @Override
   public long length() {
     return this.file.length();
   }
-  
+
+  @Override
   public boolean exists() {
     return this.file.exists();
   }
+  @Override
   public boolean canRead() {
     return this.file.canRead();
   }
+  @Override
   public boolean canWrite() {
     return this.file.canWrite();
   }
-  
+
+  @Override
   public URL toURL() {
     try { return this.file.toURI().toURL(); }
-    catch (MalformedURLException e) { };
+    catch (final MalformedURLException e) { }
     return null;
   }
-  
+
   /* OFS support */
-  
+
+  @Override
   public String pathExtension() {
     /* Note: a specialty is that this in fact reports a path extension for
      *       root! (/). This is required for OFS which maps path extensions
@@ -106,17 +117,17 @@ public class OFSHostFileInfo extends NSObject implements IOFSFileInfo {
     String fn = (this.path == null || this.path.length == 0)
       ? null /* root */
       : this.path[this.path.length - 1];
-    
+
     if (fn == null)
       fn = this.file.getName(); /* retrieve real name of root path */
-    
-    int idx = fn.indexOf('.', 1 /* skip first char for dotfiles */);
+
+    final int idx = fn.indexOf('.', 1 /* skip first char for dotfiles */);
     return idx > 0 ? fn.substring(idx + 1) : null /* no pathext */;
   }
-  
-  
+
+
   /* utility, compat */
-  
+
   public String pathAsString() {
     if (this.pathAsString == null) {
       this.pathAsString = (this.path == null || this.path.length == 0)
@@ -125,48 +136,48 @@ public class OFSHostFileInfo extends NSObject implements IOFSFileInfo {
     }
     return this.pathAsString;
   }
-  
-  
+
+
   /* KVC */
 
   public Object valueForFileSystemKey(final String _key) {
     if (this.file == null)
       return null;
-    
+
     if ("NSFileType".equals(_key))
-      return this.isDirectory() ? "NSFileTypeDirectory" : "NSFileTypeRegular";
-    
+      return isDirectory() ? "NSFileTypeDirectory" : "NSFileTypeRegular";
+
     if ("NSFileName".equals(_key))
-      return this.getName();
-    
+      return getName();
+
     if ("NSFilePath".equals(_key))
-      return this.pathAsString();
-    
+      return pathAsString();
+
     if ("NSFileModificationDate".equals(_key))
-      return this.lastModified();
-    
+      return lastModified();
+
     if ("NSFileSize".equals(_key))
-      return this.file != null ? new Long(this.length()) : null;
-   
+      return this.file != null ? Long.valueOf(length()) : null;
+
     return null;
   }
-  
-  
+
+
   /* equality */
-  
+
   @Override
   public boolean equals(final Object _obj) {
     if (_obj == this) return true;
     if (!(_obj instanceof OFSHostFileInfo)) return false;
-    
-    OFSHostFileInfo oinfo = (OFSHostFileInfo)_obj;
-    
+
+    final OFSHostFileInfo oinfo = (OFSHostFileInfo)_obj;
+
     /* Only the File provides a global context, the path-array is only unique
      * within a filemanager!
      */
     if (this.file == oinfo.file)
       return true;
-    
+
     return this.file.equals(oinfo.file);
   }
 
@@ -174,8 +185,8 @@ public class OFSHostFileInfo extends NSObject implements IOFSFileInfo {
   public int hashCode() {
     if (this.path == null)
       return 0;
-    
-    int len = this.path.length;
+
+    final int len = this.path.length;
     switch (len) {
       case 0:
         return 0;
@@ -186,21 +197,21 @@ public class OFSHostFileInfo extends NSObject implements IOFSFileInfo {
         return this.path[len - 2].hashCode() + this.path[len - 1].hashCode();
     }
   }
-  
-  
+
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     _d.append(" " + this.file.getAbsolutePath());
-    
+
     if (this.path == null || this.path.length == 0)
       _d.append(" ROOT");
     else {
       _d.append(" contained=");
-      _d.append(this.pathAsString());
+      _d.append(pathAsString());
     }
   }
 

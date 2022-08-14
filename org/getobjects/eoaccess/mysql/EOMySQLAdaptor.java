@@ -31,11 +31,11 @@ import org.getobjects.eoaccess.EOModel;
 public class EOMySQLAdaptor extends EOAdaptor {
 
   public EOMySQLAdaptor
-    (String _url, Properties _connectionProperties, EOModel _model)
+    (final String _url, final Properties _connectionProperties, final EOModel _model)
   {
     super(_url, _connectionProperties, _model);
   }
-  
+
   /* JDBC driver */
 
   @Override
@@ -43,29 +43,29 @@ public class EOMySQLAdaptor extends EOAdaptor {
     try {
       // The newInstance() call is a work around for some
       // broken Java implementations
-      Class.forName("com.mysql.jdbc.Driver").newInstance();
+      Class.forName("com.mysql.jdbc.Driver").getDeclaredConstructor().newInstance();
       return true;
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return false;
     }
   }
-  
+
   /* adaptor specific objects */
 
   @Override
-  protected EOAdaptorChannel primaryCreateChannelForConnection(Connection _c) {
+  protected EOAdaptorChannel primaryCreateChannelForConnection(final Connection _c) {
     /* can be overridden by subclasses to provide specific channels */
     return new EOMySQLChannel(this, _c);
   }
-  
+
   /* quoting SQL expressions */
 
   @Override
   public Class defaultExpressionClass() {
     return EOMySQLExpression.class;
   }
-  
+
   @Override
   public String stringByQuotingIdentifier(final String _id) {
     /* MySQL uses back-quotes for quoting identifiers */

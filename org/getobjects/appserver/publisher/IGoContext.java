@@ -29,14 +29,15 @@ package org.getobjects.appserver.publisher;
 public interface IGoContext {
 
   public GoClassRegistry   goClassRegistry();
-  
+
   /**
    * @deprecated Use {@link #goTraversalPath()} instead
    */
+  @Deprecated
   public GoTraversalPath   joTraversalPath();
 
   public GoTraversalPath   goTraversalPath();
   public Object            clientObject();
-  
+
   public IGoUser activeUser();
 }

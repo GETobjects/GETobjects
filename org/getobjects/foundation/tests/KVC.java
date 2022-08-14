@@ -36,7 +36,7 @@ public class KVC {
     public boolean primitiveTypeBoolean = false;
     public Boolean classBoolean         = Boolean.FALSE;
 
-    public void setColor(int v) {
+    public void setColor(final int v) {
       this.color = v;
     }
 
@@ -44,7 +44,7 @@ public class KVC {
       return this.color;
     }
 
-    public void setClassBoolean(Boolean _tf) {
+    public void setClassBoolean(final Boolean _tf) {
       this.classBoolean = _tf;
     }
 
@@ -68,13 +68,13 @@ public class KVC {
   @Test
   public void testValueForKey() {
     assertEquals(NSKeyValueCoding.Utility.valueForKey(this.o, "color"), 5);
-    
+
     assertEquals(NSKeyValueCoding.Utility.valueForKey(null, "key"), null);
   }
 
   @Test
   public void testTakeValueForKey() {
-    NSKeyValueCoding.Utility.takeValueForKey(this.o, new Integer(10), "color");
+    NSKeyValueCoding.Utility.takeValueForKey(this.o, Integer.valueOf(10), "color");
     assertEquals(NSKeyValueCoding.Utility.valueForKey(this.o, "color"), 10);
 
     NSKeyValueCoding.Utility.takeValueForKey(null, "a", "key");
@@ -90,19 +90,19 @@ public class KVC {
     assertEquals(NSKeyValueCodingAdditions.Utility
         .valueForKeyPath(null, "testPath.color"), null);
   }
-  
+
   @Test
   public void testTakeValueForKeyPath() {
     NSKeyValueCodingAdditions.Utility.takeValueForKeyPath
-      (this.o, new Integer(10), "testPath.color");
-    
+      (this.o, Integer.valueOf(10), "testPath.color");
+
     assertEquals(NSKeyValueCodingAdditions.Utility.valueForKeyPath
       (this.o, "color"), 10);
 
     // check against null
-    NSKeyValueCodingAdditions.Utility.takeValueForKeyPath(null, "a", "key");   
+    NSKeyValueCodingAdditions.Utility.takeValueForKeyPath(null, "a", "key");
   }
-  
+
   @Test
   public void testTakeValueForKeyWithStringArgumentForPrimitiveBooleanType() {
     NSKeyValueCoding.Utility.takeValueForKey(this.o, "YES",
@@ -118,7 +118,7 @@ public class KVC {
     assertEquals(NSKeyValueCoding.Utility.
         valueForKey(this.o, "primitiveTypeBoolean"), true);
   }
-  
+
   @Test
   public void testTakeValueForKeyWithStringArgumentForClassBoolean() {
     NSKeyValueCoding.Utility.takeValueForKey(this.o, "YES",

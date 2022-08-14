@@ -23,10 +23,10 @@ package org.getobjects.ofs.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.getobjects.appserver.publisher.IGoContext;
-import org.getobjects.appserver.publisher.IGoUser;
 import org.getobjects.appserver.publisher.GoClassRegistry;
 import org.getobjects.appserver.publisher.GoTraversalPath;
+import org.getobjects.appserver.publisher.IGoContext;
+import org.getobjects.appserver.publisher.IGoUser;
 import org.getobjects.foundation.INSExtraVariables;
 import org.getobjects.foundation.NSKeyValueCoding;
 import org.getobjects.foundation.NSObject;
@@ -41,34 +41,37 @@ public class GoConfigContext extends NSObject
 {
   /* extra attributes (used when KVC does not resolve to a key) */
   protected Map<String,Object> extraAttributes;
-  
+
   protected IGoContext context;
-  
+
   public GoConfigContext(final IGoContext _parentContext) {
     this.context = _parentContext;
   }
-  public GoConfigContext(final IGoContext _parentContext, Object... _args) {
+  public GoConfigContext(final IGoContext _parentContext, final Object... _args) {
     this(_parentContext);
     if (_args != null) {
       for (int i = 0; i + 1 < _args.length; i += 2)
-        this.setObjectForKey(_args[i + 1], (String)_args[i]);
+        setObjectForKey(_args[i + 1], (String)_args[i]);
     }
-  }  
-  
+  }
+
   /* accessors */
-  
+
   public IGoContext parentContext() {
     return this.context;
   }
 
+  @Override
   public IGoUser activeUser() {
     return this.context != null ? this.context.activeUser() : null;
   }
 
+  @Override
   public Object clientObject() {
     return this.context != null ? this.context.clientObject() : null;
   }
 
+  @Override
   public GoClassRegistry goClassRegistry() {
     return this.context != null ? this.context.goClassRegistry() : null;
   }
@@ -76,70 +79,77 @@ public class GoConfigContext extends NSObject
   /**
    * @deprecated Use {@link #goTraversalPath()} instead
    */
+  @Override
+  @Deprecated
   public GoTraversalPath joTraversalPath() {
     return goTraversalPath();
   }
+  @Override
   public GoTraversalPath goTraversalPath() {
     return this.context != null ? this.context.goTraversalPath() : null;
   }
 
   /* INSExtraVariables */
-  
-  public void setObjectForKey(Object _value, String _key) {
+
+  @Override
+  public void setObjectForKey(final Object _value, final String _key) {
     if (_value == null) {
-      this.removeObjectForKey(_key);
+      removeObjectForKey(_key);
       return;
     }
 
     if (this.extraAttributes == null)
-      this.extraAttributes = new HashMap<String,Object>(16);
-    
+      this.extraAttributes = new HashMap<>(16);
+
     this.extraAttributes.put(_key, _value);
   }
-  
-  public void removeObjectForKey(String _key) {
+
+  @Override
+  public void removeObjectForKey(final String _key) {
     if (this.extraAttributes == null)
       return;
-    
+
     this.extraAttributes.remove(_key);
   }
-  
-  public Object objectForKey(String _key) {
+
+  @Override
+  public Object objectForKey(final String _key) {
     if (_key == null || this.extraAttributes == null)
       return null;
-    
+
     return this.extraAttributes.get(_key);
   }
-  
+
+  @Override
   public Map<String,Object> variableDictionary() {
     return this.extraAttributes;
   }
-  
-  
+
+
   /* KVC */
-  
+
   @Override
-  public Object handleQueryWithUnboundKey(String _key) {
+  public Object handleQueryWithUnboundKey(final String _key) {
     if (this.extraAttributes.containsKey(_key))
       return this.extraAttributes.get(_key);
-    
+
     if (this.context instanceof NSKeyValueCoding)
       return ((NSKeyValueCoding)this.context).valueForKey(_key);
-    
+
     return null;
   }
   @Override
-  public void handleTakeValueForUnboundKey(Object _value, String _key) {
-    this.setObjectForKey(_value, _key);
+  public void handleTakeValueForUnboundKey(final Object _value, final String _key) {
+    setObjectForKey(_value, _key);
   }
-  
-  
+
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.context == null) {
       _d.append(" ctx=");
       _d.append(this.context);

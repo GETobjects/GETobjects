@@ -23,6 +23,7 @@ package org.getobjects.servlets;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class WOServletAdaptor extends HttpServlet {
   //       possibly this must be a weak reference so that
   //       the app goes away if all servlets went away.
   protected static Map<String,WOApplication> appRegistry =
-    new ConcurrentHashMap<String, WOApplication>(4);
+    new ConcurrentHashMap<>(4);
 
   /* Note: remember that the ivars are thread-shared (= do not modify!) */
   private WOApplication WOApp;
@@ -101,7 +102,7 @@ public class WOServletAdaptor extends HttpServlet {
     try {
       cl = Class.forName(_appClassName);
     }
-    catch (ClassNotFoundException cnfe) {
+    catch (final ClassNotFoundException cnfe) {
       log.fatal("did not find WOApp class: " + _appClassName);
       return;
     }
@@ -109,16 +110,28 @@ public class WOServletAdaptor extends HttpServlet {
     /* instantiate application class */
 
     try {
-      app = (WOApplication)cl.newInstance();
+      app = (WOApplication)cl.getDeclaredConstructor().newInstance();
       app._setName(_appName);
       if (_properties != null)
         app._setVolatileProperties(_properties);
     }
-    catch (InstantiationException e) {
+    catch (final InstantiationException e) {
       log.fatal("could not instantiate WOApplication class: " + cl, e);
     }
-    catch (IllegalAccessException e) {
+    catch (final IllegalAccessException e) {
       log.fatal("could not access WOApplication class: " + cl, e);
+    }
+    catch (final IllegalArgumentException e) {
+      log.fatal("could not instantiate WOApplication class: " + cl, e);
+    }
+    catch (final InvocationTargetException e) {
+      log.fatal("could not instantiate WOApplication class: " + cl, e);
+    }
+    catch (final NoSuchMethodException e) {
+      log.fatal("could not instantiate WOApplication class: " + cl, e);
+    }
+    catch (final SecurityException e) {
+      e.printStackTrace();
     }
     if (app == null) {
       log.fatal("did not find WOApp class: " + _appClassName);
@@ -128,7 +141,7 @@ public class WOServletAdaptor extends HttpServlet {
     try {
       app.init();
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       log.fatal("error initializing WOApplication: " + cl, e);
     }
 
@@ -199,7 +212,7 @@ public class WOServletAdaptor extends HttpServlet {
       try {
         contentLen = Integer.parseInt(s);
       }
-      catch (NumberFormatException e) {
+      catch (final NumberFormatException e) {
         log.error("failed to parse given content-length: " + s, e);
         contentLen = -1;
       }
@@ -278,17 +291,17 @@ public class WOServletAdaptor extends HttpServlet {
       log.error("Cannot run service, missing application object!");
       return;
     }
-    
+
     try {
       /* Changed in Jetty 6.1.12/6.1.14 (JETTY-633). Default encoding is now
        * Latin-1, which breaks Safari/Firefox, which submit forms in UTF-8.
        * (I think if the page was delivered in UTF-8)
-       * (w/o tagging the charset in the content-type?!) 
+       * (w/o tagging the charset in the content-type?!)
        */
       if (_rq.getCharacterEncoding() == null)
         _rq.setCharacterEncoding("UTF-8");
     }
-    catch (UnsupportedEncodingException e) {
+    catch (final UnsupportedEncodingException e) {
       log.error("UTF-8 is unsupported encoding?!", e);
       e.printStackTrace();
     }
@@ -305,12 +318,12 @@ public class WOServletAdaptor extends HttpServlet {
         r.flush();
 
         if (!r.isStreaming())
-          this.sendWOResponseToServletResponse(r, _r);
+          sendWOResponseToServletResponse(r, _r);
       }
       else
         log.debug("  got no response.");
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       log.debug("dispatch exception", e);
       e.printStackTrace();
     }
@@ -356,12 +369,12 @@ public class WOServletAdaptor extends HttpServlet {
     // Jetty: org.mortbay.jetty.servlet.ServletHolder$Config@114024
     super.init(_cfg);
 
-    String an = this.valueFromServletConfig(_cfg, "WOAppName");
-    String ac = this.valueFromServletConfig(_cfg, "WOAppClass");
+    String an = valueFromServletConfig(_cfg, "WOAppName");
+    String ac = valueFromServletConfig(_cfg, "WOAppClass");
     if (ac == null) ac = an;
     if (an == null && ac != null) {
       /* if only the class is set, we use the shortname of the class */
-      int dotidx = ac.lastIndexOf('.');
+      final int dotidx = ac.lastIndexOf('.');
       an = dotidx < 1 ? ac : ac.substring(dotidx + 1);
     }
 
@@ -369,7 +382,7 @@ public class WOServletAdaptor extends HttpServlet {
       log.warn("no WOAppName specified in servlet context: " + _cfg);
       an = WOApplication.class.getName();
     }
-    
+
     /* Construct properties for the volatile "domain" from servlet init
      * parameters and context init parameters and attributes.
      * It's probably best to have a real UserDefaults concept, but for the
@@ -403,7 +416,7 @@ public class WOServletAdaptor extends HttpServlet {
       }
     }
 
-    this.initApplicationWithName(an, ac, properties);
+    initApplicationWithName(an, ac, properties);
   }
 
   @Override
@@ -411,7 +424,7 @@ public class WOServletAdaptor extends HttpServlet {
     (final HttpServletRequest _rq, final HttpServletResponse _r)
     throws ServletException, IOException
   {
-    this.woService(_rq, _r);
+    woService(_rq, _r);
   }
 
   @Override
@@ -423,15 +436,15 @@ public class WOServletAdaptor extends HttpServlet {
      *       processing on the form values. So we let it do that instead
      *       of calling woService directly in our service() method.
      */
-    this.woService(_rq, _r);
+    woService(_rq, _r);
   }
-  
+
   @Override
   protected void doPut
     (final HttpServletRequest _rq, final HttpServletResponse _r)
     throws ServletException, IOException
   {
-    this.woService(_rq, _r);
+    woService(_rq, _r);
   }
 
   @Override
@@ -439,7 +452,7 @@ public class WOServletAdaptor extends HttpServlet {
     (final HttpServletRequest _rq, final HttpServletResponse _r)
     throws ServletException, IOException
   {
-    this.woService(_rq, _r);
+    woService(_rq, _r);
   }
 
   protected static String[] stdMethods = { "GET", "POST", "PUT" };
@@ -470,7 +483,7 @@ public class WOServletAdaptor extends HttpServlet {
     }
     else {
       log.debug("service custom method: " + _rq.getMethod());
-      this.woService(_rq, _r);
+      woService(_rq, _r);
     }
     log.debug("done service.");
   }

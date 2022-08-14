@@ -31,21 +31,21 @@ import org.getobjects.eoaccess.EOModel;
 public class EOPostgreSQLAdaptor extends EOAdaptor {
 
   public EOPostgreSQLAdaptor
-    (String _url, Properties _connectionProperties, EOModel _model)
+    (final String _url, final Properties _connectionProperties, final EOModel _model)
   {
     super(_url, _connectionProperties, _model);
   }
-  
+
   /* load JDBC driver */
 
   public static boolean primaryLoadDriver() {
     try {
       // The newInstance() call is a work around for some
       // broken Java implementations
-      Class.forName("org.postgresql.Driver").newInstance();
+      Class.forName("org.postgresql.Driver").getDeclaredConstructor().newInstance();
       return true;
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return false;
     }
   }
@@ -54,15 +54,15 @@ public class EOPostgreSQLAdaptor extends EOAdaptor {
   protected boolean loadDriver() {
     return primaryLoadDriver();
   }
-  
+
   /* custom channels */
 
   @Override
-  protected EOAdaptorChannel primaryCreateChannelForConnection(Connection _c) {
+  protected EOAdaptorChannel primaryCreateChannelForConnection(final Connection _c) {
     /* can be overridden by subclasses to provide specific channels */
     return new EOPostgreSQLChannel(this, _c);
   }
-  
+
   /* quoting SQL expressions */
 
   @Override

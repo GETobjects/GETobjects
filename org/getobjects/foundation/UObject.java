@@ -52,23 +52,23 @@ public class UObject extends NSObject {
    * careful with cyclic datastructures!
    * <p>
    * Eg if the EOAdaptor returns a
-   * 
+   *
    * <pre>
    * List&lt;Map&lt;String, Object&gt;&gt; results = adaptor.performSQL()
    * </pre>
-   * 
+   *
    * but you know that there is only a string contained, eg:
-   * 
+   *
    * <pre>
    * [ { comment = "Hello World!"; } ]
    * </pre>
-   * 
+   *
    * you can get the value by using the function:
-   * 
+   *
    * <pre>
    * String comment = UMap.extractString(adaptor.performSQL());
    * </pre>
-   * 
+   *
    * Neat, right? ;-)
    * <p>
    * What it does:
@@ -102,21 +102,21 @@ public class UObject extends NSObject {
       return extractString(((Map) _object).values());
 
     if (_object instanceof List) {
-      List l = (List) _object;
+      final List l = (List) _object;
       return l.size() > 0 ? extractString(l.get(0)) : null;
     }
 
     if (_object instanceof Collection) {
-      Iterator it = ((Collection) _object).iterator();
+      final Iterator it = ((Collection) _object).iterator();
       return it.hasNext() ? extractString(it.next()) : null;
     }
     if (_object instanceof Iterator) {
-      Iterator it = (Iterator) _object;
+      final Iterator it = (Iterator) _object;
       return it.hasNext() ? extractString(it.next()) : null;
     }
 
     if (_object instanceof String[]) {
-      String[] a = (String[]) _object;
+      final String[] a = (String[]) _object;
       return a.length > 0 ? a[0] : null;
     }
 
@@ -147,25 +147,25 @@ public class UObject extends NSObject {
       return extractValue(((Map) _object).values());
 
     if (_object instanceof List) {
-      List l = (List) _object;
+      final List l = (List) _object;
       return l.size() > 0 ? extractValue(l.get(0)) : null;
     }
 
     if (_object instanceof Collection) {
-      Iterator it = ((Collection) _object).iterator();
+      final Iterator it = ((Collection) _object).iterator();
       return it.hasNext() ? extractValue(it.next()) : null;
     }
     if (_object instanceof Iterator) {
-      Iterator it = (Iterator) _object;
+      final Iterator it = (Iterator) _object;
       return it.hasNext() ? extractValue(it.next()) : null;
     }
 
     if (_object instanceof String[]) {
-      String[] a = (String[]) _object;
+      final String[] a = (String[]) _object;
       return a.length > 0 ? a[0] : null;
     }
     if (_object instanceof Object[]) {
-      Object[] a = (Object[]) _object;
+      final Object[] a = (Object[]) _object;
       return a.length > 0 ? a[0] : null;
     }
 
@@ -192,8 +192,8 @@ public class UObject extends NSObject {
       if (v.equals(""))
         return false;
 
-      String s = (String) v;
-      char c0 = s.charAt(0);
+      final String s = (String) v;
+      final char c0 = s.charAt(0);
       if (c0 == 'N' && s.equals("NO"))
         return false;
       if (c0 == 'f' && s.equals("false"))
@@ -232,7 +232,7 @@ public class UObject extends NSObject {
    * <li>for all other objects, intValue() is called with the toString()
    * representation of the object.
    * </ul>
-   * 
+   *
    * @param v - some value object, can be null
    * @return the int value represented by the object
    */
@@ -245,7 +245,7 @@ public class UObject extends NSObject {
 
     if (v instanceof String) {
       /* Note: we return 0 for empty strings */
-      String s = (String) v;
+      final String s = (String) v;
       if (s.length() == 0)
         return 0;
 
@@ -254,7 +254,7 @@ public class UObject extends NSObject {
           return new BigDecimal(s).intValue();
 
         return Integer.parseInt(s);
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         return 0;
       }
     }
@@ -273,7 +273,7 @@ public class UObject extends NSObject {
    * <li>for all other objects, longValue() is called with the toString()
    * representation of the object.
    * </ul>
-   * 
+   *
    * @param v - some value object, can be null
    * @return the int value represented by the object
    */
@@ -286,7 +286,7 @@ public class UObject extends NSObject {
 
     if (v instanceof String) {
       /* Note: we return 0 for empty strings */
-      String s = (String) v;
+      final String s = (String) v;
       if (s.length() == 0)
         return 0;
 
@@ -295,7 +295,7 @@ public class UObject extends NSObject {
           return new BigDecimal(s).longValue();
 
         return Long.parseLong(s);
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         return 0;
       }
     }
@@ -306,7 +306,7 @@ public class UObject extends NSObject {
   /**
    * Returns an 'Integer' object if the value in v is small enough to fit,
    * otherwise a 'Long' object. Note: this downsizes Long objects!
-   * 
+   *
    * @param v - some value, usually a Number
    * @return null, an Integer or a Long object
    */
@@ -318,21 +318,21 @@ public class UObject extends NSObject {
       return (Number) v;
 
     if (v instanceof Number) {
-      long lv = ((Number) v).longValue();
-      return (lv >= Integer.MIN_VALUE && lv <= Integer.MAX_VALUE) ? new Integer(
-          (int) lv)
-          : new Long(lv);
+      final long lv = ((Number) v).longValue();
+      return (lv >= Integer.MIN_VALUE && lv <= Integer.MAX_VALUE)
+          ? Integer.valueOf((int) lv)
+          : Long.valueOf(lv);
     }
 
     if (v instanceof String) {
-      String s = ((String) v).trim();
+      final String s = ((String) v).trim();
       if (s.length() == 0)
         return null;
 
-      long lv = longValue(s);
-      return (lv >= Integer.MIN_VALUE && lv <= Integer.MAX_VALUE) ? new Integer(
-          (int) lv)
-          : new Long(lv);
+      final long lv = longValue(s);
+      return (lv >= Integer.MIN_VALUE && lv <= Integer.MAX_VALUE)
+          ? Integer.valueOf((int) lv)
+          : Long.valueOf(lv);
     }
 
     return intOrLongValue(v.toString());
@@ -341,7 +341,7 @@ public class UObject extends NSObject {
   /**
    * Returns an 'Integer' object if the value in v is small enough to fit,
    * otherwise a 'Long' object. Note: this downsizes Long objects!
-   * 
+   *
    * @param _objs - some values, usually a List&lt;Number&gt;
    * @return null, or a List of Integer or Long objects
    */
@@ -349,10 +349,10 @@ public class UObject extends NSObject {
     if (_objs == null)
       return null;
 
-    ArrayList<Number> nums = new ArrayList<Number>(_objs.size());
+    final ArrayList<Number> nums = new ArrayList<>(_objs.size());
 
-    for (Object o : _objs) {
-      Number n = intOrLongValue(o);
+    for (final Object o : _objs) {
+      final Number n = intOrLongValue(o);
 
       if (n != o && n == null) // could not convert
         return null;
@@ -366,7 +366,7 @@ public class UObject extends NSObject {
    * Returns true if the given object represents a discrete number, that is, a
    * number w/o digits after the decimal point. (TBD: is discrete the correct
    * word? I don't remember ;-))
-   * 
+   *
    * @param v - some object, usually a Number
    * @return true if the object is a discrete number, eg Integer or Long
    */
@@ -385,7 +385,7 @@ public class UObject extends NSObject {
   /**
    * Returns a String representing the object. This has special processing for
    * arrays, which are rendered using the stringValueForArray method.
-   * 
+   *
    * @param _value - value to convert to a String
    * @return a String representing the object _value
    */
@@ -406,10 +406,10 @@ public class UObject extends NSObject {
     if (_array == null)
       return null;
 
-    StringBuilder sb = new StringBuilder(_array.length * 16);
+    final StringBuilder sb = new StringBuilder(_array.length * 16);
     sb.append("( ");
     boolean isFirst = true;
-    for (Object o : _array) {
+    for (final Object o : _array) {
       String s = UObject.stringValue(o);
       if (s == null)
         s = "[null]";
@@ -434,9 +434,9 @@ public class UObject extends NSObject {
    * </ul>
    * All other objects are checked for a 'dateValue' method, which is then
    * called.
-   * 
+   *
    * @param _v - some object
-   * 
+   *
    * @return a java.util.Date or null
    */
   public static Date dateValue(final Object _v) {
@@ -454,12 +454,12 @@ public class UObject extends NSObject {
    * </ul>
    * All other objects are checked for a 'dateValue' method, which is then
    * called.
-   * 
+   *
    * @param _v - some object
    * @param _style the given formatting style. For example, SHORT for "M/d/yy"
    *          in the US locale.
    * @param _locale the given locale.
-   * 
+   *
    * @return a java.util.Date or null
    */
   public static Date dateValue(final Object _v, final int _style,
@@ -474,7 +474,7 @@ public class UObject extends NSObject {
       return ((Calendar) _v).getTime();
 
     if (_v instanceof String) {
-      String s = ((String) _v).trim();
+      final String s = ((String) _v).trim();
       if (s.length() == 0)
         return null;
 
@@ -484,10 +484,10 @@ public class UObject extends NSObject {
         return null;
       }
 
-      DateFormat df = DateFormat.getDateInstance(_style, _locale);
+      final DateFormat df = DateFormat.getDateInstance(_style, _locale);
       try {
         return df.parse(s);
-      } catch (ParseException _e) {
+      } catch (final ParseException _e) {
         _e.printStackTrace();
         log.warn("could not parse string as datevalue: '" + _v + "'");
         return null;
@@ -500,9 +500,9 @@ public class UObject extends NSObject {
     /* other object */
 
     try {
-      Method m = _v.getClass().getMethod("dateValue");
+      final Method m = _v.getClass().getMethod("dateValue");
       if (m != null) {
-        Object v = m.invoke(_v);
+        final Object v = m.invoke(_v);
         if (v == null)
           return null;
         if (v != _v)
@@ -510,11 +510,11 @@ public class UObject extends NSObject {
         log.warn("object returned itself in its dateValue() method!: " + v);
         return null;
       }
-    } catch (SecurityException e) {
-    } catch (NoSuchMethodException e) {
-    } catch (IllegalArgumentException e) {
-    } catch (IllegalAccessException e) {
-    } catch (InvocationTargetException e) {
+    } catch (final SecurityException e) {
+    } catch (final NoSuchMethodException e) {
+    } catch (final IllegalArgumentException e) {
+    } catch (final IllegalAccessException e) {
+    } catch (final InvocationTargetException e) {
     }
 
     // TBD: use log
@@ -531,7 +531,7 @@ public class UObject extends NSObject {
    * <li>Strings with only whitespace are consider empty (trim())
    * <li>Empty arrays are considered empty
    * </ul>
-   * 
+   *
    * @param _v - an arbitrary object
    * @return true if the object is considered 'empty', false if not
    */
