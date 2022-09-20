@@ -86,10 +86,11 @@ public class NSJavaScriptWriter extends NSObject {
   
   /* encoding */
   
-  public static final String[] JSEscapeList = 
-    { "\\", "\\\\", "'", "\'", "\"", "\\" };
   
   public void appendIdentifier(String _id) {
+
+  public static final String[] JSEscapeList =
+    { "\\", "\\\\", "'", "\'", "\"", "\\\"" };
     this.js.append(_id);
   }
   public void appendIdentifier(String _object, String _id) {
