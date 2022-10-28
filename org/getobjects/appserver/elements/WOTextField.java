@@ -27,8 +27,8 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOElement;
 import org.getobjects.appserver.core.WOErrorReport;
-import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.core.WOErrorReport.WOErrorItem;
+import org.getobjects.appserver.core.WOResponse;
 
 /**
  * WOTextField
@@ -40,10 +40,10 @@ import org.getobjects.appserver.core.WOErrorReport.WOErrorItem;
  *   name  = "firstname";
  *   value = firstname;
  * }</pre>
- * 
+ *
  * Renders:<pre>
  *   &lt;input type="text" name="firstname" value="Donald" /&gt;</pre>
- * 
+ *
  * Bindings (WOInput):<pre>
  *   id             [in]  - string
  *   name           [in]  - string
@@ -75,7 +75,7 @@ import org.getobjects.appserver.core.WOErrorReport.WOErrorItem;
  *   .key   [in]  - 'class' parameters (eg &lt;input class="selected"&gt;)</pre>
  */
 public class WOTextField extends WOInput {
-  
+
   protected WOAssociation readonly;
   protected WOAssociation size;
   protected WOAssociation trim;
@@ -83,10 +83,10 @@ public class WOTextField extends WOInput {
   protected WOFormatter   formatter;
 
   public WOTextField
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
-    
+
     this.readonly  = grabAssociation(_assocs, "readonly");
     this.size      = grabAssociation(_assocs, "size");
     this.trim      = grabAssociation(_assocs, "trim");
@@ -95,13 +95,13 @@ public class WOTextField extends WOInput {
   }
 
   /* applying formatters */
-  
+
   @Override
   protected Object parseFormValue(final Object _value, final WOContext _ctx)
     throws ParseException
   {
     String s;
-    
+
     if (_value != null) {
       s = _value.toString();
       if (this.trim != null && this.trim.booleanValueInComponent(_ctx.cursor()))
@@ -109,38 +109,38 @@ public class WOTextField extends WOInput {
     }
     else
       s = null;
-    
+
     if (this.formatter == null)
       return _value;
-    
+
     return this.formatter.objectValueForString(s, _ctx);
   }
-  
-  protected String formValueForObject(Object _value, final WOContext _ctx) {
+
+  protected String formValueForObject(final Object _value, final WOContext _ctx) {
     if (this.formatter == null)
       return _value != null ? _value.toString() : null;
-      
+
     return this.formatter.stringForObjectValue(_value, _ctx);
   }
-  
-  
+
+
   /* generate response */
-  
+
   @Override
   public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
     if (_ctx.isRenderingDisabled())
       return;
 
     final Object cursor = _ctx.cursor();
-    String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
-    String n   = this.elementNameInContext(_ctx);
-    
+    final String lid = this.eid!=null ? this.eid.stringValueInComponent(cursor):null;
+    final String n   = elementNameInContext(_ctx);
+
     String      sv    = null;
     WOErrorItem error = null;
-    
+
     /* determine error item, we need this to render the b0rked value! */
-    
-    WOErrorReport er = _ctx.errorReport();
+
+    final WOErrorReport er = _ctx.errorReport();
     if (er != null) {
       // TBD: lid is NOT the elementID! and we do not check the 'id' in
       //      takevalues, BUT we might consolidate both IDs in one? ('id'
@@ -148,14 +148,14 @@ public class WOTextField extends WOInput {
       if (lid != null) error = er.errorForElementID(lid);
       if (error == null && n != null) error = er.errorForName(n);
     }
-    
+
     /* push error item, if there is one for the element */
-    
+
     if (this.errorItem != null)
       this.errorItem.setValue(error, cursor);
-    
+
     /* calculate the form value to render, can be the error value! */
-    
+
     if (error != null) {
       /* Render raw error value (which was NOT pushed to the model). Hm,
        * could be a structured value (eg a Date) when the controller
@@ -164,31 +164,31 @@ public class WOTextField extends WOInput {
       final Object ov = error.value();
       sv = (ov instanceof String)
         ? (String)ov
-        : this.formValueForObject(ov, _ctx);
+        : formValueForObject(ov, _ctx);
     }
     else if (this.readValue != null) {
       /* retrieve value from controller, and format it for output */
       final Object ov = this.readValue.valueInComponent(cursor);
-      sv  = this.formValueForObject(ov, _ctx);
+      sv  = formValueForObject(ov, _ctx);
     }
-    
+
     /* begin rendering */
 
     _r.appendBeginTag("input");
-    _r.appendAttribute("type", this.inputType());
+    _r.appendAttribute("type", inputType());
 
     if (lid != null) _r.appendAttribute("id", lid);
     _r.appendAttribute("name", n);
-    
+
     if (this.readValue != null && sv != null)
       _r.appendAttribute("value", sv); // TBD: only render with a binding?
-    
+
     if (this.size != null) {
       final int s;
       if ((s = this.size.intValueInComponent(cursor)) > 0)
         _r.appendAttribute("size", s);
     }
-    
+
     if (this.disabled != null) {
       if (this.disabled.booleanValueInComponent(cursor)) {
         _r.appendAttribute("disabled",
@@ -201,30 +201,30 @@ public class WOTextField extends WOInput {
             _ctx.generateEmptyAttributes() ? null : "readonly");
       }
     }
-    
+
     if (this.coreAttributes != null)
       this.coreAttributes.appendToResponse(_r, _ctx);
     this.appendExtraAttributesToResponse(_r, _ctx);
     // TODO: otherTagString
-    
+
     _r.appendBeginTagClose(_ctx.closeAllElements());
   }
-  
-  
+
+
   /* input element type */
 
   protected String inputType() {
     return "text";
   }
-  
-  
+
+
   /* description */
-  
+
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
-    this.appendAssocToDescription(_d, "readonly", this.readonly);
-    this.appendAssocToDescription(_d, "size",     this.size);
-  }  
+
+    appendAssocToDescription(_d, "readonly", this.readonly);
+    appendAssocToDescription(_d, "size",     this.size);
+  }
 }
