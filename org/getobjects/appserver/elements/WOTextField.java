@@ -76,6 +76,7 @@ import org.getobjects.appserver.core.WOResponse;
  */
 public class WOTextField extends WOInput {
 
+  protected WOAssociation pattern;
   protected WOAssociation readonly;
   protected WOAssociation size;
   protected WOAssociation trim;
@@ -87,6 +88,7 @@ public class WOTextField extends WOInput {
   {
     super(_name, _assocs, _template);
 
+    this.pattern   = grabAssociation(_assocs, "pattern");
     this.readonly  = grabAssociation(_assocs, "readonly");
     this.size      = grabAssociation(_assocs, "size");
     this.trim      = grabAssociation(_assocs, "trim");
@@ -187,6 +189,11 @@ public class WOTextField extends WOInput {
       final int s;
       if ((s = this.size.intValueInComponent(cursor)) > 0)
         _r.appendAttribute("size", s);
+    }
+
+    if (this.pattern != null) {
+      final String s = this.pattern.stringValueInComponent(cursor);
+      _r.appendAttribute("pattern", s);
     }
 
     if (this.disabled != null) {
