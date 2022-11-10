@@ -545,7 +545,7 @@ public class NSPropertyListParser extends NSObject {
     boolean containsEscaped = false;
 
     /* loop until closing quote */
-    while ((this.buffer[pos] != quoteChar) && (pos < this.len)) {
+    while ((pos < this.len) && (this.buffer[pos] != quoteChar)) {
       if (this.buffer[pos] == '\\') {
         containsEscaped = true;
         pos++; /* skip following char */
