@@ -21,7 +21,7 @@
 package org.getobjects.foundation;
 
 public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
-  
+
   @SuppressWarnings("hiding")
   public static final NSHtmlAttributeEntityTextCoder sharedCoder =
     new NSHtmlAttributeEntityTextCoder();
@@ -29,7 +29,7 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
   @Override
   public Exception encodeChar(final StringBuilder _out, final char _in) {
     if (_out == null) return null;
-    
+
     switch(_in) {
     case '&': _out.append("&amp;");   break;
     case '<': _out.append("&lt;");    break;
@@ -49,19 +49,19 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
     case '\n': _out.append("&#10;");   break;
     case '\r': _out.append("&#13;");   break;
     }
-    
+
     return null;
   }
 
   @Override
-  public Exception encodeString(StringBuilder _out, final String _s) {
+  public Exception encodeString(final StringBuilder _out, final String _s) {
     if (_out == null || _s == null) return null;
 
     final char[] chars = _s.toCharArray();
     final int    len   = chars.length;
     if (len == 0)
       return null;
-  
+
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -70,7 +70,10 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
         case '>': escapeCount += 4; break;
         case '"': escapeCount += 7; break;
         default:
-          if (chars[i] > 127) escapeCount += 8;
+          if (chars[i] > 127)
+            escapeCount += 8;
+          else
+            escapeCount += 5;
           break;
       }
     }
@@ -78,7 +81,7 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
       _out.append(_s);
       return null;
     }
-  
+
     final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
@@ -99,13 +102,13 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'q'; j++; echars[j] = 'u'; j++;
           echars[j] = 'o'; j++; echars[j] = 't'; j++; echars[j] = ';'; j++;
           break;
-  
+
         case 223: /* szlig */
           echars[j] = '&'; j++; echars[j] = 's'; j++; echars[j] = 'z'; j++;
           echars[j] = 'l'; j++; echars[j] = 'i'; j++; echars[j] = 'g'; j++;
           echars[j] = ';'; j++;
           break;
-  
+
         case 252: /* uuml */
           echars[j] = '&'; j++; echars[j] = 'u'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
@@ -130,7 +133,7 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'O'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
           break;
-          
+
         // in addition to HTML content, we encode those
         // TBD: document why :-)
         case '\t':
@@ -152,22 +155,22 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           break;
       }
     }
-  
+
     _out.append(echars, 0, j);
     return null;
   }
-  
+
   public static void appendEscapedHTMLAttributeValue
     (final StringBuilder _sb, final String _s)
   {
     if (_sb == null || _s == null)
       return;
-  
+
     final char[] chars = _s.toCharArray();
-    int    len   = chars.length;
+    final int    len   = chars.length;
     if (len == 0)
       return;
-  
+
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -187,11 +190,11 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
       _sb.append(chars); // what is faster, adding chars ot adding the String?
       return;
     }
-  
+
     // TBD: what is faster, escaping into a char-array or calling append()
     // TBD: optimize, we could add in chunks (small char array which is appended
     //      when its full or when an tbe char comes up)
-  
+
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
         case '&': _sb.append("&amp;");   break;
@@ -219,12 +222,12 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
     // TBD: what is different??? \t,\n? why?
     if (_s == null)
       return null;
-  
-    char[] chars = _s.toCharArray();
-    int    len   = chars.length;
+
+    final char[] chars = _s.toCharArray();
+    final int    len   = chars.length;
     if (len == 0)
       return "";
-  
+
     int escapeCount = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -242,8 +245,8 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
     }
     if (escapeCount == 0)
       return _s;
-  
-    char[] echars = new char[len + escapeCount];
+
+    final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
@@ -264,7 +267,7 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           echars[j] = 'o'; j++; echars[j] = 't'; j++;
           echars[j] = ';'; j++;
           break;
-  
+
         case '\t':
           echars[j] = '&'; j++; echars[j] = '#'; j++; echars[j] = '9'; j++;
           echars[j] = ';'; j++;
@@ -277,13 +280,13 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = '#'; j++; echars[j] = '1'; j++;
           echars[j] = '3'; j++; echars[j] = ';'; j++;
           break;
-  
+
         case 223: /* szlig */
           echars[j] = '&'; j++; echars[j] = 's'; j++; echars[j] = 'z'; j++;
           echars[j] = 'l'; j++; echars[j] = 'i'; j++; echars[j] = 'g'; j++;
           echars[j] = ';'; j++;
           break;
-  
+
         case 252: /* uuml */
           echars[j] = '&'; j++; echars[j] = 'u'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
@@ -308,14 +311,14 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           echars[j] = '&'; j++; echars[j] = 'O'; j++; echars[j] = 'u'; j++;
           echars[j] = 'm'; j++; echars[j] = 'l'; j++; echars[j] = ';'; j++;
           break;
-  
+
         default:
           echars[j] = chars[i];
           j++;
           break;
       }
     }
-  
+
     return new String(echars, 0, j);
   }
 
