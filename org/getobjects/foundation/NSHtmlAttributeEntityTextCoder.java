@@ -70,7 +70,10 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
         case '>': escapeCount += 4; break;
         case '"': escapeCount += 7; break;
         default:
-          if (chars[i] > 127) escapeCount += 8;
+          if (chars[i] > 127)
+            escapeCount += 8;
+          else
+            escapeCount += 5;
           break;
       }
     }
