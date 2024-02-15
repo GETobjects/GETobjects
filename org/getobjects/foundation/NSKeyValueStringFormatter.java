@@ -278,7 +278,7 @@ public class NSKeyValueStringFormatter extends NSObject {
           if (value == null)
             sb.append("");
           else
-            sb.append(UObject.stringValue(value).replaceAll("\\.|\\+| |@", "_"));
+            sb.append(UObject.stringValue(value).replaceAll("\\.|\\+| |@|\"|\'", "_"));
           break;
 
         case 'J':
