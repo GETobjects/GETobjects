@@ -25,6 +25,7 @@ import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODirectAction;
 import org.getobjects.foundation.NSKeyValueCoding;
+import org.getobjects.foundation.NSKeyValueStringFormatter;
 
 /**
  * GoPathAssociation
@@ -42,8 +43,9 @@ public class GoPathAssociation extends WOAssociation {
     if (_keyPath == null || _keyPath.length() == 0) {
       log.error("invalid (empty) path passed to GoPathAssociation");
     }
-    else
+    else {
       this.goPath = _keyPath.split(GoPathSeparatorRegEx);
+    }
   }
   
   /* accessors */
@@ -106,7 +108,11 @@ public class GoPathAssociation extends WOAssociation {
       log.warn("GoPath contains no objects: " + this + "\n  path: " + tPath);
       return null;
     }
-    
+
+    Object cursor = _context;
+    if (_context instanceof WOContext)
+      cursor = ((WOContext)_context).cursor();
+
     // Note: we do not support '.', '..' etc yet
     for (int i = otPath.length - 1; i >= 0; i--) {
       Object o = otPath[i];
@@ -116,8 +122,9 @@ public class GoPathAssociation extends WOAssociation {
       }
       
       for (int j = 0; o != null && (j < this.goPath.length); j++) {
+        final String name = NSKeyValueStringFormatter.format(this.goPath[j], cursor);
         o = IGoSecuredObject.Utility.lookupName(
-            o, this.goPath[j], _context,
+            o, name, _context,
             true /* acquire (in containment path) */);
         
         if (o instanceof Exception) {
@@ -130,7 +137,7 @@ public class GoPathAssociation extends WOAssociation {
     }
     
     if (log.isInfoEnabled()) {
-      log.info("could not resolve joPath: " + this.keyPath() +
+      log.info("could not resolve goPath: " + this.keyPath() +
           "\n  against: " + tPath);
     }
     return null;
