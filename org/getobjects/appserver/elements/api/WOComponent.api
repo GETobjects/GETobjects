@@ -1,0 +1,16 @@
+<?xml version="1.0"?> 
+
+<!-- subclasses "WOElement", which is purely abstract -->
+<wo class="WOComponent"
+    xmlns="http://www.opengroupware.org/go/api"
+>
+  <binding name="name"   settable="NO" />
+  <binding name="parent" settable="NO" />
+
+  <binding name="F" settable="NO" />
+
+  <binding name="application" settable="NO" />
+  <binding name="session"     settable="NO"/>
+  <binding name="context"     settable="NO"/>
+
+</wo>
