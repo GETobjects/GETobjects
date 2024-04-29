@@ -96,7 +96,7 @@ public class KVCWrapper extends Object {
   //  register(Map.class, MapKVCWrapper.class);
   //}
 
-  private static final Log logger = LogFactory.getLog(KVCWrapper.class);
+  protected static final Log logger = LogFactory.getLog(KVCWrapper.class);
 
   private static ConcurrentHashMap<Class,Method[]> declaredMethodCache =
     new ConcurrentHashMap<>(16);
@@ -347,7 +347,9 @@ public class KVCWrapper extends Object {
     //     was unnecessarily expensive.
     //     We might want to replicate this at the Go level.
 
-    if (Map.class.isAssignableFrom(_class))
+    if (String.class.isAssignableFrom(_class))
+      helper = new StringKVCWrapper(_class);
+    else if (Map.class.isAssignableFrom(_class))
       helper = new MapKVCWrapper(_class);
     else if (List.class.isAssignableFrom(_class))
       helper = new ListKVCWrapper(_class);
