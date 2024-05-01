@@ -70,7 +70,9 @@ public class StringKVCWrapper extends KVCWrapper {
         stepCount = Integer.parseInt(stepCountString);
       if (stepCount == 1)
         return new StringSliceRangeAccessor(_spec.substring(0, lastColonIdx + 1), firstColonIdx); // way faster
-
+      else if (stepCount == 0) {
+        throw new IllegalArgumentException("slice step cannot be zero");
+      }
       // NOTE: this does include the trailing ':' on purpose!
       return new StringSliceRangeWithStepAccessor(_spec.substring(0, lastColonIdx + 1), firstColonIdx, stepCount);
     }
