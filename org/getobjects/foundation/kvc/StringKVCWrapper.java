@@ -72,7 +72,7 @@ public class StringKVCWrapper extends KVCWrapper {
         return new StringSliceRangeAccessor(_spec, firstColonIdx); // way faster
 
       // NOTE: this does include the trailing ':' on purpose!
-      return new StringSliceRangeWithStepAccessor(_spec.substring(0, firstColonIdx + 1), firstColonIdx, stepCount);
+      return new StringSliceRangeWithStepAccessor(_spec.substring(0, lastColonIdx + 1), firstColonIdx, stepCount);
     }
     
     public StringSliceAccessor(final String _spec) {
