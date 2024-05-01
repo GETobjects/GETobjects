@@ -234,6 +234,9 @@ public class StringKVCWrapper extends KVCWrapper {
           else
             maxIdx += sLength;
         }
+        else {
+          maxIdx -= 1;
+        }
         if (maxIdx >= sLength)
           maxIdx = sLength - 1;
 
@@ -260,6 +263,9 @@ public class StringKVCWrapper extends KVCWrapper {
             minIdx = 0;
           else
             minIdx += sLength;
+        }
+        else {
+          minIdx += 1;
         }
         if (minIdx < 0)
           minIdx = 0;
