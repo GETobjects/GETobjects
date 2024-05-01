@@ -69,7 +69,7 @@ public class StringKVCWrapper extends KVCWrapper {
       if (UObject.isNotEmpty(stepCountString))
         stepCount = Integer.parseInt(stepCountString);
       if (stepCount == 1)
-        return new StringSliceRangeAccessor(_spec, firstColonIdx); // way faster
+        return new StringSliceRangeAccessor(_spec.substring(0, lastColonIdx + 1), firstColonIdx); // way faster
 
       // NOTE: this does include the trailing ':' on purpose!
       return new StringSliceRangeWithStepAccessor(_spec.substring(0, lastColonIdx + 1), firstColonIdx, stepCount);
