@@ -39,10 +39,15 @@ import org.getobjects.foundation.UObject;
  * </p>
  * <p>
  * NOTE:
+
+ * Contrary to Python's implementation, index accesses which are out of bounds
+ * don't throw exceptions: instead, they're logged as KVCWrapper warnings
+ * and <code>null</code> is returned as result. This allows the result to
+ * be properly distinguished but also handled gracefully.
  * <pre>
- * "".[-1]  -> java.lang.StringIndexOutOfBoundsException
+ * "".[-1]  -> null
  * "".[-1:] -> ""
- * "".[0]   -> java.lang.StringIndexOutOfBoundsException
+ * "".[0]   -> null
  * "".[:0]  -> ""
  * </pre>
  * </p>
@@ -122,9 +127,9 @@ public class StringKVCWrapper extends KVCWrapper {
    * Examples:
    * <pre>
    * "Test".[0]  -> "T"
-   * "Test".[4]  -> java.lang.StringIndexOutOfBoundsException
+   * "Test".[4]  -> null
    * "Test".[-1] -> "t"
-   * "Test".[-5] -> java.lang.StringIndexOutOfBoundsException
+   * "Test".[-5] -> null
    * </pre>
    **/
   public static class StringSliceIndexAccessor extends StringSliceAccessor {
@@ -141,9 +146,13 @@ public class StringKVCWrapper extends KVCWrapper {
       if (this.index == NO_INDEX)
         return null;
 
+      final int sLength = ((String)_stringObj).length();
       if (this.index < 0) {
-        final int sLength = ((String)_stringObj).length();
         this.index = sLength + this.index;
+      }
+      if (this.index < 0 || this.index >= sLength) {
+        KVCWrapper.logger.warn("StringIndexOutOfBounds for " + _key);
+        return null;
       }
       return ((String)_stringObj).charAt(this.index);
     }
