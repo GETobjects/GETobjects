@@ -6,12 +6,19 @@ import org.getobjects.foundation.UObject;
  * Adds special KVC syntax for accessing slices of strings utilizing
  * the same specification as Python's slices, i.e.
  * 
+ * <p>
  * <code>[start:stop:step]</code>
+ * </p>
  * 
+ * <p>
  * <code>start</code>, <code>:stop</code> and <code>:step</code>
- * are all optional
- * 
- * Note that <code>[:]</code> and <code>[::]</code> are valid expressions.
+ * are all optional. If set, <code>step</code> MUST NOT be zero.
+ * </p>
+
+ * <p>
+ * Note that <code>[:]</code> and <code>[::]</code> are valid expressions,
+ * whereas <code>[]</code> is NOT!
+ * </p>
  * 
  * <pre>
  * +---+---+---+---+
@@ -23,11 +30,14 @@ import org.getobjects.foundation.UObject;
  * +---+---+---+---+
  * </pre>
  * 
+ * <p>
  * EXAMPLES:
  * <pre>
  * "Test".[1:] -> "est"
  * "Test".[-1] -> "t"
  * </pre>
+ * </p>
+ * <p>
  * NOTE:
  * <pre>
  * "".[-1]  -> java.lang.StringIndexOutOfBoundsException
@@ -35,6 +45,7 @@ import org.getobjects.foundation.UObject;
  * "".[0]   -> java.lang.StringIndexOutOfBoundsException
  * "".[:0]  -> ""
  * </pre>
+ * </p>
  **/
 
 public class StringKVCWrapper extends KVCWrapper {
@@ -206,6 +217,16 @@ public class StringKVCWrapper extends KVCWrapper {
     }
   }
 
+  /**
+   * Examples:
+   * <pre>
+   * "Test".[::]     -> "Test"
+   * "Test".[::-1]   -> "tseT"
+   * "Test".[1:4:2]  -> "et"
+   * "Test".[-2::2]  -> "s"
+   * "Test".[-2::-2] -> "sT"
+   * </pre>
+   */
   public static class StringSliceRangeWithStepAccessor extends StringSliceRangeAccessor {
 
     protected int stepCount;
