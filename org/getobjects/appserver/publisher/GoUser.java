@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2007-2009 Helge Hess
+  Copyright (C) 2007-2024 Helge Hess
 
   This file is part of Go.
 
@@ -21,7 +21,6 @@
 package org.getobjects.appserver.publisher;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +28,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
+import java.nio.file.attribute.GroupPrincipal; // replacement for Group?
 
 import org.getobjects.foundation.NSObject;
 import org.getobjects.foundation.UString;
@@ -82,7 +82,7 @@ public class GoUser extends NSObject implements IGoUser {
     if (_subject == null)
       return authRoles;
     
-    final Set<Group> groups = _subject.getPrincipals(Group.class);
+    final Set<GroupPrincipal> groups = _subject.getPrincipals(GroupPrincipal.class);
     if (groups == null || groups.size() == 0)
       return authRoles;
     
