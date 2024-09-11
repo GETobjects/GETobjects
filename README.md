@@ -11,3 +11,14 @@ Its unlikely that you want to give it a try, unless you:
 5. Do not expect a shrinkwrapped product
 
 If all that is OK with you, Go, give it a try ;-)
+
+
+### Checkout
+
+```
+git clone --recurse-submodules \
+  git@github.com:GETobjects/GETobjects.git \
+  GETobjects
+```
+
+Builds in Eclipse 2024-06.

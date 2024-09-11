@@ -29,6 +29,6 @@
 	<classpathentry kind="lib" path="ThirdParty/jetty-io-9.2.15.v20160210.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/postgresql-42.1.3.jre7.jar"/>
 	<classpathentry exported="true" kind="lib" path="ThirdParty/commons-codec-1.11.jar"/>
-	<classpathentry kind="lib" path="ThirdParty/log4j-1.2.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="ThirdParty/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
