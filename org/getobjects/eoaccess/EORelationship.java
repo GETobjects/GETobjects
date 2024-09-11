@@ -36,6 +36,7 @@ public class EORelationship extends EOProperty implements EOExpressionEvaluation
   protected EOEntity destinationEntity;
   protected String   destinationEntityName;
   protected EOJoin[] joins;
+
   protected int      joinSemantic;
   protected boolean  isToMany;
   protected String   relationshipPath;
@@ -296,7 +297,7 @@ public class EORelationship extends EOProperty implements EOExpressionEvaluation
    * Person:
    *   toCompany [toOne] ( SRC.company_id = TAR.company_id )
    * Company:
-   *   toPerson [toMany] ( SRC.company_id = TAR.company_id )
+   *   toPerson [toMany] ( TAR.company_id = SRC.company_id )
    *
    * @return the inverse relationship
    */
