@@ -1,5 +1,6 @@
 package org.getobjects.js;
 
+import java.util.List;
 import java.util.Map;
 
 import org.getobjects.appserver.core.WOAssociation;
@@ -9,6 +10,7 @@ import org.getobjects.appserver.core.WORequest;
 import org.getobjects.appserver.core.WOResponse;
 import org.getobjects.appserver.elements.links.WOLinkGenerator;
 import org.getobjects.foundation.NSJavaScriptWriter;
+import org.getobjects.foundation.UString;
 
 public class WEObserveField extends WEDynamicElement {
   protected WOAssociation name;
@@ -54,35 +56,32 @@ public class WEObserveField extends WEDynamicElement {
   /* generate response */
 
   protected static final String defaultFrequency = "0.75";
-  protected static final String events = "input";
+  protected static final String events = "input change";
 
   public void appendJavaScript(NSJavaScriptWriter _js, WOContext _ctx) {
     final Object cursor = _ctx.cursor();
 
     final String lName = strForAssoc(this.name, cursor);
-    final String timerVar = getProperIDName((lName != null ? lName : "form") + _ctx.elementID() + "_timer");
+    final String timerVar = getProperIDName((lName != null ? lName : "form") + _ctx.elementID() + "_timers");
 
-    _js.append("var " + timerVar + "=null;");
-    if (lName == null)
-      appendQuerySelector("form", _js);
-    else
-      appendGetElementById(lName, _js);
-
-    
-//  document.addEventListener(eventName, (event) => {
-//    if (event.target.closest(elementSelector)) {
-//      handler.call(event.target, event);
-//    }
-//  });
-
-    _js.append(".addEventListener(");
+    _js.append("var " + timerVar + "=[];");
 
     /* on parameter */
     String lOn = strForAssoc(this.on, cursor);
     if (lOn == null)
       lOn = events;
-    _js.appendConstant(lOn);
-    _js.append(",");
+    List<String> onEvents = UString.componentsListSeparatedByString(lOn, " ", true, true);
+    _js.appendList(onEvents);
+    
+    /* begin forEach */
+    _js.append(".forEach(event => ");
+
+    if (lName == null)
+      appendQuerySelector("form", _js);
+    else
+      appendGetElementById(lName, _js);
+
+    _js.append(".addEventListener(event, ");
   
     /* function or link */
   
@@ -92,14 +91,14 @@ public class WEObserveField extends WEDynamicElement {
     }
     else if (this.callElement != null) {
       _js.append("function(event){");
-      _js.append("if(");
       _js.append(timerVar);
-      _js.append(" != null){");
-      _js.append("clearTimeout(");
+      _js.append(".forEach(t => clearTimeout(t));");
       _js.append(timerVar);
-      _js.append(");};");
-      _js.append(timerVar);
-      _js.append("=setTimeout(function(){");
+      _js.append(".length=0;");
+
+      /* begin setTimeout */
+
+      _js.append("let t=setTimeout(function(){");
       this.callElement.appendJavaScript(_js, _ctx);
       _js.append("},");
   
@@ -113,7 +112,10 @@ public class WEObserveField extends WEDynamicElement {
   
       /* end setTimeout  */
       _js.append(");");
-  
+
+      _js.append(timerVar);
+      _js.append(".push(t);");
+
       /* end function(event) (and provide options) */
       _js.append("},{passive:true}");
     }
@@ -123,8 +125,8 @@ public class WEObserveField extends WEDynamicElement {
       return;
     }
   
-    /* close addEventListener() function call */
-    _js.append(");");
+    /* close addEventListener() function call and forEach */
+    _js.append("));");
   }
 
   @Override
