@@ -102,7 +102,7 @@ public class WOSubmitButton extends WOInput {
     
     if (formValue != null) {
       if (this.action != null || this.pageName != null)
-        _ctx.addActiveFormElement(this);
+        _ctx.addActiveFormElement(this, elementIDInContext(_ctx));
     }
   }
   
@@ -115,13 +115,7 @@ public class WOSubmitButton extends WOInput {
         return null;
     }
 
-    String lid = _ctx.elementID();
-    Object v = this.eid != null ? this.eid.valueInComponent(cursor) : null;
-    if (v instanceof Boolean) /* in this mode we just expose the ID in HTML */
-      ;
-    else if (v != null) {
-      lid = v.toString();
-    }
+    String lid = elementIDInContext(_ctx);
 
     // System.err.println("MY: " + lid);
     // System.err.println("RQ: " + _ctx.senderID());
@@ -130,7 +124,8 @@ public class WOSubmitButton extends WOInput {
     
     if (lid == null || !lid.equals(_ctx.senderID())) {
       // TODO: print a log?
-      result = null;
+      log.info("WOSubmitButton element-ID doesn't match sender ...");
+     result = null;
     }
     else if (this.action != null)
       result = this.action.valueInComponent(cursor);
@@ -139,7 +134,7 @@ public class WOSubmitButton extends WOInput {
       
       pname = this.pageName.stringValueInComponent(cursor);
       if (pname == null) {
-        // TODO: print a log
+        log.info("WOSubmitButton 'pageName' binding returned no value!");
         result = null;
       }
       else

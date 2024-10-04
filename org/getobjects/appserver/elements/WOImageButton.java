@@ -128,7 +128,7 @@ public class WOImageButton extends WOInput {
     
     if (xVal != null && yVal != null) {
       if (this.action != null || this.pageName != null)
-        _ctx.addActiveFormElement(this);
+        _ctx.addActiveFormElement(this, elementIDInContext(_ctx));
     }
   }
   
@@ -142,8 +142,10 @@ public class WOImageButton extends WOInput {
         return null;
     }
     
-    if (!_ctx.elementID().equals(_ctx.senderID())) {
+    String lid = elementIDInContext(_ctx);
+    if (lid == null || !lid.equals(_ctx.senderID())) {
       // TODO: print a log?
+      log.info("WOImageButton element-ID doesn't match sender ...");
       return null;
     }
     
@@ -153,7 +155,7 @@ public class WOImageButton extends WOInput {
     if (this.pageName != null) {
       String pname = this.pageName.stringValueInComponent(cursor);
       if (pname == null) {
-        log.info("'pageName' binding returned no value!");
+        log.info("WOImageButton 'pageName' binding returned no value!");
         return null;
       }
       

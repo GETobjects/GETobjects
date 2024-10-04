@@ -550,7 +550,7 @@ public class WOContext extends WOCoreContext
    *
    * @param _element - the WOElement for the action (usually an WOInput object)
    */
-  public void addActiveFormElement(final WOElement _element) {
+  public void addActiveFormElement(final WOElement _element, final String eid) {
     if (this.activeFormElement != null) {
       formLog.error("active form element already set: " + _element);
       return;
@@ -562,7 +562,7 @@ public class WOContext extends WOCoreContext
     this.activeFormElement = _element;
 
     // TBD: is this really necessary? The element-id has no relevance?
-    this.setRequestSenderID(this.elementID());
+    this.setRequestSenderID(eid);
   }
   /**
    * Returns the element (usually an WOInput) which registered itself as the
@@ -666,6 +666,7 @@ public class WOContext extends WOCoreContext
   }
 
   public void setRequestSenderID(final String _id) {
+    System.err.println("SET REQUEST SENDER ID: " + _id);
     this.reqElementID = _id;
   }
   public String senderID() {
