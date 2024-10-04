@@ -121,6 +121,17 @@ public abstract class WOInput extends WOHTMLDynamicElement {
     return _ctx.elementID();
   }
 
+  protected String elementIDInContext(final WOContext _ctx) {
+    Object cursor = _ctx.cursor();
+    String lid    = _ctx.elementID();
+    Object v = this.eid != null ? this.eid.valueInComponent(cursor) : null;
+    if (v instanceof Boolean) /* in this mode we just expose the ID in HTML */
+      return lid;
+    else if (v != null)
+      return v.toString();
+    else
+      return lid;
+  }
 
   /* taking form values */
 
