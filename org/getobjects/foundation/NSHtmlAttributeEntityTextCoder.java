@@ -142,7 +142,7 @@ public class NSHtmlAttributeEntityTextCoder extends NSHtmlEntityTextCoder {
           break;
         case '\n':
           echars[j] = '&'; j++; echars[j] = '#'; j++; echars[j] = '1'; j++;
-          echars[j] = '0'; echars[j] = ';'; j++;
+          echars[j] = '0'; j++; echars[j] = ';'; j++;
           break;
         case '\r':
           echars[j] = '&'; j++; echars[j] = '#'; j++; echars[j] = '1'; j++;
