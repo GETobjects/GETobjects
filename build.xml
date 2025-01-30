@@ -47,10 +47,10 @@
   <!-- global compile options -->
   <property name="compile.debug"     value="off" />
   <property name="compile.listfiles" value="false" />
-  <property name="compile.source"    value="11" />
-  <property name="compile.target"    value="11" />
+  <property name="compile.source"    value="21" />
+  <property name="compile.target"    value="21" />
   <!--  see http://openjdk.java.net/jeps/247 -->
-  <property name="compile.release"   value="11" />
+  <property name="compile.release"   value="21" />
   
   <presetdef name="javac">
     <javac includeantruntime="false"
