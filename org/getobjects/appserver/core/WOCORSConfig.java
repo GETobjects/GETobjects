@@ -50,32 +50,32 @@ import org.getobjects.foundation.UString;
  */
 public class WOCORSConfig extends NSObject {
   protected static final Log log = LogFactory.getLog("WOApplication");
-  
+
   protected String[] allowedOrigins       = null;
   protected String[] allowedOriginMethods = null;
   protected String[] allowedOriginHeaders = null;
   protected boolean  allowCredentials     = false;
 
-  public WOCORSConfig(Properties _defaults) {
+  public WOCORSConfig(final Properties _defaults) {
     String s;
-    
+
     s = _defaults.getProperty("WOAllowOrigins");
     this.allowedOrigins =
       UString.componentsSeparatedByString(s, ",", true, true);
-    
+
     s = _defaults.getProperty("WOAllowOriginMethods");
     this.allowedOriginMethods =
       UString.componentsSeparatedByString(s, ",", true, true);
-    
     s = _defaults.getProperty("WOAllowOriginHeaders");
+
     this.allowedOriginHeaders =
       UString.componentsSeparatedByString(s, ",", true, true);
-    
+
     s = _defaults.getProperty("WOAllowOriginCredentials", "true");
     if (UObject.boolValue(s)) {
       this.allowCredentials = true;
       if (!UList.contains(this.allowedOriginHeaders, "authorization"))
-        this.allowedOriginHeaders = 
+        this.allowedOriginHeaders =
           UList.arrayByAppending(this.allowedOriginHeaders, "authorization");
     }
   }
@@ -87,10 +87,10 @@ public class WOCORSConfig extends NSObject {
     final String hACAO = "Access-Control-Allow-Origin";
     Map<String, List<String>> headers;
     boolean isOptions   = false;
-    String  rqBase  = _rq != null ? removePathFromURL(_rq.url()) : null;
-    String  oriBase = removePathFromURL(_origin);
+    final String  rqBase  = _rq != null ? removePathFromURL(_rq.url()) : null;
+    final String  oriBase = removePathFromURL(_origin);
 
-    headers = new HashMap<String, List<String>>(4);
+    headers = new HashMap<>(4);
 
     if (_rq != null) {
       final String m = _rq.method();
@@ -133,9 +133,9 @@ public class WOCORSConfig extends NSObject {
       headers.put("Access-Control-Allow-Methods", UList.create(
           UString.componentsJoinedByString(this.allowedOriginMethods, ", ")));
       headers.put("Access-Control-Allow-Headers", UList.create(
-          UString.componentsJoinedByString(this.allowedOriginHeaders, ", ")));                  
+          UString.componentsJoinedByString(this.allowedOriginHeaders, ", ")));
     }
-    
+
     if (this.allowCredentials && headers != null)
       headers.put("Access-Control-Allow-Credentials", UList.create("true"));
 
@@ -146,9 +146,9 @@ public class WOCORSConfig extends NSObject {
     if (_url.length()  == 0) return "";
     try {
       // yeah, not perfect
-      StringBuilder sb = new StringBuilder(32);
+      final StringBuilder sb = new StringBuilder(32);
       String s;
-      URL url = new URL(_url);
+      final URL url = new URL(_url);
       if (UObject.isNotEmpty((s = url.getProtocol()))) {
         sb.append(s);
         sb.append("://");
@@ -158,7 +158,7 @@ public class WOCORSConfig extends NSObject {
 
       return sb.toString();
     }
-    catch (MalformedURLException e) {
+    catch (final MalformedURLException e) {
       log.warn("could not parse URL: " + _url);
       return _url; // keep as-is
     }
