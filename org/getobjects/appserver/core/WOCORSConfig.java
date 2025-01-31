@@ -66,8 +66,8 @@ public class WOCORSConfig extends NSObject {
     s = _defaults.getProperty("WOAllowOriginMethods");
     this.allowedOriginMethods =
       UString.componentsSeparatedByString(s, ",", true, true);
-    s = _defaults.getProperty("WOAllowOriginHeaders");
 
+    s = _defaults.getProperty("WOAllowOriginHeaders", "");
     this.allowedOriginHeaders =
       UString.componentsSeparatedByString(s, ",", true, true);
 
