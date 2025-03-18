@@ -445,10 +445,10 @@
         <patternset refid="strip.manifest" />
       </zipfileset>
       <!-- Jetty -->
-      <zipfileset src="${libs}/jetty-6.1.14.jar">
+      <zipfileset src="${libs}/jetty-6.1.26.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/jetty-util-6.1.14.jar">
+      <zipfileset src="${libs}/jetty-util-6.1.26.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
     	<!-- new Jetty for WOHTTPConnection -->

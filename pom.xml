@@ -103,16 +103,12 @@
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
-            <version>6.1.14</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/ThirdParty/jetty-6.1.14.jar</systemPath>
+            <version>6.1.23</version>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>6.1.14</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/ThirdParty/jetty-util-6.1.14.jar</systemPath>
+            <version>6.1.23</version>
         </dependency>
 
         <!-- Jetty Client -->
