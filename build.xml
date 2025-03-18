@@ -474,7 +474,7 @@
       <zipfileset src="${libs}/mysql-connector-java-3.1.13-bin.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
-      <zipfileset src="${libs}/postgresql-42.7.4.jar">
+      <zipfileset src="${libs}/postgresql-42.7.5.jar">
         <patternset refid="strip.manifest" />
       </zipfileset>
       <zipfileset src="${libs}/sqlite-jdbc-3.8.6.jar">
