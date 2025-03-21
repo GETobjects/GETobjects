@@ -141,6 +141,7 @@ public class WOJettyRunner extends Object {
 
     final int port = UObject.intValue(_properties.get("WOPort"));
     this.server = new Server(port);
+    this.server.setSendServerVersion(false);
     this.log.debug(shortAppName + " starts on port: " + port);
 
     /* Create a Jetty Context. "org.mortbay.jetty.servlet.Context" manages
