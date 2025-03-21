@@ -339,7 +339,8 @@ public class WOJettyRunner extends Object {
       this.log.debug("Opening " + applicationURL() +
                      " in browser application");
 
-      Runtime.getRuntime().exec("open " + this.applicationURL());
+      final String[] args = new String[] { "open", applicationURL() };
+      Runtime.getRuntime().exec(args);
     }
     catch (final IOException e) {
       this.log.error("Couldn't open application URL", e);
