@@ -68,32 +68,32 @@ public class WOJettyRunner extends Object {
   }
 
   public WOJettyRunner(final Class _appCls, final String[] _args) {
-    Properties properties = this.getPropertiesFromArguments(_args);
+    final Properties properties = getPropertiesFromArguments(_args);
     properties.put("WOAppClass", _appCls.getName());
-    this.initWithProperties(properties);
+    initWithProperties(properties);
   }
   public WOJettyRunner(final String _shortAppName, final String[] _args) {
-    Properties properties = this.getPropertiesFromArguments(_args);
+    final Properties properties = getPropertiesFromArguments(_args);
     properties.put("WOAppName", _shortAppName);
-    this.initWithProperties(properties);
+    initWithProperties(properties);
   }
 
   @Deprecated
-  public WOJettyRunner(int _port, String _appName) {
-    this.initWithNameAndPort(_appName, _port);
+  public WOJettyRunner(final int _port, final String _appName) {
+    initWithNameAndPort(_appName, _port);
   }
   @Deprecated
-  public WOJettyRunner(int _port, Class _appCls) {
-    this.initWithNameAndPort(_appCls.getName(), _port);
+  public WOJettyRunner(final int _port, final Class _appCls) {
+    initWithNameAndPort(_appCls.getName(), _port);
   }
 
-  public void initWithNameAndPort(String _appName, int _port) {
-    Properties properties = new Properties();
+  public void initWithNameAndPort(final String _appName, final int _port) {
+    final Properties properties = new Properties();
 
     properties.put("WOAppName", _appName);
     properties.put("WOPort",    Integer.toString(_port));
 
-    this.initWithProperties(properties);
+    initWithProperties(properties);
   }
 
   /**
@@ -119,7 +119,7 @@ public class WOJettyRunner extends Object {
    */
   public void initWithProperties(final Properties _properties) {
     String appClassName = _properties.getProperty("WOAppClass");
-    String appName      = _properties.getProperty("WOAppName");
+    final String appName      = _properties.getProperty("WOAppName");
 
     if (appClassName == null)
       appClassName = appName;
@@ -139,7 +139,7 @@ public class WOJettyRunner extends Object {
 
     this.log.debug("setting up Jetty ...");
 
-    int port = UObject.intValue(_properties.get("WOPort"));
+    final int port = UObject.intValue(_properties.get("WOPort"));
     this.server = new Server(port);
     this.log.debug(shortAppName + " starts on port: " + port);
 
@@ -157,18 +157,18 @@ public class WOJettyRunner extends Object {
     //root.addServlet("org.mortbay.servlet.Dump", "/Dump/*");
 
     /* a ServletHolder wraps a Servlet configuration in Jetty */
-    ServletHolder servletHolder = new ServletHolder(WOServletAdaptor.class);
+    final ServletHolder servletHolder = new ServletHolder(WOServletAdaptor.class);
     servletHolder.setName(shortAppName);
     servletHolder.setInitParameter("WOAppName",  shortAppName);
     servletHolder.setInitParameter("WOAppClass", appClass.getName());
 
-    for (Object pName : _properties.keySet()) {
+    for (final Object pName : _properties.keySet()) {
       final String value = _properties.getProperty((String)pName);
       servletHolder.setInitParameter((String)pName, value);
     }
 
-    this.prepareServletHolder(root, servletHolder, shortAppName);
-    
+    prepareServletHolder(root, servletHolder, shortAppName);
+
     /* This makes the Servlet being initialize on startup (instead of first
      * request).
      */
@@ -182,14 +182,14 @@ public class WOJettyRunner extends Object {
 
     /* add resource handler (directly expose 'www' directory to Jetty) */
 
-    this.addResourceHandler(rsrcBase, _properties);
+    addResourceHandler(rsrcBase, _properties);
 
     /* done */
 
     this.log.debug("finished setting up Servlets.");
     this.applicationURL = "http://localhost:" + port + "/" + shortAppName;
     this.log.info("Application URL is " + this.applicationURL);
-    
+
     this.autoOpenInBrowser = UObject.boolValue(_properties.getProperty(
         "WOAutoOpenInBrowser", "false"));
   }
@@ -203,10 +203,10 @@ public class WOJettyRunner extends Object {
    * @param _appName - the short application name
    */
   public void prepareServletHolder
-    (Context _root, ServletHolder _holder, String _appName)
+    (final Context _root, final ServletHolder _holder, final String _appName)
   {
   }
-  
+
   /**
    * Builds a Jetty Resource object. This is used to stream static application
    * content, like images or CSS files. Such don't need to go through the
@@ -222,7 +222,7 @@ public class WOJettyRunner extends Object {
    *       subclass (e.g. for org.alwaysrightinstitute.AwesomeApp this would
    *       be org.alwaysrightinstitute.www)
    * </ol>
-   * 
+   *
    * @param _appWww - URL object into the Java package system (FS or jar)
    * @param _properties - properties configured for the WO Servlet
    * @return Resource object for the static resources, or null if there is none
@@ -241,31 +241,31 @@ public class WOJettyRunner extends Object {
             baseResource = Resource.newResource(projectDir.getAbsolutePath());
             this.log.info("mapped public www to: " + projectDir);
           }
-          catch (Exception e) {}
+          catch (final Exception e) {}
         }
       }
     }
 
     if (baseResource == null) {
-      File home = new File(new File(System.getProperty("user.dir")), "www");
+      final File home = new File(new File(System.getProperty("user.dir")), "www");
       if (home.exists()) {
         try {
           baseResource = Resource.newResource(home.getAbsolutePath());
           this.log.info("mapped public www to: " + home);
         }
-        catch (Exception e) {}
+        catch (final Exception e) {}
       }
     }
-    
+
     if (baseResource == null && _appWww != null) {
       /* Map 'www' directory inside the application package */
       try {
         baseResource = Resource.newResource(_appWww);
         this.log.info("mapped public www to: " + _appWww);
       }
-      catch (Exception e) {}
+      catch (final Exception e) {}
     }
-    
+
     return baseResource;
   }
 
@@ -284,10 +284,10 @@ public class WOJettyRunner extends Object {
   protected void addResourceHandler
     (final URL _appWww, final Properties _properties)
   {
-    final Resource baseResource = this.lookupBaseResource(_appWww, _properties);
+    final Resource baseResource = lookupBaseResource(_appWww, _properties);
 
     if (baseResource != null) {
-      ResourceHandler rh = new ResourceHandler();
+      final ResourceHandler rh = new ResourceHandler();
       rh.setBaseResource(baseResource);
       this.server.addHandler(rh);
     }
@@ -336,12 +336,12 @@ public class WOJettyRunner extends Object {
   protected void openApplicationURLInBrowserIfRequested() {
     if (!this.autoOpenInBrowser) return;
     try {
-      this.log.debug("Opening " + this.applicationURL() +
+      this.log.debug("Opening " + applicationURL() +
                      " in browser application");
 
       Runtime.getRuntime().exec("open " + this.applicationURL());
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       this.log.error("Couldn't open application URL", e);
     }
   }
@@ -354,7 +354,7 @@ public class WOJettyRunner extends Object {
       this.log.debug("starting Jetty ...");
       this.server.start();
       this.log.debug("Jetty is running ...");
-      this.openApplicationURLInBrowserIfRequested();
+      openApplicationURLInBrowserIfRequested();
 
       /* execution continues in a Jetty thread ...*/
     }
@@ -372,7 +372,7 @@ public class WOJettyRunner extends Object {
 
   /* main entry point */
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     WOJettyRunner runner;
 
     runner = new WOJettyRunner("Application", args);
