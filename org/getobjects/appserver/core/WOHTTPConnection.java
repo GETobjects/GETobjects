@@ -190,7 +190,7 @@ public class WOHTTPConnection extends NSObject {
       if (needsSetup) {
         if (this.isSSL) {
           final SslContextFactory sslCtxFactory =
-              new SslContextFactory(this.allowInsecureHttpsConnection());
+              new SslContextFactory.Client(allowInsecureHttpsConnection());
           this.httpClient = new HttpClient(sslCtxFactory);
         }
         else {
