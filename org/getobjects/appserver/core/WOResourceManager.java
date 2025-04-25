@@ -513,8 +513,8 @@ public abstract class WOResourceManager extends NSObject
     final String s   = _langs[0];
     final int    idx = s.indexOf('-');
     return idx == -1
-      ? new Locale(s)
-      : new Locale(s.substring(0, idx), s.substring(idx + 1));
+      ? Locale.of(s)
+      : Locale.of(s.substring(0, idx), s.substring(idx + 1));
   }
 
   public ResourceBundle stringTableWithName

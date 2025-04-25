@@ -198,7 +198,7 @@ public class WOContext extends WOCoreContext
     if (this.request != null) {
       final String lc = this.request.stringFormValueForKey("LC");
       if (lc != null && lc.length() > 0) {
-        final Locale l = new Locale(lc);
+        final Locale l = Locale.of(lc);
         if (l != null) return l;
       }
 

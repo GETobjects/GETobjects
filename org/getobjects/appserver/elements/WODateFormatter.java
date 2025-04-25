@@ -216,7 +216,7 @@ class WODateFormatter extends WOFormatter {
       if (v instanceof Locale)
         lLocale = (Locale)v;
       else if (v instanceof String)
-        lLocale = new Locale((String)v);
+        lLocale = Locale.of((String)v);
       else if (v != null)
         log.error("unexpected 'locale' object: " + v);
     }
