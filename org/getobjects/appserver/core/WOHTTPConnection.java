@@ -65,7 +65,7 @@ public class WOHTTPConnection extends NSObject {
   /**
    * Creates an 'http' connection to _host on _port.
    */
-  public WOHTTPConnection(String _host, int _port) {
+  public WOHTTPConnection(final String _host, final int _port) {
     try {
       this.url = new URL("http://" + _host + (_port != 80 ? (":" + _port)
                                                           : ""));
@@ -73,13 +73,13 @@ public class WOHTTPConnection extends NSObject {
     catch (MalformedURLException e) { // won't happen
       e.printStackTrace();
     }
-    this.setupURL();
+    setupURL();
   }
 
   /**
    * Creates an 'http' connection to _host on port 80.
    */
-  public WOHTTPConnection(String _host) {
+  public WOHTTPConnection(final String _host) {
     this(_host, 80);
   }
 
@@ -87,19 +87,19 @@ public class WOHTTPConnection extends NSObject {
    * Creates either an 'http' connection or an 'https' connection
    * to the host specified in _url.
    */
-  public WOHTTPConnection(URL _url) {
+  public WOHTTPConnection(final URL _url) {
     try {
       this.url = new URL(_url, "/");
     }
     catch (MalformedURLException e) { // won't happen
       log.error(e);
     }
-    this.setupURL();
+    setupURL();
   }
 
   // Accessors
 
-  public void setReceiveTimeout(int _receiveTimeout) {
+  public void setReceiveTimeout(final int _receiveTimeout) {
     this.receiveTimeout = _receiveTimeout;
   }
 
@@ -107,7 +107,7 @@ public class WOHTTPConnection extends NSObject {
     return this.receiveTimeout;
   }
 
-  public void setReadTimeout(int _readTimeout) {
+  public void setReadTimeout(final int _readTimeout) {
     this.readTimeout = _readTimeout;
   }
 
@@ -117,7 +117,7 @@ public class WOHTTPConnection extends NSObject {
     return this.readTimeout;
   }
 
-  public void setSendTimeout(int _sendTimeout) {
+  public void setSendTimeout(final int _sendTimeout) {
     this.sendTimeout = _sendTimeout;
   }
 
@@ -125,7 +125,7 @@ public class WOHTTPConnection extends NSObject {
     return this.sendTimeout;
   }
 
-  public void setKeepAliveEnabled(boolean _keepAlive) {
+  public void setKeepAliveEnabled(final boolean _keepAlive) {
     this.keepAlive = _keepAlive;
   }
 
@@ -133,7 +133,7 @@ public class WOHTTPConnection extends NSObject {
     return this.keepAlive;
   }
 
-  public void setFollowRedirects(boolean _followRedirects) {
+  public void setFollowRedirects(final boolean _followRedirects) {
     this.followRedirects = _followRedirects;
   }
 
@@ -151,7 +151,7 @@ public class WOHTTPConnection extends NSObject {
    * NOTE: the keystore which the JavaVM uses can be set upon launch
    *       as the 'javax.net.ssl.trustStore' system property value.
    */
-  public void setAllowInsecureHttpsConnection(boolean _tf) {
+  public void setAllowInsecureHttpsConnection(final boolean _tf) {
     this.allowInsecureSSL = _tf;
   }
 
@@ -163,7 +163,7 @@ public class WOHTTPConnection extends NSObject {
   public boolean allowInsecureHttpsConnection() {
     return this.allowInsecureSSL;
   }
- 
+
   // Setup
 
   protected void setupURL() {
@@ -174,13 +174,13 @@ public class WOHTTPConnection extends NSObject {
       log.warn("given URL not for HTTP connection: " + this.url);
   }
 
-  protected Authentication getAuthentication(URL _rqURL) {
+  protected Authentication getAuthentication(final URL _rqURL) {
     return AllRealmsBasicAuthentication.createForURL(_rqURL);
   }
 
   // Request
 
-  public boolean sendRequest(WORequest _rq) {
+  public boolean sendRequest(final WORequest _rq) {
     if (_rq == null) return false;
 
     try {
@@ -210,32 +210,32 @@ public class WOHTTPConnection extends NSObject {
       // creates - which also includes requests created while following
       // redirects
 
-      String userAgent = _rq.headerForKey("user-agent");
+      final String userAgent = _rq.headerForKey("user-agent");
       if (UObject.isNotEmpty(userAgent)) {
         this.httpClient.setUserAgentField(
             new HttpField("user-agent", userAgent));
       }
 
       final Request rq = this.httpClient.newRequest(rqURL.toString());
-      
+
       // set properties and headers
       rq.method(_rq.method());
-      rq.followRedirects(this.followRedirects());
-      
-      for (String headerKey : _rq.headerKeys()) {
+      rq.followRedirects(followRedirects());
+
+      for (final String headerKey : _rq.headerKeys()) {
         // filter "user-agent", see above
         if ("user-agent".equals(headerKey.toLowerCase()))
           continue;
         final List<String> headers = _rq.headersForKey(headerKey);
         if (UObject.isNotEmpty(headers)) {
-          for (String header : headers)
+          for (final String header : headers)
             rq.header(headerKey, header);
         }
       }
       final String connectionProp = this.keepAlive ? "keep-alive" : "close";
       rq.header("connection", connectionProp);
 
-      for (WOCookie cookie : _rq.cookies()) {
+      for (final WOCookie cookie : _rq.cookies()) {
         final HttpCookie httpCookie =
             new HttpCookie(cookie.name(), cookie.value());
         httpCookie.setPath(cookie.path());
@@ -245,7 +245,7 @@ public class WOHTTPConnection extends NSObject {
       }
 
       rq.timeout(sendTimeout() + receiveTimeout() + readTimeout(), TimeUnit.MILLISECONDS);
- 
+
       final byte[] content = _rq.content();
       final boolean hasContent = (content != null) && (content.length > 0);
       if (hasContent) {
@@ -259,8 +259,8 @@ public class WOHTTPConnection extends NSObject {
         return false;
       return true;
     }
-    catch (Exception e) {
-      log.error("sendRequest() for '" + this.url + 
+    catch (final Exception e) {
+      log.error("sendRequest() for '" + this.url +
                 "' [" + _rq.uri() + "] failed: " + e);
       return false;
     }
@@ -275,7 +275,7 @@ public class WOHTTPConnection extends NSObject {
       r.setStatus(this.contentResponse.getStatus());
 
       final HttpFields headers = this.contentResponse.getHeaders();
-      for (HttpField header : headers) {
+      for (final HttpField header : headers) {
         final List<String> allHeaders = r.headersForKey(header.getName());
         allHeaders.add(header.getValue());
         r.setHeadersForKey(allHeaders, header.getName());
@@ -291,7 +291,7 @@ public class WOHTTPConnection extends NSObject {
         }
       }
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       r.setStatus(WOMessage.HTTP_STATUS_INTERNAL_ERROR);
       log.error("readResponse() for '" + this.url +
                 "' [" + this.request.uri() + "] failed: " + e);
@@ -299,19 +299,19 @@ public class WOHTTPConnection extends NSObject {
     this.contentResponse = null;
     return r;
   }
-  
+
   protected static class AllRealmsBasicAuthentication
     extends BasicAuthentication
   {
-    public AllRealmsBasicAuthentication(URI uri, String user, String password){
+    public AllRealmsBasicAuthentication(final URI uri, final String user, final String password){
       super(uri, null, user, password);
     }
 
-    public static AllRealmsBasicAuthentication createForURL(URL url) {
+    public static AllRealmsBasicAuthentication createForURL(final URL url) {
       String auth = url.getAuthority();
       if (auth == null)
         return null;
-    
+
       String user = "";
       String password = "";
       int idx = auth.indexOf("@");
@@ -330,12 +330,12 @@ public class WOHTTPConnection extends NSObject {
       try {
         uri = url.toURI();
       }
-      catch (URISyntaxException e) {} // never happens
+      catch (final URISyntaxException e) {} // never happens
       return new AllRealmsBasicAuthentication(uri, user, password);
     }
-    
+
     @Override
-    public boolean matches(String type, URI uri, String realm) {
+    public boolean matches(final String type, final URI uri, final String realm) {
       if (!"basic".equalsIgnoreCase(type))
         return false;
       return true;

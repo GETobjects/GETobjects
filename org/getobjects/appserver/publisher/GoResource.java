@@ -23,6 +23,8 @@ package org.getobjects.appserver.publisher;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
@@ -46,26 +48,26 @@ import org.getobjects.appserver.core.WOResponse;
  */
 public class GoResource extends WOElement implements IGoObject {
   protected static final Log log = LogFactory.getLog("GoResource");
-  
+
   protected URL url;
-  
+
   public GoResource(final URL _url) {
     this.url = _url;
   }
-  
+
   /* generate response */
-  
+
   public static String mimeTypeForPath(final String _path) {
     // TODO: fix this crap and use some real MIME/ext object
-    
-    int idx = _path.lastIndexOf('.');
+
+    final int idx = _path.lastIndexOf('.');
     if (idx < 0) {
       log.error("could not detect MIME type for path: " + _path);
       return null;
     }
 
     String mimeType = null;
-    String ext = _path.substring(idx + 1);
+    final String ext = _path.substring(idx + 1);
     if (ext.equals("css"))
       mimeType = "text/css";
     else if (ext.equals("txt"))
@@ -89,7 +91,7 @@ public class GoResource extends WOElement implements IGoObject {
 
     return mimeType;
   }
-  
+
   protected int expirationIntervalForMimeType(final String _mimeType) {
     return 3600 /* 1 hour */;
   }
@@ -100,60 +102,60 @@ public class GoResource extends WOElement implements IGoObject {
     try {
       con = this.url.openConnection();
     }
-    catch (IOException coe) {
+    catch (final IOException coe) {
       log.warn("could not open connection to url: " + this.url);
       _r.setStatus(WOMessage.HTTP_STATUS_NOT_FOUND);
       return;
     }
-    
+
     /* open stream */
-    
+
     InputStream is  = null;
     try {
       is = con.getInputStream();
     }
-    catch (IOException ioe) {
+    catch (final IOException ioe) {
       log.warn("could not open stream to url: " + this.url);
       _r.setStatus(WOMessage.HTTP_STATUS_NOT_FOUND);
       return;
     }
-    
+
     /* transfer */
-    
+
     try {
       String mimeType = con.getContentType();
       if (mimeType == null || "content/unknown".equals(mimeType))
         mimeType = mimeTypeForPath(this.url.getPath());
-      
+
       if (mimeType == null)
         mimeType = "application/octet-stream";
-      
+
       _r.setHeaderForKey(mimeType, "content-type");
       _r.setHeaderForKey("" + con.getContentLength(), "content-length");
-      
+
       /* setup caching headers */
-      
-      Date              now = new Date();
-      GregorianCalendar cal = new GregorianCalendar();
-      
+
+      final Date              now = new Date();
+      final GregorianCalendar cal = new GregorianCalendar();
+
       cal.setTime(new Date(con.getLastModified()));
       _r.setHeaderForKey(WOMessage.httpFormatDate(cal), "last-modified");
-      
+
       cal.setTime(now);
       _r.setHeaderForKey(WOMessage.httpFormatDate(cal), "date");
-      
-      cal.add(Calendar.SECOND, this.expirationIntervalForMimeType(mimeType));
+
+      cal.add(Calendar.SECOND, expirationIntervalForMimeType(mimeType));
       _r.setHeaderForKey(WOMessage.httpFormatDate(cal), "expires");
-      
+
       /* start streaming */
-      
+
       _r.enableStreaming();
-      
-      byte[] buffer = new byte[0xFFFF];
+
+      final byte[] buffer = new byte[0xFFFF];
       for (int len; (len = is.read(buffer)) != -1; )
         _r.appendContentData(buffer, len);
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       log.error("IO error trying to deliver resource: " + this.url, e);
       _r.setStatus(WOMessage.HTTP_STATUS_INTERNAL_ERROR);
     }
@@ -161,19 +163,20 @@ public class GoResource extends WOElement implements IGoObject {
       try {
         if (is != null) is.close();
       }
-      catch (IOException e) {
+      catch (final IOException e) {
         log.warn("could not close URL input stream: " + this.url, e);
       }
     }
   }
-  
+
   /* recursive lookup */
-  
-  public Object lookupName(String _name, IGoContext _ctx, boolean _acquire) {
+
+  @Override
+  public Object lookupName(final String _name, final IGoContext _ctx, final boolean _acquire) {
     /* only process names, don't try to be smart */
     if ("/".equals(_name) || "..".equals(_name) || ".".equals(_name))
       return null;
-    
+
     URL nurl = null;
     try {
       // ugly hack
@@ -185,16 +188,16 @@ public class GoResource extends WOElement implements IGoObject {
       return e;
     }
     if (nurl == null) return null;
-    
+
     return new GoResource(nurl);
   }
-  
+
   /* description */
 
   @Override
   public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
-    
+
     if (this.url != null)
       _d.append(" url=" + this.url);
   }

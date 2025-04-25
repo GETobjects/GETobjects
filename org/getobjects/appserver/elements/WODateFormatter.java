@@ -97,8 +97,8 @@ class WODateFormatter extends WOFormatter {
   }
 
   public WODateFormatter
-    (WOAssociation _fmt, WOAssociation _isLenient, WOAssociation _locale,
-        WOAssociation _timeZone, final Class _resultClass)
+    (final WOAssociation _fmt, final WOAssociation _isLenient, final WOAssociation _locale,
+        final WOAssociation _timeZone, final Class _resultClass)
   {
     this.format    = _fmt;
     this.isLenient = _isLenient;
@@ -111,7 +111,7 @@ class WODateFormatter extends WOFormatter {
       if (_fmt.isValueConstant() &&
           (_isLenient == null || _isLenient.isValueConstant()))
       {
-        Object v = _fmt.valueInComponent(null /* cursor */);
+        final Object v = _fmt.valueInComponent(null /* cursor */);
         if (v instanceof SimpleDateFormat)
           this.fmtString = ((SimpleDateFormat)v).toPattern();
         else if (v instanceof String)
@@ -212,7 +212,7 @@ class WODateFormatter extends WOFormatter {
 
     Locale lLocale = null;
     if (this.locale != null) {
-      Object v = this.locale.valueInComponent(_ctx != null?_ctx.cursor() :null);
+      final Object v = this.locale.valueInComponent(_ctx != null?_ctx.cursor() :null);
       if (v instanceof Locale)
         lLocale = (Locale)v;
       else if (v instanceof String)
@@ -239,7 +239,7 @@ class WODateFormatter extends WOFormatter {
         try {
           lFormat = new ISO8601DateTimeFormat(fmt);
         }
-        catch (IllegalArgumentException e) {
+        catch (final IllegalArgumentException e) {
           WOFormatter.log.error("invalid date format: " + fmt, e);
           lFormat =
             DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
@@ -252,7 +252,7 @@ class WODateFormatter extends WOFormatter {
             ? new SimpleDateFormat(fmt, lLocale)
             : new SimpleDateFormat(fmt);
         }
-        catch (IllegalArgumentException e) {
+        catch (final IllegalArgumentException e) {
           WOFormatter.log.error("invalid date format: " + fmt, e);
           lFormat =
             DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
@@ -289,7 +289,7 @@ class WODateFormatter extends WOFormatter {
     if (lFormat != null) {
       TimeZone tz = null;
       if (this.timeZone != null) {
-        Object v = this.timeZone.valueInComponent(_ctx != null ? _ctx.cursor()
+        final Object v = this.timeZone.valueInComponent(_ctx != null ? _ctx.cursor()
                                                                : null);
         if (v instanceof TimeZone)
           tz = (TimeZone)v;
@@ -338,13 +338,13 @@ class WODateFormatter extends WOFormatter {
     if (this.returnCalendar) {
       /* a 'calformat' binding was used (instead of 'dateformat') */
       if (v instanceof Date) {
-        Calendar cal = Calendar.getInstance(_ctx.locale());
+        final Calendar cal = Calendar.getInstance(_ctx.locale());
         cal.setTime((Date)v);
         v = cal;
       }
       else if (v instanceof Number) {
         // TBD: document how/when this can happen
-        Calendar cal = Calendar.getInstance(_ctx.locale());
+        final Calendar cal = Calendar.getInstance(_ctx.locale());
         cal.setTimeInMillis(((Number)v).longValue());
         v = cal;
       }
@@ -406,7 +406,7 @@ class WODateFormatter extends WOFormatter {
       if (UObject.isNotEmpty(_fmt)) {
         final int zIdx = _fmt.lastIndexOf('Z');
         this.isUTC = (zIdx != -1);
-        
+
         final String fmt = this.isUTC ? _fmt.substring(0, zIdx).toLowerCase()
                                       : _fmt.toLowerCase();
 
@@ -423,7 +423,7 @@ class WODateFormatter extends WOFormatter {
     }
 
     @Override
-    public void setTimeZone(TimeZone _tz) {
+    public void setTimeZone(final TimeZone _tz) {
       this.tz = _tz;
     }
 
@@ -433,8 +433,8 @@ class WODateFormatter extends WOFormatter {
     }
 
     @Override
-    public StringBuffer format(Date _date, StringBuffer _buffer,
-                               FieldPosition fieldPosition)
+    public StringBuffer format(final Date _date, final StringBuffer _buffer,
+                               final FieldPosition fieldPosition)
     {
       final TimeZone lTZ = this.isUTC ? gmtTz : getTimeZone();
       final Calendar dateCal = lTZ == null ? Calendar.getInstance()
@@ -450,30 +450,30 @@ class WODateFormatter extends WOFormatter {
             _buffer.append(c);
             break;
           case 'Y':
-            int year = dateCal.get(Calendar.YEAR);
+            final int year = dateCal.get(Calendar.YEAR);
             if (year < 0)
               throw new IllegalArgumentException(
                   "cannot format negative years: " + _date);
             formatNumber(year, 4, _buffer);
             break;
           case 'M':
-            int month = dateCal.get(Calendar.MONTH) + 1; // java snafu
+            final int month = dateCal.get(Calendar.MONTH) + 1; // java snafu
             formatNumber(month, 2, _buffer);
             break;
           case 'D':
-            int dayOfMonth = dateCal.get(Calendar.DAY_OF_MONTH);
+            final int dayOfMonth = dateCal.get(Calendar.DAY_OF_MONTH);
             formatNumber(dayOfMonth, 2, _buffer);
             break;
           case 'h':
-            int hourOfDay = dateCal.get(Calendar.HOUR_OF_DAY);
+            final int hourOfDay = dateCal.get(Calendar.HOUR_OF_DAY);
             formatNumber(hourOfDay, 2, _buffer);
             break;
           case 'm':
-            int minute = dateCal.get(Calendar.MINUTE);
+            final int minute = dateCal.get(Calendar.MINUTE);
             formatNumber(minute, 2, _buffer);
             break;
           case 's':
-            int second = dateCal.get(Calendar.SECOND);
+            final int second = dateCal.get(Calendar.SECOND);
             formatNumber(second, 2, _buffer);
             break;
 
@@ -486,7 +486,7 @@ class WODateFormatter extends WOFormatter {
       return _buffer;
     }
 
-    private void formatNumber(int _num, int _zeros, StringBuffer _buffer) {
+    private void formatNumber(final int _num, final int _zeros, final StringBuffer _buffer) {
       if (_zeros == 2) {
         if (_num < 10)
         _buffer.append("0");
@@ -503,7 +503,7 @@ class WODateFormatter extends WOFormatter {
     }
 
     @Override
-    public Date parse(String source, ParsePosition pos) {
+    public Date parse(final String source, final ParsePosition pos) {
       return null; // we're not interested in parsing, yet
     }
   }

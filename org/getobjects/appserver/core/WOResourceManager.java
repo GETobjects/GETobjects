@@ -85,12 +85,12 @@ public abstract class WOResourceManager extends NSObject
   protected Map<Object,IWOComponentDefinition> componentDefinitions;
   protected boolean isCachingEnabled;
 
-  public WOResourceManager(boolean _enableCaching) {
+  public WOResourceManager(final boolean _enableCaching) {
     this.isCachingEnabled = _enableCaching;
 
     if (this.isCachingEnabled) {
       this.componentDefinitions =
-        new ConcurrentHashMap<Object,IWOComponentDefinition>(32);
+        new ConcurrentHashMap<>(32);
     }
   }
 
@@ -110,7 +110,7 @@ public abstract class WOResourceManager extends NSObject
    * @param _ctx  - the WOContext to instantiate the page in
    * @return an instantiated WOComponent, or null on error
    */
-  public WOComponent pageWithName(String _name, WOContext _ctx) {
+  public WOComponent pageWithName(final String _name, final WOContext _ctx) {
     if (log.isDebugEnabled())
       log.debug("pageWithName(" + _name + ", " + _ctx + ")");
 
@@ -130,7 +130,7 @@ public abstract class WOResourceManager extends NSObject
     /* the underscore method does all the caching and then triggers 'da real
      * definitionForComponent() method.
      */
-    cdef = this._definitionForComponent(_name, _ctx.languages(), rm);
+    cdef = _definitionForComponent(_name, _ctx.languages(), rm);
     if (cdef == null) {
       if (log.isDebugEnabled())
         log.debug("  found no cdef for component: " + _name);
@@ -152,11 +152,11 @@ public abstract class WOResourceManager extends NSObject
    * @return the parsed template
    */
   public WOElement templateWithName
-    (String _name, List<String> _langs, WOResourceManager _rm)
+    (final String _name, final List<String> _langs, final WOResourceManager _rm)
   {
     IWOComponentDefinition cdef;
 
-    if ((cdef = this._definitionForComponent(_name, _langs, _rm)) == null)
+    if ((cdef = _definitionForComponent(_name, _langs, _rm)) == null)
       return null;
 
     /* this will invoke the template parser */
@@ -172,14 +172,14 @@ public abstract class WOResourceManager extends NSObject
    * the primary load method: definitionForComponent().
    */
   protected IWOComponentDefinition _definitionForComponent
-    (String _name, List<String> _langs, WOResourceManager _rm)
+    (final String _name, final List<String> _langs, final WOResourceManager _rm)
   {
-    String[] langs = _langs != null ? _langs.toArray(new String[0]) : null;
+    final String[] langs = _langs != null ? _langs.toArray(new String[0]) : null;
 
     /* look into cache */
 
     IWOComponentDefinition cdef;
-    if ((cdef = this._cachedDefinitionForComponent(_name, langs)) != null) {
+    if ((cdef = _cachedDefinitionForComponent(_name, langs)) != null) {
       if (cdef == null) { // TODO: add some kind of 'empty' marker
         /* component does not exist */
         return null;
@@ -191,11 +191,11 @@ public abstract class WOResourceManager extends NSObject
 
     /* not cached, create a definition */
 
-    cdef = this.definitionForComponent(_name, langs, _rm);
+    cdef = definitionForComponent(_name, langs, _rm);
 
     /* cache created definition */
 
-    return this._cacheDefinitionForComponent(_name, langs, cdef);
+    return _cacheDefinitionForComponent(_name, langs, cdef);
   }
 
   /**
@@ -214,7 +214,7 @@ public abstract class WOResourceManager extends NSObject
    * @return a WOComponentDefinition which represents the specific component
    */
   public IWOComponentDefinition definitionForComponent
-    (String _name, String[] _langs, WOResourceManager _rm)
+    (final String _name, final String[] _langs, final WOResourceManager _rm)
   {
     /*
      * Note: a 'package component' is a component which has its own package,
@@ -224,12 +224,12 @@ public abstract class WOResourceManager extends NSObject
     // TODO: complete me
     URL     templateData = null;
     String  type         = "WOx";
-    String  rsrcName     = _name != null ? _name.replace('.', '/') : null;
-    boolean debugOn      = log.isDebugEnabled();
+    final String  rsrcName     = _name != null ? _name.replace('.', '/') : null;
+    final boolean debugOn      = log.isDebugEnabled();
 
     if (debugOn) log.debug("make cdef for component: " + _name);
 
-    Class cls = this.lookupComponentClass(_name);
+    Class cls = lookupComponentClass(_name);
     if (cls == null) { /* we do not serve this class */
       if (debugOn)
         log.debug("rm does not serve the class, check for templates: " + _name);
@@ -251,7 +251,7 @@ public abstract class WOResourceManager extends NSObject
 
     /* this is a bit hackish ;-), but well, ... */
     boolean isPackageComponent = false;
-    String className = cls.getName();
+    final String className = cls.getName();
     if (className.endsWith("." + _name + ".Component"))
       isPackageComponent = true;
     else if (className.endsWith("." + _name + "." + _name))
@@ -266,7 +266,7 @@ public abstract class WOResourceManager extends NSObject
 
     /* def */
 
-    IWOComponentDefinition cdef = new WOComponentDefinition(_name, cls);
+    final IWOComponentDefinition cdef = new WOComponentDefinition(_name, cls);
 
     /* find template */
 
@@ -325,10 +325,10 @@ public abstract class WOResourceManager extends NSObject
 
   /* component definition cache */
 
-  protected String genCacheKey(String _name, String[] _langs) {
+  protected String genCacheKey(final String _name, final String[] _langs) {
     // TODO: improve ...
     /* Note: using arrays as keys didn't work properly? */
-    StringBuilder sb = new StringBuilder(_langs.length * 8 + _name.length());
+    final StringBuilder sb = new StringBuilder(_langs.length * 8 + _name.length());
 
     sb.append(_name);
 
@@ -340,7 +340,7 @@ public abstract class WOResourceManager extends NSObject
   }
 
   protected IWOComponentDefinition _cachedDefinitionForComponent
-    (String _name, String[] _langs)
+    (final String _name, final String[] _langs)
   {
     if (this.componentDefinitions == null) /* caching disabled */
       return null;
@@ -350,14 +350,14 @@ public abstract class WOResourceManager extends NSObject
     if (_langs.length == 0)
       return this.componentDefinitions.get(_name);
 
-    String cacheKey = this.genCacheKey(_name, _langs);
+    final String cacheKey = genCacheKey(_name, _langs);
     return this.componentDefinitions.get(cacheKey);
   }
 
   protected static boolean didWarnOnCaching = false;
 
   protected IWOComponentDefinition _cacheDefinitionForComponent
-    (String _name, String[] _langs, IWOComponentDefinition _cdef)
+    (final String _name, final String[] _langs, final IWOComponentDefinition _cdef)
   {
     if (this.componentDefinitions == null) { /* caching disabled */
       if (!didWarnOnCaching) {
@@ -367,17 +367,17 @@ public abstract class WOResourceManager extends NSObject
       return _cdef;
     }
 
-    boolean isDebugOn = log.isDebugEnabled();
+    final boolean isDebugOn = log.isDebugEnabled();
     String  cacheKey;
 
     if (_langs == null || _langs.length == 0) {
       cacheKey = _name;
     }
     else {
-      cacheKey = this.genCacheKey(_name, _langs);
+      cacheKey = genCacheKey(_name, _langs);
       if (isDebugOn) log.debug("cache cdef w/ langs: " + cacheKey);
     }
-    
+
     if (_cdef != null)
       this.componentDefinitions.put(cacheKey, _cdef);
     else // ConcurrentHashMap does not allow null
@@ -397,7 +397,7 @@ public abstract class WOResourceManager extends NSObject
    * Important: the returned URL is usually a file: or jar: URL for use in
    * server side code. It is NOT the URL which is exposed to the browser/client.
    */
-  public URL urlForResourceNamed(String _name, String[] _languages) {
+  public URL urlForResourceNamed(final String _name, final String[] _languages) {
     return null;
   }
 
@@ -409,13 +409,13 @@ public abstract class WOResourceManager extends NSObject
    * @param _ls   - array of language codes (eg [ 'de', 'en' ])
    * @return an InputStream or null if the resource could not be found or opened
    */
-  public InputStream inputStreamForResourceNamed(String _name, String[] _ls) {
-    URL url = this.urlForResourceNamed(_name, _ls);
+  public InputStream inputStreamForResourceNamed(final String _name, final String[] _ls) {
+    final URL url = this.urlForResourceNamed(_name, _ls);
     if (url == null) return null;
     try {
       return url.openStream();
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       log.info("could not open URL to get stream: " + url);
       return null;
     }
@@ -429,8 +429,8 @@ public abstract class WOResourceManager extends NSObject
    * @param _langs - array of language codes (eg [ 'de', 'en' ])
    * @return byte array with the contents, or null if the resource is missing
    */
-  public byte[] bytesForResourceNamed(String _name, String[] _langs) {
-    InputStream in = this.inputStreamForResourceNamed(_name, _langs);
+  public byte[] bytesForResourceNamed(final String _name, final String[] _langs) {
+    final InputStream in = inputStreamForResourceNamed(_name, _langs);
     if (in == null)
       return null;
 
@@ -452,10 +452,10 @@ public abstract class WOResourceManager extends NSObject
    * @return a URL which allows the browser to retrieve the given resource
    */
   public String urlForResourceNamed
-    (String _name, String _fwname, List<String> _langs, WOContext _ctx)
+    (final String _name, final String _fwname, final List<String> _langs, final WOContext _ctx)
   {
     // TODO: crappy way to detect whether a resource is available
-    InputStream in = this.inputStreamForResourceNamed
+    InputStream in = inputStreamForResourceNamed
                             ("www/" + _name,
                              _langs != null
                              ? _langs.toArray(new String[0]) : null);
@@ -465,7 +465,7 @@ public abstract class WOResourceManager extends NSObject
     try {
       in.close();
     }
-    catch (IOException e) {
+    catch (final IOException e) {
       log.error("failed to close resource InputStream", e);
     }
     in = null;
@@ -480,10 +480,10 @@ public abstract class WOResourceManager extends NSObject
    * Converts the _langs to an array and calls the array based
    * localForLanguages().
    * Which returns the java.util.Locale object for the given _langs.
-   * 
+   *
    * <p>
    * This method is called by the WOContext.deriveLocale() method.
-   * 
+   *
    * @param _langs - languages to check
    * @return the Locale object for the given languages, or Locale.US
    */
@@ -491,7 +491,7 @@ public abstract class WOResourceManager extends NSObject
     if (_langs == null)
       return Locale.US;
 
-    int num = _langs.size();
+    final int num = _langs.size();
     if (num == 0)
       return Locale.US;
 
@@ -500,25 +500,25 @@ public abstract class WOResourceManager extends NSObject
   /**
    * Returns the Locale object for the given language codes. Currently this just
    * checks for the first item in the array.
-   * 
+   *
    * @param _langs - languages to check for
    * @return a Locale object
    */
-  static public Locale localeForLanguages(String[] _langs) {
+  static public Locale localeForLanguages(final String[] _langs) {
     if (_langs == null)
       return Locale.US;
     if (_langs.length == 0)
       return Locale.US;
 
-    String s   = _langs[0];
-    int    idx = s.indexOf('-');
+    final String s   = _langs[0];
+    final int    idx = s.indexOf('-');
     return idx == -1
       ? new Locale(s)
       : new Locale(s.substring(0, idx), s.substring(idx + 1));
   }
 
   public ResourceBundle stringTableWithName
-    (String _table, String _fwname, String[] _langs)
+    (final String _table, final String _fwname, final String[] _langs)
   {
     return null;
   }
@@ -528,7 +528,7 @@ public abstract class WOResourceManager extends NSObject
    * converted to an array.
    * This in turn retrieves a ResourceBundle using stringTableWithName() and
    * then performs a lookup in that bundle.
-   * 
+   *
    * @param _key     - string to lookup (eg: 05_private)
    * @param _table   - name of table, eg null, LocalizableStrings, or Main
    * @param _default - string to use if the key could not be resolved
@@ -536,8 +536,8 @@ public abstract class WOResourceManager extends NSObject
    * @param _langs   - languages to check for the key
    * @return the resolved string, or the the _default
    */
-  public String stringForKey(String _key, String _table, String _default,
-                             String _fwname, Collection<String> _langs)
+  public String stringForKey(final String _key, final String _table, final String _default,
+                             final String _fwname, final Collection<String> _langs)
   {
     return this.stringForKey(_key, _table, _default, _fwname,
         _langs != null
@@ -548,7 +548,7 @@ public abstract class WOResourceManager extends NSObject
    * Retrieves the string table using stringTableWithName(), and then attempts
    * to resolve the key. If the key could not be found, the _default is returned
    * instead.
-   * 
+   *
    * @param _key     - string to lookup (eg: 05_private)
    * @param _table   - name of table, eg null, LocalizableStrings, or Main
    * @param _default - string to use if the key could not be resolved
@@ -556,17 +556,17 @@ public abstract class WOResourceManager extends NSObject
    * @param _langs   - languages to check for the key
    * @return the resolved string, or the the _default
    */
-  public String stringForKey(String _key, String _table, String _default,
-                             String _fwname, String[] _langs)
+  public String stringForKey(final String _key, final String _table, final String _default,
+                             final String _fwname, final String[] _langs)
   {
-    ResourceBundle rb = this.stringTableWithName(_table, _fwname, _langs);
+    final ResourceBundle rb = stringTableWithName(_table, _fwname, _langs);
     if (rb == null)
       return _default != null ? _default : _key;
 
     try {
       return rb.getString(_key);
     }
-    catch (MissingResourceException e) {
+    catch (final MissingResourceException e) {
       return _default;
     }
   }
@@ -589,7 +589,8 @@ public abstract class WOResourceManager extends NSObject
    * @param _name - the name of the Java class to lookup
    * @return a Java class or null if none could be found for the name
    */
-  public Class lookupClass(String _name) {
+  @Override
+  public Class lookupClass(final String _name) {
     // TODO: cache lookup results?
     Class cls;
 
@@ -617,8 +618,8 @@ public abstract class WOResourceManager extends NSObject
    * @param _name - the name of the component to lookup
    * @return a Class responsible for the component with the given name
    */
-  public Class lookupComponentClass(String _name) {
-    Class cls = this.lookupClass(_name);
+  public Class lookupComponentClass(final String _name) {
+    final Class cls = lookupClass(_name);
     return (cls != null && WOComponent.class.isAssignableFrom(cls))
       ? cls : null;
   }
@@ -634,8 +635,8 @@ public abstract class WOResourceManager extends NSObject
    * @param _name - the name of the element to lookup
    * @return a Class responsible for the element with the given name
    */
-  public Class lookupDynamicElementClass(String _name) {
-    Class cls = this.lookupClass(_name);
+  public Class lookupDynamicElementClass(final String _name) {
+    final Class cls = lookupClass(_name);
     return (cls != null && WODynamicElement.class.isAssignableFrom(cls))
       ? cls : null;
   }
@@ -651,21 +652,21 @@ public abstract class WOResourceManager extends NSObject
    * @param _name - the name of the action or class to lookup
    * @return a Class to be used for instantiating the given action object
    */
-  public Class lookupDirectActionClass(String _name) {
-    return this.lookupClass(_name);
+  public Class lookupDirectActionClass(final String _name) {
+    return lookupClass(_name);
   }
 
   /* equality (used during RM hierarchy construction) */
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     return (this == obj);
   }
 
   /* description */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     super.appendAttributesToDescription(_d);
 
     if (this.componentDefinitions != null) {

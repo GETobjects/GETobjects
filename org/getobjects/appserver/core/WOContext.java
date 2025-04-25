@@ -31,12 +31,12 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.publisher.GoClassRegistry;
+import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.getobjects.appserver.publisher.IGoAuthenticator;
 import org.getobjects.appserver.publisher.IGoAuthenticatorContainer;
 import org.getobjects.appserver.publisher.IGoContext;
 import org.getobjects.appserver.publisher.IGoUser;
-import org.getobjects.appserver.publisher.GoClassRegistry;
-import org.getobjects.appserver.publisher.GoTraversalPath;
 import org.getobjects.foundation.UMap;
 import org.getobjects.foundation.UString;
 
@@ -114,7 +114,7 @@ public class WOContext extends WOCoreContext
     if (_rq != null) {
       if ((this.fragmentID = _rq.fragmentID()) != null) {
         /* for fragments, we initially disable rendering of elements */
-        this.disableRendering();
+        disableRendering();
       }
     }
   }
@@ -132,7 +132,7 @@ public class WOContext extends WOCoreContext
    */
   public void setLanguages(final List<String> _languages) {
     this.languages = _languages;
-    this.setLocale(null); /* reset locale, so you must set it afterwards! */
+    setLocale(null); /* reset locale, so you must set it afterwards! */
   }
 
   /**
@@ -148,12 +148,12 @@ public class WOContext extends WOCoreContext
     if (this.languages != null)
       return this.languages;
 
-    if (this.hasSession()) {
-      if ((langs = this.session().languages()) != null)
+    if (hasSession()) {
+      if ((langs = session().languages()) != null)
         return langs;
     }
 
-    return this.request().browserLanguages();
+    return request().browserLanguages();
   }
 
   /**
@@ -178,7 +178,7 @@ public class WOContext extends WOCoreContext
    */
   public Locale locale() {
     if (this.locale == null)
-      this.locale = this.deriveLocale();
+      this.locale = deriveLocale();
     return this.locale;
   }
 
@@ -207,13 +207,13 @@ public class WOContext extends WOCoreContext
     }
 
     /* next check whether the session has a locale assigned */
-    if (this.hasSession()) {
-      final Locale l = (Locale)this.session().valueForKey("locale");
+    if (hasSession()) {
+      final Locale l = (Locale)session().valueForKey("locale");
       if (l != null) return l;
     }
 
     /* finally ask the WOResourceManager */
-    return WOResourceManager.localeForLanguages(this.languages());
+    return WOResourceManager.localeForLanguages(languages());
   }
 
   public void setTimeZone(final TimeZone _tz) {
@@ -232,7 +232,7 @@ public class WOContext extends WOCoreContext
    */
   public TimeZone timezone() {
     if (this.timezone == null)
-      this.timezone = this.deriveTimeZone();
+      this.timezone = deriveTimeZone();
     return this.timezone;
   }
 
@@ -252,14 +252,14 @@ public class WOContext extends WOCoreContext
     if (this.request != null) {
       final String tzname = this.request.stringFormValueForKey("TZ");
       if (tzname != null && tzname.length() > 0) {
-        TimeZone tz = TimeZone.getTimeZone(tzname);
+        final TimeZone tz = TimeZone.getTimeZone(tzname);
         if (tz != null) return tz;
       }
     }
 
     /* next check whether the session has a locale assigned */
-    if (this.hasSession()) {
-      final TimeZone tz = (TimeZone)this.session().valueForKey("timezone");
+    if (hasSession()) {
+      final TimeZone tz = (TimeZone)session().valueForKey("timezone");
       if (tz != null) return tz;
     }
 
@@ -285,10 +285,10 @@ public class WOContext extends WOCoreContext
   public boolean isRenderingDisabled() {
     return this.isRenderingDisabled;
   }
-  
-  
+
+
   /* error handling */
-  
+
   /**
    * Returns the currently active WOErrorReport. This method is called by
    * dynamic elements (eg WOInput) which want to attach errors.
@@ -298,16 +298,16 @@ public class WOContext extends WOCoreContext
    * Error reports are pushed to the WOContext using the pushErrorReport()
    * method. For example this is called by WOForm if the errorReport binding
    * is set.
-   * 
+   *
    * @return the active WOErrorReport object
    */
   public WOErrorReport errorReport() {
     return this.errorReport;
   }
   public boolean hasErrorReport() {
-    return this.errorReport() != null;
+    return errorReport() != null;
   }
-  
+
   /**
    * This method is used to push a new WOErrorReport object to the stack of
    * error reports. New error reports will be attached to their parent report,
@@ -315,7 +315,7 @@ public class WOContext extends WOCoreContext
    * Eg its called by WOForm if the 'errorReport' binding is set.
    * <p>
    * Careful: if the '_report' is null, the parent might get lost! (during pop)
-   * 
+   *
    * @param _report - the new WOErrorReport object
    */
   public void pushErrorReport(final WOErrorReport _report) {
@@ -332,7 +332,7 @@ public class WOContext extends WOCoreContext
     return old;
   }
 
-  
+
   /* sessions */
 
   public boolean hasSession() {
@@ -342,11 +342,11 @@ public class WOContext extends WOCoreContext
     return this.hasNewSession;
   }
 
-  public void setSession(WOSession _sn) {
+  public void setSession(final WOSession _sn) {
     this.session = _sn;
   }
-  public void setNewSession(WOSession _sn) {
-    this.setSession(_sn);
+  public void setNewSession(final WOSession _sn) {
+    setSession(_sn);
     this.hasNewSession = true;
   }
 
@@ -364,12 +364,12 @@ public class WOContext extends WOCoreContext
 
   public WOResourceManager rootResourceManager() {
     if (this.application == null) return null;
-      return this.application().resourceManager();
+      return application().resourceManager();
   }
 
   /* components */
 
-  public void setPage(WOComponent _page) {
+  public void setPage(final WOComponent _page) {
     if (_page != null)
       _page.ensureAwakeInContext(this);
 
@@ -395,7 +395,7 @@ public class WOContext extends WOCoreContext
     return this.stackPos + 1;
   }
 
-  public void enterComponent(WOComponent _component, WOElement _content) {
+  public void enterComponent(final WOComponent _component, final WOElement _content) {
     // TODO: support increasing the array? currently we will raise an exception
 
     /* push component to stack */
@@ -414,7 +414,7 @@ public class WOContext extends WOCoreContext
 
     /* awake component */
 
-    this._awakeComponent(_component);
+    _awakeComponent(_component);
 
     /* sync with parent */
 
@@ -422,7 +422,7 @@ public class WOContext extends WOCoreContext
       _component.pullValuesFromParent();
   }
 
-  public void leaveComponent(WOComponent _component) {
+  public void leaveComponent(final WOComponent _component) {
     if (this.stackPos < 0) {
       compStackLog.error("empty stack, tried to leave component: " +
                          _component);
@@ -454,12 +454,12 @@ public class WOContext extends WOCoreContext
   }
 
   public Object cursor() {
-    return this.component();
+    return component();
   }
 
   /* maintaining sleep/awake */
 
-  protected Set<WOComponent> awakeComponents = new HashSet<WOComponent>(16);
+  protected Set<WOComponent> awakeComponents = new HashSet<>(16);
 
   /**
    * An internal method which is called from various places. It registers a
@@ -490,7 +490,7 @@ public class WOContext extends WOCoreContext
       return;
 
     _component._awakeWithContext(this);
-    this._addAwakeComponent(_component);
+    _addAwakeComponent(_component);
   }
 
   /**
@@ -502,7 +502,7 @@ public class WOContext extends WOCoreContext
   public void sleepComponents() {
     boolean sendSleepToPage = true;
 
-    for (WOComponent c: this.awakeComponents) {
+    for (final WOComponent c: this.awakeComponents) {
       c._sleepWithContext(this);
       if (c == this.page) sendSleepToPage = false;
     }
@@ -557,12 +557,12 @@ public class WOContext extends WOCoreContext
     }
 
     if (false)
-      System.err.println("ACTIVE: " + this.elementID() + ": " + _element);
+      System.err.println("ACTIVE: " + elementID() + ": " + _element);
 
     this.activeFormElement = _element;
 
     // TBD: is this really necessary? The element-id has no relevance?
-    this.setRequestSenderID(eid);
+    setRequestSenderID(eid);
   }
   /**
    * Returns the element (usually an WOInput) which registered itself as the
@@ -673,14 +673,14 @@ public class WOContext extends WOCoreContext
     return this.reqElementID;
   }
 
-  
+
   /* URL processing */
 
   /**
    * Returns the WOQuerySession attached to the context. This calls the
    * WOApplication's restoreQuerySessionInContext() on demand to set up
    * the query session.
-   * 
+   *
    * @return the WOQuerySession assigned to the context
    */
   public WOQuerySession querySession() {
@@ -698,7 +698,7 @@ public class WOContext extends WOCoreContext
    * @return a set of key/value pairs to be included in the parameters of a URL
    */
   public Map<String, Object> allQuerySessionValues() {
-    final WOQuerySession qs = this.querySession();
+    final WOQuerySession qs = querySession();
     return qs != null ? qs.allQuerySessionValues() : null;
   }
 
@@ -713,7 +713,7 @@ public class WOContext extends WOCoreContext
    * @return a URL
    */
   public String urlWithRequestHandlerKey
-    (String _requestHandlerKey, String _requestHandlerPath, String _queryString)
+    (final String _requestHandlerKey, final String _requestHandlerPath, final String _queryString)
   {
     // TODO: complete me
     final StringBuilder sb = new StringBuilder(256);
@@ -725,7 +725,7 @@ public class WOContext extends WOCoreContext
         sb.append(an);
 
       if ((an = this.request.applicationName()) != null) {
-        int len = sb.length();
+        final int len = sb.length();
         if (len == 0 || sb.charAt(len - 1) != '/')
           sb.append("/");
         sb.append(an);
@@ -759,7 +759,7 @@ public class WOContext extends WOCoreContext
   public String componentActionURL() {
     final WOSession sn;
 
-    if ((sn = this.session()) == null) {
+    if ((sn = session()) == null) {
       log.error("could no return action URL due to missing session");
       return null;
     }
@@ -775,9 +775,9 @@ public class WOContext extends WOCoreContext
     //       and used a component action path
     //       TBD: this should be done in urlWithRequestHandlerKey, no?
 
-    return this.urlWithRequestHandlerKey(
+    return urlWithRequestHandlerKey(
         this.application.componentRequestHandlerKey(), /* request handler key */
-        sn.sessionID() + "/" + this.contextID() + "/" + this.elementID(),
+        sn.sessionID() + "/" + contextID() + "/" + elementID(),
         null /* query string */);
   }
 
@@ -793,17 +793,17 @@ public class WOContext extends WOCoreContext
    * @return a URL
    */
   @SuppressWarnings("unchecked")
-  public String directActionURLForActionNamed(String _name, Map _queryDict) {
+  public String directActionURLForActionNamed(final String _name, final Map _queryDict) {
     // TBD: is this correct? This means that the URLs embedded in the HTML
     //      page are encoded in the same charset like the page. Browsers might
     //      behave differently (and we should document the behaviour here)
-    final WOMessage r = this.response();
+    final WOMessage r = response();
     String charset = r != null ? r.contentEncoding() : null;
     if (charset == null) charset = WOMessage.defaultURLEncoding();
 
     final String qs = UMap.stringForQueryDictionary(_queryDict, charset);
 
-    return this.urlWithRequestHandlerKey(
+    return urlWithRequestHandlerKey(
         this.application.directActionRequestHandlerKey(), /* rq handler key */
         _name, /* path */
         qs /* query string */);
@@ -822,7 +822,7 @@ public class WOContext extends WOCoreContext
    */
   public String directActionURLForActionNamed
     (final String _name, final Map<String, Object> _queryDict,
-     boolean _addSnId, boolean _incQuerySession)
+     final boolean _addSnId, final boolean _incQuerySession)
   {
     if (!_addSnId && !_incQuerySession)
       return this.directActionURLForActionNamed(_name, _queryDict);
@@ -830,7 +830,7 @@ public class WOContext extends WOCoreContext
     /* check whether there is a query session */
 
     WOQuerySession qs = null;
-    if (_incQuerySession && ((qs = this.querySession()) != null)) {
+    if (_incQuerySession && ((qs = querySession()) != null)) {
       if (!qs.hasActiveQuerySessionValues())
         qs = null;
     }
@@ -838,12 +838,12 @@ public class WOContext extends WOCoreContext
     /* check whether there is a session and whether its stores IDs */
 
     String snId = null;
-    if (_addSnId && this.hasSession()) {
+    if (_addSnId && hasSession()) {
       /* Note: we are not checking storesIDsInURLs() here. If the user explictly
        *       specified a ?wosid binding, we would want to honour that, hence
        *       it must be done in the WOLinkGenerator.
        */
-      snId = this.session().sessionID();
+      snId = session().sessionID();
     }
 
     /* compose query parameters */
@@ -852,8 +852,8 @@ public class WOContext extends WOCoreContext
       return this.directActionURLForActionNamed(_name, _queryDict);
 
     final Map<String, Object> qd = _queryDict != null
-      ? new HashMap<String, Object>(_queryDict)
-      : new HashMap<String, Object>(8);
+      ? new HashMap<>(_queryDict)
+      : new HashMap<>(8);
 
     if (qs != null)
       qs.addToQueryDictionary(qd);
@@ -871,6 +871,7 @@ public class WOContext extends WOCoreContext
    * implementation returns the registry of the application object associated
    * with this context.
    */
+  @Override
   public GoClassRegistry goClassRegistry() {
     return this.application != null
       ? this.application.goClassRegistry() : null;
@@ -879,6 +880,7 @@ public class WOContext extends WOCoreContext
   public void _setGoTraversalPath(final GoTraversalPath _path) {
     this.goTraversalPath = _path;
   }
+  @Override
   public GoTraversalPath goTraversalPath() {
     return this.goTraversalPath;
   }
@@ -886,9 +888,10 @@ public class WOContext extends WOCoreContext
   /**
    * @deprecated Use {@link #goTraversalPath()} instead
    */
+  @Override
   @Deprecated
   public GoTraversalPath joTraversalPath() {
-    return this.goTraversalPath();
+    return goTraversalPath();
   }
 
 
@@ -905,15 +908,16 @@ public class WOContext extends WOCoreContext
    * Note that a Callable itself can be a clientObject. This is because we need
    * to modify Callables in the management interface (the -manage example
    * above).
-   * 
+   *
    * @return the clientObject, or null if there was no traversal path
    */
+  @Override
   public Object clientObject() {
     return this.goTraversalPath != null
       ? this.goTraversalPath.clientObject()
       : null;
   }
-  
+
   /**
    * Returns the URL path to the clientObject(). This URL is always terminated
    * with a slash (so that you can use relative URLs to invoke methods).
@@ -921,7 +925,7 @@ public class WOContext extends WOCoreContext
    * Example:<pre>
    *   /contacts/M2344/
    *   /tasks/</pre>
-   * 
+   *
    * @return the URL path
    */
   public String clientObjectActionURL() {
@@ -929,17 +933,17 @@ public class WOContext extends WOCoreContext
       return null;
     if (this.clientObjectURL != null)
       return this.clientObjectURL;
-    
+
     final String[] path = this.goTraversalPath.pathToClientObject();
     if (path == null)
       return null;
-    
+
     final StringBuilder sb = new StringBuilder(path.length * 16 + 32);
-    
+
     if (path.length == 0)
-      return this.urlWithRequestHandlerKey(null, "/", null);
-    
-    final String urlEnc = this.response().contentEncoding();
+      return urlWithRequestHandlerKey(null, "/", null);
+
+    final String urlEnc = response().contentEncoding();
     sb.append("/"); /* root */
     for (int i = 0; i < path.length; i++) {
       String s = UString.stringByEncodingURLComponent(path[i], urlEnc);
@@ -947,23 +951,24 @@ public class WOContext extends WOCoreContext
       sb.append(s);
       sb.append("/"); /* we always *end* with a slash! */
     }
-    
-    return this.urlWithRequestHandlerKey(null, sb.toString(), null);
+
+    return urlWithRequestHandlerKey(null, sb.toString(), null);
   }
 
   /**
    * Returns the user record which was determined by the Go publishing
    * process. If no user is set yet, this will attempt to lookup an
    * authenticator and use that to derive the user from the request.
-   * 
+   *
    * @return the active user
    */
+  @Override
   public IGoUser activeUser() {
     if (this.activeUser != null)
       return this.activeUser;
 
     final IGoAuthenticator authenticator =
-      this.lookupAuthenticatorByTraversingLookupPath();
+      lookupAuthenticatorByTraversingLookupPath();
     if (authenticator == null) {
       log.warn("found no authenticator to determine active user");
       return null;
@@ -973,7 +978,7 @@ public class WOContext extends WOCoreContext
       log.warn("authenticator returned no user: " + authenticator);
       return null;
     }
-    
+
     return this.activeUser;
   }
 
@@ -985,7 +990,7 @@ public class WOContext extends WOCoreContext
    * @return an IGoAuthenticator or null if none could be located.
    */
   protected IGoAuthenticator lookupAuthenticatorByTraversingLookupPath() {
-    final GoTraversalPath goPath = this.goTraversalPath();
+    final GoTraversalPath goPath = goTraversalPath();
     if (goPath == null) {
       log.warn("no traversalpath is set: " + this);
       return null;
@@ -1026,7 +1031,7 @@ public class WOContext extends WOCoreContext
   public void sleep() {
     /* this can happen if an exception occures in handleRequest() */
     if (this.awakeComponents != null)
-      this.sleepComponents();
+      sleepComponents();
     if (this.session != null)
       this.session._sleepWithContext(this);
   }
@@ -1048,9 +1053,9 @@ public class WOContext extends WOCoreContext
       _d.append(this.elementID);
     }
 
-    final WOComponent p = this.page();
+    final WOComponent p = page();
     if (p != null) _d.append(" page=" + p.name());
-    final WOComponent c = this.component();
+    final WOComponent c = component();
     if (c != null && c != p) _d.append(" comp=" + c.name());
 
     if (this.goTraversalPath != null) {

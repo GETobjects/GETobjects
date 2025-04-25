@@ -21,6 +21,8 @@
 package org.getobjects.foundation;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -29,58 +31,58 @@ import java.net.URL;
  */
 public class NSURL extends NSObject {
   // FIXME: finish me up
-  
+
   protected URL    parsedAbsoluteURL;
   protected String url;
-  
+
   public NSURL(final String _url) {
     this.url = _url;
   }
   public NSURL(final URL _url) {
     this.parsedAbsoluteURL = _url;
   }
-  
+
   /* accessors */
-  
+
   public String scheme() {
-    if (!this.parseIfNecessary())
+    if (!parseIfNecessary())
       return null;
     return this.parsedAbsoluteURL.getProtocol();
   }
-  
+
   public String host() {
-    if (!this.parseIfNecessary())
+    if (!parseIfNecessary())
       return null;
     return this.parsedAbsoluteURL.getHost();
   }
-  
+
   public int port() {
-    if (!this.parseIfNecessary())
+    if (!parseIfNecessary())
       return -1;
     return this.parsedAbsoluteURL.getPort();
   }
-  
+
   public String path() {
-    if (!this.parseIfNecessary()) {
+    if (!parseIfNecessary()) {
       // FIXME: strip of query parameters and such?
       return this.url;
     }
     return this.parsedAbsoluteURL.getPath();
   }
-  
+
   public URL URL() {
-    this.parseIfNecessary();
+    parseIfNecessary();
     return this.parsedAbsoluteURL;
   }
-  
+
   /* parsing */
-  
+
   public boolean parseIfNecessary() {
     if (this.parsedAbsoluteURL != null)
       return true;
     if (this.url == null)
       return false;
-    
+
     try {
       this.parsedAbsoluteURL = new URL(this.url);
       return true;
@@ -89,24 +91,25 @@ public class NSURL extends NSObject {
       return false;
     }
   }
-  
+
   /* string */
 
   @Override
-  public void appendAttributesToDescription(StringBuilder _d) {
+  public void appendAttributesToDescription(final StringBuilder _d) {
     _d.append(" url=");
-    _d.append(this.toString());
+    _d.append(toString());
   }
-  
+
+  @Override
   public String toString() {
     if (this.url != null)
       return this.url;
-    
+
     if (this.parsedAbsoluteURL != null) {
       this.url = this.parsedAbsoluteURL.toString();
       return this.url;
     }
-    
+
     return null;
   }
 }

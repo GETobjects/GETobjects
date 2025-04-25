@@ -37,7 +37,7 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
   }
 
   @Override
-  public Exception encodeChar(StringBuilder _out, final char _in) {
+  public Exception encodeChar(final StringBuilder _out, final char _in) {
     if (_out == null) return null;
 
     switch(_in) {
@@ -59,7 +59,7 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
   }
 
   @Override
-  public Exception encodeString(StringBuilder _out, final String _s) {
+  public Exception encodeString(final StringBuilder _out, final String _s) {
     if (_out == null || _s == null) return null;
 
     final char[] chars = _s.toCharArray();
@@ -151,8 +151,8 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
     if (_s == null)
       return null;
 
-    char[] chars = _s.toCharArray();
-    int    len   = chars.length;
+    final char[] chars = _s.toCharArray();
+    final int    len   = chars.length;
     if (len == 0)
       return "";
 
@@ -171,7 +171,7 @@ public class NSHtmlEntityTextCoder extends NSXmlEntityTextCoder {
     if (escapeCount == 0)
       return _s;
 
-    char[] echars = new char[len + escapeCount];
+    final char[] echars = new char[len + escapeCount];
     int j = 0;
     for (int i = 0; i < len; i++) {
       switch (chars[i]) {
