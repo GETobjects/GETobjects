@@ -21,6 +21,8 @@
 package org.getobjects.appserver.core;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -148,7 +150,7 @@ public class WOCORSConfig extends NSObject {
       // yeah, not perfect
       final StringBuilder sb = new StringBuilder(32);
       String s;
-      final URL url = new URL(_url);
+      final URL url = new URI(_url).toURL();
       if (UObject.isNotEmpty((s = url.getProtocol()))) {
         sb.append(s);
         sb.append("://");
@@ -158,7 +160,7 @@ public class WOCORSConfig extends NSObject {
 
       return sb.toString();
     }
-    catch (final MalformedURLException e) {
+    catch (final MalformedURLException | URISyntaxException e) {
       log.warn("could not parse URL: " + _url);
       return _url; // keep as-is
     }

@@ -67,10 +67,10 @@ public class WOHTTPConnection extends NSObject {
    */
   public WOHTTPConnection(final String _host, final int _port) {
     try {
-      this.url = new URL("http://" + _host + (_port != 80 ? (":" + _port)
-                                                          : ""));
+      this.url = new URI("http://" + _host + (_port != 80 ? (":" + _port)
+                                                          : "")).toURL();
     }
-    catch (MalformedURLException e) { // won't happen
+    catch (final MalformedURLException | URISyntaxException e) { // won't happen
       e.printStackTrace();
     }
     setupURL();
@@ -89,9 +89,9 @@ public class WOHTTPConnection extends NSObject {
    */
   public WOHTTPConnection(final URL _url) {
     try {
-      this.url = new URL(_url, "/");
+      this.url = _url.toURI().resolve("/").toURL();
     }
-    catch (MalformedURLException e) { // won't happen
+    catch (final MalformedURLException | URISyntaxException e) { // won't happen
       log.error(e);
     }
     setupURL();
@@ -184,7 +184,7 @@ public class WOHTTPConnection extends NSObject {
     if (_rq == null) return false;
 
     try {
-      final URL     rqURL      = new URL(this.url, _rq.uri());
+      final URL     rqURL      = this.url.toURI().resolve(_rq.uri()).toURL();
       final boolean needsSetup = (this.httpClient == null);
 
       if (needsSetup) {

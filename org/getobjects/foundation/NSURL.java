@@ -84,10 +84,10 @@ public class NSURL extends NSObject {
       return false;
 
     try {
-      this.parsedAbsoluteURL = new URL(this.url);
+      this.parsedAbsoluteURL = new URI(this.url).toURL();
       return true;
     }
-    catch (MalformedURLException e) {
+    catch (final MalformedURLException | URISyntaxException e) {
       return false;
     }
   }

@@ -182,9 +182,9 @@ public class GoResource extends WOElement implements IGoObject {
       // ugly hack
       String s = this.url.toExternalForm();
       if (!s.endsWith("/")) s += "/";
-      nurl = new URL(s + _name);
+      nurl = new URI(s + _name).toURL();
     }
-    catch (MalformedURLException e) {
+    catch (final MalformedURLException | URISyntaxException e) {
       return e;
     }
     if (nurl == null) return null;

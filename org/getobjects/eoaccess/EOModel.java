@@ -119,8 +119,8 @@ public class EOModel extends NSObject {
 
     final URL url = (_url.indexOf(":") < 0)
       ? new File(_url).toURI().toURL()
-      : new URL(_url);
-    
+      : new URI(_url).toURL();
+
     return loadModel(url);
   }
 
