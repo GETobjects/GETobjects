@@ -1359,7 +1359,7 @@ public class EODatabaseChannel extends NSObject
       /* calculate */
 
       for (final EOEnterpriseObject baseObject: this.baseObjects) {
-        final Object v = ((NSKeyValueCoding)baseObject).valueForKey(srcName);
+        final Object v = baseObject.valueForKey(srcName);
         if (v == null) continue;
 
         // Is this a native array?

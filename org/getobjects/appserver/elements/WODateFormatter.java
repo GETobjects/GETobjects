@@ -307,7 +307,7 @@ class WODateFormatter extends WOFormatter {
       /* apply lenient configuration */
 
       if (lIsLenient != null && lFormat instanceof SimpleDateFormat)
-        ((SimpleDateFormat)lFormat).setLenient(lIsLenient.booleanValue());
+        lFormat.setLenient(lIsLenient.booleanValue());
     }
 
     return lFormat;
