@@ -1,4 +1,4 @@
 [submodule "ThirdParty"]
 	path = ThirdParty
-	url = git@github.com:GETobjects/ThirdParty.git
+	url = https://github.com/GETobjects/ThirdParty.git
 	branch = master
