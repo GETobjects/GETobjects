@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2006 Helge Hess
+  Copyright (C) 2006-2025 Helge Hess and Contributors.
 
   This file is part of Go.
 
@@ -30,7 +30,7 @@ public interface NSLocking {
   static long OneDay     = OneHour * 24;
   static long OneWeek    = OneDay  * 7;
   static long OneYear    = OneDay  * 365;
-  static long OneCentury = OneYear * 10;
+  static long OneCentury = OneYear * 100;
   
   public void lock();
   public void unlock();
