@@ -69,7 +69,7 @@ import org.getobjects.foundation.NSKeyValueCodingAdditions;
  */
 public class WOCopyValue extends WODynamicElement {
   // TBD: improve efficiency by avoiding reflection.
-  
+
   protected WOAssociation copyValues;
   protected WOAssociation finishValues;
   protected WOAssociation resetValues;
@@ -77,10 +77,10 @@ public class WOCopyValue extends WODynamicElement {
   protected WOElement     template;
 
   public WOCopyValue
-    (String _name, Map<String, WOAssociation> _assocs, WOElement _template)
+    (final String _name, final Map<String, WOAssociation> _assocs, final WOElement _template)
   {
     super(_name, _assocs, _template);
-    
+
     this.copyValues   = grabAssociation(_assocs, "copyValues");
     this.finishValues = grabAssociation(_assocs, "finishValues");
     this.resetValues  = grabAssociation(_assocs, "resetValues");
@@ -97,35 +97,35 @@ public class WOCopyValue extends WODynamicElement {
 
     // the extra values will get processed by WODynamicElement
   }
-  
+
   /* basic copy method */
-  
+
   protected void copyValues(final Object _mapThing, final WOContext _ctx) {
     if (_mapThing == null)
       return;
-    
+
     final Map map = (Map)_mapThing; // TODO: try some coercion?
-    
+
     final Object getCursor = _ctx.cursor();
     final Object setCursor = getCursor;
     if (getCursor == null)
       return;
-    
-    for (Object lhs: map.keySet()) {
+
+    for (final Object lhs: map.keySet()) {
       Object rhs;
       Object value = null;
-      
+
       rhs = map.get(lhs);
-      
+
       /* retrieve value */
-      
+
       if (rhs instanceof WOAssociation)
         value = ((WOAssociation)rhs).valueInComponent(getCursor);
       else if (rhs instanceof String) {
         final String s = (String)rhs;
-        
+
         if (s.startsWith("const:"))
-          value = this.valueForConstString(s);
+          value = valueForConstString(s);
         else {
           // TODO: cache KVC
           value = NSKeyValueCodingAdditions.Utility
@@ -134,29 +134,29 @@ public class WOCopyValue extends WODynamicElement {
       }
       else
         value = rhs;
-      
+
       /* apply value */
-      
+
       if (lhs instanceof WOAssociation)
         ((WOAssociation)lhs).setValue(value, setCursor);
       else {
-        String s = (String)lhs;
-        
+        final String s = (String)lhs;
+
         // TODO: cache KVC
         NSKeyValueCodingAdditions.Utility
           .takeValueForKeyPath(setCursor, value, s);
       }
     }
   }
-  
+
   protected Object valueForConstString(final String _s) {
     // TBD: we could return ints or bools?
     return _s.substring(6); // strip off the 'const:' prefix
   }
-  
-  
+
+
   /* the main entry points */
-  
+
   protected void copyValuesInContext(final WOContext _ctx) {
     final Object cursor = _ctx.cursor();
     if (this.condition != null) {
@@ -166,92 +166,92 @@ public class WOCopyValue extends WODynamicElement {
 
     /* copy constant mappings */
     if (this.extraKeys != null) {
-      Object setCursor = cursor;
-      
+      final Object setCursor = cursor;
+
       for (int i = 0; i < this.extraKeys.length; i++) {
         /* retrieve value */
-        Object v = this.extraValues[i].valueInComponent(cursor);
-        
+        final Object v = this.extraValues[i].valueInComponent(cursor);
+
         /* apply value */
         // TODO: cache KVC
         NSKeyValueCodingAdditions.Utility
           .takeValueForKeyPath(setCursor, v, this.extraKeys[i]);
       }
     }
-    
+
     /* copy dynamic mappings */
     if (this.copyValues != null)
-      this.copyValues(this.copyValues.valueInComponent(cursor), _ctx);
+      copyValues(this.copyValues.valueInComponent(cursor), _ctx);
   }
 
   protected void resetValuesInContext(final WOContext _ctx) {
     if (this.resetValues == null && this.finishValues == null)
       return;
-    
-    Object cursor = _ctx.cursor();
+
+    final Object cursor = _ctx.cursor();
     if (cursor == null) return;
     if (this.condition != null) {
       if (!this.condition.booleanValueInComponent(cursor))
         return;
     }
-    
+
     /* reset values to nil */
-    
+
     if (this.resetValues.booleanValueInComponent(cursor)) {
       if (this.extraKeys != null) {
-        for (String k: this.extraKeys)
+        for (final String k: this.extraKeys)
           NSKeyValueCoding.Utility.takeValueForKey(cursor, null, k);
       }
     }
-    
+
     /* apply post value copy */
-    
+
     if (this.finishValues != null)
-      this.copyValues(this.finishValues.valueInComponent(cursor), _ctx);
+      copyValues(this.finishValues.valueInComponent(cursor), _ctx);
   }
-  
-  
+
+
   /* responder */
-  
+
   @Override
   public void takeValuesFromRequest(final WORequest _rq, final WOContext _ctx) {
-    this.copyValuesInContext(_ctx);
-    
+    copyValuesInContext(_ctx);
+
     if (this.template != null)
       this.template.takeValuesFromRequest(_rq, _ctx);
-    
-    this.resetValuesInContext(_ctx);
+
+    resetValuesInContext(_ctx);
   }
-  
+
   @Override
   public Object invokeAction(final WORequest _rq, final WOContext _ctx) {
-    this.copyValuesInContext(_ctx);
-    
+    copyValuesInContext(_ctx);
+
     Object result = null;
     if (this.template != null)
       result = this.template.invokeAction(_rq, _ctx);
-    
-    this.resetValuesInContext(_ctx);
+
+    resetValuesInContext(_ctx);
     return result;
   }
-  
+
   @Override
   public void appendToResponse(final WOResponse _r, final WOContext _ctx) {
-    this.copyValuesInContext(_ctx);
-    
+    copyValuesInContext(_ctx);
+
     if (this.template != null)
       this.template.appendToResponse(_r, _ctx);
-    
-    this.resetValuesInContext(_ctx);
+
+    resetValuesInContext(_ctx);
   }
-  
+
   @Override
   public void walkTemplate(final WOElementWalker _walker, final WOContext _ctx){
-    this.copyValuesInContext(_ctx);
-    
+    copyValuesInContext(_ctx);
+
     if (this.template != null)
       _walker.processTemplate(this, this.template, _ctx);
 
-    this.resetValuesInContext(_ctx);
+    resetValuesInContext(_ctx);
   }
 }
