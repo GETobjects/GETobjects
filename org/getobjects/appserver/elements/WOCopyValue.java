@@ -23,7 +23,6 @@ package org.getobjects.appserver.elements;
 
 import java.util.Map;
 
-import org.getobjects.appserver.associations.WONegateAssociation;
 import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WODynamicElement;
@@ -84,16 +83,8 @@ public class WOCopyValue extends WODynamicElement {
     this.copyValues   = grabAssociation(_assocs, "copyValues");
     this.finishValues = grabAssociation(_assocs, "finishValues");
     this.resetValues  = grabAssociation(_assocs, "resetValues");
-    this.condition    = grabAssociation(_assocs, "condition");
+    this.condition    = grabDefaultCondition(_assocs);
     this.template     = _template;
-    
-    if (this.condition == null) {
-      WOAssociation a = grabAssociation(_assocs, "if");
-      if (a != null)
-        this.condition = a;
-      else if ((a = grabAssociation(_assocs, "ifnot")) != null)
-        this.condition = new WONegateAssociation(a);
-    }
 
     // the extra values will get processed by WODynamicElement
   }

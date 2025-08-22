@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.getobjects.appserver.associations.WONegateAssociation;
 import org.getobjects.appserver.associations.WOValueAssociation;
 import org.getobjects.foundation.NSKeyValueStringFormatter;
 
@@ -89,6 +90,21 @@ public abstract class WODynamicElement extends WOElement {
 
     _assocs.remove(_name);
     return assoc;
+  }
+
+  public static WOAssociation grabDefaultCondition
+    (final Map<String, WOAssociation> _assocs)
+  {
+    WOAssociation cond = grabAssociation(_assocs, "condition");
+    if (cond != null)
+      return cond;
+    cond = grabAssociation(_assocs, "if");
+    if (cond != null)
+      return cond;
+    cond = grabAssociation(_assocs, "ifnot");
+    if (cond != null)
+      return new WONegateAssociation(cond);
+    return null;
   }
 
   /* accessors */
