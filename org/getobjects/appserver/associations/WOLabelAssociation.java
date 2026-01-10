@@ -25,6 +25,7 @@ import org.getobjects.appserver.core.WOAssociation;
 import org.getobjects.appserver.core.WOComponent;
 import org.getobjects.appserver.core.WOContext;
 import org.getobjects.appserver.core.WOResourceManager;
+import org.getobjects.foundation.NSKeyValueStringFormatter;
 import org.getobjects.foundation.UObject;
 
 /**
@@ -38,11 +39,17 @@ import org.getobjects.foundation.UObject;
  * WOResourceManager (or the app's manager if the component has none). It uses
  * the context's languages for the key lookup.
  * <p>
- * Note that this also supports keypaths by prefixing the values with an
+ * This also supports keypaths by prefixing the values with an
  * "$", eg: "$currentDay" will first evaluate "currentDay" in the component
  * and then pipe the result through the label processor.
- * We consider that a bit hackish, but given that it is often required in
- * practice, a pragmatic implementation.
+ * If not prefixed with a "$", these values are formatted as
+ * `NSKeyValueStringFormatter` formats (although they may as well be constant
+ * strings, which isn't conflicting in any regard).
+ * This might look a bit hackish, but given that it is often required in
+ * practice and obviates the need for specific formatter methods,
+ * it's a pragmatic implementation.
+ *
+ * @see NSKeyValueStringFormatter
  */
 public class WOLabelAssociation extends WOAssociation {
   protected String  key;
@@ -150,11 +157,17 @@ public class WOLabelAssociation extends WOAssociation {
       String lValue = this.defaultValue;
 
       if (this.isKeyKeyPath)
-        lKey   = UObject.stringValue(component.valueForKeyPath(lKey));
+        lKey = UObject.stringValue(component.valueForKeyPath(lKey));
+      else
+        lKey = NSKeyValueStringFormatter.format(lKey, _cursor);
       if (this.isTableKeyPath)
         lTable = UObject.stringValue(component.valueForKeyPath(lTable));
+      else
+        lTable = NSKeyValueStringFormatter.format(lTable, _cursor);
       if (this.isValueKeyPath)
         lValue = UObject.stringValue(component.valueForKeyPath(lValue));
+      else
+        lValue = NSKeyValueStringFormatter.format(lValue, _cursor);
 
       if (lKey == null) {
         log.error("keyPath key didn't resolve for label association: " + this);
