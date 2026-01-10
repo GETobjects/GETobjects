@@ -53,15 +53,15 @@ public class WOLabelAssociation extends WOAssociation {
   protected boolean isValueKeyPath = false;
 
   public WOLabelAssociation(final String _key) {
-    int idx = _key.indexOf("/");
+    final int idx = _key.indexOf("/");
     if (idx < 0) {
-      this.initWithKeyInTableWithDefaultValue(_key, null, _key);
+      initWithKeyInTableWithDefaultValue(_key, null, _key);
     }
     else {
-      String lTable = _key.substring(0, idx);
-      String lKey = _key.substring(idx + 1);
+      final String lTable = _key.substring(0, idx);
+      final String lKey = _key.substring(idx + 1);
 
-      this.initWithKeyInTableWithDefaultValue(lKey, lTable, lKey);
+      initWithKeyInTableWithDefaultValue(lKey, lTable, lKey);
     }
   }
 
