@@ -32,18 +32,4 @@
 	<classpathentry kind="lib" path="ThirdParty/jetty-util-9.4.57.v20241219.jar"/>
 	<classpathentry kind="lib" path="ThirdParty/postgresql-42.7.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="test" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="target/**|**/tests/*.java|**/samples/**|**/jsapp/**" including="org/**/*.java" kind="src" output="target/classes" path="">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="output" path="target/classes"/>
 </classpath>
