@@ -73,6 +73,7 @@ public class WOServletAdaptor extends HttpServlet {
    * new instance of the WOApplication (and the constructor of the WOApp calls
    * its init() method).
    */
+  @SuppressWarnings("unchecked")
   public void initApplicationWithName
     (final String _appName, final String _appClassName,
      final Properties _properties)
