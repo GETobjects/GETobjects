@@ -304,7 +304,7 @@ public class WOConditional extends WODynamicElement {
     }
 
     public boolean grabAssociations(final Map<String, WOAssociation> _assocs) {
-      this.condition = grabAssociation(_assocs, "condition");
+      this.condition = grabDefaultCondition(_assocs);
       this.negate    = grabAssociation(_assocs, "negate");
       this.value     = grabAssociation(_assocs, "value");
       this.match     = grabAssociation(_assocs, "match");
